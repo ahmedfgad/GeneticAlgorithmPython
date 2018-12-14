@@ -13,7 +13,7 @@ The y=target is to maximize this equation ASAP:
 equation_inputs = [4,-2,3.5,5,-11,-4.7]
 
 # Number of the weights we are looking to optimize.
-num_weights = 6
+num_weights = len(equation_inputs)
 
 """
 Genetic algorithm parameters:
