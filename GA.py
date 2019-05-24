@@ -32,10 +32,14 @@ def crossover(parents, offspring_size):
         offspring[k, crossover_point:] = parents[parent2_idx, crossover_point:]
     return offspring
 
-def mutation(offspring_crossover):
-    # Mutation changes a single gene in each offspring randomly.
+def mutation(offspring_crossover, num_mutations=1):
+    mutations_counter = numpy.uint8(offspring_crossover.shape[1] / num_mutations)
+    # Mutation changes a number of genes as defined by the num_mutations argument. The changes are random.
     for idx in range(offspring_crossover.shape[0]):
-        # The random value to be added to the gene.
-        random_value = numpy.random.uniform(-1.0, 1.0, 1)
-        offspring_crossover[idx, 4] = offspring_crossover[idx, 4] + random_value
+        gene_idx = mutations_counter - 1
+        for mutation_num in range(num_mutations):
+            # The random value to be added to the gene.
+            random_value = numpy.random.uniform(-1.0, 1.0, 1)
+            offspring_crossover[idx, gene_idx] = offspring_crossover[idx, gene_idx] + random_value
+            gene_idx = gene_idx + mutations_counter
     return offspring_crossover
