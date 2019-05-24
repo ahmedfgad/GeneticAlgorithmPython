@@ -64,7 +64,7 @@ for generation in range(num_generations):
     print(offspring_crossover)
 
     # Adding some variations to the offspring using mutation.
-    offspring_mutation = GA.mutation(offspring_crossover)
+    offspring_mutation = GA.mutation(offspring_crossover, num_mutations=2)
     print("Mutation")
     print(offspring_mutation)
 
