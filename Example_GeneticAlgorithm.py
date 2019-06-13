@@ -1,5 +1,5 @@
 import numpy
-import GA
+import ga
 
 """
 The y=target is to maximize this equation ASAP:
@@ -43,7 +43,7 @@ num_generations = 1000
 for generation in range(num_generations):
     print("Generation : ", generation)
     # Measuring the fitness of each chromosome in the population.
-    fitness = GA.cal_pop_fitness(equation_inputs, new_population)
+    fitness = ga.cal_pop_fitness(equation_inputs, new_population)
     print("Fitness")
     print(fitness)
 
@@ -52,19 +52,19 @@ for generation in range(num_generations):
     print("Best result : ", numpy.max(numpy.sum(new_population*equation_inputs, axis=1)))
     
     # Selecting the best parents in the population for mating.
-    parents = GA.select_mating_pool(new_population, fitness, 
+    parents = ga.select_mating_pool(new_population, fitness, 
                                       num_parents_mating)
     print("Parents")
     print(parents)
 
     # Generating next generation using crossover.
-    offspring_crossover = GA.crossover(parents,
+    offspring_crossover = ga.crossover(parents,
                                        offspring_size=(pop_size[0]-parents.shape[0], num_weights))
     print("Crossover")
     print(offspring_crossover)
 
     # Adding some variations to the offspring using mutation.
-    offspring_mutation = GA.mutation(offspring_crossover, num_mutations=2)
+    offspring_mutation = ga.mutation(offspring_crossover, num_mutations=2)
     print("Mutation")
     print(offspring_mutation)
 
@@ -74,7 +74,7 @@ for generation in range(num_generations):
     
 # Getting the best solution after iterating finishing all generations.
 #At first, the fitness is calculated for each solution in the final generation.
-fitness = GA.cal_pop_fitness(equation_inputs, new_population)
+fitness = ga.cal_pop_fitness(equation_inputs, new_population)
 # Then return the index of that solution corresponding to the best fitness.
 best_match_idx = numpy.where(fitness == numpy.max(fitness))
 
