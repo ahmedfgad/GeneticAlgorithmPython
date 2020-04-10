@@ -1,5 +1,4 @@
 # GeneticAlgorithmPython
-# GeneticAlgorithmPython
 
 This project implements the genetic algorithm (GA) in Python mainly using NumPy.
 
