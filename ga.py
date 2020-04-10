@@ -366,10 +366,6 @@ class GA:
         It returns:
             -parents: The selected parents to mate.
         """
-        # https://en.wikipedia.org/wiki/Stochastic_universal_sampling
-        # https://books.google.com.eg/books?id=gwUwIEPqk30C&pg=PA60&lpg=PA60&dq=Roulette+Wheel+genetic+algorithm+select+more+than+once&source=bl&ots=GLr2DrPcj4&sig=ACfU3U0jVOGXhzsla8mVqhi5x1giPRL4ew&hl=en&sa=X&ved=2ahUKEwim25rMvdzoAhWa8uAKHbt0AdgQ6AEwA3oECAYQLQ#v=onepage&q=Roulette%20Wheel%20&f=false
-        # https://www.tutorialspoint.com/genetic_algorithms/genetic_algorithms_parent_selection.htm
-        # https://www.obitko.com/tutorials/genetic-algorithms/selection.php
         fitness_sum = numpy.sum(fitness)
         probs = fitness / fitness_sum
         probs_start = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the start values of the ranges of probabilities.
