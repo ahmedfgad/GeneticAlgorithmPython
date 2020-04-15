@@ -1,14 +1,5 @@
 import ga
-
-"""
-Given the following function:
-    y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
-    where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
-What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize this function.
-"""
-
-function_inputs = [4,-2,3.5,5,-11,-4.7]
-function_output = 44 # Function output.
+import numpy
 
 num_generations = 50 # Number of generations.
 sol_per_pop = 8 # Number of solutions in the population.
@@ -26,12 +17,31 @@ mutation_type = "scramble" # Type of the mutation operator.
 
 keep_parents = 1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
+"""
+Given the following function:
+    y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
+    where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
+What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize this function.
+"""
+
+function_inputs = [4,-2,3.5,5,-11,-4.7] # Function inputs.
+desired_output = 44 # Function output.
+
+num_genes = len(function_inputs)
+
+def fitness_func(solution):
+    # Calculating the fitness value of each solution in the current population.
+    # The fitness function calulates the sum of products between each input and its corresponding weight.
+    output = numpy.sum(solution*function_inputs)
+    fitness = 1.0 / numpy.abs(output - desired_output)
+    return fitness
+
 # Creating an instance of the GA class inside the ga module. Some parameters are initialized within the constructor.
 ga_instance = ga.GA(num_generations=num_generations, 
           sol_per_pop=sol_per_pop, 
           num_parents_mating=num_parents_mating, 
-          function_inputs=function_inputs,
-          function_output=function_output,
+          num_genes=num_genes,
+          fitness_func=fitness_func,
           mutation_percent_genes=mutation_percent_genes,
           mutation_num_genes=mutation_num_genes,
           parent_selection_type=parent_selection_type,
