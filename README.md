@@ -225,7 +225,7 @@ You can also check my book cited as [**Ahmed Fawzy Gad 'Practical Computer Visio
 
 It is important to note that this project does not implement everything in GA and there are a wide number of variations to be applied. For example, this project just uses decimal representation for the chromosome and the binary representations might be preferred for other problems.
 
-## Get it Touch
+## Get in Touch
 * E-mail: ahmed.f.gad@gmail.com
 * [LinkedIn](https://www.linkedin.com/in/ahmedfgad)
 * [Amazon Author Page](https://amazon.com/author/ahmedgad)
