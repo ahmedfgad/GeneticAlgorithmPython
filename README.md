@@ -1,10 +1,9 @@
 # GeneticAlgorithmPython
-
 This project implements the genetic algorithm (GA) in Python mainly using NumPy.
 
 The project has 2 main files which are:
 
-1. `ga.py`: Holds all necessary methods for implementing the GA.
+1. `ga.py`: Holds all necessary methods for implementing the genetic algorithm inside a class named `GA`.
 
 2. `example.py`: Just gives an example of how to use the project by calling the methods in the `ga.py` file.
 
@@ -27,15 +26,15 @@ To use the project, here is the summary of the minimum required steps:
 
 Let's discuss how to do each of these steps.
 
-### Preparing the Parameters
+### The Supported Parameters
 
 The project has many parameters to allow customizing the genetic algorithm for your purpose. Before running the GA, the parameters must be prepared. The list of all supported parameters is as follows:
 
 - `num_generations` : Number of generations.
 - `sol_per_pop` : Number of solutions (i.e. chromosomes) within the population.
 - `num_parents_mating ` : Number of solutions to be selected as parents.
-- `function_inputs ` : Inputs of the function to be optimized.
-- `function_output` : The output of the function to be optimized.
+- `num_genes`: Number of genes in the solution/chromosome.
+- `fitness_func` : A function for calculating the fitness value for each solution.
 - `parent_selection_type="sss"` : The parent selection type. Supported types are `sss` (for steady state selection), `rws` (for roulette wheel selection), `sus` (for stochastic universal selection), `rank` (for rank selection), `random` (for random selection), and `tournament` (for tournament selection).
 - `keep_parents=-1` : Number of parents to keep in the current population. `-1` (default) means keep all parents in the next population. `0` means keep no parents in the next population. A value `greater than 0` means keep the specified number of parents in the next population. Note that the value assigned to `keep_parents` cannot be `< - 1` or greater than the number of solutions within the population `sol_per_pop`.
 - `K_tournament=3` : In case that the parent selection type is `tournament`, the `K_tournament` specifies the number of parents participating in the tournament selection. It defaults to `3`.
@@ -46,12 +45,40 @@ The project has many parameters to allow customizing the genetic algorithm for y
 - `random_mutation_min_val=-1.0` : For `random` mutation, the `random_mutation_min_val` parameter specifies the start value of the range from which a random value is selected to be added to the gene. It defaults to `-1`.
 - `random_mutation_max_val=1.0` : For `random` mutation, the `random_mutation_max_val` parameter specifies the end value of the range from which a random value is selected to be added to the gene. It defaults to `+1`.
 
-The user doesn't have to specify all of such parameters while creating an instance of the GA class. Here is an example for preparing such parameters:
+The user doesn't have to specify all of such parameters while creating an instance of the GA class. A very important parameter you must care about is `fitness_func`.
+
+### Preparing the `fitness_func` Parameter
+
+Even there are a number of steps in the genetic algorithm pipeline that can work the same regardless of the problem being solved, one critical step is the calculation of the fitness value. There is no unique way of calculating the fitness value and it changes from one problem to another. 
+
+On **`15 April 2020`**, a new argument named `fitness_func` is added that allows the user to specify a custom function to be used as a fitness function. This function must be a **maximization function** so that a solution with a high fitness value returned is selected compared to a solution with a low value. Doing that allows the user to freely use the project to solve any problem by passing the appropriate fitness function. 
+
+Let's discuss an example:
+
+> Given the following function:
+>     y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
+>     where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
+> What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize this function.
+
+So, the task is about using the genetic algorithm to find the best values for the 6 weight `W1` to `W6`. Thinking of the problem, it is clear that the best solution is that returning an output that is close to the desired output `y=44`. So, the fitness function should return a value that gets higher when the solution's output is closer to `y=44`. Here is a function that does that. The function must accept a single parameter which is a 1D vector representing a single solution.
 
 ```python
-function_inputs = [4,-2,3.5,5,-11,-4.7]
-function_output = 44
+function_inputs = [4,-2,3.5,5,-11,-4.7] # Function inputs.
+desired_output = 44 # Function output.
 
+def fitness_func(solution):
+    output = numpy.sum(solution*function_inputs)
+    fitness = 1.0 / numpy.abs(output - desired_output)
+    return fitness
+```
+
+By creating this function, you are ready to use the project. 
+
+### Parameters Example
+
+Here is an example for preparing the parameters:
+
+```python
 num_generations = 50
 sol_per_pop = 8
 num_parents_mating = 4
@@ -65,7 +92,11 @@ crossover_type = "single_point"
 mutation_type = "random"
 
 keep_parents = 1
+
+num_genes = len(function_inputs)
 ```
+
+After the parameters are prepared, we can import the `ga` module and build an instance of the GA class.
 
 ### Import the `ga.py` Module
 
@@ -85,8 +116,8 @@ The `GA` class is instantiated where the previously prepared parameters are fed 
 ga_instance = ga.GA(num_generations=num_generations, 
           sol_per_pop=sol_per_pop, 
           num_parents_mating=num_parents_mating, 
-          function_inputs=function_inputs,
-          function_output=function_output,
+          num_genes=num_genes,
+          fitness_func=fitness_func,
           mutation_percent_genes=mutation_percent_genes,
           mutation_num_genes=mutation_num_genes,
           parent_selection_type=parent_selection_type,
@@ -113,16 +144,11 @@ Inside this method, the genetic algorithm evolves over a number of generations b
 
 ### Plotting Results
 
-There is a method named `plot_result()` which creates 2 figures summarizing the results.
+There is a method named `plot_result()` which creates a figure summarizing how the fitness values of the solutions change with the generations .
 
 ```python
 ga_instance.plot_result()
 ```
-
-The first figure shows how the solutions' outputs change with the generations.
-![Fig01](https://user-images.githubusercontent.com/16560492/78829951-8391d400-79e7-11ea-8edf-e46932dc76da.png)
-
-The second figure shows how the fitness values of the solutions change with the generations.
 
 ![Fig02](https://user-images.githubusercontent.com/16560492/78830005-93111d00-79e7-11ea-9d8e-a8d8325a6101.png)
 
@@ -150,6 +176,7 @@ print(loaded_ga_instance.best_solution())
 ```
 
 ## Crossover, Mutation, and Parent Selection
+
 The project supports different types for selecting the parents and applying the crossover & mutation operators.
 
 The supported crossover operations at this time are:
@@ -196,9 +223,9 @@ You can also check my book cited as [**Ahmed Fawzy Gad 'Practical Computer Visio
 
 **Important Note**
 
-It is important to note that this project does not implement everything in GA and there are a wide number of variations to be applied. For example, this project uses decimal representation for the chromosome and the binary representations might be preferred for other problems.
+It is important to note that this project does not implement everything in GA and there are a wide number of variations to be applied. For example, this project just uses decimal representation for the chromosome and the binary representations might be preferred for other problems.
 
-## Get in Touch
+## Get it Touch
 * E-mail: ahmed.f.gad@gmail.com
 * [LinkedIn](https://www.linkedin.com/in/ahmedfgad)
 * [Amazon Author Page](https://amazon.com/author/ahmedgad)
