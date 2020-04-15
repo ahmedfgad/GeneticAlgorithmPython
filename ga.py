@@ -10,6 +10,8 @@ class GA:
     num_generations = None # Number of generations.
     pop_size = None # Population size = (number of chromosomes, number of genes per chromosome)
     keep_parents = -1 # If 0, this means the parents of the current populaiton will not be used at all in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. In some cases, the parents are of high quality and thus we do not want to loose such some high quality solutions. If some parent selection operators like roulette wheel selection (RWS), the parents may not be of high quality and thus keeping the parents might degarde the quality of the population.
+    
+    fitness_func = None
 
     # Parameters about parent selection.
     parent_selection_type = None # Type of parent selection.
@@ -25,14 +27,12 @@ class GA:
     mutation_type = None # Type of the mutation opreator.
     mutation = None # A method that applies the mutation operator based on the selected type of mutation in the mutation_type property.
 
-    # NumPy arrays holding information about the generations.
-    best_outputs = [] # A list holding the value of the best solution for each generation.
-    best_outputs_fitness = [] # A list holding the fitness value of the best solution for each generation.
+    best_solution_fitness = [] # A list holding the fitness value of the best solution for each generation.
 
     # Parameters of the function to be optimized.
     function_inputs = None # Inputs of the function to be optimized.
     function_output = None # Desired outuput of the function.
-    num_weights = None
+    num_genes = None
 
     # Mutation parameters.
     mutation_percent_genes=None # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
@@ -47,8 +47,8 @@ class GA:
     def __init__(self, num_generations, 
                  sol_per_pop, 
                  num_parents_mating, 
-                 function_inputs, 
-                 function_output,
+                 num_genes, 
+                 fitness_func,
                  parent_selection_type="sss",
                  keep_parents=-1,
                  K_tournament=3,
@@ -65,6 +65,14 @@ class GA:
             self.valid_parameters = False
             return
 
+        # Validating the number of gene.        
+        if (num_genes <= 0):
+            print("ERROR: Number of genes cannot be <= 0. \n")
+            self.valid_parameters = False
+            return
+
+        self.num_genes = num_genes # Number of genes in the solution.
+
         if (mutation_num_genes == None):
             if (mutation_percent_genes < 0 or mutation_percent_genes > 100):
                 print("ERROR: Percentage of selected genes for mutation (mutation_percent_genes) must be >= 0 and <= 100 inclusive.\n")
@@ -74,7 +82,7 @@ class GA:
             print("ERROR: Number of selected genes for mutation (mutation_num_genes) cannot be <= 0.\n")
             self.valid_parameters = False
             return
-        elif (mutation_num_genes > len(function_inputs)):
+        elif (mutation_num_genes > self.num_genes):
             print("ERROR: Number of selected genes for mutation (mutation_num_genes) cannot be greater than the number of parameters in the function.\n")
             self.valid_parameters = False
             return
@@ -166,16 +174,13 @@ class GA:
         # At this point, all necessary parameters validation is done successfully and we are sure that the parameters are valid.
         self.valid_parameters = True
 
+        self.fitness_func = fitness_func
+
         # Parameters of the genetic algorithm.
         self.sol_per_pop = sol_per_pop
         self.num_parents_mating = num_parents_mating
         self.num_generations = abs(num_generations)
         self.parent_selection_type = parent_selection_type
-
-        # Properties of the function to be optimized.
-        self.function_inputs = function_inputs # Funtion inputs.
-        self.function_output = function_output # Function output.
-        self.num_weights = len(self.function_inputs) # Number of parameters in the function.
         
         # Parameters of the mutation operation.
         self.mutation_percent_genes = mutation_percent_genes
@@ -183,9 +188,8 @@ class GA:
         self.random_mutation_min_val = random_mutation_min_val
         self.random_mutation_max_val = random_mutation_max_val
 
-        # Even such 2 parameters are declared in the class header, they are assigned to the object here to access them after saving the object.
-        self.best_outputs = []
-        self.best_outputs_fitness = []
+        # Even such this parameter is declared in the class header, it is assigned to the object here to access it after saving the object.
+        self.best_solution_fitness = []
 
         # Initializing the population.
         self.initialize_population()
@@ -194,7 +198,7 @@ class GA:
         """
         Creates an initial population.
         """
-        self.pop_size = (self.sol_per_pop,self.num_weights) # The population will have sol_per_pop chromosome where each chromosome has num_weights genes.
+        self.pop_size = (self.sol_per_pop,self.num_genes) # The population will have sol_per_pop chromosome where each chromosome has num_genes genes.
         # Creating the initial population randomly.
         self.population = numpy.random.uniform(low=-4.0, high=4.0, size=self.pop_size)
 
@@ -215,7 +219,7 @@ class GA:
 
             # Generating next generation using crossover.
             offspring_crossover = self.crossover(parents,
-                                                 offspring_size=(self.num_offspring, self.num_weights))
+                                                 offspring_size=(self.num_offspring, self.num_genes))
 
             # Adding some variations to the offspring using mutation.
             offspring_mutation = self.mutation(offspring_crossover)
@@ -244,16 +248,18 @@ class GA:
             print("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
             return []
 
+        pop_fitness = []
         # Calculating the fitness value of each solution in the current population.
-        # The fitness function calulates the sum of products between each input and its corresponding weight.
-        outputs = numpy.sum(self.population*self.function_inputs, axis=1)
-        fitness = 1.0 / numpy.abs(outputs - self.function_output)
+        for sol in self.population:
+            fitness = self.fitness_func(sol)
+            pop_fitness.append(fitness)
         
-        # The best result in the current iteration.
-        self.best_outputs.append(outputs[numpy.where(fitness == numpy.max(fitness))[0][0]])
-        self.best_outputs_fitness.append(numpy.max(fitness))
+        pop_fitness = numpy.array(pop_fitness)
 
-        return fitness
+        # The best result in the current iteration.
+        self.best_solution_fitness.append(numpy.max(pop_fitness))
+
+        return pop_fitness
 
     def steady_state_selection(self, fitness, num_parents):
         """
@@ -366,6 +372,10 @@ class GA:
         It returns:
             -parents: The selected parents to mate.
         """
+        # https://en.wikipedia.org/wiki/Stochastic_universal_sampling
+        # https://books.google.com.eg/books?id=gwUwIEPqk30C&pg=PA60&lpg=PA60&dq=Roulette+Wheel+genetic+algorithm+select+more+than+once&source=bl&ots=GLr2DrPcj4&sig=ACfU3U0jVOGXhzsla8mVqhi5x1giPRL4ew&hl=en&sa=X&ved=2ahUKEwim25rMvdzoAhWa8uAKHbt0AdgQ6AEwA3oECAYQLQ#v=onepage&q=Roulette%20Wheel%20&f=false
+        # https://www.tutorialspoint.com/genetic_algorithms/genetic_algorithms_parent_selection.htm
+        # https://www.obitko.com/tutorials/genetic-algorithms/selection.php
         fitness_sum = numpy.sum(fitness)
         probs = fitness / fitness_sum
         probs_start = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the start values of the ranges of probabilities.
@@ -579,13 +589,7 @@ class GA:
             print("Warning calling the plot_result() method: \nGA is not executed yet and there are no results to display. Please call the run() method before calling the plot_result() method.\n")
 
         matplotlib.pyplot.figure()
-        matplotlib.pyplot.plot(self.best_outputs)
-        matplotlib.pyplot.xlabel("Iteration")
-        matplotlib.pyplot.ylabel("Outputs")
-        matplotlib.pyplot.show()
-
-        matplotlib.pyplot.figure()
-        matplotlib.pyplot.plot(self.best_outputs_fitness)
+        matplotlib.pyplot.plot(self.best_solution_fitness)
         matplotlib.pyplot.xlabel("Iteration")
         matplotlib.pyplot.ylabel("Fitness")
         matplotlib.pyplot.show()
