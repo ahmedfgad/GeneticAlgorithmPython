@@ -1,4 +1,4 @@
-import ga
+import pygad
 import numpy
 
 num_generations = 50 # Number of generations.
@@ -37,7 +37,7 @@ def fitness_func(solution):
     return fitness
 
 # Creating an instance of the GA class inside the ga module. Some parameters are initialized within the constructor.
-ga_instance = ga.GA(num_generations=num_generations, 
+ga_instance = pygad.GA(num_generations=num_generations, 
           sol_per_pop=sol_per_pop, 
           num_parents_mating=num_parents_mating, 
           num_genes=num_genes,
@@ -66,6 +66,7 @@ filename = 'genetic' # The filename to which the instance is saved. The name is 
 ga_instance.save(filename=filename)
 
 # Loading the saved GA instance.
-loaded_ga_instance = ga.load(filename=filename)
+loaded_ga_instance = pygad.load(filename=filename)
+print("The saved instance of the genetic algorithm is loaded successfully.")
 loaded_ga_instance.plot_result()
 print(loaded_ga_instance.best_solution())
