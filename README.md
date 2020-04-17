@@ -1,4 +1,5 @@
 # GeneticAlgorithmPython
+
 This project implements the genetic algorithm (GA) in Python mainly using NumPy.
 
 The project has 2 main files which are:
@@ -56,8 +57,8 @@ On **`15 April 2020`**, a new argument named `fitness_func` is added that allows
 Let's discuss an example:
 
 > Given the following function:
->     y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
->     where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
+>  y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
+>  where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
 > What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize this function.
 
 So, the task is about using the genetic algorithm to find the best values for the 6 weight `W1` to `W6`. Thinking of the problem, it is clear that the best solution is that returning an output that is close to the desired output `y=44`. So, the fitness function should return a value that gets higher when the solution's output is closer to `y=44`. Here is a function that does that. The function must accept a single parameter which is a 1D vector representing a single solution.
@@ -226,6 +227,7 @@ You can also check my book cited as [**Ahmed Fawzy Gad 'Practical Computer Visio
 It is important to note that this project does not implement everything in GA and there are a wide number of variations to be applied. For example, this project just uses decimal representation for the chromosome and the binary representations might be preferred for other problems.
 
 ## Get in Touch
+
 * E-mail: ahmed.f.gad@gmail.com
 * [LinkedIn](https://www.linkedin.com/in/ahmedfgad)
 * [Amazon Author Page](https://amazon.com/author/ahmedgad)
