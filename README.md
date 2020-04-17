@@ -1,35 +1,14 @@
 # GeneticAlgorithmPython
 
-This project implements the genetic algorithm (GA) in Python mainly using NumPy.
+This project implements the genetic algorithm based on NumPy. Out of this project, a library named **PyGAD** (Decimal Genetic Algorithm) is available at [PyPI](https://pypi.org/project/pygad) at this link: https://pypi.org/project/pygad
 
-The project has 2 main files which are:
+The project has a single module named `pygad.py` which contains a class named `GA`. Simply, to run the genetic algorithm all you need to do is to create an instance of this class and pass the appropriate parameters to its constructor. This class has all the required parameters and methods for implementing the genetic algorithm. 
 
-1. `ga.py`: Holds all necessary methods for implementing the genetic algorithm inside a class named `GA`.
+The documentation starts by discussing the available parameters in addition to the steps of using the library/project.
 
-2. `example.py`: Just gives an example of how to use the project by calling the methods in the `ga.py` file.
+## Supported Parameters
 
-To test the project, you can simply run the `example.py` file.
-
-```
-python example.py
-```
-
-## How to Use the Project?
-
-To use the project, here is the summary of the minimum required steps: 
-
-1. Prepare the required parameters.
-2. Import the `ga.py` module.
-3. Create an instance of the `GA` class.
-4. Run the genetic algorithm.
-5. Plotting Results.
-6. Saving & Loading the Results.
-
-Let's discuss how to do each of these steps.
-
-### The Supported Parameters
-
-The project has many parameters to allow customizing the genetic algorithm for your purpose. Before running the GA, the parameters must be prepared. The list of all supported parameters is as follows:
+The single module available in the `PyGAD` library is named `pygad.py` and contains a class named `GA`. For creating an instance of this class, there are a number of parameters that allows the user to customize the genetic algorithm. Before running the GA, the parameters must be prepared. The list of all supported parameters is as follows:
 
 - `num_generations` : Number of generations.
 - `sol_per_pop` : Number of solutions (i.e. chromosomes) within the population.
@@ -46,13 +25,30 @@ The project has many parameters to allow customizing the genetic algorithm for y
 - `random_mutation_min_val=-1.0` : For `random` mutation, the `random_mutation_min_val` parameter specifies the start value of the range from which a random value is selected to be added to the gene. It defaults to `-1`.
 - `random_mutation_max_val=1.0` : For `random` mutation, the `random_mutation_max_val` parameter specifies the end value of the range from which a random value is selected to be added to the gene. It defaults to `+1`.
 
-The user doesn't have to specify all of such parameters while creating an instance of the GA class. A very important parameter you must care about is `fitness_func`.
+The user doesn't have to specify all of such parameters while creating an instance of the GA class. A very important parameter you must care about is `fitness_func` which defines the fitness function.
+
+Next, the steps of using the PyGAD library are discussed.
+
+## How to Use the PyGAD?
+
+To use PyGAD, here is a summary of the required steps: 
+
+1. Preparing the `fitness_func` parameter.
+2. Preparing other parameters.
+3. Example of preparing the parameters.
+4. Import the `pygad.py` module.
+5. Create an instance of the `GA` class.
+6. Run the genetic algorithm.
+7. Plotting Results.
+8. Saving & Loading the Results.
+
+Let's discuss how to do each of these steps.
 
 ### Preparing the `fitness_func` Parameter
 
 Even there are a number of steps in the genetic algorithm pipeline that can work the same regardless of the problem being solved, one critical step is the calculation of the fitness value. There is no unique way of calculating the fitness value and it changes from one problem to another. 
 
-On **`15 April 2020`**, a new argument named `fitness_func` is added that allows the user to specify a custom function to be used as a fitness function. This function must be a **maximization function** so that a solution with a high fitness value returned is selected compared to a solution with a low value. Doing that allows the user to freely use the project to solve any problem by passing the appropriate fitness function. 
+On **`15 April 2020`**, a new argument named `fitness_func` is added that allows the user to specify a custom function to be used as a fitness function. This function must be a **maximization function** so that a solution with a high fitness value returned is selected compared to a solution with a low value. Doing that allows the user to freely use the library to solve any problem by passing the appropriate fitness function. 
 
 Let's discuss an example:
 
@@ -73,9 +69,9 @@ def fitness_func(solution):
     return fitness
 ```
 
-By creating this function, you are ready to use the project. 
+By creating this function, you are ready to use the library. 
 
-### Parameters Example
+### Example of Preparing the Parameters
 
 Here is an example for preparing the parameters:
 
@@ -97,14 +93,14 @@ keep_parents = 1
 num_genes = len(function_inputs)
 ```
 
-After the parameters are prepared, we can import the `ga` module and build an instance of the GA class.
+After the parameters are prepared, we can import the `pygad` module and build an instance of the GA class.
 
-### Import the `ga.py` Module
+### Import the `pygad.py` Module
 
-The next step is to import the `ga` module as follows:
+The next step is to import the `pygad` module as follows:
 
 ```python
-import ga
+import pygad
 ```
 
 This module has a class named `GA` which holds the implementation of all methods for running the genetic algorithm.
@@ -178,7 +174,7 @@ print(loaded_ga_instance.best_solution())
 
 ## Crossover, Mutation, and Parent Selection
 
-The project supports different types for selecting the parents and applying the crossover & mutation operators.
+The library supports different types for selecting the parents and applying the crossover & mutation operators. More features will be added in the future. To ask for a feature, please open an issue in the [GitHub project](https://github.com/ahmedfgad/GeneticAlgorithmPython) of the library: https://github.com/ahmedfgad/GeneticAlgorithmPython
 
 The supported crossover operations at this time are:
 
@@ -202,7 +198,7 @@ The supported parent selection techniques at this time are:
 - Random
 - Tournament
 
-More types will be added in the future. You can also ask for supporting more types by opening an issue in the project.
+More types will be added in the future. You can also ask for supporting more types by opening an issue in the [GitHub project](https://github.com/ahmedfgad/GeneticAlgorithmPython) associated with the library: https://github.com/ahmedfgad/GeneticAlgorithmPython
 
 ## For More Information
 
@@ -224,7 +220,7 @@ You can also check my book cited as [**Ahmed Fawzy Gad 'Practical Computer Visio
 
 **Important Note**
 
-It is important to note that this project does not implement everything in GA and there are a wide number of variations to be applied. For example, this project just uses decimal representation for the chromosome and the binary representations might be preferred for other problems.
+It is important to note that this library does not implement everything in GA and there are a wide number of variations to be applied. For example, this project just uses decimal representation for the chromosome and the binary representations might be preferred for other problems.
 
 ## Get in Touch
 
