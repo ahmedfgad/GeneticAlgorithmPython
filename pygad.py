@@ -602,7 +602,8 @@ class GA:
         with open(filename + ".pkl", 'wb') as file:
             pickle.dump(self, file)
 
-def load(filename):
+    @staticmethod
+    def load(filename):
     """
     Reading a saved instance of the genetic algorithm:
         -filename: Name of the file to read the instance. It must have no extension.
