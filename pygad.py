@@ -4,51 +4,13 @@ import matplotlib.pyplot
 import pickle
 
 class GA:
-    # Parameters of the genetic algorithm.
-    sol_per_pop = None # Number of solutions in the population.
-    num_parents_mating = None # Number of solutions to be selected as parents in the mating pool.
-    num_generations = None # Number of generations.
-    pop_size = None # Population size = (number of chromosomes, number of genes per chromosome)
-    keep_parents = -1 # If 0, this means the parents of the current populaiton will not be used at all in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. In some cases, the parents are of high quality and thus we do not want to loose such some high quality solutions. If some parent selection operators like roulette wheel selection (RWS), the parents may not be of high quality and thus keeping the parents might degarde the quality of the population.
-    
-    fitness_func = None
-
-    # Parameters about parent selection.
-    parent_selection_type = None # Type of parent selection.
-    select_parents = None # Refers to a method that selects the parents based on the parent selection type specified in parent_selection_type.
-    
-    K_tournament = None # For tournament selection, a parent is selected out of K randomly selected solutions.
-
-    population = None # A NumPy array holding the opulation.
-    
-    crossover_type = None # Type of the crossover opreator.
-    crossover = None # A method that applies the crossover operator based on the selected type of crossover in the crossover_type property.
-
-    mutation_type = None # Type of the mutation opreator.
-    mutation = None # A method that applies the mutation operator based on the selected type of mutation in the mutation_type property.
-
-    best_solution_fitness = [] # A list holding the fitness value of the best solution for each generation.
-
-    # Parameters of the function to be optimized.
-    function_inputs = None # Inputs of the function to be optimized.
-    function_output = None # Desired outuput of the function.
-    num_genes = None
-
-    # Mutation parameters.
-    mutation_percent_genes=None # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-    mutation_num_genes=None # Number of genes to mutate. If the parameter mutation_num_genes exists, then no need for the parameter mutation_percent_genes.
-    random_mutation_min_val=None
-    random_mutation_max_val=None
-
-    # Some flags.
-    run_completed = False # Set to True only when the run() method completes gracefully.
-    valid_parameters = False # Set to True when all the paremeters passed in the GA class construtor are valid.
-
     def __init__(self, num_generations, 
                  sol_per_pop, 
                  num_parents_mating, 
                  num_genes, 
                  fitness_func,
+                 init_range_low=-4,
+                 init_range_high=4,
                  parent_selection_type="sss",
                  keep_parents=-1,
                  K_tournament=3,
@@ -59,43 +21,85 @@ class GA:
                  random_mutation_min_val=-1.0,
                  random_mutation_max_val=1.0):
 
+        """
+        # A list of all parameters necessary for building an instance of the genetic algorithm.
+
+        # Parameters of the genetic algorithm:
+        num_generations = None # Number of generations.
+        sol_per_pop = None # Number of solutions in the population.
+        num_parents_mating = None # Number of solutions to be selected as parents in the mating pool.
+        pop_size = None # Population size = (number of chromosomes, number of genes per chromosome)
+        keep_parents = -1 # If 0, this means the parents of the current populaiton will not be used at all in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. In some cases, the parents are of high quality and thus we do not want to loose such some high quality solutions. If some parent selection operators like roulette wheel selection (RWS), the parents may not be of high quality and thus keeping the parents might degarde the quality of the population.
+
+        fitness_func = None
+
+        # Initial population parameters:
+        # It is OK to set the value of any of the 2 parameters to be equal, higher or lower than the other parameter (i.e. init_range_low is not needed to be lower than init_range_high).
+        init_range_low = -4 # The lower value of the random range from which the gene values in the initial population are selected.
+        init_range_high = 4 # The upper value of the random range from which the gene values in the initial population are selected.
+
+        # Parameters about parent selection:
+        parent_selection_type = None # Type of parent selection.
+        select_parents = None # Refers to a method that selects the parents based on the parent selection type specified in parent_selection_type.
+
+        K_tournament = None # For tournament selection, a parent is selected out of K randomly selected solutions.
+
+        population = None # A NumPy array holding the opulation.
+
+        # Crossover parameters:           
+        crossover_type = None # Type of the crossover opreator.
+        crossover = None # A method that applies the crossover operator based on the selected type of crossover in the crossover_type property.
+
+        # Mutation parameters:           
+        mutation_type = None # Type of the mutation opreator.
+        mutation = None # A method that applies the mutation operator based on the selected type of mutation in the mutation_type property.
+
+        best_solution_fitness = [] # A list holding the fitness value of the best solution for each generation.
+
+        # Parameters of the function to be optimized:
+        num_genes = None # Number of parameters in the function.
+
+        # Mutation parameters:
+        mutation_percent_genes=None # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
+        mutation_num_genes=None # Number of genes to mutate. If the parameter mutation_num_genes exists, then no need for the parameter mutation_percent_genes.
+        random_mutation_min_val=None
+        random_mutation_max_val=None
+
+        # Some flags:
+        run_completed = False # Set to True only when the run() method completes gracefully.
+        valid_parameters = False # Set to True when all the paremeters passed in the GA class construtor are valid.
+        """
+
         # Validating the number of solutions in the population (sol_per_pop) and the number of parents to be selected for mating (num_parents_mating)
         if (sol_per_pop <= 0 or num_parents_mating <= 0):
-            print("ERROR creating an instance of the GA class with invalid parameters. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n")
             self.valid_parameters = False
-            return
+            raise ValueError("ERROR creating an instance of the GA class with invalid parameters. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n")
 
-        # Validating the number of gene.        
+        # Validating the number of gene.      
         if (num_genes <= 0):
-            print("ERROR: Number of genes cannot be <= 0. \n")
             self.valid_parameters = False
-            return
+            raise ValueError("ERROR: Number of genes cannot be <= 0. \n")
 
         self.num_genes = num_genes # Number of genes in the solution.
 
         if (mutation_num_genes == None):
             if (mutation_percent_genes < 0 or mutation_percent_genes > 100):
-                print("ERROR: Percentage of selected genes for mutation (mutation_percent_genes) must be >= 0 and <= 100 inclusive.\n")
                 self.valid_parameters = False
-                return
+                raise ValueError("ERROR: Percentage of selected genes for mutation (mutation_percent_genes) must be >= 0 and <= 100 inclusive.\n")
         elif (mutation_num_genes <= 0 ):
-            print("ERROR: Number of selected genes for mutation (mutation_num_genes) cannot be <= 0.\n")
             self.valid_parameters = False
-            return
+            raise ValueError("ERROR: Number of selected genes for mutation (mutation_num_genes) cannot be <= 0.\n")
         elif (mutation_num_genes > self.num_genes):
-            print("ERROR: Number of selected genes for mutation (mutation_num_genes) cannot be greater than the number of parameters in the function.\n")
             self.valid_parameters = False
-            return
+            raise ValueError("ERROR: Number of selected genes for mutation (mutation_num_genes) cannot be greater than the number of parameters in the function.\n")
         elif (type(mutation_num_genes) is not int):
-            print("Warning: Number of selected genes for mutation (mutation_num_genes) must be a positive integer >= 1.\n")
             self.valid_parameters = False
-            return
+            raise ValueError("Error: Number of selected genes for mutation (mutation_num_genes) must be a positive integer >= 1.\n")
 
         # Validating the number of parents to be selected for mating: num_parents_mating
         if (num_parents_mating > sol_per_pop):
-            print("ERROR creating an instance of the GA class with invalid parameters. \nThe number of parents to select for mating cannot be greater than the number of solutions in the population (i.e., num_parents_mating must always be <= sol_per_pop).\n")
             self.valid_parameters = False
-            return
+            raise ValueError("ERROR creating an instance of the GA class with invalid parameters. \nThe number of parents to select for mating cannot be greater than the number of solutions in the population (i.e., num_parents_mating must always be <= sol_per_pop).\n")
 
         # Validating the crossover type: crossover_type
         if (crossover_type == "single_point"):
@@ -105,9 +109,8 @@ class GA:
         elif (crossover_type == "uniform"):
             self.crossover = self.uniform_crossover
         else:
-            print("ERROR: undefined crossover type. \nThe assigned value to the crossover_type argument does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover).\n")
             self.valid_parameters = False
-            return
+            raise ValueError("ERROR: undefined crossover type. \nThe assigned value to the crossover_type argument does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover).\n")
 
         self.crossover_type = crossover_type
 
@@ -121,9 +124,8 @@ class GA:
         elif (mutation_type == "inversion"):
             self.mutation = self.inversion_mutation
         else:
-            print("ERROR: undefined mutation type. \nThe assigned value to the mutation_type argument does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation).\n")
             self.valid_parameters = False
-            return
+            raise ValueError("ERROR: undefined mutation type. \nThe assigned value to the mutation_type argument does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation).\n")
 
         self.mutation_type = mutation_type
 
@@ -141,26 +143,23 @@ class GA:
         elif (parent_selection_type == "rank"):
             self.select_parents = self.rank_selection
         else:
-            print("ERROR: undefined parent selection type. \nThe assigned value to the parent_selection_type argument does not refer to one of the supported parent selection techniques which are: \n-sss (for steady state selection)\n-rws (for roulette wheel selection)\n-sus (for stochastic universal selection)\n-rank (for rank selection)\n-random (for random selection)\n-tournament (for tournament selection).\n")
             self.valid_parameters = False
-            return
+            raise ValueError("ERROR: undefined parent selection type. \nThe assigned value to the parent_selection_type argument does not refer to one of the supported parent selection techniques which are: \n-sss (for steady state selection)\n-rws (for roulette wheel selection)\n-sus (for stochastic universal selection)\n-rank (for rank selection)\n-random (for random selection)\n-tournament (for tournament selection).\n")
 
         if(parent_selection_type == "tournament"):
             if (K_tournament > sol_per_pop):
                 K_tournament = sol_per_pop
                 print("Warining: K of the tournament selection should not be greater than the number of solutions within the population.\nK will be clipped to be equal to the number of solutions in the population (sol_per_pop).\n")
             elif (K_tournament <= 0):
-                print("ERROR: K of the tournament selection cannot be <=0.\n")
                 self.valid_parameters = False
-                return
+                raise ValueError("ERROR: K of the tournament selection cannot be <=0.\n")
 
         self.K_tournament = K_tournament
 
         # Validating the number of parents to keep in the next population: keep_parents
         if (keep_parents > sol_per_pop or keep_parents > num_parents_mating or keep_parents < -1):
-            print("ERROR: Incorrect value to the keep_parents parameter. \nThe assigned value to the keep_parent parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Less than or equal to num_parents_mating\n3) Greater than or equal to -1.\n")
             self.valid_parameters = False
-            return
+            raise ValueError("ERROR: Incorrect value to the keep_parents parameter. \nThe assigned value to the keep_parent parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Less than or equal to num_parents_mating\n3) Greater than or equal to -1.\n")
 
         self.keep_parents = keep_parents
 
@@ -171,10 +170,18 @@ class GA:
         elif (self.keep_parents > 0): # Keep the specified number of parents in the next population.
             self.num_offspring = sol_per_pop - self.keep_parents
 
+        # Check if the fitness function accepts only a single paramater.
+        if (fitness_func.__code__.co_argcount == 1):
+            self.fitness_func = fitness_func
+        else:
+            self.valid_parameters = False
+            raise ValueError("The fitness function must accept only a single parameter representing the solution to which the fitness value is calculated.\nThe passed fitness function named '{funcname}' accepts {argcount} argument(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
+
+        self.init_range_low = init_range_low
+        self.init_range_high = init_range_high
+
         # At this point, all necessary parameters validation is done successfully and we are sure that the parameters are valid.
         self.valid_parameters = True
-
-        self.fitness_func = fitness_func
 
         # Parameters of the genetic algorithm.
         self.sol_per_pop = sol_per_pop
@@ -192,23 +199,22 @@ class GA:
         self.best_solution_fitness = []
 
         # Initializing the population.
-        self.initialize_population()
+        self.initialize_population(self.init_range_low, self.init_range_high)
 
-    def initialize_population(self):
+    def initialize_population(self, low, high):
         """
-        Creates an initial population.
+        Creates an initial population randomly as a NumPy array. The array is saved in the instance attribute named 'population'.
         """
         self.pop_size = (self.sol_per_pop,self.num_genes) # The population will have sol_per_pop chromosome where each chromosome has num_genes genes.
         # Creating the initial population randomly.
-        self.population = numpy.random.uniform(low=-4.0, high=4.0, size=self.pop_size)
+        self.population = numpy.random.uniform(low=low, high=high, size=self.pop_size)
 
     def run(self):
         """
         Running the genetic algorithm. This is the main method in which the genetic algorithm is evolved through a number of generations.
         """
         if self.valid_parameters == False:
-            print("ERROR calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
-            return
+            raise ValueError("ERROR calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
 
         for generation in range(self.num_generations):
             # Measuring the fitness of each chromosome in the population.
@@ -245,8 +251,7 @@ class GA:
             -fitness: An array of the calculated fitness values.
         """
         if self.valid_parameters == False:
-            print("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
-            return []
+            raise ValueError("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
 
         pop_fitness = []
         # Calculating the fitness value of each solution in the current population.
@@ -565,8 +570,7 @@ class GA:
             -best_solution_fitness: Fitness value of the best solution.
         """
         if self.run_completed == False:
-            print("Warning calling the best_solution() method: \nThe run() method is not yet called and thus the GA did not evolve the solutions. Thus, the best solution is retireved from the initial random population without being evolved.\n")
-            return [], []
+            raise ValueError("Warning calling the best_solution() method: \nThe run() method is not yet called and thus the GA did not evolve the solutions. Thus, the best solution is retireved from the initial random population without being evolved.\n")
 
         # Getting the best solution after finishing all generations.
         # At first, the fitness is calculated for each solution in the final generation.
