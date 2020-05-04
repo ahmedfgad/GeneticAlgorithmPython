@@ -1,10 +1,16 @@
 # GeneticAlgorithmPython
 
-This project implements the genetic algorithm based on NumPy. Out of this project, a library named **PyGAD** (Decimal Genetic Algorithm) is available at [PyPI](https://pypi.org/project/pygad) at this link: https://pypi.org/project/pygad
+**GeneticAlgorithmPython** is an open source Python project for implementing the genetic algorithm based on NumPy. Based on this project, a Python library named [`PyGAD`](https://pypi.org/project/pygad) is available at PyPI: https://pypi.org/project/pygad. To install PyGAD using pip, just issue this command:
 
-The project has a single module named `pygad.py` which contains a class named `GA`. Simply, to run the genetic algorithm all you need to do is to create an instance of this class and pass the appropriate parameters to its constructor. This class has all the required parameters and methods for implementing the genetic algorithm. 
+```python
+pip install pygad
+```
 
-The documentation starts by discussing the available parameters in addition to the steps of using the library/project.
+The project has a single module named `pygad.py` which contains a class named `GA`. There is a script named `example.py` in which an example is given for using the `pygad.py` module. 
+
+Simply, to run the genetic algorithm all you need to do is to create an instance of the `GA` class and pass the appropriate parameters to its constructor. The `GA` class has all the required parameters and methods for implementing the genetic algorithm. 
+
+The documentation starts by discussing the available parameters in addition to the steps of using the library. Note that the [PyGAD library](https://pypi.org/project/pygad) is a reflection to the **GeneticAlgorithmPython** GitHub project. As a result, the documentation can either use **project** or **library** interchangeably.
 
 ## Supported Parameters
 
@@ -14,7 +20,9 @@ The single module available in the `PyGAD` library is named `pygad.py` and conta
 - `sol_per_pop` : Number of solutions (i.e. chromosomes) within the population.
 - `num_parents_mating ` : Number of solutions to be selected as parents.
 - `num_genes`: Number of genes in the solution/chromosome.
-- `fitness_func` : A function for calculating the fitness value for each solution.
+- `fitness_func` : A function for calculating the fitness value for each solution. Added in PyGAD 1.0.17.
+- `init_range_low=-4`: The lower value of the random range from which the gene values in the initial population are selected. `init_range_low` defaults to `-4`. Added in PyGAD 1.0.18.
+- `init_range_high=4`: The upper value of the random range from which the gene values in the initial population are selected. `init_range_high` defaults to `+4`. Added in PyGAD 1.0.18.
 - `parent_selection_type="sss"` : The parent selection type. Supported types are `sss` (for steady state selection), `rws` (for roulette wheel selection), `sus` (for stochastic universal selection), `rank` (for rank selection), `random` (for random selection), and `tournament` (for tournament selection).
 - `keep_parents=-1` : Number of parents to keep in the current population. `-1` (default) means keep all parents in the next population. `0` means keep no parents in the next population. A value `greater than 0` means keep the specified number of parents in the next population. Note that the value assigned to `keep_parents` cannot be `< - 1` or greater than the number of solutions within the population `sol_per_pop`.
 - `K_tournament=3` : In case that the parent selection type is `tournament`, the `K_tournament` specifies the number of parents participating in the tournament selection. It defaults to `3`.
@@ -26,6 +34,8 @@ The single module available in the `PyGAD` library is named `pygad.py` and conta
 - `random_mutation_max_val=1.0` : For `random` mutation, the `random_mutation_max_val` parameter specifies the end value of the range from which a random value is selected to be added to the gene. It defaults to `+1`.
 
 The user doesn't have to specify all of such parameters while creating an instance of the GA class. A very important parameter you must care about is `fitness_func` which defines the fitness function.
+
+It is OK to set the value of any of the 2 parameters `init_range_low` and `init_range_high` to be equal, higher or lower than the other parameter (i.e. `init_range_low` is not needed to be lower than `init_range_high`).
 
 Next, the steps of using the PyGAD library are discussed.
 
@@ -80,6 +90,9 @@ num_generations = 50
 sol_per_pop = 8
 num_parents_mating = 4
 
+init_range_low = -2
+init_range_high = 5
+
 mutation_percent_genes = 10
 
 parent_selection_type = "sss"
@@ -115,6 +128,8 @@ ga_instance = ga.GA(num_generations=num_generations,
           num_parents_mating=num_parents_mating, 
           num_genes=num_genes,
           fitness_func=fitness_func,
+          init_range_low=init_range_low,
+          init_range_high=init_range_high,
           mutation_percent_genes=mutation_percent_genes,
           mutation_num_genes=mutation_num_genes,
           parent_selection_type=parent_selection_type,
@@ -174,7 +189,7 @@ print(loaded_ga_instance.best_solution())
 
 ## Crossover, Mutation, and Parent Selection
 
-The library supports different types for selecting the parents and applying the crossover & mutation operators. More features will be added in the future. To ask for a feature, please open an issue in the [GitHub project](https://github.com/ahmedfgad/GeneticAlgorithmPython) of the library: https://github.com/ahmedfgad/GeneticAlgorithmPython
+The library supports different types for selecting the parents and applying the crossover & mutation operators. More features will be added in the future. To ask for a feature, please open an issue in the [GitHub project](https://github.com/ahmedfgad/GeneticAlgorithmPython): https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/new
 
 The supported crossover operations at this time are:
 
@@ -200,6 +215,19 @@ The supported parent selection techniques at this time are:
 
 More types will be added in the future. You can also ask for supporting more types by opening an issue in the [GitHub project](https://github.com/ahmedfgad/GeneticAlgorithmPython) associated with the library: https://github.com/ahmedfgad/GeneticAlgorithmPython
 
+## Release History
+
+PyGAD 1.0.17 (15 April 2020):
+
+1. The `GA` class accepts a new argument named `fitness_func` which accepts a function to be used for calculating the fitness values for the solutions. This allows the project to be customized to any problem by building the right fitness function.
+
+PyGAD 1.0.18 (4 May 2020):
+
+1. The attributes are moved from the class scope to the instance scope.
+2. Raising a `ValueError` exception on passing incorrect values to the parameters.
+3. Two new parameters are added (`init_range_low` and `init_range_high`) allowing the user to customize the range from which the genes values in the initial population are selected. 
+4. The code object `__code__` of the passed fitness function is checked to ensure it has the right number of parameters.
+
 ## For More Information
 
 To start with coding the genetic algorithm, you can check the tutorial titled [**Genetic Algorithm Implementation in Python**](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad) available at these links:
@@ -220,7 +248,7 @@ You can also check my book cited as [**Ahmed Fawzy Gad 'Practical Computer Visio
 
 **Important Note**
 
-It is important to note that this library does not implement everything in GA and there are a wide number of variations to be applied. For example, this project just uses decimal representation for the chromosome and the binary representations might be preferred for other problems.
+The library just supports the decimal representation for the chromosome and there is no current support for binary representations. The library is updated and soon support for the binary version will be available.
 
 ## Get in Touch
 
