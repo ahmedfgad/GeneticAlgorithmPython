@@ -17,6 +17,9 @@ mutation_type = "scramble" # Type of the mutation operator.
 
 keep_parents = 1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
+init_range_low = -2
+init_range_high = 5
+
 """
 Given the following function:
     y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
@@ -44,6 +47,8 @@ ga_instance = pygad.GA(num_generations=num_generations,
           fitness_func=fitness_func,
           mutation_percent_genes=mutation_percent_genes,
           mutation_num_genes=mutation_num_genes,
+          init_range_low=init_range_low,
+          init_range_high=init_range_high,
           parent_selection_type=parent_selection_type,
           crossover_type=crossover_type,
           mutation_type=mutation_type,
