@@ -23,12 +23,14 @@ fitness_function = fitness_func
 num_generations = 50 # Number of generations.
 num_parents_mating = 4 # Number of solutions to be selected as parents in the mating pool.
 
+# To prepare the initial population, there are 2 ways:
+# 1) Prepare it yourself and pass it to the initial_population parameter. This way is useful when the user wants to start the genetic algorithm with a custom initial population.
+# 2) Assign valid integer values to the sol_per_pop and num_genes parameters. If the initial_population parameter exists, then the sol_per_pop and num_genes parameters are useless.
 sol_per_pop = 8 # Number of solutions in the population.
 num_genes = len(function_inputs)
 
 init_range_low = -2
 init_range_high = 5
-
 
 parent_selection_type = "sss" # Type of parent selection.
 keep_parents = 1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
@@ -39,9 +41,12 @@ crossover_type = "single_point" # Type of the crossover operator.
 mutation_type = "random" # Type of the mutation operator.
 mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
 
+last_fitness = 0
 def callback_generation(ga_instance):
-    print("Generation :", ga_instance.generations_completed)
-    print("Fitness of the best solution :", ga_instance.best_solution()[1])
+    global last_fitness
+    print("Generation = {generation}".format(generation=ga_instance.generations_completed))
+    print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+    print("Change     = {change}".format(change=ga_instance.best_solution()[1] - last_fitness))
 
 # Creating an instance of the GA class inside the ga module. Some parameters are initialized within the constructor.
 ga_instance = pygad.GA(num_generations=num_generations,
@@ -65,9 +70,12 @@ ga_instance.run()
 ga_instance.plot_result()
 
 # Returning the details of the best solution.
-best_solution, best_solution_fitness = ga_instance.best_solution()
-print("Parameters of the best solution :", best_solution)
-print("Fitness value of the best solution :", best_solution_fitness, "\n")
+solution, solution_fitness, solution_idx = ga_instance.best_solution()
+print("Parameters of the best solution : {solution}".format(solution=solution))
+print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
+print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+
+print("Best solution reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
 
 # Saving the GA instance.
 filename = 'genetic' # The filename to which the instance is saved. The name is without extension.
@@ -75,6 +83,4 @@ ga_instance.save(filename=filename)
 
 # Loading the saved GA instance.
 loaded_ga_instance = pygad.load(filename=filename)
-print("The saved instance of the genetic algorithm is loaded successfully.")
 loaded_ga_instance.plot_result()
-print(loaded_ga_instance.best_solution())
