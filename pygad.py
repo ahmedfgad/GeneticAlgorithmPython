@@ -229,7 +229,9 @@ class GA:
         self.random_mutation_max_val = random_mutation_max_val
 
         # Even such this parameter is declared in the class header, it is assigned to the object here to access it after saving the object.
-        self.best_solution_fitness = [] # A list holding the fitness value of the best solution for each generation.
+        self.best_solutions_fitness = [] # A list holding the fitness value of the best solution for each generation.
+        
+        self.best_solution_generation = -1 # The generation number at which the best solution is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
 
     def initialize_population(self, low, high):
         """
@@ -238,7 +240,9 @@ class GA:
         # Population size = (number of chromosomes, number of genes per chromosome)
         self.pop_size = (self.sol_per_pop,self.num_genes) # The population will have sol_per_pop chromosome where each chromosome has num_genes genes.
         # Creating the initial population randomly.
-        self.population = numpy.random.uniform(low=low, high=high, size=self.pop_size) # A NumPy array holding the initial population.
+        self.population = numpy.random.uniform(low=low, 
+                                               high=high, 
+                                               size=self.pop_size) # A NumPy array holding the initial population.
         
         # Keeping the initial population in the initial_population attribute.
         self.initial_population = self.population
@@ -253,6 +257,9 @@ class GA:
         for generation in range(self.num_generations):
             # Measuring the fitness of each chromosome in the population.
             fitness = self.cal_pop_fitness()
+
+            # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
+            self.best_solutions_fitness.append(numpy.max(fitness))
 
             # Selecting the best parents in the population for mating.
             parents = self.select_parents(fitness, num_parents=self.num_parents_mating)
@@ -281,6 +288,7 @@ class GA:
             if not (self.callback_generation is None):
                 self.callback_generation(self)
 
+        self.best_solution_generation = numpy.where(numpy.array(self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
         # After the run() method completes, the run_completed flag is changed from False to True.
         self.run_completed = True # Set to True only after the run() method completes gracefully.
 
@@ -300,9 +308,6 @@ class GA:
             pop_fitness.append(fitness)
 
         pop_fitness = numpy.array(pop_fitness)
-
-        # The best result in the current iteration.
-        self.best_solution_fitness.append(numpy.max(pop_fitness))
 
         return pop_fitness
 
@@ -608,6 +613,7 @@ class GA:
         If no generation is completed (at least 1), an exception is raised. Otherwise, the following is returned:
             -best_solution: Best solution in the current population.
             -best_solution_fitness: Fitness value of the best solution.
+            -best_match_idx: Index of the best solution in the current population.
         """
         
         if self.generations_completed < 1:
@@ -620,12 +626,12 @@ class GA:
         # At first, the fitness is calculated for each solution in the final generation.
         fitness = self.cal_pop_fitness()
         # Then return the index of that solution corresponding to the best fitness.
-        best_match_idx = numpy.where(fitness == numpy.max(fitness))
+        best_match_idx = numpy.where(fitness == numpy.max(fitness))[0][0]
 
-        best_solution = self.population[best_match_idx, :][0][0]
-        best_solution_fitness = fitness[best_match_idx][0]
+        best_solution = self.population[best_match_idx, :]
+        best_solution_fitness = fitness[best_match_idx]
 
-        return best_solution, best_solution_fitness
+        return best_solution, best_solution_fitness, best_match_idx
 
     def plot_result(self):
         """
@@ -641,7 +647,7 @@ class GA:
 #            print("Warning calling the plot_result() method: \nGA is not executed yet and there are no results to display. Please call the run() method before calling the plot_result() method.\n")
 
         matplotlib.pyplot.figure()
-        matplotlib.pyplot.plot(self.best_solution_fitness)
+        matplotlib.pyplot.plot(self.best_solutions_fitness)
         matplotlib.pyplot.title("PyGAD - Iteration vs. Fitness")
         matplotlib.pyplot.xlabel("Iteration")
         matplotlib.pyplot.ylabel("Fitness")
@@ -664,6 +670,8 @@ def load(filename):
     try:
         with open(filename + ".pkl", 'rb') as file:
             ga_in = pickle.load(file)
-    except (FileNotFoundError):
-        print("Error loading the file. Please check if the file exists.")
+    except FileNotFoundError:
+        raise FileNotFoundError("Error reading the file {filename}. Please check your inputs.".format(filename=filename))
+    except:
+        raise BaseException("Error loading the file. Please check if the file exists.")
     return ga_in
