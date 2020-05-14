@@ -1,4 +1,5 @@
 # GeneticAlgorithmPython
+
 **GeneticAlgorithmPython** is an open source Python project for implementing the genetic algorithm based on NumPy. Based on this project, a Python library named [`PyGAD`](https://pypi.org/project/pygad) is available at PyPI: https://pypi.org/project/pygad. To install PyGAD using pip, just issue this command:
 
 ```python
@@ -50,7 +51,8 @@ All the parameters and functions passed to the GA class constructor are used as 
 - `crossover`: Refers to the method that applies the crossover operator based on the selected type of crossover in the `crossover_type` property.
 - `mutation`: Refers to the method that applies the mutation operator based on the selected type of mutation in the `mutation_type` property.
 - `select_parents`: Refers to a method that selects the parents based on the parent selection type specified in the `parent_selection_type` attribute.
-- `best_solution_fitness`: A list holding the fitness value of the best solution for each generation.
+- `best_solutions_fitness`: A list holding the fitness values of the best solutions for all generation.
+- `best_solution_generation`: The generation number at which the best solution is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
 - `cal_pop_fitness`: A method that calculates the fitness values for all solutions within the population by calling the function passed to the `fitness_func` parameter for each solution.
 
 Next, the steps of using the PyGAD library are discussed.
@@ -79,8 +81,8 @@ On **`15 April 2020`**, a new argument named `fitness_func` is added to PyGAD 1.
 Let's discuss an example:
 
 > Given the following function:
->     y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
->     where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
+>  y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
+>  where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
 > What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize this function.
 
 So, the task is about using the genetic algorithm to find the best values for the 6 weight `W1` to `W6`. Thinking of the problem, it is clear that the best solution is that returning an output that is close to the desired output `y=44`. So, the fitness function should return a value that gets higher when the solution's output is closer to `y=44`. Here is a function that does that:
@@ -271,6 +273,26 @@ PyGAD 2.0.0 (13 May 2020)
 2. A new parameter to the GA constructor named `initial_population` is supported to allow the user to use a custom initial population to be used by the genetic algorithm. If not None, then the passed population will be used. If `None`, then the genetic algorithm will create the initial population using the `sol_per_pop` and `num_genes` parameters. 
 3. The parameters `sol_per_pop` and `num_genes` are optional and set to `None` by default.
 4. A new parameter named `callback_generation` is introduced in the GA class constructor. It accepts a function with a single parameter representing the GA instance. This function called after each generation. This helps the user to do post-processing or debugging operations after each generation.
+
+PyGAD 2.1.0 (14 May 2020)
+
+1. The `best_solution()` method in the `pygad.GA` class returns a new output representing the index of the best solution within the population. Now, it returns a total of 3 outputs and their order is: best solution, best solution fitness, and best solution index. Here is an example: 
+
+```python
+solution, solution_fitness, solution_idx = ga_instance.best_solution()
+print("Parameters of the best solution :", solution)
+print("Fitness value of the best solution :", solution_fitness, "\n")
+print("Index of the best solution :", solution_idx, "\n")
+```
+
+2. A new attribute named `best_solution_generation` is added to the instances of the pygad.GA class. it holds the generation number at which the best solution is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
+   Example:
+
+```python
+print("Best solution reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
+```
+
+3. The `best_solution_fitness` attribute is renamed to `best_solutions_fitness`.
 
 ## For More Information
 
