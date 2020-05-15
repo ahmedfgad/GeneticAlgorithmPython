@@ -22,7 +22,7 @@ The 3 projects in the series of building and training neural networks using the 
 
 1. [GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython): Implements the genetic algorithm in its `pygagd.py` module.
 2. [NumPyANN](https://github.com/ahmedfgad/NumPyANN): Implements neural networks in its `nn.py` module without being trained (i.e. only the forward pass).
-3. [NeuralGenetic](https://github.com/ahmedfgad/NeuralGenetic/): Trains neural networks using the genetic algorithm in its `gann.py` module. The neural network is implemented in the `nn.py` module of the [NumPyANN](https://github.com/ahmedfgad/NumPyANN) project. The genetic algorithm is implemented in the `pygad.py` module in the [GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython) project.  
+3. [NeuralGenetic](https://github.com/ahmedfgad/NeuralGenetic): Trains neural networks using the genetic algorithm in its `gann.py` module. The neural network is implemented in the `nn.py` module of the [NumPyANN](https://github.com/ahmedfgad/NumPyANN) project. The genetic algorithm is implemented in the `pygad.py` module in the [GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython) project.  
 
 Feel free to leave an issue in this project (https://github.com/ahmedfgad/GeneticAlgorithmPython) in case something is not working properly or to ask for questions. I am also available for e-mails at ahmed.f.gad@gmail.com
 
