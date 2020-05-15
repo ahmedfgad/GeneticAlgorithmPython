@@ -1,6 +1,6 @@
 # GeneticAlgorithmPython
 
-As part of a series of 3 projects that uses Python 3 (with the user of NumPy) to build and train artificial neural networks (ANNs) using the genetic algorithm (GA), **GeneticAlgorithmPython** is the first project which is an open-source Python 3 project for implementing the genetic algorithm based on NumPy. 
+As part of a series of 3 projects that uses Python 3 (with the use of NumPy) to build and train artificial neural networks (ANNs) using the genetic algorithm (GA), **GeneticAlgorithmPython** is the first project which is an open-source Python 3 project for implementing the genetic algorithm based on NumPy. 
 
 Based on this project, a Python library named [`PyGAD`](https://pypi.org/project/pygad) is available at PyPI: https://pypi.org/project/pygad. To install PyGAD using pip, just issue this command:
 
