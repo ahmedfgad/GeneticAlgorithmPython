@@ -66,7 +66,7 @@ All the parameters and functions passed to the GA class constructor are used as 
 - `mutation`: Refers to the method that applies the mutation operator based on the selected type of mutation in the `mutation_type` property.
 - `select_parents`: Refers to a method that selects the parents based on the parent selection type specified in the `parent_selection_type` attribute.
 - `best_solutions_fitness`: A list holding the fitness values of the best solutions for all generation.
-- `best_solution_generation`: The generation number at which the best solution is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
+- `best_solution_generation`: The generation number at which the best fitness value is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
 - `cal_pop_fitness`: A method that calculates the fitness values for all solutions within the population by calling the function passed to the `fitness_func` parameter for each solution.
 
 Next, the steps of using the PyGAD library are discussed.
@@ -76,12 +76,12 @@ Next, the steps of using the PyGAD library are discussed.
 To use PyGAD, here is a summary of the required steps: 
 
 1. Preparing the `fitness_func` parameter.
-2. Preparing other parameters.
-3. Example of preparing the parameters.
-4. Import the `pygad.py` module.
-5. Create an instance of the `GA` class.
-6. Run the genetic algorithm.
-7. Plotting Results.
+2. Preparing Other Parameters.
+3. Import `pygad`.
+4. Create an Instance of the `pygad.GA` Class.
+5. Run the Genetic Algorithm.
+6. Plotting Results.
+7. Information about the Best Solution.
 8. Saving & Loading the Results.
 
 Let's discuss how to do each of these steps.
@@ -118,9 +118,9 @@ The function must accept 2 parameters:
 
 By creating this function, you are ready to use the library. 
 
-### Example of Preparing the Parameters
+### Preparing Other Parameters
 
-Here is an example for preparing the parameters:
+Here is an example for preparing the other parameters:
 
 ```python
 num_generations = 50
@@ -143,7 +143,7 @@ mutation_type = "random"
 mutation_percent_genes = 10
 ```
 
-#### Optional `callback_generation` Parameter
+#### The `callback_generation` Parameter
 
 In PyGAD 2.0.0 and higher, an optional parameter named `callback_generation` is supported which allow the user to call a function (with a single parameter) after each generation. Here is a simple function that just prints the current generation number and the fitness value of the best solution in the current generation. The `generations_completed` attribute of the GA class returns the number of the last completed generation.
 
@@ -161,21 +161,21 @@ ga_instance = pygad.GA(...,
                        ...)
 ```
 
-After the parameters are prepared, we can import the `pygad` module and build an instance of the GA class.
+After the parameters are prepared, we can import the `pygad` and build an instance of the GA class.
 
-### Import the `pygad.py` Module
+### Import the `pygad`
 
-The next step is to import the `pygad` module as follows:
+The next step is to import `pygad` as follows:
 
 ```python
 import pygad
 ```
 
-This module has a class named `GA` which holds the implementation of all methods for running the genetic algorithm.
+PyGAD has a class named `GA` which holds the implementation of all methods for running the genetic algorithm.
 
-### Create an Instance of the `GA` Class.
+### Create an Instance of the `pygad.GA` Class.
 
-The `GA` class is instantiated where the previously prepared parameters are fed to its constructor. The constructor is responsible for creating the initial population.
+The `pygad.GA` class is instantiated where the previously prepared parameters are fed to its constructor. The constructor is responsible for creating the initial population.
 
 ```python
 ga_instance = pygad.GA(num_generations=num_generations,
@@ -217,20 +217,40 @@ ga_instance.plot_result()
 
 ![Fig02](https://user-images.githubusercontent.com/16560492/78830005-93111d00-79e7-11ea-9d8e-a8d8325a6101.png)
 
-### Saving & Loading the Results
+### Information about the Best Solution
 
-After the `run()` method completes, it is possible to save the current instance of the genetic algorithm to avoid losing the progress made. The `save()` method is available for that purpose. According to the next code, a file named `genetic.pkl` will be created and saved in the current directory.
+The following information about the best solution in the last population is be returned using the `best_solution()` method. 
+
+- Solution
+- Fitness value of the solution
+- Index of the solution within the population
 
 ```python
-# Saving the GA instance.
-filename = 'genetic' # The filename to which the instance is saved. The name is without extension.
+solution, solution_fitness, solution_idx = ga_instance.best_solution()
+print("Parameters of the best solution : {solution}".format(solution=solution))
+print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
+print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+```
+
+Using the `best_solution_generation` attribute of the instance from the `pygad.GA` class, the generation number at which the **best fitness** is reached could be fetched.
+
+```python
+if ga_instance.best_solution_generation != -1:
+    print("Best fitness value reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
+```
+
+### Saving & Loading the Results
+
+After the `run()` method completes, it is possible to save the current instance of the genetic algorithm to avoid losing the progress made. The `save()` method is available for that purpose. Just pass the file name to it without an extension. According to the next code, a file named `genetic.pkl` will be created and saved in the current directory.
+
+```python
+filename = 'genetic'
 ga_instance.save(filename=filename)
 ```
 
 You can also load the saved model using the `load()` function and continue using it. For example, you might run the genetic algorithm for a number of generations, save its current state using the `save()` method, load the model using the `load()` function, and then call the `run()` method again.
 
 ```python
-# Loading the saved GA instance.
 loaded_ga_instance = pygad.load(filename=filename)
 ```
 
@@ -313,14 +333,38 @@ print("Best solution reached after {best_solution_generation} generations.".form
 To start with coding the genetic algorithm, you can check the tutorial titled [**Genetic Algorithm Implementation in Python**](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad) available at these links:
 
 - https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad
-
 - https://towardsdatascience.com/genetic-algorithm-implementation-in-python-5ab67bb124a6
+- https://www.kdnuggets.com/2018/07/genetic-algorithm-implementation-python.html 
 
 [This tutorial](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad) is prepared based on a previous version of the project but it still a good resource to start with coding the genetic algorithm.
 
 ![Fig03](https://user-images.githubusercontent.com/16560492/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png)
 
-You can also check my book cited as [**Ahmed Fawzy Gad 'Practical Computer Vision Applications Using Deep Learning with CNNs'. Dec. 2018, Apress, 978-1-4842-4167-7**](https://www.amazon.com/Practical-Computer-Vision-Applications-Learning/dp/1484241665).
+Get started with the genetic algorithm by reading the tutorial titled [**Introduction to Optimization with Genetic Algorithm**](https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad) which is available at these links:
+
+* https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad
+* https://www.kdnuggets.com/2018/03/introduction-optimization-with-genetic-algorithm.html
+* https://towardsdatascience.com/introduction-to-optimization-with-genetic-algorithm-2f5001d9964b  
+
+![Introduction to Genetic Algorithm](https://user-images.githubusercontent.com/16560492/82078259-26252d00-96e1-11ea-9a02-52a99e1054b9.jpg)
+
+Read about building neural networks in Python through the tutorial titled [**Artificial Neural Network Implementation using NumPy and Classification of the Fruits360 Image Dataset**](https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad) available at these links:
+
+* https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad
+* https://towardsdatascience.com/artificial-neural-network-implementation-using-numpy-and-classification-of-the-fruits360-image-3c56affa4491
+* https://www.kdnuggets.com/2019/02/artificial-neural-network-implementation-using-numpy-and-image-classification.html
+
+![Building Neural Networks Python](https://user-images.githubusercontent.com/16560492/82078281-30472b80-96e1-11ea-8017-6a1f4383d602.jpg)
+
+Read about training neural networks using the genetic algorithm through the tutorial titled [**Artificial Neural Networks Optimization using Genetic Algorithm with Python**](https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad) available at these links:
+
+- https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad
+- https://towardsdatascience.com/artificial-neural-networks-optimization-using-genetic-algorithm-with-python-1fe8ed17733e
+- https://www.kdnuggets.com/2019/03/artificial-neural-networks-optimization-genetic-algorithm-python.html
+
+![Training Neural Networks using Genetic Algorithm Python](https://user-images.githubusercontent.com/16560492/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg)
+
+You can also check my book cited as [**Ahmed Fawzy Gad 'Practical Computer Vision Applications Using Deep Learning with CNNs'. Dec. 2018, Apress, 978-1-4842-4167-7**](https://www.amazon.com/Practical-Computer-Vision-Applications-Learning/dp/1484241665) which discusses neural networks, convolutional neural networks, deep learning, genetic algorithm, and more.
 
 ![Fig04](https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg)
 
