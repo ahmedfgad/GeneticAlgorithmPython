@@ -230,8 +230,8 @@ class GA:
 
         # Even such this parameter is declared in the class header, it is assigned to the object here to access it after saving the object.
         self.best_solutions_fitness = [] # A list holding the fitness value of the best solution for each generation.
-        
-        self.best_solution_generation = -1 # The generation number at which the best solution is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
+
+        self.best_solution_generation = -1 # The generation number at which the best fitness value is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
 
     def initialize_population(self, low, high):
         """
