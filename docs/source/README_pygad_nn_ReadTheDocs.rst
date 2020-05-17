@@ -19,7 +19,7 @@ Currently, **pygad.nn** it only supports classification and later
 regression will be also supported. Moreover, only one class is supported
 per sample.
 
-.. _header-n5:
+.. _header-n6:
 
 Supported Layers
 ================
@@ -35,7 +35,7 @@ class. The layers and their classes are:
 In the future, more layers will be added. The next subsections discuss
 such layers.
 
-.. _header-n13:
+.. _header-n14:
 
 ``pygad.nn.InputLayer`` Class
 -----------------------------
@@ -63,7 +63,7 @@ the ``pygad.nn.InputLayer`` class can be accessed.
 
 This is everything about the input layer.
 
-.. _header-n19:
+.. _header-n20:
 
 ``pygad.nn.DenseLayer`` Class
 -----------------------------
@@ -157,7 +157,7 @@ the number of input neurons.
 Assuming that ``dense_layer2`` is the last dense layer, then it is
 regarded as the output layer.
 
-.. _header-n47:
+.. _header-n48:
 
 ``previous_layer`` Attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -200,7 +200,7 @@ is the input layer.
         Go to the previous layer.
        layer = layer.previous_layer
 
-.. _header-n55:
+.. _header-n56:
 
 Functions to Manipulate Neural Networks
 =======================================
@@ -208,7 +208,7 @@ Functions to Manipulate Neural Networks
 There are a number of functions existing in the ``pygad.nn`` module that
 helps to manipulate the neural network.
 
-.. _header-n57:
+.. _header-n58:
 
 ``pygad.nn.layers_weights()``
 -----------------------------
@@ -234,7 +234,7 @@ their ``previous_layer`` attribute. For each layer, either the initial
 weights or the trained weights are returned based on where the
 ``initial`` parameter is ``True`` or ``False``.
 
-.. _header-n66:
+.. _header-n67:
 
 ``pygad.nn.layers_weights_as_vector()``
 ---------------------------------------
@@ -264,7 +264,7 @@ their ``previous_layer`` attribute. For each layer, either the initial
 weights or the trained weights are returned based on where the
 ``initial`` parameter is ``True`` or ``False``.
 
-.. _header-n76:
+.. _header-n77:
 
 ``pygad.nn.layers_weights_as_matrix()``
 ---------------------------------------
@@ -290,7 +290,7 @@ their ``previous_layer`` attribute. For each layer, the shape of its
 weights array is returned. This shape is used to reshape the weights
 vector of the layer into a matrix.
 
-.. _header-n86:
+.. _header-n87:
 
 ``pygad.nn.layers_activations()``
 ---------------------------------
@@ -308,7 +308,7 @@ their ``previous_layer`` attribute. For each layer, the name of the
 activation function used is returned using the layer's
 ``activation_function`` attribute.
 
-.. _header-n93:
+.. _header-n94:
 
 ``pygad.nn.sigmoid()``
 ----------------------
@@ -319,7 +319,7 @@ Accepts the following parameters:
 
 -  ``sop``: The input to which the sigmoid function is applied.
 
-.. _header-n99:
+.. _header-n100:
 
 ``relu()``
 ----------
@@ -331,7 +331,7 @@ Accepts the following parameters:
 
 -  ``sop``: The input to which the sigmoid function is applied.
 
-.. _header-n105:
+.. _header-n106:
 
 ``pygad.nn.train_network()``
 ----------------------------
@@ -357,7 +357,7 @@ the learning rate. No learning algorithm is used because the purpose of
 this project is to only build the forward pass of training a neural
 network.
 
-.. _header-n120:
+.. _header-n121:
 
 ``pygad.nn.update_weights()``
 -----------------------------
@@ -375,7 +375,7 @@ Accepts the following parameters:
 
 -  ``learning_rate``: The learning rate.
 
-.. _header-n130:
+.. _header-n131:
 
 ``pygad.nn.update_layers_trained_weights()``
 --------------------------------------------
@@ -402,7 +402,7 @@ their ``previous_layer`` attribute. For each layer, its
 ``trained_weights`` attribute is assigned the weights of the layer from
 the ``final_weights`` parameter.
 
-.. _header-n140:
+.. _header-n141:
 
 ``pygad.nn.predict_outputs()``
 ------------------------------
@@ -419,7 +419,7 @@ Accepts the following parameters:
 
 All the data samples are fed to the network to return their predictions.
 
-.. _header-n149:
+.. _header-n150:
 
 Helper Functions
 ================
@@ -427,7 +427,7 @@ Helper Functions
 There are functions in the ``pygad.nn`` module that does not directly
 manipulate the neural networks.
 
-.. _header-n151:
+.. _header-n152:
 
 ``pygad.nn.to_vector()``
 ------------------------
@@ -439,7 +439,7 @@ Accepts the following parameters:
 
 -  ``array``: The NumPy array to be converted into a 1D vector.
 
-.. _header-n157:
+.. _header-n158:
 
 ``pygad.nn.to_array()``
 -----------------------
@@ -453,7 +453,7 @@ Accepts the following parameters:
 
 -  ``shape``: The target shape of the array.
 
-.. _header-n165:
+.. _header-n166:
 
 Supported Activation Functions
 ==============================
@@ -465,7 +465,7 @@ The supported activation functions are:
 2. Rectified Linear Unit (ReLU): Implemented using the
    ``pygad.nn.relu()`` function.
 
-.. _header-n172:
+.. _header-n173:
 
 Steps to Build a Neural Network
 ===============================
@@ -483,7 +483,7 @@ neural network. The summary of the steps are as follows:
 
 -  Calculating Some Statistics
 
-.. _header-n185:
+.. _header-n186:
 
 Reading the Data
 ----------------
@@ -592,7 +592,7 @@ arrays according to the next 2 lines:
 
 After the data is prepared, next is to create the network architecture.
 
-.. _header-n220:
+.. _header-n221:
 
 Building the Network Architecture
 ---------------------------------
@@ -621,7 +621,7 @@ neurons equal to the number of classes in the dataset which is 4.
 After both the data and the network architecture are prepared, the next
 step is to train the network.
 
-.. _header-n226:
+.. _header-n227:
 
 Training the Network
 --------------------
@@ -638,7 +638,7 @@ Here is an example of using the ``pygad.nn.train_network()`` function.
 
 After training the network, the next step is to make predictions.
 
-.. _header-n230:
+.. _header-n231:
 
 Making Predictions
 ------------------
@@ -653,7 +653,7 @@ making predictions. Here is an example.
 It is not expected to have high accuracy in the predictions because no
 training algorithm is used.
 
-.. _header-n234:
+.. _header-n235:
 
 Calculating Some Statistics
 ---------------------------
@@ -676,7 +676,7 @@ classification accuracy is high because no training algorithm is used.
 Please check the documentation of the ``pygad.gann`` module for training
 the network using the genetic algorithm.
 
-.. _header-n238:
+.. _header-n239:
 
 Examples
 ========
@@ -684,7 +684,7 @@ Examples
 This section gives the complete code of some examples that build neural
 networks using ``pygad.nn``. Each subsection builds a different network.
 
-.. _header-n240:
+.. _header-n241:
 
 XOR
 ---
@@ -741,7 +741,7 @@ has 2 neurons, one for each class.
    print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
    print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
 
-.. _header-n243:
+.. _header-n244:
 
 Image Classification
 --------------------

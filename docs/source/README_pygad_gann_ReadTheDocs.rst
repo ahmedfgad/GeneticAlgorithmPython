@@ -326,7 +326,8 @@ The output layer has 2 neurons because there are only 2 classes (0 and
 
 .. code:: python
 
-   import pygad
+   import pygad.gann
+   import pygad.nn
 
    num_solutions = 6
    GANN_instance = pygad.gann.GANN(num_solutions=num_solutions,
@@ -666,14 +667,14 @@ its complete code is listed below.
 
    import numpy
    import pygad
-   import nn
-   import gann
+   import pygad.nn
+   import pygad.gann
 
    def fitness_func(solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
        predictions = pygad.nn.predict_outputs(last_layer=GANN_instance.population_networks[sol_idx],
-                                        data_inputs=data_inputs)
+                                              data_inputs=data_inputs)
        correct_predictions = numpy.where(predictions == data_outputs)[0].size
        solution_fitness = (correct_predictions/data_outputs.size)*100
 
@@ -683,7 +684,7 @@ its complete code is listed below.
        global GANN_instance, last_fitness
 
        population_matrices = pygad.gann.population_as_matrices(population_networks=GANN_instance.population_networks, 
-                                                         population_vectors=ga_instance.population)
+                                                               population_vectors=ga_instance.population)
 
        GANN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
@@ -716,11 +717,11 @@ its complete code is listed below.
    # Creating an initial population of neural networks. The return of the initial_population() function holds references to the networks, not their weights. Using such references, the weights of all networks can be fetched.
    num_solutions = 6 # A solution or a network can be used interchangeably.
    GANN_instance = pygad.gann.GANN(num_solutions=num_solutions,
-                             num_neurons_input=num_inputs,
-                             num_neurons_hidden_layers=[2],
-                             num_neurons_output=num_classes,
-                             hidden_activations=["relu"],
-                             output_activation="sigmoid")
+                                   num_neurons_input=num_inputs,
+                                   num_neurons_hidden_layers=[2],
+                                   num_neurons_output=num_classes,
+                                   hidden_activations=["relu"],
+                                   output_activation="sigmoid")
 
    # population does not hold the numerical weights of the network instead it holds a list of references to each last layer of each network (i.e. solution) in the population. A solution or a network can be used interchangeably.
    # If there is a population with 3 solutions (i.e. networks), then the population is a list with 3 elements. Each element is a reference to the last layer of each network. Using such a reference, all details of the network can be accessed.
@@ -825,12 +826,14 @@ according to the ``num_neurons_output`` parameter of the
 
    import numpy
    import pygad
+   import pygad.nn
+   import pygad.gann
 
    def fitness_func(solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
        predictions = pygad.nn.predict_outputs(last_layer=GANN_instance.population_networks[sol_idx],
-                                        data_inputs=data_inputs)
+                                              data_inputs=data_inputs)
        correct_predictions = numpy.where(predictions == data_outputs)[0].size
        solution_fitness = (correct_predictions/data_outputs.size)*100
 
@@ -839,7 +842,8 @@ according to the ``num_neurons_output`` parameter of the
    def callback_generation(ga_instance):
        global GANN_instance, last_fitness
 
-       population_matrices = pygad.gann.population_as_matrices(population_networks=GANN_instance.population_networks, population_vectors=ga_instance.population)
+       population_matrices = pygad.gann.population_as_matrices(population_networks=GANN_instance.population_networks, 
+                                                               population_vectors=ga_instance.population)
 
        GANN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
@@ -868,7 +872,7 @@ according to the ``num_neurons_output`` parameter of the
    num_classes = 4
 
    # Creating an initial population of neural networks. The return of the initial_population() function holds references to the networks, not their weights. Using such references, the weights of all networks can be fetched.
-   num_solutions = 6 # A solution or a network can be used interchangeably.
+   num_solutions = 8 # A solution or a network can be used interchangeably.
    GANN_instance = pygad.gann.GANN(num_solutions=num_solutions,
                                    num_neurons_input=num_inputs,
                                    num_neurons_hidden_layers=[150, 50],
@@ -877,7 +881,7 @@ according to the ``num_neurons_output`` parameter of the
                                    output_activation="relu")
 
    # population does not hold the numerical weights of the network instead it holds a list of references to each last layer of each network (i.e. solution) in the population. A solution or a network can be used interchangeably.
-   # If there is a population with 3 solutions (i.e. networks), then the population is a list with 3 elements. Each element is a reference to the last layer of each network. Using such reference, all details of the network can be accessed.
+   # If there is a population with 3 solutions (i.e. networks), then the population is a list with 3 elements. Each element is a reference to the last layer of each network. Using such a reference, all details of the network can be accessed.
    population_vectors = pygad.gann.population_as_vectors(population_networks=GANN_instance.population_networks)
 
    # To prepare the initial population, there are 2 ways:
@@ -912,11 +916,12 @@ according to the ``num_neurons_output`` parameter of the
 
    ga_instance.run()
 
-   # After the generations complete, some plots are showed that summarize the how the outputs/fitenss values evolve over generations.
+   # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
    ga_instance.plot_result()
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
+   print("Parameters of the best solution : {solution}".format(solution=solution))
    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
@@ -926,6 +931,7 @@ according to the ``num_neurons_output`` parameter of the
    # Predicting the outputs of the data using the best solution.
    predictions = pygad.nn.predict_outputs(last_layer=GANN_instance.population_networks[solution_idx],
                                     data_inputs=data_inputs)
+   print("Predictions of the trained network : {predictions}".format(predictions=predictions))
 
    # Calculating some statistics
    num_wrong = numpy.where(predictions != data_outputs)[0]
