@@ -233,13 +233,13 @@ pygad.gann Module
 
 .. _header-n7:
 
-Conclusion
+More Information
 =================
 
 
 .. toctree::
    :maxdepth: 4
-   :caption: Conclusion
+   :caption: More Information
 
    Footer.rst
 
@@ -250,6 +250,4 @@ Conclusion
 Indices and tables
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
