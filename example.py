@@ -75,6 +75,9 @@ print("Parameters of the best solution : {solution}".format(solution=solution))
 print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
 print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
+prediction = numpy.sum(numpy.array(function_inputs)*solution)
+print("Predicted output based on the best solution : {prediction}".format(prediction=prediction))
+
 if ga_instance.best_solution_generation != -1:
     print("Best fitness value reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
 
