@@ -97,6 +97,16 @@ Release Date: 14 May 2020
 
 .. _header-n42:
 
+PyGAD 2.2.1
+===========
+
+Release Date: 17 May 2020
+
+1. Adding 2 extra modules (pygad.nn and pygad.gann) for building and
+   training neural networks with the genetic algorithm.
+
+.. _header-n148:
+
 PyGAD Projects at GitHub
 ========================
 
