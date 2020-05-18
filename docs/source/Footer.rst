@@ -95,17 +95,53 @@ Release Date: 14 May 2020
 1. The ``best_solution_fitness`` attribute is renamed to
    ``best_solutions_fitness`` (plural solution).
 
-.. _header-n42:
+2. Mutation is applied independently for the genes.
+
+.. _header-n44:
 
 PyGAD 2.2.1
-===========
+-----------
 
 Release Date: 17 May 2020
 
 1. Adding 2 extra modules (pygad.nn and pygad.gann) for building and
    training neural networks with the genetic algorithm.
 
-.. _header-n148:
+.. _header-n49:
+
+PyGAD 2.2.2
+-----------
+
+Release Date: 18 May 2020
+
+1. The initial value of the ``generations_completed`` attribute of
+   instances from the pygad.GA class is ``0`` rather than ``None``.
+
+2. An optional bool parameter named ``mutation_by_replacement`` is added
+   to the constructor of the pygad.GA class. It works only when the
+   selected type of mutation is random (``mutation_type="random"``). In
+   this case, setting ``mutation_by_replacement=True`` means replace the
+   gene by the randomly generated value. If ``False``, then it has no
+   effect and random mutation works by adding the random value to the
+   gene. This parameter should be used when the gene falls within a
+   fixed range and its value must not go out of this range. Here are
+   some examples:
+
+   Assume there is a gene with the value 0.5.
+
+   If ``mutation_type="random"`` and ``mutation_by_replacement=False``,
+   then the generated random value (e.g. 0.1) will be added to the gene
+   value. The new gene value is **0.5+0.1=0.6**.
+
+   If ``mutation_type="random"`` and ``mutation_by_replacement=True``,
+   then the generated random value (e.g. 0.1) will replace the gene
+   value. The new gene value is **0.1**.
+
+3. ``None`` value could be assigned to the ``mutation_type`` and
+   ``crossover_type`` parameters of the pygad.GA class constructor. When
+   ``None``, this means the step is bypassed and has no action.
+
+.. _header-n155:
 
 PyGAD Projects at GitHub
 ========================
@@ -115,7 +151,7 @@ https://pypi.org/project/pygad. PyGAD is built out of a number of
 open-source GitHub projects. A brief note about these projects is given
 in the next subsections.
 
-.. _header-n44:
+.. _header-n51:
 
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 --------------------------------------------------------------------------------
@@ -126,7 +162,7 @@ GitHub Link: https://github.com/ahmedfgad/GeneticAlgorithmPython
 is the first project which is an open-source Python 3 project for
 implementing the genetic algorithm based on NumPy.
 
-.. _header-n47:
+.. _header-n54:
 
 `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__
 ----------------------------------------------------
@@ -140,7 +176,7 @@ neural network without using a training algorithm. Currently, it only
 supports classification and later regression will be also supported.
 Moreover, only one class is supported per sample.
 
-.. _header-n50:
+.. _header-n57:
 
 `NeuralGenetic <https://github.com/ahmedfgad/NeuralGenetic>`__
 --------------------------------------------------------------
@@ -153,7 +189,7 @@ projects
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 and `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__.
 
-.. _header-n53:
+.. _header-n60:
 
 Submitting Issues
 =================
@@ -170,7 +206,7 @@ is not working properly or to ask for questions.
 If this is not a proper option for you, then check the **Contact Us**
 section for more contact details.
 
-.. _header-n57:
+.. _header-n64:
 
 Ask for Feature
 ===============
@@ -187,7 +223,7 @@ to ahmed.f.gad@gmail.com.
 
 Also check the **Contact Us** section for more contact details.
 
-.. _header-n61:
+.. _header-n68:
 
 Projects Built using PyGAD
 ==========================
@@ -206,7 +242,7 @@ Within your message, please send the following details:
 
 -  Preferably, a link that directs the readers to your project
 
-.. _header-n72:
+.. _header-n79:
 
 For More Information
 ====================
@@ -214,7 +250,7 @@ For More Information
 There are different resources that can be used to get started with the
 genetic algorithm and building it in Python.
 
-.. _header-n74:
+.. _header-n81:
 
 Tutorial: Implementing Genetic Algorithm in Python
 --------------------------------------------------
@@ -238,7 +274,7 @@ good resource to start with coding the genetic algorithm.
 
 |image0|
 
-.. _header-n85:
+.. _header-n92:
 
 Tutorial: Introduction to Genetic Algorithm
 -------------------------------------------
@@ -257,7 +293,7 @@ which is available at these links:
 
 |image1|
 
-.. _header-n95:
+.. _header-n102:
 
 Tutorial: Build Neural Networks in Python
 -----------------------------------------
@@ -277,7 +313,7 @@ available at these links:
 
 |image2|
 
-.. _header-n105:
+.. _header-n112:
 
 Tutorial: Optimize Neural Networks with Genetic Algorithm
 ---------------------------------------------------------
@@ -297,7 +333,7 @@ available at these links:
 
 |image3|
 
-.. _header-n115:
+.. _header-n122:
 
 Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 --------------------------------------------------------------------------
@@ -323,7 +359,7 @@ Find the book at these links:
 .. figure:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
    :alt: 
 
-.. _header-n130:
+.. _header-n137:
 
 Contact Us
 ==========
