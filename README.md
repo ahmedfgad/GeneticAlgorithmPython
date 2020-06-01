@@ -1,10 +1,12 @@
-# PyGAD
+# GeneticAlgorithmPython: Implementing Genetic Algorithm in Python
 
-[PyGAD](https://pypi.org/project/pygad) is an open-source Python 3 library for implementing the genetic algorithm and optimizing machine learning algorithms. 
+[GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython) is a Python project for training neural networks using NumPy. 
+
+[GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython) is part of [PyGAD](https://pypi.org/project/pygad) which is an open-source Python 3 library for implementing the genetic algorithm and optimizing machine learning algorithms. 
+
+Check documentation of the [GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython) project in the PyGAD's documentation: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html
 
 [PyGAD](https://pypi.org/project/pygad) supports different types of crossover, mutation, and parent selection. [PyGAD](https://pypi.org/project/pygad) allows different types of problems to be optimized using the genetic algorithm by customizing the fitness function. 
-
-Besides building the genetic algorithm, it builds and optimizes machine learning algorithms. Currently, [PyGAD](https://pypi.org/project/pygad) supports building and training (using genetic algorithm) artificial neural networks for classification problems. 
 
 The library is under active development and more features in the genetic algorithm will be added like working with binary problems. This is in addition to supporting more machine learning algorithms.
 
