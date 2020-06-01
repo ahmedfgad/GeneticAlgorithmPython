@@ -10,25 +10,35 @@
 Welcome to PyGAD's documentation!
 =================================
 
-PyGAD is an open-source Python 3 library for implementing the genetic algorithm and optimizing machine learning algorithms. 
+`PyGAD <https://pypi.org/project/pygad>`__ is an open-source Python 3
+library for implementing the genetic algorithm and optimizing machine
+learning algorithms.
 
-PyGAD supports different types of crossover, mutation, and parent selection. PyGAD allows different types of problems to be optimized using the genetic algorithm by customizing the fitness function. 
+`PyGAD <https://pypi.org/project/pygad>`__ supports different types of
+crossover, mutation, and parent selection.
+`PyGAD <https://pypi.org/project/pygad>`__ allows different types of
+problems to be optimized using the genetic algorithm by customizing the
+fitness function.
 
-Besides building the genetic algorithm, it builds and optimizes machine learning algorithms. Currently, PyGAD supports building and training (using genetic algorithm) artificial neural networks for classification problems. 
+Besides building the genetic algorithm, it builds and optimizes machine
+learning algorithms. Currently,
+`PyGAD <https://pypi.org/project/pygad>`__ supports building and
+training (using genetic algorithm) artificial neural networks for
+classification problems.
 
-The library is under active development and more features in the genetic algorithm will be added like working with binary problems. This is in addition to supporting more machine learning algorithms.
+The library is under active development and more features in the genetic
+algorithm will be added like working with binary problems. This is in
+addition to supporting more machine learning algorithms.
 
-
-
-
-
-.. _header-n1:
+.. _header-n5:
 
 Installation
 ============
 
-To install PyGAD, simply use pip to download and install the library
-from PyPI (Python Package Index).
+To install `PyGAD <https://pypi.org/project/pygad>`__, simply use pip to
+download and install the library from
+`PyPI <https://pypi.org/project/pygad>`__ (Python Package Index). The
+library lives a PyPI at this page https://pypi.org/project/pygad.
 
 For Windows, issue the following command:
 
@@ -48,24 +58,22 @@ manipulating arrays and Matplotlib for creating figures. The exact NumPy
 version used in developing PyGAD is 1.16.4. For Matplotlib, the version
 is 3.1.0.
 
-
-
-
-
-.. _header-n2:
+.. _header-n12:
 
 Quick Start
 ===========
 
-To get started with PyGAD, simply import it.
+To get started with `PyGAD <https://pypi.org/project/pygad>`__, simply
+import it.
 
 .. code:: python
 
    import pygad
 
-Using PyGAD, a wide range of problems can be optimized. A quick and
-simple problem to be optimized using the PyGAD is finding the best set
-of weights that satisfy the following function:
+Using `PyGAD <https://pypi.org/project/pygad>`__, a wide range of
+problems can be optimized. A quick and simple problem to be optimized
+using the `PyGAD <https://pypi.org/project/pygad>`__ is finding the best
+set of weights that satisfy the following function:
 
 .. code:: 
 
@@ -90,7 +98,8 @@ used for calculating the fitness value for each solution. Here is one.
        fitness = 1.0 / numpy.abs(output - desired_output)
        return fitness
 
-Next is to prepare the parameters of PyGAD. Here is an example for a set
+Next is to prepare the parameters of
+`PyGAD <https://pypi.org/project/pygad>`__. Here is an example for a set
 of parameters.
 
 .. code:: python
@@ -157,27 +166,28 @@ solution found by PyGAD can be accessed.
    Fitness value of the best solution = 157.37320042925006
    Predicted output based on the best solution : 44.00635432206546
 
-There is more to do using PyGAD. Read PyGAD's documentation to explore its
-features.
+There is more to do using PyGAD. Read its documentation to explore the
+features of PyGAD.
 
-
-
-
-
-.. _header-n3:
+.. _header-n31:
 
 PyGAD's Modules
 ===============
 
-PyGAD has the following modules:
+`PyGAD <https://pypi.org/project/pygad>`__ has the following modules:
 
 1. The main module has the same name as the library which is ``pygad``
    that builds the genetic algorithm.
 
-2. The second module is ``nn`` which builds artificial neural networks.
+2. The ``nn`` module builds artificial neural networks.
 
-3. The third module is ``gann`` for optimizing neural networks using the
-   genetic algorithm.
+3. The ``gann`` module optimizes neural networks using the genetic
+   algorithm.
+
+4. The ``cnn`` module builds convolutional neural networks.
+
+5. The ``gacnn`` module optimizes convolutional neural networks using
+   the genetic algorithm.
 
 The documentation discusses each of these modules.
 
@@ -231,7 +241,47 @@ pygad.gann Module
 
 
 
+
+
+
+
+
 .. _header-n7:
+
+pygad.cnn Module
+=================
+
+
+.. toctree::
+   :maxdepth: 4
+   :caption: pygad.cnn Module TOC
+
+   README_pygad_cnn_ReadTheDocs.rst
+
+
+
+
+
+
+
+
+
+.. _header-n8:
+
+pygad.gacnn Module
+=================
+
+
+.. toctree::
+   :maxdepth: 4
+   :caption: pygad.gacnn Module TOC
+
+   README_pygad_gacnn_ReadTheDocs.rst
+
+
+
+
+.. _header-n9:
 
 More Information
 =================

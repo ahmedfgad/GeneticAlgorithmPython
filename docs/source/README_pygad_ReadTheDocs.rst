@@ -498,6 +498,14 @@ generation.
 
 If no generation is completed (at least 1), an exception is raised.
 
+In PyGAD 2.3.0 and higher, this function accepts 3 optional parameters:
+
+1. ``title``: Title of the figure.
+
+2. ``xlabel``: X-axis label.
+
+3. ``ylabel``: Y-axis label.
+
 .. _header-n186:
 
 ``save()``

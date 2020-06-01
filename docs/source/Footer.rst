@@ -127,21 +127,46 @@ Release Date: 18 May 2020
    fixed range and its value must not go out of this range. Here are
    some examples:
 
-   Assume there is a gene with the value 0.5.
+ Assume there is a gene with the value 0.5.
 
-   If ``mutation_type="random"`` and ``mutation_by_replacement=False``,
-   then the generated random value (e.g. 0.1) will be added to the gene
-   value. The new gene value is **0.5+0.1=0.6**.
+ If ``mutation_type="random"`` and ``mutation_by_replacement=False``,
+then the generated random value (e.g. 0.1) will be added to the gene
+value. The new gene value is **0.5+0.1=0.6**.
 
-   If ``mutation_type="random"`` and ``mutation_by_replacement=True``,
-   then the generated random value (e.g. 0.1) will replace the gene
-   value. The new gene value is **0.1**.
+ If ``mutation_type="random"`` and ``mutation_by_replacement=True``,
+then the generated random value (e.g. 0.1) will replace the gene value.
+The new gene value is **0.1**.
 
-3. ``None`` value could be assigned to the ``mutation_type`` and
+1. ``None`` value could be assigned to the ``mutation_type`` and
    ``crossover_type`` parameters of the pygad.GA class constructor. When
    ``None``, this means the step is bypassed and has no action.
 
-.. _header-n155:
+.. _header-n62:
+
+PyGAD 2.3.0
+-----------
+
+Release date: 1 June 2020
+
+1. A new module named ``pygad.cnn`` is supported for building
+   convolutional neural networks.
+
+2. A new module named ``pygad.gacnn`` is supported for training
+   convolutional neural networks using the genetic algorithm.
+
+3. The ``pygad.plot_result()`` method has 3 optional parameters named
+   ``title``, ``xlabel``, and ``ylabel`` to customize the plot title,
+   x-axis label, and y-axis label, respectively.
+
+4. The ``pygad.nn`` module supports the softmax activation function.
+
+5. The name of the ``pygad.nn.predict_outputs()`` function is changed to
+   ``pygad.nn.predict()``.
+
+6. The name of the ``pygad.nn.train_network()`` function is changed to
+   ``pygad.nn.train()``.
+
+.. _header-n77:
 
 PyGAD Projects at GitHub
 ========================
@@ -151,7 +176,7 @@ https://pypi.org/project/pygad. PyGAD is built out of a number of
 open-source GitHub projects. A brief note about these projects is given
 in the next subsections.
 
-.. _header-n51:
+.. _header-n79:
 
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 --------------------------------------------------------------------------------
@@ -162,7 +187,7 @@ GitHub Link: https://github.com/ahmedfgad/GeneticAlgorithmPython
 is the first project which is an open-source Python 3 project for
 implementing the genetic algorithm based on NumPy.
 
-.. _header-n54:
+.. _header-n82:
 
 `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__
 ----------------------------------------------------
@@ -176,7 +201,7 @@ neural network without using a training algorithm. Currently, it only
 supports classification and later regression will be also supported.
 Moreover, only one class is supported per sample.
 
-.. _header-n57:
+.. _header-n85:
 
 `NeuralGenetic <https://github.com/ahmedfgad/NeuralGenetic>`__
 --------------------------------------------------------------
@@ -189,7 +214,19 @@ projects
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 and `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__.
 
-.. _header-n60:
+.. _header-n88:
+
+`NumPyCNN <https://github.com/ahmedfgad/NumPyCNN>`__
+----------------------------------------------------
+
+GitHub Link: https://github.com/ahmedfgad/NumPyCNN
+
+`NumPyCNN <https://github.com/ahmedfgad/NumPyCNN>`__ builds and trains
+convolutional neural networks using the genetic algorithm. It uses the
+`GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
+project for building the genetic algorithm.
+
+.. _header-n91:
 
 Submitting Issues
 =================
@@ -206,7 +243,7 @@ is not working properly or to ask for questions.
 If this is not a proper option for you, then check the **Contact Us**
 section for more contact details.
 
-.. _header-n64:
+.. _header-n95:
 
 Ask for Feature
 ===============
@@ -223,7 +260,7 @@ to ahmed.f.gad@gmail.com.
 
 Also check the **Contact Us** section for more contact details.
 
-.. _header-n68:
+.. _header-n99:
 
 Projects Built using PyGAD
 ==========================
@@ -242,7 +279,7 @@ Within your message, please send the following details:
 
 -  Preferably, a link that directs the readers to your project
 
-.. _header-n79:
+.. _header-n110:
 
 For More Information
 ====================
@@ -250,7 +287,7 @@ For More Information
 There are different resources that can be used to get started with the
 genetic algorithm and building it in Python.
 
-.. _header-n81:
+.. _header-n112:
 
 Tutorial: Implementing Genetic Algorithm in Python
 --------------------------------------------------
@@ -274,7 +311,7 @@ good resource to start with coding the genetic algorithm.
 
 |image0|
 
-.. _header-n92:
+.. _header-n123:
 
 Tutorial: Introduction to Genetic Algorithm
 -------------------------------------------
@@ -293,7 +330,7 @@ which is available at these links:
 
 |image1|
 
-.. _header-n102:
+.. _header-n133:
 
 Tutorial: Build Neural Networks in Python
 -----------------------------------------
@@ -313,7 +350,7 @@ available at these links:
 
 |image2|
 
-.. _header-n112:
+.. _header-n143:
 
 Tutorial: Optimize Neural Networks with Genetic Algorithm
 ---------------------------------------------------------
@@ -333,7 +370,52 @@ available at these links:
 
 |image3|
 
-.. _header-n122:
+.. _header-n153:
+
+Tutorial: Building CNN in Python
+--------------------------------
+
+To start with coding the genetic algorithm, you can check the tutorial
+titled `Building Convolutional Neural Network using NumPy from
+Scratch <https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad>`__
+available at these links:
+
+-  `LinkedIn <https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad>`__
+
+-  `Towards Data
+   Science <https://towardsdatascience.com/building-convolutional-neural-network-using-numpy-from-scratch-b30aac50e50a>`__
+
+-  `KDnuggets <https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html>`__
+
+-  `Chinese Translation <http://m.aliyun.com/yunqi/articles/585741>`__
+
+`This
+tutorial <https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad>`__)
+is prepared based on a previous version of the project but it still a
+good resource to start with coding CNNs.
+
+|image4|
+
+.. _header-n166:
+
+Tutorial: Derivation of CNN from FCNN
+-------------------------------------
+
+Get started with the genetic algorithm by reading the tutorial titled
+`Derivation of Convolutional Neural Network from Fully Connected Network
+Step-By-Step <https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad>`__
+which is available at these links:
+
+-  `LinkedIn <https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad>`__
+
+-  `Towards Data
+   Science <https://towardsdatascience.com/derivation-of-convolutional-neural-network-from-fully-connected-network-step-by-step-b42ebafa5275>`__
+
+-  `KDnuggets <https://www.kdnuggets.com/2018/04/derivation-convolutional-neural-network-fully-connected-step-by-step.html>`__
+
+|image5|
+
+.. _header-n176:
 
 Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 --------------------------------------------------------------------------
@@ -359,7 +441,7 @@ Find the book at these links:
 .. figure:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
    :alt: 
 
-.. _header-n137:
+.. _header-n191:
 
 Contact Us
 ==========
@@ -388,3 +470,7 @@ Contact Us
    :target: https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad
 .. |image3| image:: https://user-images.githubusercontent.com/16560492/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg
    :target: https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad
+.. |image4| image:: https://user-images.githubusercontent.com/16560492/82431022-6c3a1200-9a8e-11ea-8f1b-b055196d76e3.png
+   :target: https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad
+.. |image5| image:: https://user-images.githubusercontent.com/16560492/82431369-db176b00-9a8e-11ea-99bd-e845192873fc.png
+   :target: https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad

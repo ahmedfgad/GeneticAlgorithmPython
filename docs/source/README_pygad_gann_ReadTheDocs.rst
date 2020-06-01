@@ -50,8 +50,8 @@ parameters:
    hidden layers with 10 neurons for the first and 5 neurons for the
    second hidden layer.
 
--  ``output_activation="relu"``: The name of the activation function of
-   the output layer which defaults to ``"relu"``.
+-  ``output_activation="softmax"``: The name of the activation function
+   of the output layer which defaults to ``"softmax"``.
 
 -  ``hidden_activations="relu"``: The name(s) of the activation
    function(s) of the hidden layer(s). It defaults to ``"relu"``. If
@@ -195,10 +195,10 @@ Accepts the population as networks and returns a list holding all
 weights of the layers of each solution (i.e. network) in the population
 as a vector.
 
-If the population has 6 solutions (i.e. networks), this function accepts
-references to such networks and returns a list with 6 vectors, one for
-each network (i.e. solution). Each vector holds the weights for all
-layers for a single network.
+For example, if the population has 6 solutions (i.e. networks), this
+function accepts references to such networks and returns a list with 6
+vectors, one for each network (i.e. solution). Each vector holds the
+weights for all layers for a single network.
 
 Accepts the following parameters:
 
@@ -217,9 +217,11 @@ Accepts the population as both networks and weights vectors and returns
 the weights of all layers of each solution (i.e. network) in the
 population as a matrix.
 
-If the population has 6 solutions (i.e. networks), this function returns
-a list with 6 matrices, one for each network holding its weights for all
-layers.
+For example, if the population has 6 solutions (i.e. networks), this
+function returns a list with 6 matrices, one for each network holding
+its weights for all layers.
+
+Accepts the following parameters:
 
 -  ``population_networks``: A list holding references to the output
    (last) layers of the neural networks used in the population.
@@ -230,7 +232,7 @@ layers.
 Returns a list holding the weights matrices for all solutions (i.e.
 networks).
 
-.. _header-n72:
+.. _header-n73:
 
 Steps to Build and Train Neural Networks using Genetic Algorithm
 ================================================================
@@ -262,7 +264,7 @@ using the genetic algorithm are as follows:
 
 Let's start covering all of these steps.
 
-.. _header-n98:
+.. _header-n99:
 
 Prepare the Training Data
 -------------------------
@@ -307,7 +309,7 @@ For the XOR example, there are 2 classes and thus their labels are 0 and
 Note that the project only supports classification problems where each
 sample is assigned to only one class.
 
-.. _header-n106:
+.. _header-n107:
 
 Create an Instance of the ``pygad.gann.GANN`` Class
 ---------------------------------------------------
@@ -335,7 +337,7 @@ The output layer has 2 neurons because there are only 2 classes (0 and
                                    num_neurons_hidden_layers=[2],
                                    num_neurons_output=2,
                                    hidden_activations=["relu"],
-                                   output_activation="sigmoid")
+                                   output_activation="softmax")
 
 The architecture of the created network has the following layers:
 
@@ -354,13 +356,13 @@ The weights of the network are as follows:
    size equal to
    ``(number of hidden neurons x number of outputs) = (2x2)``.
 
-The activation function used for the output layer is ``sigmoid``. The
+The activation function used for the output layer is ``softmax``. The
 ``relu`` activation function is used for the hidden layer.
 
 After creating the instance of the ``pygad.gann.GANN`` class next is to
 fetch the weights of the population as a list of vectors.
 
-.. _header-n127:
+.. _header-n128:
 
 Fetch the Population Weights as Vectors
 ---------------------------------------
@@ -386,7 +388,7 @@ prepare 2 functions which are:
 
 2. Callback function after each generation.
 
-.. _header-n138:
+.. _header-n139:
 
 Prepare the Fitness Function
 ----------------------------
@@ -405,11 +407,11 @@ The fitness function must return a single number representing the
 fitness. The higher the fitness value, the better the solution.
 
 Here is the implementation of the fitness function for training a neural
-network. It uses the ``pygad.nn.predict_outputs()`` function to predict
-the class labels based on the current solution's weights. The
-``pygad.nn.predict_outputs()`` function uses the trained weights
-available in the ``trained_weights`` attribute of each layer of the
-network for making predictions.
+network. It uses the ``pygad.nn.predict()`` function to predict the
+class labels based on the current solution's weights. The
+``pygad.nn.predict()`` function uses the trained weights available in
+the ``trained_weights`` attribute of each layer of the network for
+making predictions.
 
 Based on such predictions, the classification accuracy is calculated.
 This accuracy is used as the fitness value of the solution. Finally, the
@@ -420,22 +422,22 @@ fitness value is returned.
    def fitness_func(solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
-       predictions = pygad.nn.predict_outputs(last_layer=GANN_instance.population_networks[sol_idx],
-                                        data_inputs=data_inputs)
+       predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],
+                                      data_inputs=data_inputs)
        correct_predictions = numpy.where(predictions == data_outputs)[0].size
        solution_fitness = (correct_predictions/data_outputs.size)*100
 
        return solution_fitness
 
-.. _header-n149:
+.. _header-n150:
 
 Prepare the Generation Callback Function
 ----------------------------------------
 
 After each generation of the genetic algorithm, the fitness function
 will be called to calculate the fitness value of each solution. Within
-the fitness function, the ``pygad.nn.predict_outputs()`` function is
-used for predicting the outputs based on the current solution's
+the fitness function, the ``pygad.nn.predict()`` function is used for
+predicting the outputs based on the current solution's
 ``trained_weights`` attribute. Thus, it is required that such an
 attribute is updated by weights evolved by the genetic algorithm after
 each generation.
@@ -476,7 +478,7 @@ solutions within the population.
 After preparing the fitness and callback function, next is to create an
 instance of the ``pygad.GA`` class.
 
-.. _header-n158:
+.. _header-n159:
 
 Create an Instance of the ``pygad.GA`` Class
 --------------------------------------------
@@ -523,7 +525,7 @@ Here is an example.
 The last step for training the neural networks using the genetic
 algorithm is calling the ``run()`` method.
 
-.. _header-n163:
+.. _header-n164:
 
 Run the Created Instance of the ``pygad.GA`` Class
 --------------------------------------------------
@@ -536,7 +538,7 @@ specified in its ``num_generations`` parameter.
 
    ga_instance.run()
 
-.. _header-n166:
+.. _header-n167:
 
 Plot the Fitness Values
 -----------------------
@@ -558,7 +560,7 @@ of generations. On the other hand, a different initial population might
 cause 100% accuracy to be reached using more generations or not reached
 at all.
 
-.. _header-n171:
+.. _header-n172:
 
 Information about the Best Solution
 -----------------------------------
@@ -603,25 +605,25 @@ fitness value is reached after 182 generations.
 
    Best solution reached after 182 generations.
 
-.. _header-n186:
+.. _header-n187:
 
 Making Predictions using the Trained Weights
 --------------------------------------------
 
-The ``pygad.nn.predict_outputs()`` function can be used to make
-predictions using the trained network. As printed, the network is able
-to predict the labels correctly.
+The ``pygad.nn.predict()`` function can be used to make predictions
+using the trained network. As printed, the network is able to predict
+the labels correctly.
 
 .. code:: python
 
-   predictions = pygad.nn.predict_outputs(last_layer=GANN_instance.population_networks[solution_idx], data_inputs=data_inputs)
+   predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[solution_idx], data_inputs=data_inputs)
    print("Predictions of the trained network : {predictions}".format(predictions=predictions))
 
 .. code:: 
 
    Predictions of the trained network : [0. 1. 1. 0.]
 
-.. _header-n190:
+.. _header-n191:
 
 Calculating Some Statistics
 ---------------------------
@@ -645,7 +647,7 @@ addition to the classification accuracy.
    print("Number of wrong classifications : 0
    Classification accuracy : 100
 
-.. _header-n194:
+.. _header-n195:
 
 Examples
 ========
@@ -654,7 +656,7 @@ This section gives the complete code of some examples that build and
 train neural networks using the genetic algorithm. Each subsection
 builds a different network.
 
-.. _header-n196:
+.. _header-n197:
 
 XOR
 ---
@@ -673,8 +675,8 @@ its complete code is listed below.
    def fitness_func(solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
-       predictions = pygad.nn.predict_outputs(last_layer=GANN_instance.population_networks[sol_idx],
-                                              data_inputs=data_inputs)
+       predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],
+                                      data_inputs=data_inputs)
        correct_predictions = numpy.where(predictions == data_outputs)[0].size
        solution_fitness = (correct_predictions/data_outputs.size)*100
 
@@ -721,7 +723,7 @@ its complete code is listed below.
                                    num_neurons_hidden_layers=[2],
                                    num_neurons_output=num_classes,
                                    hidden_activations=["relu"],
-                                   output_activation="sigmoid")
+                                   output_activation="softmax")
 
    # population does not hold the numerical weights of the network instead it holds a list of references to each last layer of each network (i.e. solution) in the population. A solution or a network can be used interchangeably.
    # If there is a population with 3 solutions (i.e. networks), then the population is a list with 3 elements. Each element is a reference to the last layer of each network. Using such a reference, all details of the network can be accessed.
@@ -777,8 +779,8 @@ its complete code is listed below.
        print("Best fitness value reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
 
    # Predicting the outputs of the data using the best solution.
-   predictions = pygad.nn.predict_outputs(last_layer=GANN_instance.population_networks[solution_idx],
-                                    data_inputs=data_inputs)
+   predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[solution_idx],
+                                  data_inputs=data_inputs)
    print("Predictions of the trained network : {predictions}".format(predictions=predictions))
 
    # Calculating some statistics
@@ -789,7 +791,7 @@ its complete code is listed below.
    print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
    print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
 
-.. _header-n199:
+.. _header-n200:
 
 Image Classification
 --------------------
@@ -832,8 +834,8 @@ according to the ``num_neurons_output`` parameter of the
    def fitness_func(solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
-       predictions = pygad.nn.predict_outputs(last_layer=GANN_instance.population_networks[sol_idx],
-                                              data_inputs=data_inputs)
+       predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],
+                                      data_inputs=data_inputs)
        correct_predictions = numpy.where(predictions == data_outputs)[0].size
        solution_fitness = (correct_predictions/data_outputs.size)*100
 
@@ -878,7 +880,7 @@ according to the ``num_neurons_output`` parameter of the
                                    num_neurons_hidden_layers=[150, 50],
                                    num_neurons_output=num_classes,
                                    hidden_activations=["relu", "relu"],
-                                   output_activation="relu")
+                                   output_activation="softmax")
 
    # population does not hold the numerical weights of the network instead it holds a list of references to each last layer of each network (i.e. solution) in the population. A solution or a network can be used interchangeably.
    # If there is a population with 3 solutions (i.e. networks), then the population is a list with 3 elements. Each element is a reference to the last layer of each network. Using such a reference, all details of the network can be accessed.
@@ -929,8 +931,8 @@ according to the ``num_neurons_output`` parameter of the
        print("Best fitness value reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
 
    # Predicting the outputs of the data using the best solution.
-   predictions = pygad.nn.predict_outputs(last_layer=GANN_instance.population_networks[solution_idx],
-                                    data_inputs=data_inputs)
+   predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[solution_idx],
+                                  data_inputs=data_inputs)
    print("Predictions of the trained network : {predictions}".format(predictions=predictions))
 
    # Calculating some statistics
