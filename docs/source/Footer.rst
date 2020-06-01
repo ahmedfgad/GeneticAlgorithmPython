@@ -221,12 +221,24 @@ and `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__.
 
 GitHub Link: https://github.com/ahmedfgad/NumPyCNN
 
-`NumPyCNN <https://github.com/ahmedfgad/NumPyCNN>`__ builds and trains
+`NumPyCNN <https://github.com/ahmedfgad/NumPyCNN>`__ builds
+convolutional neural networks using NumPy. The purpose of this project
+is to only implement the **forward pass** of a convolutional neural
+network without using a training algorithm.
+
+.. _header-n212:
+
+`CNNGenetic <https://github.com/ahmedfgad/CNNGenetic>`__
+--------------------------------------------------------
+
+GitHub Link: https://github.com/ahmedfgad/CNNGenetic
+
+`CNNGenetic <https://github.com/ahmedfgad/CNNGenetic>`__ trains
 convolutional neural networks using the genetic algorithm. It uses the
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 project for building the genetic algorithm.
 
-.. _header-n91:
+.. _header-n216:
 
 Submitting Issues
 =================
