@@ -18,6 +18,7 @@ class GA:
                  K_tournament=3,
                  crossover_type="single_point",
                  mutation_type="random",
+                 mutation_by_replacement=False,
                  mutation_percent_genes=10,
                  mutation_num_genes=None,
                  random_mutation_min_val=-1.0,
@@ -44,8 +45,10 @@ class GA:
         keep_parents: If 0, this means the parents of the current populaiton will not be used at all in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. In some cases, the parents are of high quality and thus we do not want to loose such some high quality solutions. If some parent selection operators like roulette wheel selection (RWS), the parents may not be of high quality and thus keeping the parents might degarde the quality of the population.
         K_tournament: When the value of 'parent_selection_type' is 'tournament', the 'K_tournament' parameter specifies the number of solutions from which a parent is selected randomly.
 
-        crossover_type: Type of the crossover opreator.
-        mutation_type: Type of the mutation opreator.
+        crossover_type: Type of the crossover opreator. If  crossover_type=None, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
+        mutation_type: Type of the mutation opreator. If mutation_type=None, then the mutation step is bypassed which means no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
+
+        mutation_by_replacement: An optional bool parameter. It works only when the selected type of mutation is random (mutation_type="random"). In this case, setting mutation_by_replacement=True means replace the gene by the randomly generated value. If False, then it has no effect and random mutation works by adding the random value to the gene.
 
         mutation_percent_genes: Percentage of genes to mutate which defaults to 10%. This parameter has no action if the parameter mutation_num_genes exists.
         mutation_num_genes: Number of genes to mutate which defaults to None. If the parameter mutation_num_genes exists, then no need for the parameter mutation_percent_genes.
@@ -98,20 +101,6 @@ class GA:
 
         self.num_parents_mating = num_parents_mating
 
-        if (mutation_num_genes == None):
-            if (mutation_percent_genes < 0 or mutation_percent_genes > 100):
-                self.valid_parameters = False
-                raise ValueError("The percentage of selected genes for mutation (mutation_percent_genes) must be >= 0 and <= 100 inclusive but {mutation_percent_genes=mutation_percent_genes} found.\n".format(mutation_percent_genes=mutation_percent_genes))
-        elif (mutation_num_genes <= 0 ):
-            self.valid_parameters = False
-            raise ValueError("The number of selected genes for mutation (mutation_num_genes) cannot be <= 0 but {mutation_num_genes} found.\n".format(mutation_num_genes=mutation_num_genes))
-        elif (mutation_num_genes > self.num_genes):
-            self.valid_parameters = False
-            raise ValueError("The number of selected genes for mutation (mutation_num_genes) ({mutation_num_genes}) cannot be greater than the number of genes ({num_genes}).\n".format(mutation_num_genes=mutation_num_genes, num_genes=self.num_genes))
-        elif (type(mutation_num_genes) is not int):
-            self.valid_parameters = False
-            raise ValueError("The number of selected genes for mutation (mutation_num_genes) must be a positive integer >= 1 but {mutation_num_genes} found.\n".format(mutation_num_genes=mutation_num_genes))
-
         # crossover: Refers to the method that applies the crossover operator based on the selected type of crossover in the crossover_type property.
         # Validating the crossover type: crossover_type
         if (crossover_type == "single_point"):
@@ -120,9 +109,11 @@ class GA:
             self.crossover = self.two_points_crossover
         elif (crossover_type == "uniform"):
             self.crossover = self.uniform_crossover
+        elif (crossover_type is None):
+            self.crossover = None
         else:
             self.valid_parameters = False
-            raise ValueError("ERROR: undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) argument does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover).\n".format(crossover_type=crossover_type))
+            raise ValueError("Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) argument does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover).\n".format(crossover_type=crossover_type))
 
         self.crossover_type = crossover_type
 
@@ -136,11 +127,42 @@ class GA:
             self.mutation = self.scramble_mutation
         elif (mutation_type == "inversion"):
             self.mutation = self.inversion_mutation
+        elif (mutation_type is None):
+            self.mutation = None
         else:
             self.valid_parameters = False
-            raise ValueError("ERROR: undefined mutation type. \nThe assigned value to the mutation_type argument does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation).\n")
+            raise ValueError("Undefined mutation type. \nThe assigned value to the mutation_type argument ({mutation_type}) does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation).\n".format(mutation_type=mutation_type))
 
         self.mutation_type = mutation_type
+
+        if not (self.mutation_type is None):
+            if (mutation_num_genes == None):
+                if (mutation_percent_genes < 0 or mutation_percent_genes > 100):
+                    self.valid_parameters = False
+                    raise ValueError("The percentage of selected genes for mutation (mutation_percent_genes) must be >= 0 and <= 100 inclusive but {mutation_percent_genes=mutation_percent_genes} found.\n".format(mutation_percent_genes=mutation_percent_genes))
+            elif (mutation_num_genes <= 0 ):
+                self.valid_parameters = False
+                raise ValueError("The number of selected genes for mutation (mutation_num_genes) cannot be <= 0 but {mutation_num_genes} found.\n".format(mutation_num_genes=mutation_num_genes))
+            elif (mutation_num_genes > self.num_genes):
+                self.valid_parameters = False
+                raise ValueError("The number of selected genes for mutation (mutation_num_genes) ({mutation_num_genes}) cannot be greater than the number of genes ({num_genes}).\n".format(mutation_num_genes=mutation_num_genes, num_genes=self.num_genes))
+            elif (type(mutation_num_genes) is not int):
+                self.valid_parameters = False
+                raise ValueError("The number of selected genes for mutation (mutation_num_genes) must be a positive integer >= 1 but {mutation_num_genes} found.\n".format(mutation_num_genes=mutation_num_genes))
+        else:
+            pass
+
+        if not (type(mutation_by_replacement) is bool):
+            self.valid_parameters = False
+            raise TypeError("The expected type of the 'mutation_by_replacement' parameter is bool but {mutation_by_replacement_type} found.".format(mutation_by_replacement_type=type(mutation_by_replacement)))
+
+        self.mutation_by_replacement = mutation_by_replacement
+        
+        if self.mutation_type != "random" and self.mutation_by_replacement:
+            print("Warning: The mutation_by_replacement parameter is set to True while the mutation_type parameter is not set to random but {mut_type}. Note that the mutation_by_replacement parameter has an effect only when mutation_type='random'.".format(mut_type=mutation_type))
+
+        if (self.mutation_type is None) and (self.crossover_type is None):
+            print("Warning: the 2 parameters mutation_type and crossover_type are None. This disables any type of evolution the genetic algorithm can make. As a result, the genetic algorithm cannot find a better solution that the best solution in the initial population.")
 
         # select_parents: Refers to a method that selects the parents based on the parent selection type specified in the parent_selection_type attribute.
         # Validating the selected type of parent selection: parent_selection_type
@@ -213,7 +235,7 @@ class GA:
             self.callback_generation = None
 
         # The number of completed generations.
-        self.generations_completed = None 
+        self.generations_completed = 0
 
         # At this point, all necessary parameters validation is done successfully and we are sure that the parameters are valid.
         self.valid_parameters = True # Set to True when all the parameters passed in the GA class constructor are valid.
@@ -234,9 +256,19 @@ class GA:
         self.best_solution_generation = -1 # The generation number at which the best fitness value is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
 
     def initialize_population(self, low, high):
+
         """
         Creates an initial population randomly as a NumPy array. The array is saved in the instance attribute named 'population'.
+
+        low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
+        high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
+        
+        This method assigns the values of the following 3 instance attributes:
+            1. pop_size: Size of the population.
+            2. population: Initially, holds the initial population and later updated after each generation.
+            3. init_population: Keeping the initial population.
         """
+
         # Population size = (number of chromosomes, number of genes per chromosome)
         self.pop_size = (self.sol_per_pop,self.num_genes) # The population will have sol_per_pop chromosome where each chromosome has num_genes genes.
         # Creating the initial population randomly.
@@ -245,12 +277,35 @@ class GA:
                                                size=self.pop_size) # A NumPy array holding the initial population.
         
         # Keeping the initial population in the initial_population attribute.
-        self.initial_population = self.population
+        self.initial_population = self.population.copy()
+
+    def cal_pop_fitness(self):
+
+        """
+        Calculating the fitness values of all solutions in the current population. 
+        It returns:
+            -fitness: An array of the calculated fitness values.
+        """
+
+        if self.valid_parameters == False:
+            raise ValueError("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
+
+        pop_fitness = []
+        # Calculating the fitness value of each solution in the current population.
+        for sol_idx, sol in enumerate(self.population):
+            fitness = self.fitness_func(sol, sol_idx)
+            pop_fitness.append(fitness)
+
+        pop_fitness = numpy.array(pop_fitness)
+
+        return pop_fitness
 
     def run(self):
+
         """
-        Running the genetic algorithm. This is the main method in which the genetic algorithm is evolved through a number of generations.
+        Runs the genetic algorithm. This is the main method in which the genetic algorithm is evolved through a number of generations.
         """
+
         if self.valid_parameters == False:
             raise ValueError("ERROR calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
 
@@ -264,12 +319,23 @@ class GA:
             # Selecting the best parents in the population for mating.
             parents = self.select_parents(fitness, num_parents=self.num_parents_mating)
 
-            # Generating next generation using crossover.
-            offspring_crossover = self.crossover(parents,
-                                                 offspring_size=(self.num_offspring, self.num_genes))
+            # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
+            if self.crossover_type is None:
+                if self.num_offspring <= self.keep_parents:
+                    offspring_crossover = parents[0:self.num_offspring]
+                else:
+                    offspring_crossover = numpy.concatenate((parents, self.population[0:(self.num_offspring - parents.shape[0])]))
+            else:
+                # Generating offspring using crossover.
+                offspring_crossover = self.crossover(parents,
+                                                     offspring_size=(self.num_offspring, self.num_genes))
 
-            # Adding some variations to the offspring using mutation.
-            offspring_mutation = self.mutation(offspring_crossover)
+            # If self.mutation_type=None, then no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
+            if self.mutation_type is None:
+                offspring_mutation = offspring_crossover
+            else:
+                # Adding some variations to the offspring using mutation.
+                offspring_mutation = self.mutation(offspring_crossover)
 
             if (self.keep_parents == 0):
                 self.population = offspring_mutation
@@ -292,34 +358,16 @@ class GA:
         # After the run() method completes, the run_completed flag is changed from False to True.
         self.run_completed = True # Set to True only after the run() method completes gracefully.
 
-    def cal_pop_fitness(self):
-        """
-        Calculating the fitness values of all solutions in the current population. 
-        It returns:
-            -fitness: An array of the calculated fitness values.
-        """
-        if self.valid_parameters == False:
-            raise ValueError("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
-
-        pop_fitness = []
-        # Calculating the fitness value of each solution in the current population.
-        for sol_idx, sol in enumerate(self.population):
-            fitness = self.fitness_func(sol, sol_idx)
-            pop_fitness.append(fitness)
-
-        pop_fitness = numpy.array(pop_fitness)
-
-        return pop_fitness
-
     def steady_state_selection(self, fitness, num_parents):
+
         """
-        Applies the steady state selection of the parents that will mate to produce the offspring. 
+        Selects the parents using the steady-state selection technique. Later, these parents will mate to produce the offspring.
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns:
-            -parents: The selected parents to mate.
+        It returns an array of the selected parents.
         """
+
         fitness_sorted = sorted(range(len(fitness)), key=lambda k: fitness[k])
         fitness_sorted.reverse()
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
@@ -329,14 +377,15 @@ class GA:
         return parents
 
     def rank_selection(self, fitness, num_parents):
+
         """
-        Applies the rank selection of the parents that will mate to produce the offspring. 
+        Selects the parents using the rank selection technique. Later, these parents will mate to produce the offspring.
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns:
-            -parents: The selected parents to mate.
+        It returns an array of the selected parents.
         """
+
         fitness_sorted = sorted(range(len(fitness)), key=lambda k: fitness[k])
         fitness_sorted.reverse()
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
@@ -346,14 +395,15 @@ class GA:
         return parents
 
     def random_selection(self, fitness, num_parents):
+
         """
-        Randomly selecting the parents that will mate to produce the offspring. 
+        Selects the parents randomly. Later, these parents will mate to produce the offspring.
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns:
-            -parents: The selected parents to mate.
+        It returns an array of the selected parents.
         """
+
         parents = numpy.empty((num_parents, self.population.shape[1]))
 
         rand_indices = numpy.random.randint(low=0.0, high=fitness.shape[0], size=num_parents)
@@ -363,14 +413,15 @@ class GA:
         return parents
 
     def tournament_selection(self, fitness, num_parents):
+
         """
-        Applies the tournament selection of the parents that will mate to produce the offspring. 
+        Selects the parents using the tournament selection technique. Later, these parents will mate to produce the offspring.
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns:
-            -parents: The selected parents to mate.
+        It returns an array of the selected parents.
         """
+
         parents = numpy.empty((num_parents, self.population.shape[1]))
         for parent_num in range(num_parents):
             rand_indices = numpy.random.randint(low=0.0, high=len(fitness), size=self.K_tournament)
@@ -380,14 +431,15 @@ class GA:
         return parents
 
     def roulette_wheel_selection(self, fitness, num_parents):
+
         """
-        Applies the roulette wheel selection of the parents that will mate to produce the offspring. 
+        Selects the parents using the roulette wheel selection technique. Later, these parents will mate to produce the offspring.
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns:
-            -parents: The selected parents to mate.
+        It returns an array of the selected parents.
         """
+
         fitness_sum = numpy.sum(fitness)
         probs = fitness / fitness_sum
         probs_start = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the start values of the ranges of probabilities.
@@ -414,18 +466,15 @@ class GA:
         return parents
 
     def stochastic_universal_selection(self, fitness, num_parents):
+
         """
-        Applies the stochastic universal selection of the parents that will mate to produce the offspring. 
+        Selects the parents using the stochastic universal selection technique. Later, these parents will mate to produce the offspring.
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns:
-            -parents: The selected parents to mate.
+        It returns an array of the selected parents.
         """
-        # https://en.wikipedia.org/wiki/Stochastic_universal_sampling
-        # https://books.google.com.eg/books?id=gwUwIEPqk30C&pg=PA60&lpg=PA60&dq=Roulette+Wheel+genetic+algorithm+select+more+than+once&source=bl&ots=GLr2DrPcj4&sig=ACfU3U0jVOGXhzsla8mVqhi5x1giPRL4ew&hl=en&sa=X&ved=2ahUKEwim25rMvdzoAhWa8uAKHbt0AdgQ6AEwA3oECAYQLQ#v=onepage&q=Roulette%20Wheel%20&f=false
-        # https://www.tutorialspoint.com/genetic_algorithms/genetic_algorithms_parent_selection.htm
-        # https://www.obitko.com/tutorials/genetic-algorithms/selection.php
+
         fitness_sum = numpy.sum(fitness)
         probs = fitness / fitness_sum
         probs_start = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the start values of the ranges of probabilities.
@@ -455,14 +504,15 @@ class GA:
         return parents
 
     def single_point_crossover(self, parents, offspring_size):
+
         """
-        Applies the single point crossover. It selects a point randomly at which crossover takes place between two parents.
+        Applies the single-point crossover. It selects a point randomly at which crossover takes place between the pairs of parents.
         It accepts 2 parameters:
-            -parents: The parents to mate and create the offspring.
+            -parents: The parents to mate for producing the offspring.
             -offspring_size: The size of the offspring to produce.
-        It returns:
-            -offspring: The produced offspring after the parents mate.
+        It returns an array the produced offspring.
         """
+
         offspring = numpy.empty(offspring_size)
         # The point at which crossover takes place between two parents. Usually, it is at the center.
         crossover_point = numpy.random.randint(low=0, high=parents.shape[1], size=1)[0]
@@ -479,14 +529,15 @@ class GA:
         return offspring
 
     def two_points_crossover(self, parents, offspring_size):
+
         """
-        Applies the 2 points crossover. It selects the 2 points randomly at which crossover takes place between two parents.
+        Applies the 2 points crossover. It selects the 2 points randomly at which crossover takes place between the pairs of parents.
         It accepts 2 parameters:
-            -parents: The parents to mate and create the offspring.
+            -parents: The parents to mate for producing the offspring.
             -offspring_size: The size of the offspring to produce.
-        It returns:
-            -offspring: The produced offspring after the parents mate.
+        It returns an array the produced offspring.
         """
+
         offspring = numpy.empty(offspring_size)
         if (parents.shape[1] == 1): # If the chromosome has only a single gene. In this case, this gene is copied from the second parent.
             crossover_point1 = 0
@@ -509,14 +560,15 @@ class GA:
         return offspring
 
     def uniform_crossover(self, parents, offspring_size):
+
         """
         Applies the uniform crossover. For each gene, a parent out of the 2 mating parents is selected randomly and the gene is copied from it.
         It accepts 2 parameters:
-            -parents: The parents to mate and create the offspring.
+            -parents: The parents to mate for producing the offspring.
             -offspring_size: The size of the offspring to produce.
-        It returns:
-            -offspring: The produced offspring after the parents mate.
+        It returns an array the produced offspring.
         """
+
         offspring = numpy.empty(offspring_size)
 
         for k in range(offspring_size[0]):
@@ -536,13 +588,14 @@ class GA:
         return offspring
 
     def random_mutation(self, offspring):
+
         """
         Applies the random mutation which changes the values of a number of genes randomly by selecting a random value between random_mutation_min_val and random_mutation_max_val to be added to the selected genes.
         It accepts a single parameter:
             -offspring: The offspring to mutate.
-        It returns:
-            -offspring: The offspring after mutation.
+        It returns an array of the mutated offspring.
         """
+
         if self.mutation_num_genes == None:
             self.mutation_num_genes = numpy.uint32((self.mutation_percent_genes*offspring.shape[1])/100)
             # Based on the percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
@@ -550,20 +603,27 @@ class GA:
                 self.mutation_num_genes = 1
         mutation_indices = numpy.array(random.sample(range(0, offspring.shape[1]), self.mutation_num_genes))
         # Random mutation changes a single gene in each offspring randomly.
-        for idx in range(offspring.shape[0]):
-            # The random value to be added to the gene.
-            random_value = numpy.random.uniform(self.random_mutation_min_val, self.random_mutation_max_val, 1)
-            offspring[idx, mutation_indices] = offspring[idx, mutation_indices] + random_value
+        for offspring_idx in range(offspring.shape[0]):
+            for gene_idx in mutation_indices:
+                # Generating a random value.
+                random_value = numpy.random.uniform(self.random_mutation_min_val, self.random_mutation_max_val, 1)
+                # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
+                if self.mutation_by_replacement:
+                    offspring[offspring_idx, gene_idx] = random_value
+                # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
+                else:
+                    offspring[offspring_idx, gene_idx] = offspring[offspring_idx, gene_idx] + random_value
         return offspring
 
     def swap_mutation(self, offspring):
+
         """
-        Applies the swap mutation which selects interchanges the values of 2 randomly selected genes.
+        Applies the swap mutation which interchanges the values of 2 randomly selected genes.
         It accepts a single parameter:
             -offspring: The offspring to mutate.
-        It returns:
-            -offspring: The offspring after mutation.
+        It returns an array of the mutated offspring.
         """
+
         for idx in range(offspring.shape[0]):
             mutation_gene1 = numpy.random.randint(low=0, high=offspring.shape[1]/2, size=1)[0]
             mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
@@ -574,13 +634,14 @@ class GA:
         return offspring
 
     def inversion_mutation(self, offspring):
+
         """
         Applies the inversion mutation which selects a subset of genes and invert them.
         It accepts a single parameter:
             -offspring: The offspring to mutate.
-        It returns:
-            -offspring: The offspring after mutation.
+        It returns an array of the mutated offspring.
         """
+
         for idx in range(offspring.shape[0]):
             mutation_gene1 = numpy.random.randint(low=0, high=numpy.ceil(offspring.shape[1]/2 + 1), size=1)[0]
             mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
@@ -590,13 +651,14 @@ class GA:
         return offspring
 
     def scramble_mutation(self, offspring):
+
         """
         Applies the scramble mutation which selects a subset of genes and shuffles their order randomly.
         It accepts a single parameter:
             -offspring: The offspring to mutate.
-        It returns:
-            -offspring: The offspring after mutation.
+        It returns an array of the mutated offspring.
         """
+
         for idx in range(offspring.shape[0]):
             mutation_gene1 = numpy.random.randint(low=0, high=numpy.ceil(offspring.shape[1]/2 + 1), size=1)[0]
             mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
@@ -608,8 +670,9 @@ class GA:
         return offspring
 
     def best_solution(self):
+
         """
-        Calculates the fitness values for the current population. 
+        Returns information about the best solution found by the genetic algorithm. Can only be called after completing at least 1 generation.
         If no generation is completed (at least 1), an exception is raised. Otherwise, the following is returned:
             -best_solution: Best solution in the current population.
             -best_solution_fitness: Fitness value of the best solution.
@@ -633,11 +696,11 @@ class GA:
 
         return best_solution, best_solution_fitness, best_match_idx
 
-    def plot_result(self):
+    def plot_result(self, title="PyGAD - Iteration vs. Fitness", xlabel="Generation", ylabel="Fitness"):
+
         """
-        Creating 2 plots that summarizes how the solutions evolved. Can only be called after completing at least 1 generation.
-        The first plot is between the iteration number and the function output based on the current parameters for the best solution.
-        The second plot is between the iteration number and the fitness value of the best solution.
+        Creates and shows a plot that summarizes how the fitness value evolved by generation. Can only be called after completing at least 1 generation.
+        If no generation is completed, an exception is raised.
         """
 
         if self.generations_completed < 1:
@@ -648,25 +711,29 @@ class GA:
 
         matplotlib.pyplot.figure()
         matplotlib.pyplot.plot(self.best_solutions_fitness)
-        matplotlib.pyplot.title("PyGAD - Iteration vs. Fitness")
-        matplotlib.pyplot.xlabel("Iteration")
-        matplotlib.pyplot.ylabel("Fitness")
+        matplotlib.pyplot.title(title)
+        matplotlib.pyplot.xlabel(xlabel)
+        matplotlib.pyplot.ylabel(ylabel)
         matplotlib.pyplot.show()
 
     def save(self, filename):
+
         """
-        Saving the genetic algorithm instance:
-            -filename: Name of the file to save the instance. It must have no extension.
+        Saves the genetic algorithm instance:
+            -filename: Name of the file to save the instance. No extension is needed.
         """
+
         with open(filename + ".pkl", 'wb') as file:
             pickle.dump(self, file)
 
 def load(filename):
+
     """
-    Reading a saved instance of the genetic algorithm:
-        -filename: Name of the file to read the instance. It must have no extension.
+    Reads a saved instance of the genetic algorithm:
+        -filename: Name of the file to read the instance. No extension is needed.
     Returns the genetic algorithm instance.
     """
+
     try:
         with open(filename + ".pkl", 'rb') as file:
             ga_in = pickle.load(file)
