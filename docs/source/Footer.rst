@@ -1,7 +1,3 @@
-=========
-Footer.md
-=========
-
 .. _header-n0:
 
 Release History
