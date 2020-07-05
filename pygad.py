@@ -2,6 +2,7 @@ import numpy
 import random
 import matplotlib.pyplot
 import pickle
+import time
 
 class GA:
     def __init__(self, 
@@ -23,7 +24,8 @@ class GA:
                  mutation_num_genes=None,
                  random_mutation_min_val=-1.0,
                  random_mutation_max_val=1.0,
-                 callback_generation=None):
+                 callback_generation=None,
+                 delay_after_gen=0.0):
 
         """
         The constructor of the GA class accepts all parameters required to create an instance of the GA class. It validates such parameters.
@@ -55,7 +57,9 @@ class GA:
         random_mutation_min_val: The minimum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to -1.0.
         random_mutation_max_val: The maximum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to 1.0.
 
-        callback_generation: If not None, then it accepts a function to be called after each generation. This function must accept a single parameter representing the instance of the genetic algorithm.
+        callback_generation: If not None, then it accepts a function to be called after each generation. This function must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the generations.
+
+        delay_after_gen: Added in PyGAD 2.4.0. It accepts a non-negative number specifying the number of seconds to wait after a generation completes and before going to the next generation. It defaults to 0.0 which means no delay after the generation.
         """
 
         self.init_range_low = init_range_low
@@ -216,7 +220,7 @@ class GA:
                 raise ValueError("The fitness function must accept 2 parameters representing the solution to which the fitness value is calculated and the solution index within the population.\nThe passed fitness function named '{funcname}' accepts {argcount} argument(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
         else:
             self.valid_parameters = False
-            raise ValueError("The value assigned to the 'fitness_func' parameter is expected to be of type function by {fitness_func_type} found.".format(fitness_func_type=type(fitness_func)))
+            raise ValueError("The value assigned to the 'fitness_func' parameter is expected to be of type function but {fitness_func_type} found.".format(fitness_func_type=type(fitness_func)))
 
         # Check if the callback_generation exists.
         if not (callback_generation is None):
@@ -230,9 +234,15 @@ class GA:
                     raise ValueError("The callback_generation function must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed callback_generation function named '{funcname}' accepts {argcount} argument(s).".format(funcname=callback_generation.__code__.co_name, argcount=callback_generation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the 'callback_generation' parameter is expected to be of type function by {callback_generation_type} found.".format(callback_generation_type=type(callback_generation)))
+                raise ValueError("The value assigned to the 'callback_generation' parameter is expected to be of type function but {callback_generation_type} found.".format(callback_generation_type=type(callback_generation)))
         else:
             self.callback_generation = None
+
+        if delay_after_gen >= 0.0:
+            self.delay_after_gen = delay_after_gen
+        else:
+            self.valid_parameters = False
+            raise ValueError("The value passed to the 'delay_after_gen' parameter must be a non-negative number. The value passed is {delay_after_gen} of type {delay_after_gen_type}.".format(delay_after_gen=delay_after_gen, delay_after_gen_type=type(delay_after_gen)))
 
         # The number of completed generations.
         self.generations_completed = 0
@@ -352,7 +362,11 @@ class GA:
 
             # If the callback_generation attribute is not None, then cal the callback function after the generation.
             if not (self.callback_generation is None):
-                self.callback_generation(self)
+                r = self.callback_generation(self)
+                if type(r) is str and r.lower() == "stop":
+                    break
+
+            time.sleep(self.delay_after_gen)
 
         self.best_solution_generation = numpy.where(numpy.array(self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
         # After the run() method completes, the run_completed flag is changed from False to True.
