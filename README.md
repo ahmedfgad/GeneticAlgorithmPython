@@ -114,6 +114,7 @@ def callback_generation(ga_instance):
     print("Generation = {generation}".format(generation=ga_instance.generations_completed))
     print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
     print("Change     = {change}".format(change=ga_instance.best_solution()[1] - last_fitness))
+    last_fitness = ga_instance.best_solution()[1]
 
 # Creating an instance of the GA class inside the ga module. Some parameters are initialized within the constructor.
 ga_instance = pygad.GA(num_generations=num_generations,
