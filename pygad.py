@@ -18,12 +18,15 @@ class GA:
                  keep_parents=-1,
                  K_tournament=3,
                  crossover_type="single_point",
+                 crossover_probability=None,
                  mutation_type="random",
+                 mutation_probability=None,
                  mutation_by_replacement=False,
                  mutation_percent_genes=10,
                  mutation_num_genes=None,
                  random_mutation_min_val=-1.0,
                  random_mutation_max_val=1.0,
+                 gene_space=None,
                  callback_generation=None,
                  delay_after_gen=0.0):
 
@@ -48,7 +51,10 @@ class GA:
         K_tournament: When the value of 'parent_selection_type' is 'tournament', the 'K_tournament' parameter specifies the number of solutions from which a parent is selected randomly.
 
         crossover_type: Type of the crossover opreator. If  crossover_type=None, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
+        crossover_probability: The probability of selecting a solution for the crossover operation. If the solution probability is <= crossover_probability, the solution is selected. The value must be between 0 and 1 inclusive.
+
         mutation_type: Type of the mutation opreator. If mutation_type=None, then the mutation step is bypassed which means no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
+        mutation_probability: The probability of selecting a gene for the mutation operation. If the gene probability is <= mutation_probability, the gene is selected. The value must be between 0 and 1 inclusive. If specified, then no need for the parameters mutation_percent_genes, mutation_num_genes, random_mutation_min_val, and random_mutation_max_val.
 
         mutation_by_replacement: An optional bool parameter. It works only when the selected type of mutation is random (mutation_type="random"). In this case, setting mutation_by_replacement=True means replace the gene by the randomly generated value. If False, then it has no effect and random mutation works by adding the random value to the gene.
 
@@ -57,10 +63,46 @@ class GA:
         random_mutation_min_val: The minimum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to -1.0.
         random_mutation_max_val: The maximum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to 1.0.
 
+        gene_space: Added in PyGAD 2.5.0. It accepts a list of all possible values of the gene. This list is used in the mutation step. Should be used only if the gene space is a set of discrete values. No need for the 2 parameters (random_mutation_min_val and random_mutation_max_val) if the parameter gene_space exists.
+
         callback_generation: If not None, then it accepts a function to be called after each generation. This function must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the generations.
 
         delay_after_gen: Added in PyGAD 2.4.0. It accepts a non-negative number specifying the number of seconds to wait after a generation completes and before going to the next generation. It defaults to 0.0 which means no delay after the generation.
         """
+
+        self.gene_space_nested = False
+        if type(gene_space) is type(None):
+            pass
+        elif type(gene_space) in [list, tuple, range]:
+            if len(gene_space) == 0:
+                self.valid_parameters = False
+                raise TypeError("'gene_space' cannot be empty (i.e. its length must be >= 0).")
+            else:
+                for index, el in enumerate(gene_space):
+                    if type(el) in [list, tuple, range]:
+                        if len(el) == 0:
+                            self.valid_parameters = False
+                            raise TypeError("The element indexed {index} of 'gene_space' with type {el_type} cannot be empty (i.e. its length must be >= 0).".format(index=index, el_type=type(el)))
+                        else:
+                            for val in el:
+                                if not (type(val) in [int, float]):
+                                    raise TypeError("All values in the sublists inside the 'gene_space' attribute must be numeric of type int/float but the value ({val}) of type {typ} found.".format(val=val, typ=type(val)))
+                        self.gene_space_nested = True
+                    elif type(el)  == type(None):
+                        self.gene_space_nested = True
+                    elif not (type(el) in [int, float]):
+                        self.valid_parameters = False
+                        raise TypeError("Unexpected type {el_type} for the element indexed {index} of 'gene_space'. The accepted types are list/tuple/range of numbers, a single number (int/float), or None.".format(index=index, el_type=type(el)))
+        else:
+            self.valid_parameters = False
+            raise TypeError("The expected type of 'gene_space' is list, tuple, or range but {gene_space_type} found.".format(gene_space_type=type(gene_space)))
+
+        if self.gene_space_nested:
+            if len(gene_space) != num_genes:
+                self.valid_parameters = False
+                raise TypeError("When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len_gene_space}) != num_genes ({len_num_genes})".format(len_gene_space=len(gene_space), len_num_genes=num_genes))
+
+        self.gene_space = gene_space
 
         self.init_range_low = init_range_low
         self.init_range_high = init_range_high
@@ -120,6 +162,18 @@ class GA:
             raise ValueError("Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) argument does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover).\n".format(crossover_type=crossover_type))
 
         self.crossover_type = crossover_type
+        
+        if crossover_probability == None:
+            self.crossover_probability = None
+        elif type(crossover_probability) in [int, float]:
+            if crossover_probability >= 0 and crossover_probability <= 1:
+                self.crossover_probability = crossover_probability
+            else:
+                self.valid_parameters = False
+                raise ValueError("The value assigned to the 'crossover_probability' parameter must be between 0 and 1 inclusive but {crossover_probability_value} found.".format(crossover_probability_value=crossover_probability))
+        else:
+            self.valid_parameters = False
+            raise ValueError("Unexpected type for the 'crossover_probability' parameter. Float is expected by {crossover_probability_type} found.".format(crossover_probability_type=type(crossover_probability)))
 
         # mutation: Refers to the method that applies the mutation operator based on the selected type of mutation in the mutation_type property.
         # Validating the mutation type: mutation_type
@@ -139,12 +193,31 @@ class GA:
 
         self.mutation_type = mutation_type
 
+        if mutation_probability == None:
+            self.mutation_probability = None
+        elif type(mutation_probability) in [int, float]:
+            if mutation_probability >= 0 and mutation_probability <= 1:
+                self.mutation_probability = mutation_probability
+            else:
+                self.valid_parameters = False
+                raise ValueError("The value assigned to the 'mutation_probability' parameter must be between 0 and 1 inclusive but {mutation_probability_value} found.".format(mutation_probability_value=crossover_probability))
+        else:
+            self.valid_parameters = False
+            raise ValueError("Unexpected type for the 'mutation_probability' parameter. Float is expected by {mutation_probability_type} found.".format(mutation_probability_type=type(mutation_probability)))
+
         if not (self.mutation_type is None):
             if (mutation_num_genes == None):
                 if (mutation_percent_genes < 0 or mutation_percent_genes > 100):
                     self.valid_parameters = False
                     raise ValueError("The percentage of selected genes for mutation (mutation_percent_genes) must be >= 0 and <= 100 inclusive but {mutation_percent_genes=mutation_percent_genes} found.\n".format(mutation_percent_genes=mutation_percent_genes))
-            elif (mutation_num_genes <= 0 ):
+                else:
+                    # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
+                    if mutation_num_genes == None:
+                        mutation_num_genes = numpy.uint32((mutation_percent_genes*self.num_genes)/100)
+                        # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
+                        if mutation_num_genes == 0:
+                            mutation_num_genes = 1
+            elif (mutation_num_genes <= 0):
                 self.valid_parameters = False
                 raise ValueError("The number of selected genes for mutation (mutation_num_genes) cannot be <= 0 but {mutation_num_genes} found.\n".format(mutation_num_genes=mutation_num_genes))
             elif (mutation_num_genes > self.num_genes):
@@ -272,7 +345,7 @@ class GA:
 
         low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
         high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
-        
+
         This method assigns the values of the following 3 instance attributes:
             1. pop_size: Size of the population.
             2. population: Initially, holds the initial population and later updated after each generation.
@@ -281,11 +354,30 @@ class GA:
 
         # Population size = (number of chromosomes, number of genes per chromosome)
         self.pop_size = (self.sol_per_pop,self.num_genes) # The population will have sol_per_pop chromosome where each chromosome has num_genes genes.
-        # Creating the initial population randomly.
-        self.population = numpy.random.uniform(low=low, 
-                                               high=high, 
-                                               size=self.pop_size) # A NumPy array holding the initial population.
-        
+
+        if self.gene_space == None:
+            # Creating the initial population randomly.
+            self.population = numpy.random.uniform(low=low, 
+                                                   high=high, 
+                                                   size=self.pop_size) # A NumPy array holding the initial population.
+        elif self.gene_space_nested:
+            self.population = numpy.zeros(shape=self.pop_size)
+            for sol_idx in range(self.sol_per_pop):
+                for gene_idx in range(self.num_genes):
+                    curr_gene_space = self.gene_space[gene_idx]
+                    if type(curr_gene_space) in [list, tuple, range]:
+                        self.population[sol_idx, gene_idx] = random.choice(curr_gene_space)
+                    elif type(curr_gene_space)  == type(None):
+                        self.population[sol_idx, gene_idx] = numpy.random.uniform(low=low,
+                                       high=high, 
+                                       size=1)
+                    elif type(curr_gene_space) in [int, float]:
+                        self.population[sol_idx, gene_idx] = curr_gene_space                
+        else:
+            # Creating the initial population by randomly selecting the genes' values from the values inside the 'gene_space' parameter.
+            self.population = numpy.random.choice(self.gene_space,
+                                                  size=self.pop_size) # A NumPy array holding the initial population.
+
         # Keeping the initial population in the initial_population attribute.
         self.initial_population = self.population.copy()
 
@@ -346,6 +438,7 @@ class GA:
             else:
                 # Adding some variations to the offspring using mutation.
                 offspring_mutation = self.mutation(offspring_crossover)
+
 
             if (self.keep_parents == 0):
                 self.population = offspring_mutation
@@ -528,17 +621,35 @@ class GA:
         """
 
         offspring = numpy.empty(offspring_size)
-        # The point at which crossover takes place between two parents. Usually, it is at the center.
-        crossover_point = numpy.random.randint(low=0, high=parents.shape[1], size=1)[0]
 
         for k in range(offspring_size[0]):
-            # Index of the first parent to mate.
-            parent1_idx = k % parents.shape[0]
-            # Index of the second parent to mate.
-            parent2_idx = (k+1) % parents.shape[0]
-            # The new offspring will have its first half of its genes taken from the first parent.
+            # The point at which crossover takes place between two parents. Usually, it is at the center.
+            crossover_point = numpy.random.randint(low=0, high=parents.shape[1], size=1)[0]
+            
+            if self.crossover_probability  != None:
+                probs = numpy.random.random(size=parents.shape[1])
+                indices = numpy.where(probs <= self.crossover_probability)[0]
+
+                # If no parent satisfied the probability, no crossover is applied and a parent is selected.
+                if len(indices) == 0:
+                    offspring[k, :] = parents[k % parents.shape[0], :]
+                    continue
+                elif len(indices) == 1:
+                    parent1_idx = indices[0]
+                    parent2_idx = parent1_idx
+                else:
+                    indices = random.sample(set(indices), 2)
+                    parent1_idx = indices[0]
+                    parent2_idx = indices[1]
+            else:
+                # Index of the first parent to mate.
+                parent1_idx = k % parents.shape[0]
+                # Index of the second parent to mate.
+                parent2_idx = (k+1) % parents.shape[0]
+
+            # The new offspring has its first half of its genes from the first parent.
             offspring[k, 0:crossover_point] = parents[parent1_idx, 0:crossover_point]
-            # The new offspring will have its second half of its genes taken from the second parent.
+            # The new offspring has its second half of its genes from the second parent.
             offspring[k, crossover_point:] = parents[parent2_idx, crossover_point:]
         return offspring
 
@@ -553,18 +664,36 @@ class GA:
         """
 
         offspring = numpy.empty(offspring_size)
-        if (parents.shape[1] == 1): # If the chromosome has only a single gene. In this case, this gene is copied from the second parent.
-            crossover_point1 = 0
-        else:
-            crossover_point1 = numpy.random.randint(low=0, high=numpy.ceil(parents.shape[1]/2 + 1), size=1)[0]
-
-        crossover_point2 = crossover_point1 + int(parents.shape[1]/2) # The second point must always be greater than the first point.
 
         for k in range(offspring_size[0]):
-            # Index of the first parent to mate.
-            parent1_idx = k % parents.shape[0]
-            # Index of the second parent to mate.
-            parent2_idx = (k+1) % parents.shape[0]
+            if (parents.shape[1] == 1): # If the chromosome has only a single gene. In this case, this gene is copied from the second parent.
+                crossover_point1 = 0
+            else:
+                crossover_point1 = numpy.random.randint(low=0, high=numpy.ceil(parents.shape[1]/2 + 1), size=1)[0]
+    
+            crossover_point2 = crossover_point1 + int(parents.shape[1]/2) # The second point must always be greater than the first point.
+
+            if self.crossover_probability != None:
+                probs = numpy.random.random(size=parents.shape[1])
+                indices = numpy.where(probs <= self.crossover_probability)[0]
+
+                # If no parent satisfied the probability, no crossover is applied and a parent is selected.
+                if len(indices) == 0:
+                    offspring[k, :] = parents[k % parents.shape[0], :]
+                    continue
+                elif len(indices) == 1:
+                    parent1_idx = indices[0]
+                    parent2_idx = parent1_idx
+                else:
+                    indices = random.sample(set(indices), 2)
+                    parent1_idx = indices[0]
+                    parent2_idx = indices[1]
+            else:
+                # Index of the first parent to mate.
+                parent1_idx = k % parents.shape[0]
+                # Index of the second parent to mate.
+                parent2_idx = (k+1) % parents.shape[0]
+
             # The genes from the beginning of the chromosome up to the first point are copied from the first parent.
             offspring[k, 0:crossover_point1] = parents[parent1_idx, 0:crossover_point1]
             # The genes from the second point up to the end of the chromosome are copied from the first parent.
@@ -586,10 +715,26 @@ class GA:
         offspring = numpy.empty(offspring_size)
 
         for k in range(offspring_size[0]):
-            # Index of the first parent to mate.
-            parent1_idx = k % parents.shape[0]
-            # Index of the second parent to mate.
-            parent2_idx = (k+1) % parents.shape[0]
+            if self.crossover_probability  != None:
+                probs = numpy.random.random(size=parents.shape[1])
+                indices = numpy.where(probs <= self.crossover_probability)[0]
+
+                # If no parent satisfied the probability, no crossover is applied and a parent is selected.
+                if len(indices) == 0:
+                    offspring[k, :] = parents[k % parents.shape[0], :]
+                    continue
+                elif len(indices) == 1:
+                    parent1_idx = indices[0]
+                    parent2_idx = parent1_idx
+                else:
+                    indices = random.sample(set(indices), 2)
+                    parent1_idx = indices[0]
+                    parent2_idx = indices[1]
+            else:
+                # Index of the first parent to mate.
+                parent1_idx = k % parents.shape[0]
+                # Index of the second parent to mate.
+                parent2_idx = (k+1) % parents.shape[0]
 
             genes_source = numpy.random.randint(low=0, high=2, size=offspring_size[1])
             for gene_idx in range(offspring_size[1]):
@@ -610,14 +755,121 @@ class GA:
         It returns an array of the mutated offspring.
         """
 
-        if self.mutation_num_genes == None:
-            self.mutation_num_genes = numpy.uint32((self.mutation_percent_genes*offspring.shape[1])/100)
-            # Based on the percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
-            if self.mutation_num_genes == 0:
-                self.mutation_num_genes = 1
-        mutation_indices = numpy.array(random.sample(range(0, offspring.shape[1]), self.mutation_num_genes))
+        # If the mutation values are selected from the mutation space, the attribute 'gene_space' is True. Otherwise, it is set to False.
+
+        # When the attribute 'gene_space' is False, the mutation values are selected randomly from the mutation space.
+        if self.mutation_probability == None:
+            if self.gene_space != None:
+                offspring = self.mutation_by_space(offspring)
+                # When the attribute 'gene_space' is False, the mutation values are selected randomly based on the continuous range specified by the 2 attributes 'random_mutation_min_val' and 'random_mutation_max_val'.
+            else:
+                offspring = self.mutation_randomly(offspring)
+        else:
+            if self.gene_space != None:
+                offspring = self.mutation_probs_by_space(offspring)
+                # When the attribute 'gene_space' is False, the mutation values are selected randomly based on the continuous range specified by the 2 attributes 'random_mutation_min_val' and 'random_mutation_max_val'.
+            else:
+                offspring = self.mutation_probs_randomly(offspring)
+
+
+        return offspring
+
+    def mutation_by_space(self, offspring):
+
+        """
+        Applies the random mutation using the mutation values' space.
+        It accepts a single parameter:
+            -offspring: The offspring to mutate.
+        It returns an array of the mutated offspring using the mutation space.
+        """
+
+        # For each offspring, a value from the gene space is selected randomly and assigned to the selected mutated gene.
+        for offspring_idx in range(offspring.shape[0]):
+            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
+            for gene_idx in mutation_indices:
+
+                if self.gene_space_nested:
+                    # Returning the current gene space from the 'gene_space' attribute.
+                    curr_gene_space = self.gene_space[gene_idx]
+
+                    # If the gene space has only a single value, use it as the new gene value.
+                    if type(curr_gene_space) in [int, float]:
+                        value_from_space = curr_gene_space
+                    # Keep the gene unchanged if the gene space is None.
+                    elif curr_gene_space == None:
+                        rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
+                                                        high=self.random_mutation_max_val,
+                                                        size=1)
+                        if self.mutation_by_replacement:
+                            value_from_space = rand_val
+                        else:
+                            value_from_space = offspring[offspring_idx, gene_idx] + rand_val
+                    else:
+                        # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
+                        value_from_space = random.choice(curr_gene_space)
+                else:
+                    # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
+                    value_from_space = random.choice(self.gene_space)
+
+                # Assinging the selected value from the space to the gene.
+                offspring[offspring_idx, gene_idx] = value_from_space
+                    
+        return offspring
+
+    def mutation_probs_by_space(self, offspring):
+
+        """
+        Applies the random mutation using the mutation values' space and the mutation probability. For each gene, if its probability is <= that mutation probability, then it will be mutated based on the mutation space.
+        It accepts a single parameter:
+            -offspring: The offspring to mutate.
+        It returns an array of the mutated offspring using the mutation space.
+        """
+
+        # For each offspring, a value from the gene space is selected randomly and assigned to the selected mutated gene.
+        for offspring_idx in range(offspring.shape[0]):
+            probs = numpy.random.random(size=offspring.shape[1])
+            for gene_idx in range(offspring.shape[1]):
+                if probs[gene_idx] <= self.mutation_probability:
+                    if self.gene_space_nested:
+                        # Returning the current gene space from the 'gene_space' attribute.
+                        curr_gene_space = self.gene_space[gene_idx]
+        
+                        # If the gene space has only a single value, use it as the new gene value.
+                        if type(curr_gene_space) in [int, float]:
+                            value_from_space = curr_gene_space
+                        # Keep the gene unchanged if the gene space is None.
+                        elif curr_gene_space == None:
+                            rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
+                                                            high=self.random_mutation_max_val,
+                                                            size=1)
+                            if self.mutation_by_replacement:
+                                value_from_space = rand_val
+                            else:
+                                value_from_space = offspring[offspring_idx, gene_idx] + rand_val
+                        else:
+                            # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
+                            value_from_space = random.choice(curr_gene_space)
+                    else:
+                        # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
+                        value_from_space = random.choice(self.gene_space)
+
+                    # Assinging the selected value from the space to the gene.
+                    offspring[offspring_idx, gene_idx] = value_from_space
+                    
+        return offspring
+
+    def mutation_randomly(self, offspring):
+
+        """
+        Applies the random mutation the mutation probability. For each gene, if its probability is <= that mutation probability, then it will be mutated randomly.
+        It accepts a single parameter:
+            -offspring: The offspring to mutate.
+        It returns an array of the mutated offspring.
+        """
+
         # Random mutation changes a single gene in each offspring randomly.
         for offspring_idx in range(offspring.shape[0]):
+            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
             for gene_idx in mutation_indices:
                 # Generating a random value.
                 random_value = numpy.random.uniform(self.random_mutation_min_val, self.random_mutation_max_val, 1)
@@ -627,6 +879,30 @@ class GA:
                 # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                 else:
                     offspring[offspring_idx, gene_idx] = offspring[offspring_idx, gene_idx] + random_value
+        return offspring
+
+    def mutation_probs_randomly(self, offspring):
+
+        """
+        Applies the random mutation using the mutation probability. For each gene, if its probability is <= that mutation probability, then it will be mutated randomly.
+        It accepts a single parameter:
+            -offspring: The offspring to mutate.
+        It returns an array of the mutated offspring.
+        """
+
+        # Random mutation changes a single gene in each offspring randomly.
+        for offspring_idx in range(offspring.shape[0]):
+            probs = numpy.random.random(size=offspring.shape[1])
+            for gene_idx in range(offspring.shape[1]):
+                if probs[gene_idx] <= self.mutation_probability:
+                    # Generating a random value.
+                    random_value = numpy.random.uniform(self.random_mutation_min_val, self.random_mutation_max_val, 1)
+                    # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
+                    if self.mutation_by_replacement:
+                        offspring[offspring_idx, gene_idx] = random_value
+                    # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
+                    else:
+                        offspring[offspring_idx, gene_idx] = offspring[offspring_idx, gene_idx] + random_value
         return offspring
 
     def swap_mutation(self, offspring):
@@ -650,7 +926,7 @@ class GA:
     def inversion_mutation(self, offspring):
 
         """
-        Applies the inversion mutation which selects a subset of genes and invert them.
+        Applies the inversion mutation which selects a subset of genes and inverts them.
         It accepts a single parameter:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
@@ -710,7 +986,7 @@ class GA:
 
         return best_solution, best_solution_fitness, best_match_idx
 
-    def plot_result(self, title="PyGAD - Iteration vs. Fitness", xlabel="Generation", ylabel="Fitness"):
+    def plot_result(self, title="PyGAD - Iteration vs. Fitness", xlabel="Generation", ylabel="Fitness", linewidth=3):
 
         """
         Creates and shows a plot that summarizes how the fitness value evolved by generation. Can only be called after completing at least 1 generation.
@@ -724,7 +1000,7 @@ class GA:
 #            print("Warning calling the plot_result() method: \nGA is not executed yet and there are no results to display. Please call the run() method before calling the plot_result() method.\n")
 
         matplotlib.pyplot.figure()
-        matplotlib.pyplot.plot(self.best_solutions_fitness)
+        matplotlib.pyplot.plot(self.best_solutions_fitness, linewidth=linewidth)
         matplotlib.pyplot.title(title)
         matplotlib.pyplot.xlabel(xlabel)
         matplotlib.pyplot.ylabel(ylabel)

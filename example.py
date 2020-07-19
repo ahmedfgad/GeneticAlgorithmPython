@@ -15,25 +15,26 @@ def fitness_func(solution, solution_idx):
     # Calculating the fitness value of each solution in the current population.
     # The fitness function calulates the sum of products between each input and its corresponding weight.
     output = numpy.sum(solution*function_inputs)
-    fitness = 1.0 / numpy.abs(output - desired_output)
+    # The value 0.000001 is used to avoid the Inf value when the denominator numpy.abs(output - desired_output) is 0.0.
+    fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
     return fitness
 
 fitness_function = fitness_func
 
 num_generations = 100 # Number of generations.
-num_parents_mating = 7 # Number of solutions to be selected as parents in the mating pool.
+num_parents_mating = 10 # Number of solutions to be selected as parents in the mating pool.
 
 # To prepare the initial population, there are 2 ways:
 # 1) Prepare it yourself and pass it to the initial_population parameter. This way is useful when the user wants to start the genetic algorithm with a custom initial population.
 # 2) Assign valid integer values to the sol_per_pop and num_genes parameters. If the initial_population parameter exists, then the sol_per_pop and num_genes parameters are useless.
-sol_per_pop = 50 # Number of solutions in the population.
+sol_per_pop = 20 # Number of solutions in the population.
 num_genes = len(function_inputs)
 
 init_range_low = -2
 init_range_high = 5
 
 parent_selection_type = "sss" # Type of parent selection.
-keep_parents = 7 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
+keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
 crossover_type = "single_point" # Type of the crossover operator.
 
@@ -51,9 +52,9 @@ def callback_generation(ga_instance):
 
 # Creating an instance of the GA class inside the ga module. Some parameters are initialized within the constructor.
 ga_instance = pygad.GA(num_generations=num_generations,
-                       num_parents_mating=num_parents_mating, 
+                       num_parents_mating=num_parents_mating,
                        fitness_func=fitness_function,
-                       sol_per_pop=sol_per_pop, 
+                       sol_per_pop=sol_per_pop,
                        num_genes=num_genes,
                        init_range_low=init_range_low,
                        init_range_high=init_range_high,
