@@ -166,7 +166,7 @@ Release date: 1 June 2020
 6. The name of the ``pygad.nn.train_network()`` function is changed to
    ``pygad.nn.train()``.
 
-.. _header-n214:
+.. _header-n77:
 
 PyGAD 2.4.0
 -----------
@@ -183,28 +183,124 @@ Release date: 5 July 2020
    algorithm if it returns the string ``stop``. This causes the
    ``run()`` method to stop.
 
-   One important use case for that feature is to stop the genetic
-   algorithm when a condition is met before passing though all the
-   generations. The user may assigned a value of 100 to the
-   ``num_generations`` parameter of the pygad.GA class constructor.
-   Assuming that at generation 50, for example, a condition is met and
-   the user wants to stop the execution before waiting the remaining 50
-   generations. To do that, just make the function passed to the
-   ``callback_generation`` parameter to return the string ``stop``.
+One important use case for that feature is to stop the genetic algorithm
+when a condition is met before passing though all the generations. The
+user may assigned a value of 100 to the ``num_generations`` parameter of
+the pygad.GA class constructor. Assuming that at generation 50, for
+example, a condition is met and the user wants to stop the execution
+before waiting the remaining 50 generations. To do that, just make the
+function passed to the ``callback_generation`` parameter to return the
+string ``stop``.
 
-   Here is an example of a function to be passed to the
-   ``callback_generation`` parameter which stops the execution if the
-   fitness value 70 is reached. The value 70 might be the best possible
-   fitness value. After being reached, then there is no need to pass
-   through more generations because no further improvement is possible.
+Here is an example of a function to be passed to the
+``callback_generation`` parameter which stops the execution if the
+fitness value 70 is reached. The value 70 might be the best possible
+fitness value. After being reached, then there is no need to pass
+through more generations because no further improvement is possible.
 
-   .. code:: python
+.. code:: python
 
       def func_generation(ga_instance):
        if ga_instance.best_solution()[1] >= 70:
            return "stop"
 
-.. _header-n219:
+.. _header-n225:
+
+PyGAD 2.5.0
+-----------
+
+Release date: 19 July 2020
+
+1. | 2 new optional parameters added to the constructor of the
+     ``pygad.GA`` class which are ``crossover_probability`` and
+     ``mutation_probability``. 
+   | While applying the crossover operation, each parent has a random
+     value generated between 0.0 and 1.0. If this random value is less
+     than or equal to the value assigned to the
+     ``crossover_probability`` parameter, then the parent is selected
+     for the crossover operation.
+   | For the mutation operation, a random value between 0.0 and 1.0 is
+     generated for each gene in the solution. If this value is less than
+     or equal to the value assigned to the ``mutation_probability``,
+     then this gene is selected for mutation.
+
+2. A new optional parameter named ``linewidth`` is added to the
+   ``plot_result()`` method to specify the width of the curve in the
+   plot. It defaults to 3.0.
+
+3. Previously, the indices of the genes selected for mutation was
+   randomly generated once for all solutions within the generation.
+   Currently, the genes' indices are randomly generated for each
+   solution in the population. If the population has 4 solutions, the
+   indices are randomly generated 4 times inside the single generation,
+   1 time for each solution.
+
+4. Previously, the position of the point(s) for the single-point and
+   two-points crossover was(were) randomly selected once for all
+   solutions within the generation. Currently, the position(s) is(are)
+   randomly selected for each solution in the population. If the
+   population has 4 solutions, the position(s) is(are) randomly
+   generated 4 times inside the single generation, 1 time for each
+   solution.
+
+5. A new optional parameter named ``gene_space`` as added to the
+   ``pygad.GA`` class constructor. It is used to specify the possible
+   values for each gene in case the user wants to restrict the gene
+   values. It is useful if the gene space is restricted to a certain
+   range or to discrete values.
+
+Assuming that all genes have the same global space which include the
+values 0.3, 5.2, -4, and 8, then those values can be assigned to the
+``gene_space`` parameter as a list, tuple, or range. Here is a list
+assigned to this parameter. By doing that, then the gene values are
+restricted to those assigned to the ``gene_space`` parameter.
+
+.. code:: python
+
+   gene_space = [0.3, 5.2, -4, 8]
+
+If some genes have different spaces, then ``gene_space`` should accept a
+nested list or tuple. In this case, its elements could be:
+
+1. List, tuple, or range: It holds the individual gene space.
+
+2. Number (int/float): A single value to be assigned to the gene. This
+   means this gene will have the same value across all generations.
+
+3. ``None``: A gene with its space set to ``None`` is initialized
+   randomly from the range specified by the 2 parameters
+   ``init_range_low`` and ``init_range_high``. For mutation, its value
+   is mutated based on a random value from the range specified by the 2
+   parameters ``random_mutation_min_val`` and
+   ``random_mutation_max_val``. If all elements in the ``gene_space``
+   parameter are ``None``, the parameter will not have any effect.
+
+Assuming that a chromosome has 2 genes and each gene has a different
+value space. Then the ``gene_space`` could be assigned a nested
+list/tuple where each element determines the space of a gene. According
+to the next code, the space of the first gene is [0.4, -5] which has 2
+values and the space for the second gene is [0.5, -3.2, 8.8, -9] which
+has 4 values.
+
+.. code:: python
+
+   gene_space = [[0.4, -5], [0.5, -3.2, 8.2, -9]]
+
+For a 2 gene chromosome, if the first gene space is restricted to the
+discrete values from 0 to 4 and the second gene is restricted to the
+values from 10 to 19, then it could be specified according to the next
+code.
+
+.. code:: python
+
+   gene_space = [range(5), range(10, 20)]
+
+If the user did not assign the initial population to the
+``initial_population`` parameter, the the initial population is created
+randomly based on the ``gene_space`` parameter. Moreover, the mutation
+is applied based on this parameter.
+
+.. _header-n224:
 
 PyGAD Projects at GitHub
 ========================
@@ -214,7 +310,7 @@ https://pypi.org/project/pygad. PyGAD is built out of a number of
 open-source GitHub projects. A brief note about these projects is given
 in the next subsections.
 
-.. _header-n79:
+.. _header-n89:
 
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 --------------------------------------------------------------------------------
@@ -225,7 +321,7 @@ GitHub Link: https://github.com/ahmedfgad/GeneticAlgorithmPython
 is the first project which is an open-source Python 3 project for
 implementing the genetic algorithm based on NumPy.
 
-.. _header-n82:
+.. _header-n92:
 
 `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__
 ----------------------------------------------------
@@ -239,7 +335,7 @@ neural network without using a training algorithm. Currently, it only
 supports classification and later regression will be also supported.
 Moreover, only one class is supported per sample.
 
-.. _header-n85:
+.. _header-n95:
 
 `NeuralGenetic <https://github.com/ahmedfgad/NeuralGenetic>`__
 --------------------------------------------------------------
@@ -252,7 +348,7 @@ projects
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 and `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__.
 
-.. _header-n88:
+.. _header-n98:
 
 `NumPyCNN <https://github.com/ahmedfgad/NumPyCNN>`__
 ----------------------------------------------------
@@ -264,7 +360,7 @@ convolutional neural networks using NumPy. The purpose of this project
 is to only implement the **forward pass** of a convolutional neural
 network without using a training algorithm.
 
-.. _header-n91:
+.. _header-n101:
 
 `CNNGenetic <https://github.com/ahmedfgad/CNNGenetic>`__
 --------------------------------------------------------
@@ -276,7 +372,7 @@ convolutional neural networks using the genetic algorithm. It uses the
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 project for building the genetic algorithm.
 
-.. _header-n94:
+.. _header-n104:
 
 Submitting Issues
 =================
@@ -293,7 +389,7 @@ is not working properly or to ask for questions.
 If this is not a proper option for you, then check the **Contact Us**
 section for more contact details.
 
-.. _header-n98:
+.. _header-n108:
 
 Ask for Feature
 ===============
@@ -310,7 +406,7 @@ to ahmed.f.gad@gmail.com.
 
 Also check the **Contact Us** section for more contact details.
 
-.. _header-n102:
+.. _header-n112:
 
 Projects Built using PyGAD
 ==========================
@@ -329,7 +425,7 @@ Within your message, please send the following details:
 
 -  Preferably, a link that directs the readers to your project
 
-.. _header-n113:
+.. _header-n123:
 
 For More Information
 ====================
@@ -337,7 +433,7 @@ For More Information
 There are different resources that can be used to get started with the
 genetic algorithm and building it in Python.
 
-.. _header-n115:
+.. _header-n125:
 
 Tutorial: Implementing Genetic Algorithm in Python
 --------------------------------------------------
@@ -361,7 +457,7 @@ good resource to start with coding the genetic algorithm.
 
 |image0|
 
-.. _header-n126:
+.. _header-n136:
 
 Tutorial: Introduction to Genetic Algorithm
 -------------------------------------------
@@ -380,7 +476,7 @@ which is available at these links:
 
 |image1|
 
-.. _header-n136:
+.. _header-n146:
 
 Tutorial: Build Neural Networks in Python
 -----------------------------------------
@@ -400,7 +496,7 @@ available at these links:
 
 |image2|
 
-.. _header-n146:
+.. _header-n156:
 
 Tutorial: Optimize Neural Networks with Genetic Algorithm
 ---------------------------------------------------------
@@ -420,7 +516,7 @@ available at these links:
 
 |image3|
 
-.. _header-n156:
+.. _header-n166:
 
 Tutorial: Building CNN in Python
 --------------------------------
@@ -446,7 +542,7 @@ good resource to start with coding CNNs.
 
 |image4|
 
-.. _header-n169:
+.. _header-n179:
 
 Tutorial: Derivation of CNN from FCNN
 -------------------------------------
@@ -465,7 +561,7 @@ which is available at these links:
 
 |image5|
 
-.. _header-n179:
+.. _header-n189:
 
 Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 --------------------------------------------------------------------------
@@ -491,7 +587,7 @@ Find the book at these links:
 .. figure:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
    :alt: 
 
-.. _header-n194:
+.. _header-n204:
 
 Contact Us
 ==========
