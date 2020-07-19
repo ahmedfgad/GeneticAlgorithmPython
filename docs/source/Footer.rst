@@ -204,7 +204,7 @@ through more generations because no further improvement is possible.
        if ga_instance.best_solution()[1] >= 70:
            return "stop"
 
-.. _header-n225:
+.. _header-n87:
 
 PyGAD 2.5.0
 -----------
@@ -296,11 +296,11 @@ code.
    gene_space = [range(5), range(10, 20)]
 
 If the user did not assign the initial population to the
-``initial_population`` parameter, the the initial population is created
+``initial_population`` parameter, the initial population is created
 randomly based on the ``gene_space`` parameter. Moreover, the mutation
 is applied based on this parameter.
 
-.. _header-n224:
+.. _header-n115:
 
 PyGAD Projects at GitHub
 ========================
@@ -310,7 +310,7 @@ https://pypi.org/project/pygad. PyGAD is built out of a number of
 open-source GitHub projects. A brief note about these projects is given
 in the next subsections.
 
-.. _header-n89:
+.. _header-n117:
 
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 --------------------------------------------------------------------------------
@@ -321,7 +321,7 @@ GitHub Link: https://github.com/ahmedfgad/GeneticAlgorithmPython
 is the first project which is an open-source Python 3 project for
 implementing the genetic algorithm based on NumPy.
 
-.. _header-n92:
+.. _header-n120:
 
 `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__
 ----------------------------------------------------
@@ -335,7 +335,7 @@ neural network without using a training algorithm. Currently, it only
 supports classification and later regression will be also supported.
 Moreover, only one class is supported per sample.
 
-.. _header-n95:
+.. _header-n123:
 
 `NeuralGenetic <https://github.com/ahmedfgad/NeuralGenetic>`__
 --------------------------------------------------------------
@@ -348,7 +348,7 @@ projects
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 and `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__.
 
-.. _header-n98:
+.. _header-n126:
 
 `NumPyCNN <https://github.com/ahmedfgad/NumPyCNN>`__
 ----------------------------------------------------
@@ -360,7 +360,7 @@ convolutional neural networks using NumPy. The purpose of this project
 is to only implement the **forward pass** of a convolutional neural
 network without using a training algorithm.
 
-.. _header-n101:
+.. _header-n129:
 
 `CNNGenetic <https://github.com/ahmedfgad/CNNGenetic>`__
 --------------------------------------------------------
@@ -372,7 +372,7 @@ convolutional neural networks using the genetic algorithm. It uses the
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 project for building the genetic algorithm.
 
-.. _header-n104:
+.. _header-n132:
 
 Submitting Issues
 =================
@@ -389,7 +389,7 @@ is not working properly or to ask for questions.
 If this is not a proper option for you, then check the **Contact Us**
 section for more contact details.
 
-.. _header-n108:
+.. _header-n136:
 
 Ask for Feature
 ===============
@@ -406,7 +406,7 @@ to ahmed.f.gad@gmail.com.
 
 Also check the **Contact Us** section for more contact details.
 
-.. _header-n112:
+.. _header-n140:
 
 Projects Built using PyGAD
 ==========================
@@ -425,7 +425,7 @@ Within your message, please send the following details:
 
 -  Preferably, a link that directs the readers to your project
 
-.. _header-n123:
+.. _header-n151:
 
 For More Information
 ====================
@@ -433,7 +433,7 @@ For More Information
 There are different resources that can be used to get started with the
 genetic algorithm and building it in Python.
 
-.. _header-n125:
+.. _header-n153:
 
 Tutorial: Implementing Genetic Algorithm in Python
 --------------------------------------------------
@@ -457,7 +457,7 @@ good resource to start with coding the genetic algorithm.
 
 |image0|
 
-.. _header-n136:
+.. _header-n164:
 
 Tutorial: Introduction to Genetic Algorithm
 -------------------------------------------
@@ -476,7 +476,7 @@ which is available at these links:
 
 |image1|
 
-.. _header-n146:
+.. _header-n174:
 
 Tutorial: Build Neural Networks in Python
 -----------------------------------------
@@ -496,7 +496,7 @@ available at these links:
 
 |image2|
 
-.. _header-n156:
+.. _header-n184:
 
 Tutorial: Optimize Neural Networks with Genetic Algorithm
 ---------------------------------------------------------
@@ -516,7 +516,7 @@ available at these links:
 
 |image3|
 
-.. _header-n166:
+.. _header-n194:
 
 Tutorial: Building CNN in Python
 --------------------------------
@@ -542,7 +542,7 @@ good resource to start with coding CNNs.
 
 |image4|
 
-.. _header-n179:
+.. _header-n207:
 
 Tutorial: Derivation of CNN from FCNN
 -------------------------------------
@@ -561,7 +561,7 @@ which is available at these links:
 
 |image5|
 
-.. _header-n189:
+.. _header-n217:
 
 Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 --------------------------------------------------------------------------
@@ -587,7 +587,7 @@ Find the book at these links:
 .. figure:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
    :alt: 
 
-.. _header-n204:
+.. _header-n232:
 
 Contact Us
 ==========
