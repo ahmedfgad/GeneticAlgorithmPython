@@ -14,6 +14,7 @@ class GA:
                  num_genes=None,
                  init_range_low=-4,
                  init_range_high=4,
+                 gene_type=float,
                  parent_selection_type="sss",
                  keep_parents=-1,
                  K_tournament=3,
@@ -27,7 +28,14 @@ class GA:
                  random_mutation_min_val=-1.0,
                  random_mutation_max_val=1.0,
                  gene_space=None,
+                 on_start=None,
+                 on_fitness=None,
+                 on_parents=None,
+                 on_crossover=None,
+                 on_mutation=None,
                  callback_generation=None,
+                 on_generation=None,
+                 on_stop=None,
                  delay_after_gen=0.0):
 
         """
@@ -46,6 +54,8 @@ class GA:
         init_range_high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
         # It is OK to set the value of any of the 2 parameters ('init_range_high' and 'init_range_high') to be equal, higher or lower than the other parameter (i.e. init_range_low is not needed to be lower than init_range_high).
 
+        gene_type: The type of the gene. It works only when the 'gene_space' parameter is None (i.e. the population is created randomly). It is assigned to either the int or float types and forces all the genes to be of that type.
+
         parent_selection_type: Type of parent selection.
         keep_parents: If 0, this means the parents of the current populaiton will not be used at all in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. In some cases, the parents are of high quality and thus we do not want to loose such some high quality solutions. If some parent selection operators like roulette wheel selection (RWS), the parents may not be of high quality and thus keeping the parents might degarde the quality of the population.
         K_tournament: When the value of 'parent_selection_type' is 'tournament', the 'K_tournament' parameter specifies the number of solutions from which a parent is selected randomly.
@@ -63,10 +73,16 @@ class GA:
         random_mutation_min_val: The minimum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to -1.0.
         random_mutation_max_val: The maximum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to 1.0.
 
-        gene_space: Added in PyGAD 2.5.0. It accepts a list of all possible values of the gene. This list is used in the mutation step. Should be used only if the gene space is a set of discrete values. No need for the 2 parameters (random_mutation_min_val and random_mutation_max_val) if the parameter gene_space exists.
+        gene_space: It accepts a list of all possible values of the gene. This list is used in the mutation step. Should be used only if the gene space is a set of discrete values. No need for the 2 parameters (random_mutation_min_val and random_mutation_max_val) if the parameter gene_space exists. Added in PyGAD 2.5.0.
 
-        callback_generation: If not None, then it accepts a function to be called after each generation. This function must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the generations.
-
+        on_start: Accepts a function to be called only once before the genetic algorithm starts its evolution. This function must accept a single parameter representing the instance of the genetic algorithm. Added in PyGAD 2.6.0.
+        on_fitness: Accepts a function to be called after calculating the fitness values of all solutions in the population. This function must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of all solutions' fitness values. Added in PyGAD 2.6.0.
+        on_parents: Accepts a function to be called after selecting the parents that mates. This function must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the selected parents. Added in PyGAD 2.6.0.
+        on_crossover: Accepts a function to be called each time the crossover operation is applied. This function must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring generated using crossover. Added in PyGAD 2.6.0.
+        on_mutation: Accepts a function to be called each time the mutation operation is applied. This function must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring after applying the mutation. Added in PyGAD 2.6.0.
+        callback_generation: Accepts a function to be called after each generation. This function must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and should be replaced by the on_generation parameter.
+        on_generation: Accepts a function to be called after each generation. This function must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. Added in PyGAD 2.6.0.
+        on_stop: Accepts a function to be called only once exactly before the genetic algorithm stops or when it completes all the generations. This function must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of fitness values of the last population's solutions. Added in PyGAD 2.6.0. 
         delay_after_gen: Added in PyGAD 2.4.0. It accepts a non-negative number specifying the number of seconds to wait after a generation completes and before going to the next generation. It defaults to 0.0 which means no delay after the generation.
         """
 
@@ -106,9 +122,16 @@ class GA:
 
         self.init_range_low = init_range_low
         self.init_range_high = init_range_high
+        
+        if gene_type in [int, float]:
+            self.gene_type = gene_type
+        else:
+            self.valid_parameters = False
+            raise ValueError("The value passed to the 'gene_type' parameter must be either int or float but the value {gene_type} found.".format(gene_type=gene_type))
 
         if initial_population is None:
             if (sol_per_pop is None) or (num_genes is None):
+                self.valid_parameters = False
                 raise ValueError("Error creating the initail population\n\nWhen the parameter initial_population is None, then neither of the 2 parameters sol_per_pop and num_genes can be None at the same time.\nThere are 2 options to prepare the initial population:\n1) Create an initial population and assign it to the initial_population parameter. In this case, the values of the 2 parameters sol_per_pop and num_genes will be deduced.\n2) Allow the genetic algorithm to create the initial population automatically by passing valid integer values to the sol_per_pop and num_genes parameters.")
             elif (type(sol_per_pop) is int) and (type(num_genes) is int):
                 # Validating the number of solutions in the population (sol_per_pop)
@@ -130,7 +153,7 @@ class GA:
             raise ValueError("A 2D list is expected to the initail_population parameter but a {initial_population_ndim}-D list found.".format(initial_population_ndim=numpy.array(initial_population).ndim))
         else:
             self.initial_population = numpy.array(initial_population)
-            self.population = self.initial_population # A NumPy array holding the initial population.
+            self.population = self.initial_population.copy() # A NumPy array holding the initial population.
             self.num_genes = self.initial_population.shape[1] # Number of genes in the solution.
             self.sol_per_pop = self.initial_population.shape[0]  # Number of solutions in the population.
             self.pop_size = (self.sol_per_pop,self.num_genes) # The population size.
@@ -293,7 +316,87 @@ class GA:
                 raise ValueError("The fitness function must accept 2 parameters representing the solution to which the fitness value is calculated and the solution index within the population.\nThe passed fitness function named '{funcname}' accepts {argcount} argument(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
         else:
             self.valid_parameters = False
-            raise ValueError("The value assigned to the 'fitness_func' parameter is expected to be of type function but {fitness_func_type} found.".format(fitness_func_type=type(fitness_func)))
+            raise ValueError("The value assigned to the fitness_func parameter is expected to be of type function but {fitness_func_type} found.".format(fitness_func_type=type(fitness_func)))
+
+        # Check if the on_start exists.
+        if not (on_start is None):
+            # Check if the on_start is a function.
+            if callable(on_start):
+                # Check if the on_start function accepts only a single paramater.
+                if (on_start.__code__.co_argcount == 1):
+                    self.on_start = on_start
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
+            else:
+                self.valid_parameters = False
+                raise ValueError("The value assigned to the on_start parameter is expected to be of type function but {on_start_type} found.".format(on_start_type=type(on_start)))
+        else:
+            self.on_start = None
+
+        # Check if the on_fitness exists.
+        if not (on_fitness is None):
+            # Check if the on_fitness is a function.
+            if callable(on_fitness):
+                # Check if the on_fitness function accepts 2 paramaters.
+                if (on_fitness.__code__.co_argcount == 2):
+                    self.on_fitness = on_fitness
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
+            else:
+                self.valid_parameters = False
+                raise ValueError("The value assigned to the on_fitness parameter is expected to be of type function but {on_fitness_type} found.".format(on_fitness_type=type(on_fitness)))
+        else:
+            self.on_fitness = None
+
+        # Check if the on_parents exists.
+        if not (on_parents is None):
+            # Check if the on_parents is a function.
+            if callable(on_parents):
+                # Check if the on_parents function accepts 2 paramaters.
+                if (on_parents.__code__.co_argcount == 2):
+                    self.on_parents = on_parents
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_parents.__code__.co_name, argcount=on_parents.__code__.co_argcount))
+            else:
+                self.valid_parameters = False
+                raise ValueError("The value assigned to the on_parents parameter is expected to be of type function but {on_parents_type} found.".format(on_parents_type=type(on_parents)))
+        else:
+            self.on_parents = None
+
+        # Check if the on_crossover exists.
+        if not (on_crossover is None):
+            # Check if the on_crossover is a function.
+            if callable(on_crossover):
+                # Check if the on_crossover function accepts 2 paramaters.
+                if (on_crossover.__code__.co_argcount == 2):
+                    self.on_crossover = on_crossover
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_crossover.__code__.co_name, argcount=on_crossover.__code__.co_argcount))
+            else:
+                self.valid_parameters = False
+                raise ValueError("The value assigned to the on_crossover parameter is expected to be of type function but {on_crossover_type} found.".format(on_crossover_type=type(on_crossover)))
+        else:
+            self.on_crossover = None
+
+        # Check if the on_mutation exists.
+        if not (on_mutation is None):
+            # Check if the on_mutation is a function.
+            if callable(on_mutation):
+                # Check if the on_mutation function accepts 2 paramaters.
+                if (on_mutation.__code__.co_argcount == 2):
+                    self.on_mutation = on_mutation
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_mutation.__code__.co_name, argcount=on_mutation.__code__.co_argcount))
+            else:
+                self.valid_parameters = False
+                raise ValueError("The value assigned to the on_mutation parameter is expected to be of type function but {on_mutation_type} found.".format(on_mutation_type=type(on_mutation)))
+        else:
+            self.on_mutation = None
 
         # Check if the callback_generation exists.
         if not (callback_generation is None):
@@ -302,14 +405,48 @@ class GA:
                 # Check if the callback_generation function accepts only a single paramater.
                 if (callback_generation.__code__.co_argcount == 1):
                     self.callback_generation = callback_generation
+                    on_generation = callback_generation
+                    print("Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and will be removed in a later release of PyGAD. Please use the on_generation parameter instead.")
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The callback_generation function must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed callback_generation function named '{funcname}' accepts {argcount} argument(s).".format(funcname=callback_generation.__code__.co_name, argcount=callback_generation.__code__.co_argcount))
+                    raise ValueError("The function assigned to the callback_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=callback_generation.__code__.co_name, argcount=callback_generation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the 'callback_generation' parameter is expected to be of type function but {callback_generation_type} found.".format(callback_generation_type=type(callback_generation)))
+                raise ValueError("The value assigned to the callback_generation parameter is expected to be of type function but {callback_generation_type} found.".format(callback_generation_type=type(callback_generation)))
         else:
             self.callback_generation = None
+
+        # Check if the on_generation exists.
+        if not (on_generation is None):
+            # Check if the on_generation is a function.
+            if callable(on_generation):
+                # Check if the on_generation function accepts only a single paramater.
+                if (on_generation.__code__.co_argcount == 1):
+                    self.on_generation = on_generation
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_generation.__code__.co_name, argcount=on_generation.__code__.co_argcount))
+            else:
+                self.valid_parameters = False
+                raise ValueError("The value assigned to the on_generation parameter is expected to be of type function but {on_generation_type} found.".format(on_generation_type=type(on_generation)))
+        else:
+            self.on_generation = None
+
+        # Check if the on_stop exists.
+        if not (on_stop is None):
+            # Check if the on_stop is a function.
+            if callable(on_stop):
+                # Check if the on_stop function accepts 2 paramaters.
+                if (on_stop.__code__.co_argcount == 2):
+                    self.on_stop = on_stop
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_stop.__code__.co_name, argcount=on_stop.__code__.co_argcount))
+            else:
+                self.valid_parameters = False
+                raise ValueError("The value assigned to the on_stop parameter is expected to be of type function but {on_stop_type} found.".format(on_stop_type=type(on_stop)))
+        else:
+            self.on_stop = None
 
         if delay_after_gen >= 0.0:
             self.delay_after_gen = delay_after_gen
@@ -357,9 +494,9 @@ class GA:
 
         if self.gene_space == None:
             # Creating the initial population randomly.
-            self.population = numpy.random.uniform(low=low, 
-                                                   high=high, 
-                                                   size=self.pop_size) # A NumPy array holding the initial population.
+            self.population = numpy.asarray(numpy.random.uniform(low=low, 
+                                                                 high=high, 
+                                                                 size=self.pop_size), dtype=self.gene_type) # A NumPy array holding the initial population.
         elif self.gene_space_nested:
             self.population = numpy.zeros(shape=self.pop_size)
             for sol_idx in range(self.sol_per_pop):
@@ -368,9 +505,9 @@ class GA:
                     if type(curr_gene_space) in [list, tuple, range]:
                         self.population[sol_idx, gene_idx] = random.choice(curr_gene_space)
                     elif type(curr_gene_space)  == type(None):
-                        self.population[sol_idx, gene_idx] = numpy.random.uniform(low=low,
+                        self.population[sol_idx, gene_idx] = self.gene_type(numpy.random.uniform(low=low,
                                        high=high, 
-                                       size=1)
+                                       size=1))
                     elif type(curr_gene_space) in [int, float]:
                         self.population[sol_idx, gene_idx] = curr_gene_space                
         else:
@@ -411,15 +548,22 @@ class GA:
         if self.valid_parameters == False:
             raise ValueError("ERROR calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
 
+        if not (self.on_start is None):
+            self.on_start(self)
+
         for generation in range(self.num_generations):
             # Measuring the fitness of each chromosome in the population.
             fitness = self.cal_pop_fitness()
+            if not (self.on_fitness is None):
+                self.on_fitness(self, fitness)
 
             # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
             self.best_solutions_fitness.append(numpy.max(fitness))
 
             # Selecting the best parents in the population for mating.
             parents = self.select_parents(fitness, num_parents=self.num_parents_mating)
+            if not (self.on_parents is None):
+                self.on_parents(self, parents)
 
             # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
             if self.crossover_type is None:
@@ -431,6 +575,8 @@ class GA:
                 # Generating offspring using crossover.
                 offspring_crossover = self.crossover(parents,
                                                      offspring_size=(self.num_offspring, self.num_genes))
+                if not (self.on_crossover is None):
+                    self.on_crossover(self, offspring_crossover)
 
             # If self.mutation_type=None, then no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
             if self.mutation_type is None:
@@ -438,7 +584,8 @@ class GA:
             else:
                 # Adding some variations to the offspring using mutation.
                 offspring_mutation = self.mutation(offspring_crossover)
-
+                if not (self.on_mutation is None):
+                    self.on_mutation(self, offspring_mutation)
 
             if (self.keep_parents == 0):
                 self.population = offspring_mutation
@@ -454,8 +601,8 @@ class GA:
             self.generations_completed = generation + 1 # The generations_completed attribute holds the number of the last completed generation.
 
             # If the callback_generation attribute is not None, then cal the callback function after the generation.
-            if not (self.callback_generation is None):
-                r = self.callback_generation(self)
+            if not (self.on_generation is None):
+                r = self.on_generation(self)
                 if type(r) is str and r.lower() == "stop":
                     break
 
@@ -464,6 +611,9 @@ class GA:
         self.best_solution_generation = numpy.where(numpy.array(self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
         # After the run() method completes, the run_completed flag is changed from False to True.
         self.run_completed = True # Set to True only after the run() method completes gracefully.
+
+        if not (self.on_stop is None):
+            self.on_stop(self, self.cal_pop_fitness())
 
     def steady_state_selection(self, fitness, num_parents):
 
@@ -797,9 +947,9 @@ class GA:
                         value_from_space = curr_gene_space
                     # Keep the gene unchanged if the gene space is None.
                     elif curr_gene_space == None:
-                        rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                        high=self.random_mutation_max_val,
-                                                        size=1)
+                        rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
+                                                                        high=self.random_mutation_max_val,
+                                                                        size=1))
                         if self.mutation_by_replacement:
                             value_from_space = rand_val
                         else:
@@ -839,9 +989,9 @@ class GA:
                             value_from_space = curr_gene_space
                         # Keep the gene unchanged if the gene space is None.
                         elif curr_gene_space == None:
-                            rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                            high=self.random_mutation_max_val,
-                                                            size=1)
+                            rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
+                                                                            high=self.random_mutation_max_val,
+                                                                            size=1))
                             if self.mutation_by_replacement:
                                 value_from_space = rand_val
                             else:
@@ -872,7 +1022,9 @@ class GA:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
             for gene_idx in mutation_indices:
                 # Generating a random value.
-                random_value = numpy.random.uniform(self.random_mutation_min_val, self.random_mutation_max_val, 1)
+                random_value = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                                   high=self.random_mutation_max_val, 
+                                                                   size=1))
                 # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                 if self.mutation_by_replacement:
                     offspring[offspring_idx, gene_idx] = random_value
@@ -896,7 +1048,9 @@ class GA:
             for gene_idx in range(offspring.shape[1]):
                 if probs[gene_idx] <= self.mutation_probability:
                     # Generating a random value.
-                    random_value = numpy.random.uniform(self.random_mutation_min_val, self.random_mutation_max_val, 1)
+                    random_value = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                                       high=self.random_mutation_max_val, 
+                                                                       size=1))
                     # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                     if self.mutation_by_replacement:
                         offspring[offspring_idx, gene_idx] = random_value
