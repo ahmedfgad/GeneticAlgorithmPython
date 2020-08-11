@@ -30,6 +30,19 @@ The library is under active development and more features in the genetic
 algorithm will be added like working with binary problems. This is in
 addition to supporting more machine learning algorithms.
 
+.. _header-n47:
+
+Donation
+========
+
+You can donate to PyGAD via `Open
+Collective <https://opencollective.com/pygad>`__:
+`opencollective.com/pygad <https://opencollective.com/pygad>`__.
+
+To donate using PayPal, use either this link:
+`paypal.me/ahmedfgad <https://paypal.me/ahmedfgad>`__ or the e-mail
+address ahmed.f.gad@gmail.com.
+
 .. _header-n5:
 
 Installation
