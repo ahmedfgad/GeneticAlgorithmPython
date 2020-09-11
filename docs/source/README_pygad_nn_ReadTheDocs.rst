@@ -15,9 +15,10 @@ trains the network, makes predictions, and more.
 Later, the **pygad.gann** module is used to train the **pygad.nn**
 network using the genetic algorithm built in the **pygad** module.
 
-Currently, **pygad.nn** it only supports classification and later
-regression will be also supported. Moreover, only one class is supported
-per sample.
+Starting from PyGAD 2.7.0, the **pygad.nn** module supports both
+classification and regression problems. For more information, check the
+``problem_type`` parameter in the ``pygad.nn.train()`` and
+``pygad.nn.predict()`` functions.
 
 .. _header-n6:
 
@@ -84,8 +85,14 @@ the class. The constructor accepts the following parameters:
 
 -  ``activation_function``: A string representing the activation
    function to be used in this layer. Defaults to ``"sigmoid"``.
-   Currently, the supported activation functions are ``"sigmoid"``,
-   ``"relu"``, and ``"softmax"`` (supported in PyGAD 2.3.0 and higher).
+   Currently, the supported values for the activation functions are
+   ``"sigmoid"``, ``"relu"``, ``"softmax"`` (supported in PyGAD 2.3.0
+   and higher), and ``"None"`` (supported in PyGAD 2.7.0 and higher).
+   When a layer has its activation function set to ``"None"``, then it
+   means no activation function is applied. For a **regression
+   problem**, set the activation function of the output (last) layer to
+   ``"None"``. If all outputs in the regression problem are nonnegative,
+   then it is possible to use the ReLU function in the output layer.
 
 Within the constructor, the accepted parameters are used as instance
 attributes. Besides the parameters, some new instance attributes are
@@ -364,6 +371,10 @@ Accepts the following parameters:
 
 -  ``data_outputs``: Data outputs.
 
+-  ``problem_type``: The type of the problem which can be either
+   ``"classification"`` or ``"regression"``. Added in PyGAD 2.7.0 and
+   higher.
+
 -  ``learning_rate``: Learning rate.
 
 For each epoch, all the data samples are fed to the network to return
@@ -372,7 +383,7 @@ the learning rate. No learning algorithm is used because the purpose of
 this project is to only build the forward pass of training a neural
 network.
 
-.. _header-n129:
+.. _header-n131:
 
 ``pygad.nn.update_weights()``
 -----------------------------
@@ -390,7 +401,7 @@ Accepts the following parameters:
 
 -  ``learning_rate``: The learning rate.
 
-.. _header-n139:
+.. _header-n141:
 
 ``pygad.nn.update_layers_trained_weights()``
 --------------------------------------------
@@ -417,7 +428,7 @@ their ``previous_layer`` attribute. For each layer, its
 ``trained_weights`` attribute is assigned the weights of the layer from
 the ``final_weights`` parameter.
 
-.. _header-n149:
+.. _header-n151:
 
 ``pygad.nn.predict()``
 ----------------------
@@ -432,9 +443,13 @@ Accepts the following parameters:
 
 -  ``data_inputs``: Data features.
 
+-  ``problem_type``: The type of the problem which can be either
+   ``"classification"`` or ``"regression"``. Added in PyGAD 2.7.0 and
+   higher.
+
 All the data samples are fed to the network to return their predictions.
 
-.. _header-n158:
+.. _header-n162:
 
 Helper Functions
 ================
@@ -442,7 +457,7 @@ Helper Functions
 There are functions in the ``pygad.nn`` module that does not directly
 manipulate the neural networks.
 
-.. _header-n160:
+.. _header-n164:
 
 ``pygad.nn.to_vector()``
 ------------------------
@@ -454,7 +469,7 @@ Accepts the following parameters:
 
 -  ``array``: The NumPy array to be converted into a 1D vector.
 
-.. _header-n166:
+.. _header-n170:
 
 ``pygad.nn.to_array()``
 -----------------------
@@ -468,7 +483,7 @@ Accepts the following parameters:
 
 -  ``shape``: The target shape of the array.
 
-.. _header-n174:
+.. _header-n178:
 
 Supported Activation Functions
 ==============================
@@ -482,7 +497,7 @@ The supported activation functions are:
 
 3. Softmax: Implemented using the ``pygad.nn.softmax()`` function.
 
-.. _header-n183:
+.. _header-n187:
 
 Steps to Build a Neural Network
 ===============================
@@ -500,7 +515,7 @@ neural network. The summary of the steps are as follows:
 
 -  Calculating Some Statistics
 
-.. _header-n196:
+.. _header-n200:
 
 Reading the Data
 ----------------
@@ -609,7 +624,7 @@ arrays according to the next 2 lines:
 
 After the data is prepared, next is to create the network architecture.
 
-.. _header-n231:
+.. _header-n235:
 
 Building the Network Architecture
 ---------------------------------
@@ -638,7 +653,7 @@ neurons equal to the number of classes in the dataset which is 4.
 After both the data and the network architecture are prepared, the next
 step is to train the network.
 
-.. _header-n237:
+.. _header-n241:
 
 Training the Network
 --------------------
@@ -655,7 +670,7 @@ Here is an example of using the ``pygad.nn.train()`` function.
 
 After training the network, the next step is to make predictions.
 
-.. _header-n241:
+.. _header-n245:
 
 Making Predictions
 ------------------
@@ -670,7 +685,7 @@ predictions. Here is an example.
 It is not expected to have high accuracy in the predictions because no
 training algorithm is used.
 
-.. _header-n245:
+.. _header-n249:
 
 Calculating Some Statistics
 ---------------------------
@@ -693,7 +708,7 @@ classification accuracy is high because no training algorithm is used.
 Please check the documentation of the ``pygad.gann`` module for training
 the network using the genetic algorithm.
 
-.. _header-n249:
+.. _header-n253:
 
 Examples
 ========
@@ -701,10 +716,10 @@ Examples
 This section gives the complete code of some examples that build neural
 networks using ``pygad.nn``. Each subsection builds a different network.
 
-.. _header-n251:
+.. _header-n255:
 
-XOR
----
+XOR Classification
+------------------
 
 This is an example of building a network with 1 hidden layer with 2
 neurons for building a network that simulates the XOR logic gate.
@@ -758,7 +773,7 @@ has 2 neurons, one for each class.
    print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
    print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
 
-.. _header-n254:
+.. _header-n258:
 
 Image Classification
 --------------------
@@ -818,3 +833,173 @@ files before running this code.
    print("Number of correct classifications : {num_correct}.".format(num_correct=num_correct))
    print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
    print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
+
+.. _header-n262:
+
+Regression Example 1
+--------------------
+
+The next code listing builds a neural network for regression. Here is
+what to do to make the code works for regression:
+
+1. Set the ``problem_type`` parameter in the ``pygad.nn.train()`` and
+   ``pygad.nn.predict()`` functions to the string ``"regression"``.
+
+.. code:: python
+
+   pygad.nn.train(...,
+                  problem_type="regression")
+
+   predictions = pygad.nn.predict(..., 
+                                  problem_type="regression")
+
+1. Set the activation function for the output layer to the string
+   ``"None"``.
+
+.. code:: python
+
+   output_layer = pygad.nn.DenseLayer(num_neurons=num_outputs, previous_layer=hidden_layer1, activation_function="None")
+
+1. Calculate the prediction error according to your preferred error
+   function. Here is how the mean absolute error is calculated.
+
+.. code:: python
+
+   abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
+   print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+
+Here is the complete code. Yet, there is no algorithm used to train the
+network and thus the network is expected to give bad results. Later, the
+``pygad.gann`` module is used to train either a regression or
+classification networks.
+
+.. code:: python
+
+   import numpy
+   import pygad.nn
+
+   # Preparing the NumPy array of the inputs.
+   data_inputs = numpy.array([[2, 5, -3, 0.1],
+                              [8, 15, 20, 13]])
+
+   # Preparing the NumPy array of the outputs.
+   data_outputs = numpy.array([0.1, 
+                               1.5])
+
+   # The number of inputs (i.e. feature vector length) per sample
+   num_inputs = data_inputs.shape[1]
+   # Number of outputs per sample
+   num_outputs = 1
+
+   HL1_neurons = 2
+
+   # Building the network architecture.
+   input_layer = pygad.nn.InputLayer(num_inputs)
+   hidden_layer1 = pygad.nn.DenseLayer(num_neurons=HL1_neurons, previous_layer=input_layer, activation_function="relu")
+   output_layer = pygad.nn.DenseLayer(num_neurons=num_outputs, previous_layer=hidden_layer1, activation_function="None")
+
+   # Training the network.
+   pygad.nn.train(num_epochs=100,
+                  last_layer=output_layer,
+                  data_inputs=data_inputs,
+                  data_outputs=data_outputs,
+                  learning_rate=0.01,
+                  problem_type="regression")
+
+   # Using the trained network for predictions.
+   predictions = pygad.nn.predict(last_layer=output_layer, 
+                            data_inputs=data_inputs, 
+                            problem_type="regression")
+
+   # Calculating some statistics
+   abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
+   print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+
+.. _header-n278:
+
+Regression Example 2 - Fish Weight Prediction
+---------------------------------------------
+
+This example uses the Fish Market Dataset available at Kaggle
+(https://www.kaggle.com/aungpyaeap/fish-market). Simply download the CSV
+dataset from `this
+link <https://www.kaggle.com/aungpyaeap/fish-market/download>`__
+(https://www.kaggle.com/aungpyaeap/fish-market/download). The dataset is
+also available at the `GitHub project of the ``pygad.nn``
+module <https://github.com/ahmedfgad/NumPyANN>`__:
+https://github.com/ahmedfgad/NumPyANN
+
+Using the Pandas library, the dataset is read using the ``read_csv()``
+function.
+
+.. code:: python
+
+   data = numpy.array(pandas.read_csv("Fish.csv"))
+
+The last 5 columns in the dataset are used as inputs and the **Weight**
+column is used as output.
+
+.. code:: python
+
+   # Preparing the NumPy array of the inputs.
+   data_inputs = numpy.asarray(data[:, 2:], dtype=numpy.float32)
+
+   # Preparing the NumPy array of the outputs.
+   data_outputs = numpy.asarray(data[:, 1], dtype=numpy.float32) # Fish Weight
+
+Note how the activation function at the last layer is set to ``"None"``.
+Moreover, the ``problem_type`` parameter in the ``pygad.nn.train()`` and
+``pygad.nn.predict()`` functions is set to ``"regression"``.
+
+After the ``pygad.nn.train()`` function completes, the mean absolute
+error is calculated.
+
+.. code:: python
+
+   abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
+   print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+
+Here is the complete code.
+
+.. code:: python
+
+   import numpy
+   import pygad.nn
+   import pandas
+
+   data = numpy.array(pandas.read_csv("Fish.csv"))
+
+   # Preparing the NumPy array of the inputs.
+   data_inputs = numpy.asarray(data[:, 2:], dtype=numpy.float32)
+
+   # Preparing the NumPy array of the outputs.
+   data_outputs = numpy.asarray(data[:, 1], dtype=numpy.float32) # Fish Weight
+
+   # The number of inputs (i.e. feature vector length) per sample
+   num_inputs = data_inputs.shape[1]
+   # Number of outputs per sample
+   num_outputs = 1
+
+   HL1_neurons = 2
+
+   # Building the network architecture.
+   input_layer = pygad.nn.InputLayer(num_inputs)
+   hidden_layer1 = pygad.nn.DenseLayer(num_neurons=HL1_neurons, previous_layer=input_layer, activation_function="relu")
+   output_layer = pygad.nn.DenseLayer(num_neurons=num_outputs, previous_layer=hidden_layer1, activation_function="None")
+
+   # Training the network.
+   pygad.nn.train(num_epochs=100,
+                  last_layer=output_layer,
+                  data_inputs=data_inputs,
+                  data_outputs=data_outputs,
+                  learning_rate=0.01,
+                  problem_type="regression")
+
+   # Using the trained network for predictions.
+   predictions = pygad.nn.predict(last_layer=output_layer, 
+                            data_inputs=data_inputs, 
+                            problem_type="regression")
+
+   # Calculating some statistics
+   abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
+   print("Absolute error : {abs_error}.".format(abs_error=abs_error))

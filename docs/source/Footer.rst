@@ -320,6 +320,65 @@ Release Date: 6 August 2020
 
 .. _header-n124:
 
+PyGAD 2.7.0
+-----------
+
+Changes in PyGAD 2.7.0 (11 September 2020):
+
+1. The ``learning_rate`` parameter in the ``pygad.nn.train()`` function
+   defaults to **0.01**.
+
+2. Added support of building neural networks for regression using the
+   new parameter named ``problem_type``. It is added as a parameter to
+   both ``pygad.nn.train()`` and ``pygad.nn.predict()`` functions. The
+   value of this parameter can be either **classification** or
+   **regression** to define the problem type. It defaults to
+   **classification**.
+
+3. The activation function for a layer can be set to the string
+   ``"None"`` to refer that there is no activation function at this
+   layer. As a result, the supported values for the activation function
+   are ``"sigmoid"``, ``"relu"``, ``"softmax"``, and ``"None"``.
+
+To build a regression network using the ``pygad.nn`` module, just do the
+following:
+
+1. Set the ``problem_type`` parameter in the ``pygad.nn.train()`` and
+   ``pygad.nn.predict()`` functions to the string ``"regression"``.
+
+2. Set the activation function for the output layer to the string
+   ``"None"``. This sets no limits on the range of the outputs as it
+   will be from ``-infinity`` to ``+infinity``. If you are sure that all
+   outputs will be nonnegative values, then use the ReLU function.
+
+Check the documentation of the ``pygad.nn`` module for an example that
+builds a neural network for regression. The regression example is also
+available at `this GitHub
+project <https://github.com/ahmedfgad/NumPyANN>`__:
+https://github.com/ahmedfgad/NumPyANN
+
+To build and train a regression network using the ``pygad.gann`` module,
+do the following:
+
+1. Set the ``problem_type`` parameter in the ``pygad.nn.train()`` and
+   ``pygad.nn.predict()`` functions to the string ``"regression"``.
+
+2. Set the ``output_activation`` parameter in the constructor of the
+   ``pygad.gann.GANN`` class to ``"None"``.
+
+Check the documentation of the ``pygad.gann`` module for an example that
+builds and trains a neural network for regression. The regression
+example is also available at `this GitHub
+project <https://github.com/ahmedfgad/NeuralGenetic>`__:
+https://github.com/ahmedfgad/NeuralGenetic
+
+To build a classification network, either ignore the ``problem_type``
+parameter or set it to ``"classification"`` (default value). In this
+case, the activation function of the last layer can be set to any type
+(e.g. softmax).
+
+.. _header-n148:
+
 PyGAD Projects at GitHub
 ========================
 
@@ -328,7 +387,7 @@ https://pypi.org/project/pygad. PyGAD is built out of a number of
 open-source GitHub projects. A brief note about these projects is given
 in the next subsections.
 
-.. _header-n126:
+.. _header-n150:
 
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 --------------------------------------------------------------------------------
@@ -339,7 +398,7 @@ GitHub Link: https://github.com/ahmedfgad/GeneticAlgorithmPython
 is the first project which is an open-source Python 3 project for
 implementing the genetic algorithm based on NumPy.
 
-.. _header-n129:
+.. _header-n153:
 
 `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__
 ----------------------------------------------------
@@ -353,7 +412,7 @@ neural network without using a training algorithm. Currently, it only
 supports classification and later regression will be also supported.
 Moreover, only one class is supported per sample.
 
-.. _header-n132:
+.. _header-n156:
 
 `NeuralGenetic <https://github.com/ahmedfgad/NeuralGenetic>`__
 --------------------------------------------------------------
@@ -366,7 +425,7 @@ projects
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 and `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__.
 
-.. _header-n135:
+.. _header-n159:
 
 `NumPyCNN <https://github.com/ahmedfgad/NumPyCNN>`__
 ----------------------------------------------------
@@ -378,7 +437,7 @@ convolutional neural networks using NumPy. The purpose of this project
 is to only implement the **forward pass** of a convolutional neural
 network without using a training algorithm.
 
-.. _header-n138:
+.. _header-n162:
 
 `CNNGenetic <https://github.com/ahmedfgad/CNNGenetic>`__
 --------------------------------------------------------
@@ -390,7 +449,7 @@ convolutional neural networks using the genetic algorithm. It uses the
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 project for building the genetic algorithm.
 
-.. _header-n141:
+.. _header-n165:
 
 Submitting Issues
 =================
@@ -407,7 +466,7 @@ is not working properly or to ask for questions.
 If this is not a proper option for you, then check the **Contact Us**
 section for more contact details.
 
-.. _header-n145:
+.. _header-n169:
 
 Ask for Feature
 ===============
@@ -424,7 +483,7 @@ to ahmed.f.gad@gmail.com.
 
 Also check the **Contact Us** section for more contact details.
 
-.. _header-n149:
+.. _header-n173:
 
 Projects Built using PyGAD
 ==========================
@@ -443,7 +502,7 @@ Within your message, please send the following details:
 
 -  Preferably, a link that directs the readers to your project
 
-.. _header-n160:
+.. _header-n184:
 
 For More Information
 ====================
@@ -451,7 +510,7 @@ For More Information
 There are different resources that can be used to get started with the
 genetic algorithm and building it in Python.
 
-.. _header-n162:
+.. _header-n186:
 
 Tutorial: Implementing Genetic Algorithm in Python
 --------------------------------------------------
@@ -475,7 +534,7 @@ good resource to start with coding the genetic algorithm.
 
 |image0|
 
-.. _header-n173:
+.. _header-n197:
 
 Tutorial: Introduction to Genetic Algorithm
 -------------------------------------------
@@ -494,7 +553,7 @@ which is available at these links:
 
 |image1|
 
-.. _header-n183:
+.. _header-n207:
 
 Tutorial: Build Neural Networks in Python
 -----------------------------------------
@@ -514,7 +573,7 @@ available at these links:
 
 |image2|
 
-.. _header-n193:
+.. _header-n217:
 
 Tutorial: Optimize Neural Networks with Genetic Algorithm
 ---------------------------------------------------------
@@ -534,7 +593,7 @@ available at these links:
 
 |image3|
 
-.. _header-n203:
+.. _header-n227:
 
 Tutorial: Building CNN in Python
 --------------------------------
@@ -560,7 +619,7 @@ good resource to start with coding CNNs.
 
 |image4|
 
-.. _header-n216:
+.. _header-n240:
 
 Tutorial: Derivation of CNN from FCNN
 -------------------------------------
@@ -579,7 +638,7 @@ which is available at these links:
 
 |image5|
 
-.. _header-n226:
+.. _header-n250:
 
 Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 --------------------------------------------------------------------------
@@ -605,7 +664,7 @@ Find the book at these links:
 .. figure:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
    :alt: 
 
-.. _header-n241:
+.. _header-n265:
 
 Contact Us
 ==========

@@ -30,7 +30,7 @@ The library is under active development and more features in the genetic
 algorithm will be added like working with binary problems. This is in
 addition to supporting more machine learning algorithms.
 
-.. _header-n47:
+.. _header-n5:
 
 Donation
 ========
@@ -43,7 +43,7 @@ To donate using PayPal, use either this link:
 `paypal.me/ahmedfgad <https://paypal.me/ahmedfgad>`__ or the e-mail
 address ahmed.f.gad@gmail.com.
 
-.. _header-n5:
+.. _header-n8:
 
 Installation
 ============
@@ -71,7 +71,7 @@ manipulating arrays and Matplotlib for creating figures. The exact NumPy
 version used in developing PyGAD is 1.16.4. For Matplotlib, the version
 is 3.1.0.
 
-.. _header-n12:
+.. _header-n15:
 
 Quick Start
 ===========
@@ -182,7 +182,7 @@ solution found by PyGAD can be accessed.
 There is more to do using PyGAD. Read its documentation to explore the
 features of PyGAD.
 
-.. _header-n31:
+.. _header-n34:
 
 PyGAD's Modules
 ===============
@@ -194,8 +194,8 @@ PyGAD's Modules
 
 2. The ``nn`` module builds artificial neural networks.
 
-3. The ``gann`` module optimizes neural networks using the genetic
-   algorithm.
+3. The ``gann`` module optimizes neural networks (for classification and
+   regression) using the genetic algorithm.
 
 4. The ``cnn`` module builds convolutional neural networks.
 
@@ -203,7 +203,6 @@ PyGAD's Modules
    the genetic algorithm.
 
 The documentation discusses each of these modules.
-
 
 
 
