@@ -10,9 +10,7 @@
 Welcome to PyGAD's documentation!
 =================================
 
-`PyGAD <https://pypi.org/project/pygad>`__ is an open-source Python 3
-library for implementing the genetic algorithm and optimizing machine
-learning algorithms.
+`PyGAD <https://pypi.org/project/pygad>`__ is an open-source Python library for building the genetic algorithm and optimizing machine learning algorithms.
 
 `PyGAD <https://pypi.org/project/pygad>`__ supports different types of
 crossover, mutation, and parent selection.
@@ -26,9 +24,8 @@ learning algorithms. Currently,
 training (using genetic algorithm) artificial neural networks for
 classification problems.
 
-The library is under active development and more features in the genetic
-algorithm will be added like working with binary problems. This is in
-addition to supporting more machine learning algorithms.
+The library is under active development and more features added
+regularly. Please contact us if you want a feature to be supported.
 
 .. _header-n5:
 
