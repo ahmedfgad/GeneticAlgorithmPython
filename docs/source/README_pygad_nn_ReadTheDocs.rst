@@ -15,7 +15,7 @@ trains the network, makes predictions, and more.
 Later, the **pygad.gann** module is used to train the **pygad.nn**
 network using the genetic algorithm built in the **pygad** module.
 
-Starting from PyGAD 2.7.0, the **pygad.nn** module supports both
+Starting from PyGAD 2.7.1, the **pygad.nn** module supports both
 classification and regression problems. For more information, check the
 ``problem_type`` parameter in the ``pygad.nn.train()`` and
 ``pygad.nn.predict()`` functions.
