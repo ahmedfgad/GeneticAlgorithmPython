@@ -22,7 +22,7 @@ copyright = '2020, Ahmed Fawzy Gad'
 author = 'Ahmed Fawzy Gad'
 
 # The full version, including alpha/beta/rc tags
-release = '2.7.1'
+release = '2.7.2'
 
 master_doc = 'index'
 

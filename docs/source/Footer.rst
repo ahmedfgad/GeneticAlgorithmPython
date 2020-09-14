@@ -323,7 +323,7 @@ Release Date: 6 August 2020
 PyGAD 2.7.0
 -----------
 
-Changes in PyGAD 2.7.0 (11 September 2020):
+Release Date: 11 September 2020
 
 1. The ``learning_rate`` parameter in the ``pygad.nn.train()`` function
    defaults to **0.01**.
@@ -377,7 +377,27 @@ parameter or set it to ``"classification"`` (default value). In this
 case, the activation function of the last layer can be set to any type
 (e.g. softmax).
 
-.. _header-n148:
+.. _header-n284:
+
+PyGAD 2.7.1
+-----------
+
+Release Date: 11 September 2020
+
+1. A bug fix when the ``problem_type`` argument is set to
+   ``regression``.
+
+.. _header-n289:
+
+PyGAD 2.7.2
+-----------
+
+Release Date: 14 September 2020
+
+1. Bug fix to support building and training regression neural networks
+   with multiple outputs.
+
+.. _header-n283:
 
 PyGAD Projects at GitHub
 ========================
