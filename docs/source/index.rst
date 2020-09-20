@@ -199,6 +199,9 @@ PyGAD's Modules
 5. The ``gacnn`` module optimizes convolutional neural networks using
    the genetic algorithm.
 
+6. The ``kerasga`` module to train Keras models using the genetic
+   algorithm.
+
 The documentation discusses each of these modules.
 
 
@@ -291,6 +294,21 @@ pygad.gacnn Module
 
 
 .. _header-n9:
+
+pygad.kerasga Module
+=================
+
+
+.. toctree::
+   :maxdepth: 4
+   :caption: pygad.kerasga Module TOC
+
+   README_pygad_kerasga_ReadTheDocs.rst
+
+
+
+
+.. _header-n10:
 
 More Information
 =================

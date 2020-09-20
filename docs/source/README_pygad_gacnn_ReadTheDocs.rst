@@ -1,4 +1,4 @@
-.. _header-n176:
+.. _header-n0:
 
 ``pygad.gacnn`` Module
 ======================
@@ -10,7 +10,7 @@ The ``pygad.gacnn`` module trains convolutional neural networks using
 the genetic algorithm. It makes use of the 2 modules ``pygad`` and
 ``pygad.cnn``.
 
-.. _header-n180:
+.. _header-n4:
 
 ``pygad.gacnn.GACNN`` Class
 ===========================
@@ -20,7 +20,7 @@ training convolutional neural networks (CNNs) using the genetic
 algorithm. The constructor, methods, function, and attributes within the
 class are discussed in this section.
 
-.. _header-n182:
+.. _header-n6:
 
 ``__init__()``
 --------------
@@ -39,7 +39,7 @@ parameters:
    CNNs are created where their parameters are optimized using the
    genetic algorithm.
 
-.. _header-n190:
+.. _header-n14:
 
 Instance Attributes
 -------------------
@@ -52,7 +52,7 @@ which is:
 -  ``population_networks``: A list holding references to all the
    solutions (i.e. CNNs) used in the population.
 
-.. _header-n195:
+.. _header-n19:
 
 Methods in the GACNN Class
 --------------------------
@@ -60,7 +60,7 @@ Methods in the GACNN Class
 This section discusses the methods available for instances of the
 ``pygad.gacnn.GACNN`` class.
 
-.. _header-n197:
+.. _header-n21:
 
 ``create_population()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,7 +72,7 @@ are copied from the CNN model passed to constructor of the GACNN class.
 The list of networks is assigned to the ``population_networks``
 attribute of the instance.
 
-.. _header-n200:
+.. _header-n24:
 
 ``update_population_trained_weights()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,14 +89,14 @@ Accepts the following parameters:
    all networks as matrices. Such matrices are to be assigned to the
    ``trained_weights`` attribute of all layers of all networks.
 
-.. _header-n206:
+.. _header-n30:
 
 Functions in the ``pygad.gacnn`` Module
 =======================================
 
 This section discusses the functions in the ``pygad.gacnn`` module.
 
-.. _header-n208:
+.. _header-n32:
 
 ``pygad.gacnn.population_as_vectors()`` 
 ----------------------------------------
@@ -118,7 +118,7 @@ Accepts the following parameters:
 Returns a list holding the weights vectors for all solutions (i.e.
 networks).
 
-.. _header-n216:
+.. _header-n40:
 
 ``pygad.gacnn.population_as_matrices()``
 ----------------------------------------
@@ -142,7 +142,7 @@ Accepts the following parameters:
 Returns a list holding the weights matrices for all solutions (i.e.
 networks).
 
-.. _header-n226:
+.. _header-n50:
 
 Steps to Build and Train CNN using Genetic Algorithm
 ====================================================
@@ -174,7 +174,7 @@ using the genetic algorithm are as follows:
 
 Let's start covering all of these steps.
 
-.. _header-n252:
+.. _header-n76:
 
 Prepare the Training Data
 -------------------------
@@ -215,10 +215,10 @@ elements in the output array must range from 0 to 4 inclusive.
 Generally, the class labels start from ``0`` to ``N-1`` where ``N`` is
 the number of classes.
 
-Note that the project only supports that each sample is assigned to only
-one class.
+Note that the project only supports classification problems where each
+sample is assigned to only one class.
 
-.. _header-n265:
+.. _header-n89:
 
 Building the Network Architecture
 ---------------------------------
@@ -246,7 +246,7 @@ Here is an example for a CNN architecture.
 After the network architecture is prepared, the next step is to create a
 CNN model.
 
-.. _header-n269:
+.. _header-n93:
 
 Building Model
 --------------
@@ -263,7 +263,7 @@ class. Here is an example.
 After the model is created, a summary of the model architecture can be
 printed.
 
-.. _header-n273:
+.. _header-n97:
 
 Model Summary
 -------------
@@ -287,7 +287,7 @@ summary of the CNN model.
 The next step is to create an instance of the ``pygad.gacnn.GACNN``
 class.
 
-.. _header-n278:
+.. _header-n102:
 
 Create an Instance of the ``pygad.gacnn.GACNN`` Class
 -----------------------------------------------------
@@ -311,7 +311,7 @@ specified by the ``model`` parameter.
 After creating the instance of the ``pygad.gacnn.GACNN`` class, next is
 to fetch the weights of the population as a list of vectors.
 
-.. _header-n283:
+.. _header-n107:
 
 Fetch the Population Weights as Vectors
 ---------------------------------------
@@ -343,7 +343,7 @@ prepare 2 functions which are:
 
 2. Callback function after each generation.
 
-.. _header-n296:
+.. _header-n120:
 
 Prepare the Fitness Function
 ----------------------------
@@ -383,7 +383,7 @@ fitness value is returned.
 
        return solution_fitness
 
-.. _header-n308:
+.. _header-n132:
 
 Prepare the Generation Callback Function
 ----------------------------------------
@@ -431,7 +431,7 @@ solutions within the population.
 After preparing the fitness and callback function, next is to create an
 instance of the ``pygad.GA`` class.
 
-.. _header-n317:
+.. _header-n141:
 
 Create an Instance of the ``pygad.GA`` Class
 --------------------------------------------
@@ -475,7 +475,7 @@ number of generations is 10.
 The last step for training the neural networks using the genetic
 algorithm is calling the ``run()`` method.
 
-.. _header-n321:
+.. _header-n145:
 
 Run the Created Instance of the ``pygad.GA`` Class
 --------------------------------------------------
@@ -488,7 +488,7 @@ specified in its ``num_generations`` parameter.
 
    ga_instance.run()
 
-.. _header-n324:
+.. _header-n148:
 
 Plot the Fitness Values
 -----------------------
@@ -503,7 +503,7 @@ be called to show how the fitness values evolve by generation.
 .. figure:: https://user-images.githubusercontent.com/16560492/83429675-ab744580-a434-11ea-8f21-9d3804b50d15.png
    :alt: 
 
-.. _header-n328:
+.. _header-n152:
 
 Information about the Best Solution
 -----------------------------------
@@ -534,7 +534,7 @@ Here is how such information is returned.
    Index of the best solution : 0
    Best fitness value reached after 4 generations.
 
-.. _header-n340:
+.. _header-n164:
 
 Making Predictions using the Trained Weights
 --------------------------------------------
@@ -548,7 +548,7 @@ the labels correctly.
    predictions = pygad.cnn.predict(last_layer=GANN_instance.population_networks[solution_idx], data_inputs=data_inputs)
    print("Predictions of the trained network : {predictions}".format(predictions=predictions))
 
-.. _header-n343:
+.. _header-n167:
 
 Calculating Some Statistics
 ---------------------------
@@ -572,7 +572,7 @@ addition to the classification accuracy.
    Number of wrong classifications : 13.
    Classification accuracy : 83.75.
 
-.. _header-n347:
+.. _header-n171:
 
 Examples
 ========
@@ -581,7 +581,7 @@ This section gives the complete code of some examples that build and
 train neural networks using the genetic algorithm. Each subsection
 builds a different network.
 
-.. _header-n349:
+.. _header-n173:
 
 Image Classification
 --------------------
@@ -618,13 +618,12 @@ complete code is listed below.
    def callback_generation(ga_instance):
        global GACNN_instance, last_fitness
 
-       population_matrices = pygad.gacnn.population_as_matrices(population_networks=GACNN_instance.population_networks, 
+       population_matrices = gacnn.population_as_matrices(population_networks=GACNN_instance.population_networks, 
                                                           population_vectors=ga_instance.population)
 
        GACNN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solutions_fitness))
 
    data_inputs = numpy.load("dataset_inputs.npy")
    data_outputs = numpy.load("dataset_outputs.npy")
@@ -635,35 +634,35 @@ complete code is listed below.
    data_inputs = data_inputs
    data_outputs = data_outputs
 
-   input_layer = pygad.cnn.Input2D(input_shape=sample_shape)
-   conv_layer1 = pygad.cnn.Conv2D(num_filters=2,
-                                  kernel_size=3,
-                                  previous_layer=input_layer,
-                                  activation_function="relu")
-   average_pooling_layer = pygad.cnn.AveragePooling2D(pool_size=5, 
-                                                      previous_layer=conv_layer1,
-                                                      stride=3)
+   input_layer = cnn.Input2D(input_shape=sample_shape)
+   conv_layer1 = cnn.Conv2D(num_filters=2,
+                                 kernel_size=3,
+                                 previous_layer=input_layer,
+                                 activation_function="relu")
+   average_pooling_layer = cnn.AveragePooling2D(pool_size=5, 
+                                                     previous_layer=conv_layer1,
+                                                     stride=3)
 
-   flatten_layer = pygad.cnn.Flatten(previous_layer=average_pooling_layer)
-   dense_layer2 = pygad.cnn.Dense(num_neurons=num_classes, 
-                                  previous_layer=flatten_layer,
-                                  activation_function="softmax")
+   flatten_layer = cnn.Flatten(previous_layer=average_pooling_layer)
+   dense_layer2 = cnn.Dense(num_neurons=num_classes, 
+                                 previous_layer=flatten_layer,
+                                 activation_function="softmax")
 
-   model = pygad.cnn.Model(last_layer=dense_layer2,
-                           epochs=1,
-                           learning_rate=0.01)
+   model = cnn.Model(last_layer=dense_layer2,
+                          epochs=1,
+                          learning_rate=0.01)
 
    model.summary()
 
 
-   GACNN_instance = pygad.gacnn.GACNN(model=model,
+   GACNN_instance = gacnn.GACNN(model=model,
                                 num_solutions=4)
 
    # GACNN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
    # population does not hold the numerical weights of the network instead it holds a list of references to each last layer of each network (i.e. solution) in the population. A solution or a network can be used interchangeably.
    # If there is a population with 3 solutions (i.e. networks), then the population is a list with 3 elements. Each element is a reference to the last layer of each network. Using such a reference, all details of the network can be accessed.
-   population_vectors = pygad.gacnn.population_as_vectors(population_networks=GACNN_instance.population_networks)
+   population_vectors = gacnn.population_as_vectors(population_networks=GACNN_instance.population_networks)
 
    # To prepare the initial population, there are 2 ways:
    # 1) Prepare it yourself and pass it to the initial_population parameter. This way is useful when the user wants to start the genetic algorithm with a custom initial population.
