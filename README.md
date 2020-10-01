@@ -18,7 +18,7 @@ To donate using PayPal, use either this link: [paypal.me/ahmedfgad](https://payp
 
 **IMPORTANT** If you are coming for the code of the tutorial titled  [**Genetic Algorithm Implementation in Python**](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad), then it has been moved to the [Tutorial Project](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/Tutorial Project) directory on 06 May 2020.
 
-# Installation
+# Installation Process-
 
 To install [PyGAD](https://pypi.org/project/pygad), simply use pip to download and install the library from [PyPI](https://pypi.org/project/pygad) (Python Package Index). The library lives a PyPI at this page https://pypi.org/project/pygad.
 
@@ -331,7 +331,7 @@ Find the book at these links:
 
 ![Fig04](https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg)
 
-# Contact Us
+# Contact Us via-
 
 * E-mail: ahmed.f.gad@gmail.com
 * [LinkedIn](https://www.linkedin.com/in/ahmedfgad)
