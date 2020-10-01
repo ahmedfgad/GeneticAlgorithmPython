@@ -8,7 +8,7 @@ Check documentation of the [GeneticAlgorithmPython](https://github.com/ahmedfgad
 
 The library is under active development and more features are added regularly. If you want a feature to be supported, please check the **Contact Us** section to send a request.
 
-# Donation
+# Donation-support us
 
 You can donate via [Open Collective](https://opencollective.com/pygad): [opencollective.com/pygad](https://opencollective.com/pygad). 
 
