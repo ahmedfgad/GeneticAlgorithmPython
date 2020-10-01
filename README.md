@@ -1,4 +1,6 @@
-# GeneticAlgorithmPython: Building Genetic Algorithm in Python vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+
+
 
 [This project](https://github.com/ahmedfgad/GeneticAlgorithmPython) is part of [PyGAD](https://pypi.org/project/pygad) which is an open-source Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. 
 
@@ -14,7 +16,7 @@ You can donate via [Open Collective](https://opencollective.com/pygad): [opencol
 
 To donate using PayPal, use either this link: [paypal.me/ahmedfgad](https://paypal.me/ahmedfgad) or the e-mail address ahmed.f.gad@gmail.com.
 
-# Tutorial Project
+# Tutorial Project bbbbbbbbbbbb
 
 **IMPORTANT** If you are coming for the code of the tutorial titled  [**Genetic Algorithm Implementation in Python**](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad), then it has been moved to the [Tutorial Project](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/Tutorial Project) directory on 06 May 2020.
 
