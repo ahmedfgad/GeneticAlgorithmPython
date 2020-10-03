@@ -775,9 +775,9 @@ class GA:
         for k in range(offspring_size[0]):
             # The point at which crossover takes place between two parents. Usually, it is at the center.
             crossover_point = numpy.random.randint(low=0, high=parents.shape[1], size=1)[0]
-            
-            if self.crossover_probability  != None:
-                probs = numpy.random.random(size=parents.shape[1])
+
+            if self.crossover_probability != None:
+                probs = numpy.random.random(size=parents.shape[0])
                 indices = numpy.where(probs <= self.crossover_probability)[0]
 
                 # If no parent satisfied the probability, no crossover is applied and a parent is selected.
@@ -824,7 +824,7 @@ class GA:
             crossover_point2 = crossover_point1 + int(parents.shape[1]/2) # The second point must always be greater than the first point.
 
             if self.crossover_probability != None:
-                probs = numpy.random.random(size=parents.shape[1])
+                probs = numpy.random.random(size=parents.shape[0])
                 indices = numpy.where(probs <= self.crossover_probability)[0]
 
                 # If no parent satisfied the probability, no crossover is applied and a parent is selected.
@@ -866,7 +866,7 @@ class GA:
 
         for k in range(offspring_size[0]):
             if self.crossover_probability  != None:
-                probs = numpy.random.random(size=parents.shape[1])
+                probs = numpy.random.random(size=parents.shape[0])
                 indices = numpy.where(probs <= self.crossover_probability)[0]
 
                 # If no parent satisfied the probability, no crossover is applied and a parent is selected.
