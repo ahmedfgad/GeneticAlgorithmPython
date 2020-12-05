@@ -18,6 +18,12 @@ crossover, mutation, and parent selection.
 problems to be optimized using the genetic algorithm by customizing the
 fitness function.
 
+.. figure:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
+   :alt: 
+
+*Logo designed by*\ `Asmaa
+Kabil <https://www.linkedin.com/in/asmaa-kabil-9901b7b6>`__
+
 Besides building the genetic algorithm, it builds and optimizes machine
 learning algorithms. Currently,
 `PyGAD <https://pypi.org/project/pygad>`__ supports building and
