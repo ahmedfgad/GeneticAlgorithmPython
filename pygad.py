@@ -36,7 +36,8 @@ class GA:
                  callback_generation=None,
                  on_generation=None,
                  on_stop=None,
-                 delay_after_gen=0.0):
+                 delay_after_gen=0.0,
+                 save_best_solutions=False):
 
         """
         The constructor of the GA class accepts all parameters required to create an instance of the GA class. It validates such parameters.
@@ -83,35 +84,38 @@ class GA:
         callback_generation: Accepts a function to be called after each generation. This function must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and should be replaced by the on_generation parameter.
         on_generation: Accepts a function to be called after each generation. This function must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. Added in PyGAD 2.6.0.
         on_stop: Accepts a function to be called only once exactly before the genetic algorithm stops or when it completes all the generations. This function must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of fitness values of the last population's solutions. Added in PyGAD 2.6.0. 
-        delay_after_gen: Added in PyGAD 2.4.0. It accepts a non-negative number specifying the number of seconds to wait after a generation completes and before going to the next generation. It defaults to 0.0 which means no delay after the generation.
-        """
 
+        delay_after_gen: Added in PyGAD 2.4.0. It accepts a non-negative number specifying the number of seconds to wait after a generation completes and before going to the next generation. It defaults to 0.0 which means no delay after the generation.
+        
+        save_best_solutions: Added in PyGAD 2.9.0. It True, then the best solution in each generation is saved into the 'best_solutions' attribute. Use this parameter with caution as it may cause memory overflow when either the number of generations or the number of genes is large.
+        """
+        
         self.gene_space_nested = False
         if type(gene_space) is type(None):
             pass
-        elif type(gene_space) in [list, tuple, range]:
+        elif type(gene_space) in [list, tuple, range, numpy.ndarray]:
             if len(gene_space) == 0:
                 self.valid_parameters = False
                 raise TypeError("'gene_space' cannot be empty (i.e. its length must be >= 0).")
             else:
                 for index, el in enumerate(gene_space):
-                    if type(el) in [list, tuple, range]:
+                    if type(el) in [list, tuple, range, numpy.ndarray]:
                         if len(el) == 0:
                             self.valid_parameters = False
                             raise TypeError("The element indexed {index} of 'gene_space' with type {el_type} cannot be empty (i.e. its length must be >= 0).".format(index=index, el_type=type(el)))
                         else:
                             for val in el:
-                                if not (type(val) in [int, float]):
+                                if not (type(val) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]):
                                     raise TypeError("All values in the sublists inside the 'gene_space' attribute must be numeric of type int/float but the value ({val}) of type {typ} found.".format(val=val, typ=type(val)))
                         self.gene_space_nested = True
                     elif type(el)  == type(None):
                         self.gene_space_nested = True
-                    elif not (type(el) in [int, float]):
+                    elif not (type(el) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]):
                         self.valid_parameters = False
-                        raise TypeError("Unexpected type {el_type} for the element indexed {index} of 'gene_space'. The accepted types are list/tuple/range of numbers, a single number (int/float), or None.".format(index=index, el_type=type(el)))
+                        raise TypeError("Unexpected type {el_type} for the element indexed {index} of 'gene_space'. The accepted types are list/tuple/range/numpy.ndarray of numbers, a single number (int/float), or None.".format(index=index, el_type=type(el)))
         else:
             self.valid_parameters = False
-            raise TypeError("The expected type of 'gene_space' is list, tuple, or range but {gene_space_type} found.".format(gene_space_type=type(gene_space)))
+            raise TypeError("The expected type of 'gene_space' is list, tuple, range, or numpy.ndarray but {gene_space_type} found.".format(gene_space_type=type(gene_space)))
 
         if self.gene_space_nested:
             if len(gene_space) != num_genes:
@@ -122,8 +126,8 @@ class GA:
 
         self.init_range_low = init_range_low
         self.init_range_high = init_range_high
-        
-        if gene_type in [int, float]:
+
+        if gene_type in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
             self.gene_type = gene_type
         else:
             self.valid_parameters = False
@@ -178,6 +182,8 @@ class GA:
             self.crossover = self.two_points_crossover
         elif (crossover_type == "uniform"):
             self.crossover = self.uniform_crossover
+        elif (crossover_type == "scattered"):
+            self.crossover = self.scattered_crossover
         elif (crossover_type is None):
             self.crossover = None
         else:
@@ -185,10 +191,10 @@ class GA:
             raise ValueError("Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) argument does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover).\n".format(crossover_type=crossover_type))
 
         self.crossover_type = crossover_type
-        
-        if crossover_probability == None:
+
+        if crossover_probability is None:
             self.crossover_probability = None
-        elif type(crossover_probability) in [int, float]:
+        elif type(crossover_probability) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
             if crossover_probability >= 0 and crossover_probability <= 1:
                 self.crossover_probability = crossover_probability
             else:
@@ -216,9 +222,9 @@ class GA:
 
         self.mutation_type = mutation_type
 
-        if mutation_probability == None:
+        if mutation_probability is None:
             self.mutation_probability = None
-        elif type(mutation_probability) in [int, float]:
+        elif type(mutation_probability) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
             if mutation_probability >= 0 and mutation_probability <= 1:
                 self.mutation_probability = mutation_probability
             else:
@@ -229,13 +235,13 @@ class GA:
             raise ValueError("Unexpected type for the 'mutation_probability' parameter. Float is expected by {mutation_probability_type} found.".format(mutation_probability_type=type(mutation_probability)))
 
         if not (self.mutation_type is None):
-            if (mutation_num_genes == None):
+            if (mutation_num_genes is None):
                 if (mutation_percent_genes < 0 or mutation_percent_genes > 100):
                     self.valid_parameters = False
                     raise ValueError("The percentage of selected genes for mutation (mutation_percent_genes) must be >= 0 and <= 100 inclusive but {mutation_percent_genes=mutation_percent_genes} found.\n".format(mutation_percent_genes=mutation_percent_genes))
                 else:
                     # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
-                    if mutation_num_genes == None:
+                    if mutation_num_genes is None:
                         mutation_num_genes = numpy.uint32((mutation_percent_genes*self.num_genes)/100)
                         # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
                         if mutation_num_genes == 0:
@@ -444,15 +450,28 @@ class GA:
                     raise ValueError("The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_stop.__code__.co_name, argcount=on_stop.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the on_stop parameter is expected to be of type function but {on_stop_type} found.".format(on_stop_type=type(on_stop)))
+                raise ValueError("The value assigned to the 'on_stop' parameter is expected to be of type function but {on_stop_type} found.".format(on_stop_type=type(on_stop)))
         else:
             self.on_stop = None
 
-        if delay_after_gen >= 0.0:
-            self.delay_after_gen = delay_after_gen
+        # delay_after_gen
+        if type(delay_after_gen) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+            if delay_after_gen >= 0.0:
+                self.delay_after_gen = delay_after_gen
+            else:
+                self.valid_parameters = False
+                raise ValueError("The value passed to the 'delay_after_gen' parameter must be a non-negative number. The value passed is {delay_after_gen} of type {delay_after_gen_type}.".format(delay_after_gen=delay_after_gen, delay_after_gen_type=type(delay_after_gen)))
         else:
             self.valid_parameters = False
-            raise ValueError("The value passed to the 'delay_after_gen' parameter must be a non-negative number. The value passed is {delay_after_gen} of type {delay_after_gen_type}.".format(delay_after_gen=delay_after_gen, delay_after_gen_type=type(delay_after_gen)))
+            raise ValueError("The value passed to the 'delay_after_gen' parameter must be of type int or float but {delay_after_gen_type} found.".format(delay_after_gen_type=type(delay_after_gen)))
+
+        # save_best_solutions
+        if type(save_best_solutions) is bool:
+            if save_best_solutions == True:
+                print("Warning: Use the 'save_best_solutions' parameter with caution as it may cause memory overflow.")
+        else:
+            self.valid_parameters = False
+            raise ValueError("The value passed to the 'save_best_solutions' parameter must be of type bool but {save_best_solutions_type} found.".format(save_best_solutions_type=type(save_best_solutions)))
 
         # The number of completed generations.
         self.generations_completed = 0
@@ -475,6 +494,9 @@ class GA:
 
         self.best_solution_generation = -1 # The generation number at which the best fitness value is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
 
+        self.save_best_solutions = save_best_solutions
+        self.best_solutions = [] # Holds the best solution in each generation.
+
     def initialize_population(self, low, high):
 
         """
@@ -492,7 +514,7 @@ class GA:
         # Population size = (number of chromosomes, number of genes per chromosome)
         self.pop_size = (self.sol_per_pop,self.num_genes) # The population will have sol_per_pop chromosome where each chromosome has num_genes genes.
 
-        if self.gene_space == None:
+        if self.gene_space is None:
             # Creating the initial population randomly.
             self.population = numpy.asarray(numpy.random.uniform(low=low, 
                                                                  high=high, 
@@ -508,7 +530,7 @@ class GA:
                         self.population[sol_idx, gene_idx] = self.gene_type(numpy.random.uniform(low=low,
                                        high=high, 
                                        size=1))
-                    elif type(curr_gene_space) in [int, float]:
+                    elif type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                         self.population[sol_idx, gene_idx] = curr_gene_space                
         else:
             # Creating the initial population by randomly selecting the genes' values from the values inside the 'gene_space' parameter.
@@ -557,8 +579,14 @@ class GA:
             if not (self.on_fitness is None):
                 self.on_fitness(self, fitness)
 
+            best_solution, best_solution_fitness, best_match_idx = self.best_solution()
+
             # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
-            self.best_solutions_fitness.append(numpy.max(fitness))
+            self.best_solutions_fitness.append(best_solution_fitness)
+
+            # Appending the best solution to the best_solutions list.
+            if self.save_best_solutions:
+                self.best_solutions.append(best_solution)
 
             # Selecting the best parents in the population for mating.
             parents = self.select_parents(fitness, num_parents=self.num_parents_mating)
@@ -614,6 +642,9 @@ class GA:
 
         if not (self.on_stop is None):
             self.on_stop(self, self.cal_pop_fitness())
+
+        # Converting the 'best_solutions' list into a NumPy array.
+        self.best_solutions = numpy.array(self.best_solutions)
 
     def steady_state_selection(self, fitness, num_parents):
 
@@ -896,6 +927,46 @@ class GA:
                     offspring[k, gene_idx] = parents[parent2_idx, gene_idx]
         return offspring
 
+    def scattered_crossover(self, parents, offspring_size):
+
+        """
+        Applies the scattered crossover. It randomly selects the gene from one of the 2 parents. 
+        It accepts 2 parameters:
+            -parents: The parents to mate for producing the offspring.
+            -offspring_size: The size of the offspring to produce.
+        It returns an array the produced offspring.
+        """
+
+        offspring = numpy.empty(offspring_size)
+
+        for k in range(offspring_size[0]):
+            if self.crossover_probability != None:
+                probs = numpy.random.random(size=parents.shape[0])
+                indices = numpy.where(probs <= self.crossover_probability)[0]
+
+                # If no parent satisfied the probability, no crossover is applied and a parent is selected.
+                if len(indices) == 0:
+                    offspring[k, :] = parents[k % parents.shape[0], :]
+                    continue
+                elif len(indices) == 1:
+                    parent1_idx = indices[0]
+                    parent2_idx = parent1_idx
+                else:
+                    indices = random.sample(set(indices), 2)
+                    parent1_idx = indices[0]
+                    parent2_idx = indices[1]
+            else:
+                # Index of the first parent to mate.
+                parent1_idx = k % parents.shape[0]
+                # Index of the second parent to mate.
+                parent2_idx = (k+1) % parents.shape[0]
+
+            # A 0/1 vector where 0 means the gene is taken from the first parent and 1 means the gene is taken from the second parent.
+            gene_sources = numpy.random.randint(0, 2, size=self.num_genes)
+            offspring[k, :] = numpy.where(gene_sources == 0, parents[parent1_idx, :], parents[parent2_idx, :])
+
+        return offspring
+
     def random_mutation(self, offspring):
 
         """
@@ -908,8 +979,8 @@ class GA:
         # If the mutation values are selected from the mutation space, the attribute 'gene_space' is True. Otherwise, it is set to False.
 
         # When the attribute 'gene_space' is False, the mutation values are selected randomly from the mutation space.
-        if self.mutation_probability == None:
-            if self.gene_space != None:
+        if self.mutation_probability is None:
+            if not (self.gene_space is None):
                 offspring = self.mutation_by_space(offspring)
                 # When the attribute 'gene_space' is False, the mutation values are selected randomly based on the continuous range specified by the 2 attributes 'random_mutation_min_val' and 'random_mutation_max_val'.
             else:
@@ -943,10 +1014,10 @@ class GA:
                     curr_gene_space = self.gene_space[gene_idx]
 
                     # If the gene space has only a single value, use it as the new gene value.
-                    if type(curr_gene_space) in [int, float]:
+                    if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                         value_from_space = curr_gene_space
                     # Keep the gene unchanged if the gene space is None.
-                    elif curr_gene_space == None:
+                    elif curr_gene_space is None:
                         rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
                                                                         high=self.random_mutation_max_val,
                                                                         size=1))
@@ -985,10 +1056,10 @@ class GA:
                         curr_gene_space = self.gene_space[gene_idx]
         
                         # If the gene space has only a single value, use it as the new gene value.
-                        if type(curr_gene_space) in [int, float]:
+                        if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                             value_from_space = curr_gene_space
                         # Keep the gene unchanged if the gene space is None.
-                        elif curr_gene_space == None:
+                        elif curr_gene_space is None:
                             rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
                                                                             high=self.random_mutation_max_val,
                                                                             size=1))
@@ -1116,15 +1187,15 @@ class GA:
     def best_solution(self):
 
         """
-        Returns information about the best solution found by the genetic algorithm. Can only be called after completing at least 1 generation.
-        If no generation is completed (at least 1), an exception is raised. Otherwise, the following is returned:
+        Returns information about the best solution found by the genetic algorithm.
+        The following is returned:
             -best_solution: Best solution in the current population.
             -best_solution_fitness: Fitness value of the best solution.
             -best_match_idx: Index of the best solution in the current population.
         """
-        
-        if self.generations_completed < 1:
-            raise RuntimeError("The best_solution() method can only be called after completing at least 1 generation but {generations_completed} is completed.".format(generations_completed=self.generations_completed))
+
+#        if self.generations_completed < 1:
+#            raise RuntimeError("The best_solution() method can only be called after completing at least 1 generation but {generations_completed} is completed.".format(generations_completed=self.generations_completed))
 
 #        if self.run_completed == False:
 #            raise ValueError("Warning calling the best_solution() method: \nThe run() method is not yet called and thus the GA did not evolve the solutions. Thus, the best solution is retireved from the initial random population without being evolved.\n")
