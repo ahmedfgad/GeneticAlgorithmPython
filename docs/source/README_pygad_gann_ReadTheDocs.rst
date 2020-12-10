@@ -444,10 +444,9 @@ attribute is updated by weights evolved by the genetic algorithm after
 each generation.
 
 PyGAD 2.0.0 and higher has a new parameter accepted by the ``pygad.GA``
-class constructor named ``callback_generation``. It could be assigned to
-a function that is called after each generation. The function must
-accept a single parameter representing the instance of the ``pygad.GA``
-class.
+class constructor named ``on_generation``. It could be assigned to a
+function that is called after each generation. The function must accept
+a single parameter representing the instance of the ``pygad.GA`` class.
 
 This callback function can be used to update the ``trained_weights``
 attribute of layers of each network in the population.
@@ -521,7 +520,7 @@ Here is an example.
                           crossover_type=crossover_type,
                           mutation_type=mutation_type,
                           keep_parents=keep_parents,
-                          callback_generation=callback_generation)
+                          on_generation=callback_generation)
 
 The last step for training the neural networks using the genetic
 algorithm is calling the ``run()`` method.
@@ -763,7 +762,7 @@ its complete code is listed below.
                           crossover_type=crossover_type,
                           mutation_type=mutation_type,
                           keep_parents=keep_parents,
-                          callback_generation=callback_generation)
+                          on_generation=callback_generation)
 
    ga_instance.run()
 
@@ -915,7 +914,7 @@ according to the ``num_neurons_output`` parameter of the
                           crossover_type=crossover_type,
                           mutation_type=mutation_type,
                           keep_parents=keep_parents,
-                          callback_generation=callback_generation)
+                          on_generation=callback_generation)
 
    ga_instance.run()
 
@@ -1094,7 +1093,7 @@ for regression.
                           crossover_type=crossover_type,
                           mutation_type=mutation_type,
                           keep_parents=keep_parents,
-                          callback_generation=callback_generation)
+                          on_generation=callback_generation)
 
    ga_instance.run()
 
@@ -1262,7 +1261,7 @@ Here is the complete code.
                           crossover_type=crossover_type,
                           mutation_type=mutation_type,
                           keep_parents=keep_parents,
-                          callback_generation=callback_generation)
+                          on_generation=callback_generation)
 
    ga_instance.run()
 

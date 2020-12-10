@@ -215,8 +215,8 @@ elements in the output array must range from 0 to 4 inclusive.
 Generally, the class labels start from ``0`` to ``N-1`` where ``N`` is
 the number of classes.
 
-Note that the project only supports classification problems where each
-sample is assigned to only one class.
+Note that the project only supports that each sample is assigned to only
+one class.
 
 .. _header-n89:
 
@@ -396,11 +396,10 @@ predicting the outputs based on the current solution's
 attribute is updated by weights evolved by the genetic algorithm after
 each generation.
 
-PyGAD 2.0.0 and higher has a new parameter accepted by the ``pygad.GA``
-class constructor named ``callback_generation``. It could be assigned to
-a function that is called after each generation. The function must
-accept a single parameter representing the instance of the ``pygad.GA``
-class.
+PyGAD has a parameter accepted by the ``pygad.GA`` class constructor
+named ``on_generation``. It could be assigned to a function that is
+called after each generation. The function must accept a single
+parameter representing the instance of the ``pygad.GA`` class.
 
 This callback function can be used to update the ``trained_weights``
 attribute of layers of each network in the population.
@@ -470,7 +469,7 @@ number of generations is 10.
                           crossover_type=crossover_type,
                           mutation_type=mutation_type,
                           keep_parents=keep_parents,
-                          callback_generation=callback_generation)
+                          on_generation=callback_generation)
 
 The last step for training the neural networks using the genetic
 algorithm is calling the ``run()`` method.
@@ -618,12 +617,13 @@ complete code is listed below.
    def callback_generation(ga_instance):
        global GACNN_instance, last_fitness
 
-       population_matrices = gacnn.population_as_matrices(population_networks=GACNN_instance.population_networks, 
+       population_matrices = pygad.gacnn.population_as_matrices(population_networks=GACNN_instance.population_networks, 
                                                           population_vectors=ga_instance.population)
 
        GACNN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
+       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solutions_fitness))
 
    data_inputs = numpy.load("dataset_inputs.npy")
    data_outputs = numpy.load("dataset_outputs.npy")
@@ -634,35 +634,35 @@ complete code is listed below.
    data_inputs = data_inputs
    data_outputs = data_outputs
 
-   input_layer = cnn.Input2D(input_shape=sample_shape)
-   conv_layer1 = cnn.Conv2D(num_filters=2,
-                                 kernel_size=3,
-                                 previous_layer=input_layer,
-                                 activation_function="relu")
-   average_pooling_layer = cnn.AveragePooling2D(pool_size=5, 
-                                                     previous_layer=conv_layer1,
-                                                     stride=3)
+   input_layer = pygad.cnn.Input2D(input_shape=sample_shape)
+   conv_layer1 = pygad.cnn.Conv2D(num_filters=2,
+                                  kernel_size=3,
+                                  previous_layer=input_layer,
+                                  activation_function="relu")
+   average_pooling_layer = pygad.cnn.AveragePooling2D(pool_size=5, 
+                                                      previous_layer=conv_layer1,
+                                                      stride=3)
 
-   flatten_layer = cnn.Flatten(previous_layer=average_pooling_layer)
-   dense_layer2 = cnn.Dense(num_neurons=num_classes, 
-                                 previous_layer=flatten_layer,
-                                 activation_function="softmax")
+   flatten_layer = pygad.cnn.Flatten(previous_layer=average_pooling_layer)
+   dense_layer2 = pygad.cnn.Dense(num_neurons=num_classes, 
+                                  previous_layer=flatten_layer,
+                                  activation_function="softmax")
 
-   model = cnn.Model(last_layer=dense_layer2,
-                          epochs=1,
-                          learning_rate=0.01)
+   model = pygad.cnn.Model(last_layer=dense_layer2,
+                           epochs=1,
+                           learning_rate=0.01)
 
    model.summary()
 
 
-   GACNN_instance = gacnn.GACNN(model=model,
+   GACNN_instance = pygad.gacnn.GACNN(model=model,
                                 num_solutions=4)
 
    # GACNN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
    # population does not hold the numerical weights of the network instead it holds a list of references to each last layer of each network (i.e. solution) in the population. A solution or a network can be used interchangeably.
    # If there is a population with 3 solutions (i.e. networks), then the population is a list with 3 elements. Each element is a reference to the last layer of each network. Using such a reference, all details of the network can be accessed.
-   population_vectors = gacnn.population_as_vectors(population_networks=GACNN_instance.population_networks)
+   population_vectors = pygad.gacnn.population_as_vectors(population_networks=GACNN_instance.population_networks)
 
    # To prepare the initial population, there are 2 ways:
    # 1) Prepare it yourself and pass it to the initial_population parameter. This way is useful when the user wants to start the genetic algorithm with a custom initial population.
@@ -692,7 +692,7 @@ complete code is listed below.
                           crossover_type=crossover_type,
                           mutation_type=mutation_type,
                           keep_parents=keep_parents,
-                          callback_generation=callback_generation)
+                          on_generation=callback_generation)
 
    ga_instance.run()
 
