@@ -219,7 +219,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
                        crossover_type=crossover_type,
                        mutation_type=mutation_type,
                        mutation_percent_genes=mutation_percent_genes,
-                       callback_generation=callback_generation)
+                       on_generation=callback_generation)
 
 # Running the GA to optimize the parameters of the function.
 ga_instance.run()
