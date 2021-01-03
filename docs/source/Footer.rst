@@ -1,9 +1,9 @@
-.. _header-n0:
+.. _header-n348:
 
 Release History
 ===============
 
-.. _header-n2:
+.. _header-n350:
 
 PyGAD 1.0.17
 ------------
@@ -15,7 +15,7 @@ Release Date: 15 April 2020
    values for the solutions. This allows the project to be customized to
    any problem by building the right fitness function.
 
-.. _header-n7:
+.. _header-n355:
 
 PyGAD 1.0.20 
 -------------
@@ -35,7 +35,7 @@ Release Date: 4 May 2020
 4. The code object ``__code__`` of the passed fitness function is
    checked to ensure it has the right number of parameters.
 
-.. _header-n18:
+.. _header-n366:
 
 PyGAD 2.0.0 
 ------------
@@ -61,7 +61,7 @@ Release Date: 13 May 2020
    is called after each generation. This helps the user to do
    post-processing or debugging operations after each generation.
 
-.. _header-n29:
+.. _header-n377:
 
 PyGAD 2.1.0
 -----------
@@ -97,7 +97,7 @@ Release Date: 14 May 2020
 
 2. Mutation is applied independently for the genes.
 
-.. _header-n44:
+.. _header-n392:
 
 PyGAD 2.2.1
 -----------
@@ -107,7 +107,7 @@ Release Date: 17 May 2020
 1. Adding 2 extra modules (pygad.nn and pygad.gann) for building and
    training neural networks with the genetic algorithm.
 
-.. _header-n49:
+.. _header-n397:
 
 PyGAD 2.2.2
 -----------
@@ -141,7 +141,7 @@ The new gene value is **0.1**.
    ``crossover_type`` parameters of the pygad.GA class constructor. When
    ``None``, this means the step is bypassed and has no action.
 
-.. _header-n62:
+.. _header-n410:
 
 PyGAD 2.3.0
 -----------
@@ -166,7 +166,7 @@ Release date: 1 June 2020
 6. The name of the ``pygad.nn.train_network()`` function is changed to
    ``pygad.nn.train()``.
 
-.. _header-n77:
+.. _header-n425:
 
 PyGAD 2.4.0
 -----------
@@ -204,7 +204,7 @@ through more generations because no further improvement is possible.
        if ga_instance.best_solution()[1] >= 70:
            return "stop"
 
-.. _header-n87:
+.. _header-n435:
 
 PyGAD 2.5.0
 -----------
@@ -300,7 +300,7 @@ If the user did not assign the initial population to the
 randomly based on the ``gene_space`` parameter. Moreover, the mutation
 is applied based on this parameter.
 
-.. _header-n115:
+.. _header-n463:
 
 PyGAD 2.6.0 
 ------------
@@ -318,7 +318,7 @@ Release Date: 6 August 2020
    ``on_fitness``, ``on_parents``, ``on_crossover``, ``on_mutation``,
    ``on_generation``, and ``on_stop``.
 
-.. _header-n124:
+.. _header-n472:
 
 PyGAD 2.7.0
 -----------
@@ -377,7 +377,7 @@ parameter or set it to ``"classification"`` (default value). In this
 case, the activation function of the last layer can be set to any type
 (e.g. softmax).
 
-.. _header-n148:
+.. _header-n496:
 
 PyGAD 2.7.1
 -----------
@@ -387,7 +387,7 @@ Release Date: 11 September 2020
 1. A bug fix when the ``problem_type`` argument is set to
    ``regression``.
 
-.. _header-n153:
+.. _header-n501:
 
 PyGAD 2.7.2
 -----------
@@ -397,7 +397,7 @@ Release Date: 14 September 2020
 1. Bug fix to support building and training regression neural networks
    with multiple outputs.
 
-.. _header-n158:
+.. _header-n506:
 
 PyGAD 2.8.0
 -----------
@@ -407,7 +407,7 @@ Release Date: 20 September 2020
 1. Support of a new module named ``kerasga`` so that the Keras models
    can be trained by the genetic algorithm using PyGAD.
 
-.. _header-n163:
+.. _header-n511:
 
 PyGAD 2.8.1
 -----------
@@ -420,7 +420,7 @@ Release Date: 3 October 2020
    Management, Faculty of Engineering, Alexandria University,
    Egypt <https://www.linkedin.com/in/hamadakassem>`__.
 
-.. _header-n168:
+.. _header-n516:
 
 PyGAD 2.9.0 
 ------------
@@ -448,7 +448,7 @@ Release Date: 06 December 2020
    ``numpy.int64``, ``numpy.float``, ``numpy.float16``,
    ``numpy.float32``, or ``numpy.float64``.
 
-.. _header-n181:
+.. _header-n529:
 
 PyGAD 2.10.0
 ------------
@@ -503,7 +503,13 @@ Release Date: 03 January 2021
     created to calculate the average fitness value used in adaptive
     mutation to filter the solutions.
 
-.. _header-n202:
+11. The ``best_solution()`` method accepts a new optional parameter
+    called ``pop_fitness``. It accepts a list of the fitness values of
+    the solutions in the population. If ``None``, then the
+    ``cal_pop_fitness()`` method is called to calculate the fitness
+    values of the population.
+
+.. _header-n554:
 
 PyGAD Projects at GitHub
 ========================
@@ -513,7 +519,7 @@ https://pypi.org/project/pygad. PyGAD is built out of a number of
 open-source GitHub projects. A brief note about these projects is given
 in the next subsections.
 
-.. _header-n204:
+.. _header-n556:
 
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 --------------------------------------------------------------------------------
@@ -524,7 +530,7 @@ GitHub Link: https://github.com/ahmedfgad/GeneticAlgorithmPython
 is the first project which is an open-source Python 3 project for
 implementing the genetic algorithm based on NumPy.
 
-.. _header-n207:
+.. _header-n559:
 
 `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__
 ----------------------------------------------------
@@ -538,7 +544,7 @@ neural network without using a training algorithm. Currently, it only
 supports classification and later regression will be also supported.
 Moreover, only one class is supported per sample.
 
-.. _header-n210:
+.. _header-n562:
 
 `NeuralGenetic <https://github.com/ahmedfgad/NeuralGenetic>`__
 --------------------------------------------------------------
@@ -551,7 +557,7 @@ projects
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 and `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__.
 
-.. _header-n213:
+.. _header-n565:
 
 `NumPyCNN <https://github.com/ahmedfgad/NumPyCNN>`__
 ----------------------------------------------------
@@ -563,7 +569,7 @@ convolutional neural networks using NumPy. The purpose of this project
 is to only implement the **forward pass** of a convolutional neural
 network without using a training algorithm.
 
-.. _header-n216:
+.. _header-n568:
 
 `CNNGenetic <https://github.com/ahmedfgad/CNNGenetic>`__
 --------------------------------------------------------
@@ -575,7 +581,7 @@ convolutional neural networks using the genetic algorithm. It uses the
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 project for building the genetic algorithm.
 
-.. _header-n219:
+.. _header-n571:
 
 `KerasGA <https://github.com/ahmedfgad/KerasGA>`__
 --------------------------------------------------
@@ -588,7 +594,7 @@ the
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 project for building the genetic algorithm.
 
-.. _header-n222:
+.. _header-n574:
 
 `TorchGA <https://github.com/ahmedfgad/TorchGA>`__
 --------------------------------------------------
@@ -604,7 +610,7 @@ project for building the genetic algorithm.
 `pygad.torchga <https://github.com/ahmedfgad/TorchGA>`__:
 https://github.com/ahmedfgad/TorchGA
 
-.. _header-n226:
+.. _header-n578:
 
 Submitting Issues
 =================
@@ -621,7 +627,7 @@ is not working properly or to ask for questions.
 If this is not a proper option for you, then check the **Contact Us**
 section for more contact details.
 
-.. _header-n230:
+.. _header-n582:
 
 Ask for Feature
 ===============
@@ -638,7 +644,7 @@ to ahmed.f.gad@gmail.com.
 
 Also check the **Contact Us** section for more contact details.
 
-.. _header-n234:
+.. _header-n586:
 
 Projects Built using PyGAD
 ==========================
@@ -657,7 +663,7 @@ Within your message, please send the following details:
 
 -  Preferably, a link that directs the readers to your project
 
-.. _header-n245:
+.. _header-n597:
 
 For More Information
 ====================
@@ -665,7 +671,7 @@ For More Information
 There are different resources that can be used to get started with the
 genetic algorithm and building it in Python.
 
-.. _header-n247:
+.. _header-n599:
 
 Tutorial: Implementing Genetic Algorithm in Python
 --------------------------------------------------
@@ -689,7 +695,7 @@ good resource to start with coding the genetic algorithm.
 
 |image0|
 
-.. _header-n258:
+.. _header-n610:
 
 Tutorial: Introduction to Genetic Algorithm
 -------------------------------------------
@@ -708,7 +714,7 @@ which is available at these links:
 
 |image1|
 
-.. _header-n268:
+.. _header-n620:
 
 Tutorial: Build Neural Networks in Python
 -----------------------------------------
@@ -728,7 +734,7 @@ available at these links:
 
 |image2|
 
-.. _header-n278:
+.. _header-n630:
 
 Tutorial: Optimize Neural Networks with Genetic Algorithm
 ---------------------------------------------------------
@@ -748,7 +754,7 @@ available at these links:
 
 |image3|
 
-.. _header-n288:
+.. _header-n640:
 
 Tutorial: Building CNN in Python
 --------------------------------
@@ -774,7 +780,7 @@ good resource to start with coding CNNs.
 
 |image4|
 
-.. _header-n301:
+.. _header-n653:
 
 Tutorial: Derivation of CNN from FCNN
 -------------------------------------
@@ -793,7 +799,7 @@ which is available at these links:
 
 |image5|
 
-.. _header-n311:
+.. _header-n663:
 
 Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 --------------------------------------------------------------------------
@@ -819,7 +825,7 @@ Find the book at these links:
 .. figure:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
    :alt: 
 
-.. _header-n326:
+.. _header-n678:
 
 Contact Us
 ==========
