@@ -10,10 +10,12 @@
 Welcome to PyGAD's documentation!
 =================================
 
-`PyGAD <https://pypi.org/project/pygad>`__ is an open-source Python library for building the genetic algorithm and optimizing machine learning algorithms.
+`PyGAD <https://pypi.org/project/pygad>`__ is an open-source Python
+library for building the genetic algorithm and optimizing machine
+learning algorithms.
 
 `PyGAD <https://pypi.org/project/pygad>`__ supports different types of
-crossover, mutation, and parent selection.
+crossover, mutation, and parent selection operators.
 `PyGAD <https://pypi.org/project/pygad>`__ allows different types of
 problems to be optimized using the genetic algorithm by customizing the
 fitness function.
@@ -33,7 +35,7 @@ classification problems.
 The library is under active development and more features added
 regularly. Please contact us if you want a feature to be supported.
 
-.. _header-n5:
+.. _header-n59:
 
 Donation
 ========
@@ -46,7 +48,7 @@ To donate using PayPal, use either this link:
 `paypal.me/ahmedfgad <https://paypal.me/ahmedfgad>`__ or the e-mail
 address ahmed.f.gad@gmail.com.
 
-.. _header-n8:
+.. _header-n62:
 
 Installation
 ============
@@ -74,7 +76,7 @@ manipulating arrays and Matplotlib for creating figures. The exact NumPy
 version used in developing PyGAD is 1.16.4. For Matplotlib, the version
 is 3.1.0.
 
-.. _header-n15:
+.. _header-n69:
 
 Quick Start
 ===========
@@ -185,7 +187,7 @@ solution found by PyGAD can be accessed.
 There is more to do using PyGAD. Read its documentation to explore the
 features of PyGAD.
 
-.. _header-n34:
+.. _header-n88:
 
 PyGAD's Modules
 ===============
@@ -205,8 +207,11 @@ PyGAD's Modules
 5. The ``gacnn`` module optimizes convolutional neural networks using
    the genetic algorithm.
 
-6. The ``kerasga`` module to train Keras models using the genetic
-   algorithm.
+6. The ``kerasga`` module to train `Keras <https://keras.io>`__ models
+   using the genetic algorithm.
+
+7. The ``torchga`` module to train `PyTorch <https://pytorch.org>`__
+   models using the genetic algorithm.
 
 The documentation discusses each of these modules.
 
@@ -315,6 +320,21 @@ pygad.kerasga Module
 
 
 .. _header-n10:
+
+pygad.torchga Module
+=================
+
+
+.. toctree::
+   :maxdepth: 4
+   :caption: pygad.torchga Module TOC
+
+   README_pygad_torchga_ReadTheDocs.rst
+
+
+
+
+.. _header-n11:
 
 More Information
 =================

@@ -1,26 +1,23 @@
 .. _header-n0:
 
-``pygad.kerasga`` Module
+``pygad.torchga`` Module
 ========================
 
 This section of the PyGAD's library documentation discusses the
-**pygad.kerasga** module.
+**pygad.torchga** module.
 
-The ``pygad.kerarsga`` module has helper a class and 2 functions to
-train Keras models using the genetic algorithm (PyGAD). The Keras model
-can be built either using the `Sequential
-Model <https://keras.io/guides/sequential_model>`__ or the `Functional
-API <https://keras.io/guides/functional_api>`__.
+The ``pygad.torchga`` module has helper a class and 2 functions to train
+PyTorch models using the genetic algorithm (PyGAD).
 
 The contents of this module are:
 
-1. ``KerasGA``: A class for creating an initial population of all
-   parameters in the Keras model.
+1. ``TorchGA``: A class for creating an initial population of all
+   parameters in the PyTorch model.
 
-2. ``model_weights_as_vector()``: A function to reshape the Keras model
-   weights to a single vector.
+2. ``model_weights_as_vector()``: A function to reshape the PyTorch
+   model weights to a single vector.
 
-3. ``model_weights_as_matrix()``: A function to restore the Keras model
+3. ``model_weights_as_dict()``: A function to restore the PyTorch model
    weights from a vector.
 
 More details are given in the next sections.
@@ -30,12 +27,12 @@ More details are given in the next sections.
 Steps Summary
 =============
 
-The summary of the steps used to train a Keras model using PyGAD is as
+The summary of the steps used to train a PyTorch model using PyGAD is as
 follows:
 
-1. Create a Keras model.
+1. Create a PyTorch model.
 
-2. Create an instance of the ``pygad.kerasga.KerasGA`` class.
+2. Create an instance of the ``pygad.torchga.TorchGA`` class.
 
 3. Prepare the training data.
 
@@ -47,81 +44,59 @@ follows:
 
 .. _header-n28:
 
-Create Keras Model
-==================
+Create PyTorch Model
+====================
 
-Before discussing training a Keras model using PyGAD, the first thing to
-do is to create the Keras model.
+Before discussing training a PyTorch model using PyGAD, the first thing
+to do is to create the PyTorch model. To get started, please check the
+`PyTorch library
+documentation <https://pytorch.org/docs/stable/index.html>`__.
 
-According to the `Keras library
-documentation <https://keras.io/api/models>`__, there are 3 ways to
-build a Keras model:
-
-1. `Sequential Model <https://keras.io/guides/sequential_model>`__
-
-2. `Functional API <https://keras.io/guides/functional_api>`__
-
-3. `Model Subclassing <https://keras.io/guides/model_subclassing>`__
-
-PyGAD supports training the models created either using the Sequential
-Model or the Functional API.
-
-Here is an example of a model created using the Sequential Model.
+Here is an example of a PyTorch model.
 
 .. code:: python
 
-   import tensorflow.keras
+   import torch
 
-   input_layer  = tensorflow.keras.layers.Input(3)
-   dense_layer1 = tensorflow.keras.layers.Dense(5, activation="relu")
-   output_layer = tensorflow.keras.layers.Dense(1, activation="linear")
+   input_layer = torch.nn.Linear(3, 5)
+   relu_layer = torch.nn.ReLU()
+   output_layer = torch.nn.Linear(5, 1)
 
-   model = tensorflow.keras.Sequential()
-   model.add(input_layer)
-   model.add(dense_layer1)
-   model.add(output_layer)
-
-This is the same model created using the Functional API.
-
-.. code:: python
-
-   input_layer  = tensorflow.keras.layers.Input(3)
-   dense_layer1 = tensorflow.keras.layers.Dense(5, activation="relu")(input_layer)
-   output_layer = tensorflow.keras.layers.Dense(1, activation="linear")(dense_layer1)
-
-   model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
+   model = torch.nn.Sequential(input_layer,
+                               relu_layer,
+                               output_layer)
 
 Feel free to add the layers of your choice.
 
-.. _header-n44:
+.. _header-n33:
 
-``pygad.kerasga.KerasGA`` Class
+``pygad.torchga.TorchGA`` Class
 ===============================
 
-The ``pygad.kerasga`` module has a class named ``KerasGA`` for creating
-an initial population for the genetic algorithm based on a Keras model.
-The constructor, methods, and attributes within the class are discussed
-in this section.
+The ``pygad.torchga`` module has a class named ``TorchGA`` for creating
+an initial population for the genetic algorithm based on a PyTorch
+model. The constructor, methods, and attributes within the class are
+discussed in this section.
 
-.. _header-n46:
+.. _header-n35:
 
 ``__init__()``
 --------------
 
-The ``pygad.kerasga.KerasGA`` class constructor accepts the following
+The ``pygad.torchga.TorchGA`` class constructor accepts the following
 parameters:
 
--  ``model``: An instance of the Keras model.
+-  ``model``: An instance of the PyTorch model.
 
 -  ``num_solutions``: Number of solutions in the population. Each
    solution has different parameters of the model.
 
-.. _header-n53:
+.. _header-n42:
 
 Instance Attributes
 -------------------
 
-All parameters in the ``pygad.kerasga.KerasGA`` class constructor are
+All parameters in the ``pygad.torchga.TorchGA`` class constructor are
 used as instance attributes in addition to adding a new attribute called
 ``population_weights``.
 
@@ -134,15 +109,15 @@ Here is a list of all instance attributes:
 -  ``population_weights``: A nested list holding the weights of all
    solutions in the population.
 
-.. _header-n63:
+.. _header-n52:
 
-Methods in the ``KerasGA`` Class
+Methods in the ``TorchGA`` Class
 --------------------------------
 
 This section discusses the methods available for instances of the
-``pygad.kerasga.KerasGA`` class.
+``pygad.torchga.TorchGA`` class.
 
-.. _header-n65:
+.. _header-n54:
 
 ``create_population()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,80 +127,83 @@ genetic algorithm as a list of solutions where each solution represents
 different model parameters. The list of networks is assigned to the
 ``population_weights`` attribute of the instance.
 
-.. _header-n67:
+.. _header-n56:
 
-Functions in the ``pygad.kerasga`` Module
+Functions in the ``pygad.torchga`` Module
 =========================================
 
-This section discusses the functions in the ``pygad.kerasga`` module.
+This section discusses the functions in the ``pygad.torchga`` module.
 
-.. _header-n69:
+.. _header-n58:
 
-``pygad.kerasga.model_weights_as_vector()`` 
+``pygad.torchga.model_weights_as_vector()`` 
 --------------------------------------------
 
 The ``model_weights_as_vector()`` function accepts a single parameter
-named ``model`` representing the Keras model. It returns a vector
+named ``model`` representing the PyTorch model. It returns a vector
 holding all model weights. The reason for representing the model weights
 as a vector is that the genetic algorithm expects all parameters of any
 solution to be in a 1D vector form.
 
 The function accepts the following parameters:
 
--  ``model``: The Keras model.
+-  ``model``: The PyTorch model.
 
 It returns a 1D vector holding the model weights.
 
-.. _header-n76:
+.. _header-n65:
 
-``pygad.kerasga.model_weights_as_matrix()``
--------------------------------------------
+``pygad.torch.model_weights_as_dict()``
+---------------------------------------
 
-The ``model_weights_as_matrix()`` function accepts the following
+The ``model_weights_as_dict()`` function accepts the following
 parameters:
 
-1. ``model``: The Keras model.
+1. ``model``: The PyTorch model.
 
 2. ``weights_vector``: The model parameters as a vector.
 
-It returns the restored model weights after reshaping the vector.
+It returns the restored model weights in the same form used by the
+``state_dict()`` method. The returned dictionary is ready to be passed
+to the ``load_state_dict()`` method for setting the PyTorch model's
+parameters.
 
-.. _header-n84:
+.. _header-n73:
 
 Examples
 ========
 
 This section gives the complete code of some examples that build and
-train a Keras model using PyGAD. Each subsection builds a different
+train a PyTorch model using PyGAD. Each subsection builds a different
 network.
 
-.. _header-n86:
+.. _header-n75:
 
 Example 1: Regression Example
 -----------------------------
 
-The next code builds a simple Keras model for regression. The next
+The next code builds a simple PyTorch model for regression. The next
 subsections discuss each part in the code.
 
 .. code:: python
 
-   import tensorflow.keras
-   import pygad.kerasga
-   import numpy
+   import torch
+   import torchga
    import pygad
 
    def fitness_func(solution, sol_idx):
-       global data_inputs, data_outputs, keras_ga, model
+       global data_inputs, data_outputs, torch_ga, model, loss_function
 
-       model_weights_matrix = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                    weights_vector=solution)
+       model_weights_dict = torchga.model_weights_as_dict(model=model,
+                                                          weights_vector=solution)
 
-       model.set_weights(weights=model_weights_matrix)
-       
-       predictions = model.predict(data_inputs)
-       mae = tensorflow.keras.losses.MeanAbsoluteError()
-       abs_error = mae(data_outputs, predictions).numpy() + 0.00000001
-       solution_fitness = 1.0/abs_error
+       # Use the current solution as the model parameters.
+       model.load_state_dict(model_weights_dict)
+
+       predictions = model(data_inputs)
+       abs_error = loss_function(predictions, data_outputs).detach().numpy() + 0.00000001
+
+       solution_fitness = 1.0 / abs_error
 
        return solution_fitness
 
@@ -233,31 +211,38 @@ subsections discuss each part in the code.
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
-   input_layer  = tensorflow.keras.layers.Input(3)
-   dense_layer1 = tensorflow.keras.layers.Dense(5, activation="relu")(input_layer)
-   output_layer = tensorflow.keras.layers.Dense(1, activation="linear")(dense_layer1)
+   # Create the PyTorch model.
+   input_layer = torch.nn.Linear(3, 5)
+   relu_layer = torch.nn.ReLU()
+   output_layer = torch.nn.Linear(5, 1)
 
-   model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
+   model = torch.nn.Sequential(input_layer,
+                               relu_layer,
+                               output_layer)
+   # print(model)
 
-   keras_ga = pygad.kerasga.KerasGA(model=model,
-                                    num_solutions=10)
+   # Create an instance of the pygad.torchga.TorchGA class to build the initial population.
+   torch_ga = torchga.TorchGA(model=model,
+                              num_solutions=10)
+
+   loss_function = torch.nn.L1Loss()
 
    # Data inputs
-   data_inputs = numpy.array([[0.02, 0.1, 0.15],
-                              [0.7, 0.6, 0.8],
-                              [1.5, 1.2, 1.7],
-                              [3.2, 2.9, 3.1]])
+   data_inputs = torch.tensor([[0.02, 0.1, 0.15],
+                               [0.7, 0.6, 0.8],
+                               [1.5, 1.2, 1.7],
+                               [3.2, 2.9, 3.1]])
 
    # Data outputs
-   data_outputs = numpy.array([[0.1],
-                               [0.6],
-                               [1.3],
-                               [2.5]])
+   data_outputs = torch.tensor([[0.1],
+                                [0.6],
+                                [1.3],
+                                [2.5]])
 
    # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
-   initial_population = keras_ga.population_weights # Initial population of network weights
+   initial_population = torch_ga.population_weights # Initial population of network weights
    parent_selection_type = "sss" # Type of parent selection.
    crossover_type = "single_point" # Type of the crossover operator.
    mutation_type = "random" # Type of the mutation operator.
@@ -278,7 +263,7 @@ subsections discuss each part in the code.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
@@ -286,65 +271,53 @@ subsections discuss each part in the code.
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
    # Fetch the parameters of the best solution.
-   best_solution_weights = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                 weights_vector=solution)
-   model.set_weights(best_solution_weights)
-   predictions = model.predict(data_inputs)
-   print("Predictions : \n", predictions)
+   best_solution_weights = torchga.model_weights_as_dict(model=model,
+                                                         weights_vector=solution)
+   model.load_state_dict(best_solution_weights)
+   predictions = model(data_inputs)
+   print("Predictions : \n", predictions.detach().numpy())
 
-   mae = tensorflow.keras.losses.MeanAbsoluteError()
-   abs_error = mae(data_outputs, predictions).numpy()
-   print("Absolute Error : ", abs_error)
+   abs_error = loss_function(predictions, data_outputs)
+   print("Absolute Error : ", abs_error.detach().numpy())
 
-.. _header-n89:
+.. _header-n78:
 
-Create a Keras Model
-~~~~~~~~~~~~~~~~~~~~
+Create a PyTorch model
+~~~~~~~~~~~~~~~~~~~~~~
 
 According to the steps mentioned previously, the first step is to create
-a Keras model. Here is the code that builds the model using the
+a PyTorch model. Here is the code that builds the model using the
 Functional API.
 
 .. code:: python
 
-   import tensorflow.keras
+   import torch
 
-   input_layer  = tensorflow.keras.layers.Input(3)
-   dense_layer1 = tensorflow.keras.layers.Dense(5, activation="relu")(input_layer)
-   output_layer = tensorflow.keras.layers.Dense(1, activation="linear")(dense_layer1)
+   input_layer = torch.nn.Linear(3, 5)
+   relu_layer = torch.nn.ReLU()
+   output_layer = torch.nn.Linear(5, 1)
 
-   model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
+   model = torch.nn.Sequential(input_layer,
+                               relu_layer,
+                               output_layer)
 
-The model can also be build using the Keras Sequential Model API.
+.. _header-n81:
 
-.. code:: python
-
-   input_layer  = tensorflow.keras.layers.Input(3)
-   dense_layer1 = tensorflow.keras.layers.Dense(5, activation="relu")
-   output_layer = tensorflow.keras.layers.Dense(1, activation="linear")
-
-   model = tensorflow.keras.Sequential()
-   model.add(input_layer)
-   model.add(dense_layer1)
-   model.add(output_layer)
-
-.. _header-n94:
-
-Create an Instance of the ``pygad.kerasga.KerasGA`` Class
+Create an Instance of the ``pygad.torchga.TorchGA`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The second step is to create an instance of the
-``pygad.kerasga.KerasGA`` class. There are 10 solutions per population.
+``pygad.torchga.TorchGA`` class. There are 10 solutions per population.
 Change this number according to your needs.
 
 .. code:: python
 
-   import pygad.kerasga
+   import pygad.torchga
 
-   keras_ga = pygad.kerasga.KerasGA(model=model,
-                                    num_solutions=10)
+   torch_ga = torchga.TorchGA(model=model,
+                              num_solutions=10)
 
-.. _header-n97:
+.. _header-n84:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -369,7 +342,7 @@ output.
                                [1.3],
                                [2.5]])
 
-.. _header-n100:
+.. _header-n87:
 
 Build the Fitness Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -379,35 +352,38 @@ accept 2 parameters representing the solution and its index within the
 population.
 
 The next fitness function calculates the mean absolute error (MAE) of
-the Keras model based on the parameters in the solution. The reciprocal
-of the MAE is used as the fitness value. Feel free to use any other loss
-function to calculate the fitness value.
+the PyTorch model based on the parameters in the solution. The
+reciprocal of the MAE is used as the fitness value. Feel free to use any
+other loss function to calculate the fitness value.
 
 .. code:: python
 
+   loss_function = torch.nn.L1Loss()
+
    def fitness_func(solution, sol_idx):
-       global data_inputs, data_outputs, keras_ga, model
+       global data_inputs, data_outputs, torch_ga, model, loss_function
 
-       model_weights_matrix = kerasga.model_weights_as_matrix(model=model,
-                                                              weights_vector=solution)
+       model_weights_dict = torchga.model_weights_as_dict(model=model,
+                                                          weights_vector=solution)
 
-       model.set_weights(weights=model_weights_matrix)
-       
-       predictions = model.predict(data_inputs)
-       mae = tensorflow.keras.losses.MeanAbsoluteError()
-       abs_error = mae(data_outputs, predictions).numpy() + 0.00000001
-       solution_fitness = 1.0/abs_error
+       # Use the current solution as the model parameters.
+       model.load_state_dict(model_weights_dict)
+
+       predictions = model(data_inputs)
+       abs_error = loss_function(predictions, data_outputs).detach().numpy() + 0.00000001
+
+       solution_fitness = 1.0 / abs_error
 
        return solution_fitness
 
-.. _header-n104:
+.. _header-n91:
 
 Create an Instance of the ``pygad.GA`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The fifth step is to instantiate the ``pygad.GA`` class. Note how the
 ``initial_population`` parameter is assigned to the initial weights of
-the Keras models.
+the PyTorch models.
 
 For more information, please check the `parameters this class
 accepts <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#init>`__.
@@ -417,7 +393,7 @@ accepts <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#in
    # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
-   initial_population = keras_ga.population_weights # Initial population of network weights
+   initial_population = torch_ga.population_weights # Initial population of network weights
    parent_selection_type = "sss" # Type of parent selection.
    crossover_type = "single_point" # Type of the crossover operator.
    mutation_type = "random" # Type of the mutation operator.
@@ -435,7 +411,7 @@ accepts <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#in
                           keep_parents=keep_parents,
                           on_generation=callback_generation)
 
-.. _header-n108:
+.. _header-n95:
 
 Run the Genetic Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -453,11 +429,11 @@ shows how the fitness value changes by generation. Call the
 
 .. code:: python
 
-   ga_instance.plot_result(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
 Here is the figure.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/93722638-ac261880-fb98-11ea-95d3-e773deb034f4.png
+.. figure:: https://user-images.githubusercontent.com/16560492/103469779-22f5b480-4d37-11eb-80dc-95503065ebb1.png
    :alt: 
 
 To get information about the best solution found by PyGAD, use the
@@ -472,70 +448,67 @@ To get information about the best solution found by PyGAD, use the
 
 .. code:: python
 
-   Fitness value of the best solution = 72.77768757825352
+   Fitness value of the best solution = 145.42425295191546
    Index of the best solution : 0
 
 The next code restores the trained model weights using the
-``model_weights_as_matrix()`` function. The restored weights are used to
+``model_weights_as_dict()`` function. The restored weights are used to
 calculate the predicted values.
 
 .. code:: python
 
-   # Fetch the parameters of the best solution.
-   best_solution_weights = kerasga.model_weights_as_matrix(model=model,
-                                                           weights_vector=solution)
-   model.set_weights(best_solution_weights)
-   predictions = model.predict(data_inputs)
-   print("Predictions : \n", predictions)
+   best_solution_weights = torchga.model_weights_as_dict(model=model,
+                                                         weights_vector=solution)
+   model.load_state_dict(best_solution_weights)
+   predictions = model(data_inputs)
+   print("Predictions : \n", predictions.detach().numpy())
 
 .. code:: python
 
    Predictions : 
-   [[0.09935353]
-    [0.63082725]
-    [1.2765523 ]
-    [2.4999595 ]]
+   [[0.08401088]
+    [0.60939324]
+    [1.3010881 ]
+    [2.5010352 ]]
 
 The next code measures the trained model error.
 
 .. code:: python
 
-   mae = tensorflow.keras.losses.MeanAbsoluteError()
-   abs_error = mae(data_outputs, predictions).numpy()
-   print("Absolute Error : ", abs_error)
+   abs_error = loss_function(predictions, data_outputs)
+   print("Absolute Error : ", abs_error.detach().numpy())
 
 .. code:: 
 
-   Absolute Error :  0.013740465
+   Absolute Error :  0.006876422
 
-.. _header-n124:
+.. _header-n111:
 
 Example 2: XOR Binary Classification
 ------------------------------------
 
-The next code creates a Keras model to build the XOR binary
+The next code creates a PyTorch model to build the XOR binary
 classification problem. Let's highlight the changes compared to the
 previous example.
 
 .. code:: python
 
-   import tensorflow.keras
-   import pygad.kerasga
-   import numpy
+   import torch
+   import torchga
    import pygad
 
    def fitness_func(solution, sol_idx):
-       global data_inputs, data_outputs, keras_ga, model
+       global data_inputs, data_outputs, torch_ga, model, loss_function
 
-       model_weights_matrix = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                    weights_vector=solution)
+       model_weights_dict = torchga.model_weights_as_dict(model=model,
+                                                          weights_vector=solution)
 
-       model.set_weights(weights=model_weights_matrix)
+       # Use the current solution as the model parameters.
+       model.load_state_dict(model_weights_dict)
 
-       predictions = model.predict(data_inputs)
+       predictions = model(data_inputs)
 
-       bce = tensorflow.keras.losses.BinaryCrossentropy()
-       solution_fitness = 1.0 / (bce(data_outputs, predictions).numpy() + 0.00000001)
+       solution_fitness = 1.0 / (loss_function(predictions, data_outputs).detach().numpy() + 0.00000001)
 
        return solution_fitness
 
@@ -543,33 +516,40 @@ previous example.
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
-   # Build the keras model using the functional API.
-   input_layer  = tensorflow.keras.layers.Input(2)
-   dense_layer = tensorflow.keras.layers.Dense(4, activation="relu")(input_layer)
-   output_layer = tensorflow.keras.layers.Dense(2, activation="softmax")(dense_layer)
+   # Create the PyTorch model.
+   input_layer  = torch.nn.Linear(2, 4)
+   relu_layer = torch.nn.ReLU()
+   dense_layer = torch.nn.Linear(4, 2)
+   output_layer = torch.nn.Softmax(1)
 
-   model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
+   model = torch.nn.Sequential(input_layer,
+                               relu_layer,
+                               dense_layer,
+                               output_layer)
+   # print(model)
 
-   # Create an instance of the pygad.kerasga.KerasGA class to build the initial population.
-   keras_ga = pygad.kerasga.KerasGA(model=model,
-                                    num_solutions=10)
+   # Create an instance of the pygad.torchga.TorchGA class to build the initial population.
+   torch_ga = torchga.TorchGA(model=model,
+                              num_solutions=10)
+
+   loss_function = torch.nn.BCELoss()
 
    # XOR problem inputs
-   data_inputs = numpy.array([[0, 0],
-                              [0, 1],
-                              [1, 0],
-                              [1, 1]])
+   data_inputs = torch.tensor([[0.0, 0.0],
+                               [0.0, 1.0],
+                               [1.0, 0.0],
+                               [1.0, 1.0]])
 
    # XOR problem outputs
-   data_outputs = numpy.array([[1, 0],
-                               [0, 1],
-                               [0, 1],
-                               [1, 0]])
+   data_outputs = torch.tensor([[1.0, 0.0],
+                                [0.0, 1.0],
+                                [0.0, 1.0],
+                                [1.0, 0.0]])
 
    # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
-   initial_population = keras_ga.population_weights # Initial population of network weights.
+   initial_population = torch_ga.population_weights # Initial population of network weights.
    parent_selection_type = "sss" # Type of parent selection.
    crossover_type = "single_point" # Type of the crossover operator.
    mutation_type = "random" # Type of the mutation operator.
@@ -592,7 +572,7 @@ previous example.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
@@ -600,36 +580,38 @@ previous example.
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
    # Fetch the parameters of the best solution.
-   best_solution_weights = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                 weights_vector=solution)
-   model.set_weights(best_solution_weights)
-   predictions = model.predict(data_inputs)
-   print("Predictions : \n", predictions)
+   best_solution_weights = torchga.model_weights_as_dict(model=model,
+                                                         weights_vector=solution)
+   model.load_state_dict(best_solution_weights)
+   predictions = model(data_inputs)
+   print("Predictions : \n", predictions.detach().numpy())
 
    # Calculate the binary crossentropy for the trained model.
-   bce = tensorflow.keras.losses.BinaryCrossentropy()
-   print("Binary Crossentropy : ", bce(data_outputs, predictions).numpy())
+   print("Binary Crossentropy : ", loss_function(predictions, data_outputs).detach().numpy())
 
-   # Calculate the classification accuracy for the trained model.
-   ba = tensorflow.keras.metrics.BinaryAccuracy()
-   ba.update_state(data_outputs, predictions)
-   accuracy = ba.result().numpy()
-   print("Accuracy : ", accuracy)
+   # Calculate the classification accuracy of the trained model.
+   a = torch.max(predictions, axis=1)
+   b = torch.max(data_outputs, axis=1)
+   accuracy = torch.sum(a.indices == b.indices) / len(data_outputs)
+   print("Accuracy : ", accuracy.detach().numpy())
 
 Compared to the previous regression example, here are the changes:
 
--  The Keras model is changed according to the nature of the problem.
+-  The PyTorch model is changed according to the nature of the problem.
    Now, it has 2 inputs and 2 outputs with an in-between hidden layer of
    4 neurons.
 
 .. code:: python
 
-   # Build the keras model using the functional API.
-   input_layer  = tensorflow.keras.layers.Input(2)
-   dense_layer = tensorflow.keras.layers.Dense(4, activation="relu")(input_layer)
-   output_layer = tensorflow.keras.layers.Dense(2, activation="softmax")(dense_layer)
+   input_layer  = torch.nn.Linear(2, 4)
+   relu_layer = torch.nn.ReLU()
+   dense_layer = torch.nn.Linear(4, 2)
+   output_layer = torch.nn.Softmax(1)
 
-   model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
+   model = torch.nn.Sequential(input_layer,
+                               relu_layer,
+                               dense_layer,
+                               output_layer)
 
 -  The train data is changed. Note that the output of each sample is a
    1D vector of 2 values, 1 for each class.
@@ -637,49 +619,49 @@ Compared to the previous regression example, here are the changes:
 .. code:: python
 
    # XOR problem inputs
-   data_inputs = numpy.array([[0, 0],
-                              [0, 1],
-                              [1, 0],
-                              [1, 1]])
+   data_inputs = torch.tensor([[0.0, 0.0],
+                               [0.0, 1.0],
+                               [1.0, 0.0],
+                               [1.0, 1.0]])
 
    # XOR problem outputs
-   data_outputs = numpy.array([[1, 0],
-                               [0, 1],
-                               [0, 1],
-                               [1, 0]])
+   data_outputs = torch.tensor([[1.0, 0.0],
+                                [0.0, 1.0],
+                                [0.0, 1.0],
+                                [1.0, 0.0]])
 
 -  The fitness value is calculated based on the binary cross entropy.
 
 .. code:: python
 
-   bce = tensorflow.keras.losses.BinaryCrossentropy()
-   solution_fitness = 1.0 / (bce(data_outputs, predictions).numpy() + 0.00000001)
+   loss_function = torch.nn.BCELoss()
 
 After the previous code completes, the next figure shows how the fitness
 value change by generation.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/93722639-b811da80-fb98-11ea-8951-f13a7a266c04.png
+.. figure:: https://user-images.githubusercontent.com/16560492/103469818-c646c980-4d37-11eb-98c3-d9d591acd5e2.png
    :alt: 
 
 Here is some information about the trained model. Its fitness value is
-``739.24``, loss is ``0.0013527311`` and accuracy is 100%.
+``100000000.0``, loss is ``0.0`` and accuracy is 100%.
 
 .. code:: python
 
-   Fitness value of the best solution = 739.2397344644013
-   Index of the best solution : 7
+   Fitness value of the best solution = 100000000.0
+
+   Index of the best solution : 0
 
    Predictions : 
-   [[9.9694413e-01 3.0558957e-03]
-    [5.0176249e-04 9.9949825e-01]
-    [1.8470541e-03 9.9815291e-01]
-    [9.9999976e-01 2.0538971e-07]]
+   [[1.0000000e+00 1.3627675e-10]
+    [3.8521746e-09 1.0000000e+00]
+    [4.2789325e-10 1.0000000e+00]
+    [1.0000000e+00 3.3668417e-09]]
 
-   Binary Crossentropy :  0.0013527311
+   Binary Crossentropy :  0.0
 
    Accuracy :  1.0
 
-.. _header-n144:
+.. _header-n131:
 
 Example 3: Image Multi-Class Classification (Dense Layers)
 ----------------------------------------------------------
@@ -688,23 +670,22 @@ Here is the code.
 
 .. code:: python
 
-   import tensorflow.keras
-   import pygad.kerasga
-   import numpy
+   import torch
+   import torchga
    import pygad
+   import numpy
 
    def fitness_func(solution, sol_idx):
-       global data_inputs, data_outputs, keras_ga, model
+       global data_inputs, data_outputs, torch_ga, model, loss_function
 
-       model_weights_matrix = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                      weights_vector=solution)
+       model_weights_dict = torchga.model_weights_as_dict(model=model,
+                                                          weights_vector=solution)
 
-       model.set_weights(weights=model_weights_matrix)
+       model.load_state_dict(model_weights_dict)
 
-       predictions = model.predict(data_inputs)
+       predictions = model(data_inputs)
 
-       cce = tensorflow.keras.losses.CategoricalCrossentropy()
-       solution_fitness = 1.0 / (cce(data_outputs, predictions).numpy() + 0.00000001)
+       solution_fitness = 1.0 / (loss_function(predictions, data_outputs).detach().numpy() + 0.00000001)
 
        return solution_fitness
 
@@ -712,28 +693,36 @@ Here is the code.
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
-   # Build the keras model using the functional API.
-   input_layer  = tensorflow.keras.layers.Input(360)
-   dense_layer = tensorflow.keras.layers.Dense(50, activation="relu")(input_layer)
-   output_layer = tensorflow.keras.layers.Dense(4, activation="softmax")(dense_layer)
+   # Build the PyTorch model using the functional API.
+   input_layer = torch.nn.Linear(360, 50)
+   relu_layer = torch.nn.ReLU()
+   dense_layer = torch.nn.Linear(50, 4)
+   output_layer = torch.nn.Softmax(1)
 
-   model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
+   model = torch.nn.Sequential(input_layer,
+                               relu_layer,
+                               dense_layer,
+                               output_layer)
 
-   # Create an instance of the pygad.kerasga.KerasGA class to build the initial population.
-   keras_ga = pygad.kerasga.KerasGA(model=model,
-                                      num_solutions=10)
+   # Create an instance of the pygad.torchga.TorchGA class to build the initial population.
+   torch_ga = torchga.TorchGA(model=model,
+                              num_solutions=10)
+
+   loss_function = torch.nn.CrossEntropyLoss()
 
    # Data inputs
-   data_inputs = numpy.load("dataset_features.npy")
+   data_inputs = torch.from_numpy(numpy.load("dataset_features.npy")).float()
 
    # Data outputs
-   data_outputs = numpy.load("outputs.npy")
-   data_outputs = tensorflow.keras.utils.to_categorical(data_outputs)
+   data_outputs = torch.from_numpy(numpy.load("outputs.npy")).long()
+   # The next 2 lines are equivelant to this Keras function to perform 1-hot encoding: tensorflow.keras.utils.to_categorical(data_outputs)
+   # temp_outs = numpy.zeros((data_outputs.shape[0], numpy.unique(data_outputs).size), dtype=numpy.uint8)
+   # temp_outs[numpy.arange(data_outputs.shape[0]), numpy.uint8(data_outputs)] = 1
 
    # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
-   num_generations = 100 # Number of generations.
+   num_generations = 200 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
-   initial_population = keras_ga.population_weights # Initial population of network weights.
+   initial_population = torch_ga.population_weights # Initial population of network weights.
    parent_selection_type = "sss" # Type of parent selection.
    crossover_type = "single_point" # Type of the crossover operator.
    mutation_type = "random" # Type of the mutation operator.
@@ -756,7 +745,7 @@ Here is the code.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
@@ -764,32 +753,27 @@ Here is the code.
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
    # Fetch the parameters of the best solution.
-   best_solution_weights = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                   weights_vector=solution)
-   model.set_weights(best_solution_weights)
-   predictions = model.predict(data_inputs)
+   best_solution_weights = torchga.model_weights_as_dict(model=model,
+                                                           weights_vector=solution)
+   model.load_state_dict(best_solution_weights)
+   predictions = model(data_inputs)
    # print("Predictions : \n", predictions)
 
-   # Calculate the categorical crossentropy for the trained model.
-   cce = tensorflow.keras.losses.CategoricalCrossentropy()
-   print("Categorical Crossentropy : ", cce(data_outputs, predictions).numpy())
+   # Calculate the crossentropy loss of the trained model.
+   print("Crossentropy : ", loss_function(predictions, data_outputs).detach().numpy())
 
    # Calculate the classification accuracy for the trained model.
-   ca = tensorflow.keras.metrics.CategoricalAccuracy()
-   ca.update_state(data_outputs, predictions)
-   accuracy = ca.result().numpy()
-   print("Accuracy : ", accuracy)
+   accuracy = torch.sum(torch.max(predictions, axis=1).indices == data_outputs) / len(data_outputs)
+   print("Accuracy : ", accuracy.detach().numpy())
 
 Compared to the previous binary classification example, this example has
-multiple classes (4) and thus the loss is measured using categorical
-cross entropy.
+multiple classes (4) and thus the loss is measured using cross entropy.
 
 .. code:: python
 
-   cce = tensorflow.keras.losses.CategoricalCrossentropy()
-   solution_fitness = 1.0 / (cce(data_outputs, predictions).numpy() + 0.00000001)
+   loss_function = torch.nn.CrossEntropyLoss()
 
-.. _header-n149:
+.. _header-n136:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -812,10 +796,6 @@ The data consists of 4 classes of images. The image shape is
 ``(100, 100, 3)``. The number of training samples is 1962. The feature
 vector extracted from each image has a length 360.
 
-Simply download these 2 files and read them according to the next code.
-Note that the class labels are one-hot encoded using the
-``tensorflow.keras.utils.to_categorical()`` function.
-
 .. code:: python
 
    import numpy
@@ -823,23 +803,22 @@ Note that the class labels are one-hot encoded using the
    data_inputs = numpy.load("dataset_features.npy")
 
    data_outputs = numpy.load("outputs.npy")
-   data_outputs = tensorflow.keras.utils.to_categorical(data_outputs)
 
 The next figure shows how the fitness value changes.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/93722649-c2cc6f80-fb98-11ea-96e7-3f6ce3cfe1cf.png
+.. figure:: https://user-images.githubusercontent.com/16560492/103469855-5d138600-4d38-11eb-84b1-b5eff8faa7bc.png
    :alt: 
 
 Here are some statistics about the trained model.
 
 .. code:: 
 
-   Fitness value of the best solution = 4.197464252185969
+   Fitness value of the best solution = 1.3446997034434534
    Index of the best solution : 0
-   Categorical Crossentropy :  0.23823906
-   Accuracy :  0.9852192
+   Crossentropy :  0.74366045
+   Accuracy :  1.0
 
-.. _header-n164:
+.. _header-n150:
 
 Example 4: Image Multi-Class Classification (Conv Layers)
 ---------------------------------------------------------
@@ -851,23 +830,22 @@ Here is the complete code.
 
 .. code:: python
 
-   import tensorflow.keras
-   import pygad.kerasga
-   import numpy
+   import torch
+   import torchga
    import pygad
+   import numpy
 
    def fitness_func(solution, sol_idx):
-       global data_inputs, data_outputs, keras_ga, model
+       global data_inputs, data_outputs, torch_ga, model, loss_function
 
-       model_weights_matrix = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                    weights_vector=solution)
+       model_weights_dict = torchga.model_weights_as_dict(model=model,
+                                                          weights_vector=solution)
 
-       model.set_weights(weights=model_weights_matrix)
+       model.load_state_dict(model_weights_dict)
 
-       predictions = model.predict(data_inputs)
+       predictions = model(data_inputs)
 
-       cce = tensorflow.keras.losses.CategoricalCrossentropy()
-       solution_fitness = 1.0 / (cce(data_outputs, predictions).numpy() + 0.00000001)
+       solution_fitness = 1.0 / (loss_function(predictions, data_outputs).detach().numpy() + 0.00000001)
 
        return solution_fitness
 
@@ -875,37 +853,50 @@ Here is the complete code.
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
-   # Build the keras model using the functional API.
-   input_layer = tensorflow.keras.layers.Input(shape=(100, 100, 3))
-   conv_layer1 = tensorflow.keras.layers.Conv2D(filters=5,
-                                                kernel_size=7,
-                                                activation="relu")(input_layer)
-   max_pool1 = tensorflow.keras.layers.MaxPooling2D(pool_size=(5,5),
-                                                    strides=5)(conv_layer1)
-   conv_layer2 = tensorflow.keras.layers.Conv2D(filters=3,
-                                                kernel_size=3,
-                                                activation="relu")(max_pool1)
-   flatten_layer  = tensorflow.keras.layers.Flatten()(conv_layer2)
-   dense_layer = tensorflow.keras.layers.Dense(15, activation="relu")(flatten_layer)
-   output_layer = tensorflow.keras.layers.Dense(4, activation="softmax")(dense_layer)
+   # Build the PyTorch model.
+   input_layer = torch.nn.Conv2d(in_channels=3, out_channels=5, kernel_size=7)
+   relu_layer1 = torch.nn.ReLU()
+   max_pool1 = torch.nn.MaxPool2d(kernel_size=5, stride=5)
 
-   model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
+   conv_layer2 = torch.nn.Conv2d(in_channels=5, out_channels=3, kernel_size=3)
+   relu_layer2 = torch.nn.ReLU()
 
-   # Create an instance of the pygad.kerasga.KerasGA class to build the initial population.
-   keras_ga = pygad.kerasga.KerasGA(model=model,
-                                    num_solutions=10)
+   flatten_layer1 = torch.nn.Flatten()
+   # The value 768 is pre-computed by tracing the sizes of the layers' outputs.
+   dense_layer1 = torch.nn.Linear(in_features=768, out_features=15)
+   relu_layer3 = torch.nn.ReLU()
+
+   dense_layer2 = torch.nn.Linear(in_features=15, out_features=4)
+   output_layer = torch.nn.Softmax(1)
+
+   model = torch.nn.Sequential(input_layer,
+                               relu_layer1,
+                               max_pool1,
+                               conv_layer2,
+                               relu_layer2,
+                               flatten_layer1,
+                               dense_layer1,
+                               relu_layer3,
+                               dense_layer2,
+                               output_layer)
+
+   # Create an instance of the pygad.torchga.TorchGA class to build the initial population.
+   torch_ga = torchga.TorchGA(model=model,
+                              num_solutions=10)
+
+   loss_function = torch.nn.CrossEntropyLoss()
 
    # Data inputs
-   data_inputs = numpy.load("dataset_inputs.npy")
+   data_inputs = torch.from_numpy(numpy.load("dataset_inputs.npy")).float()
+   data_inputs = data_inputs.reshape((data_inputs.shape[0], data_inputs.shape[3], data_inputs.shape[1], data_inputs.shape[2]))
 
    # Data outputs
-   data_outputs = numpy.load("dataset_outputs.npy")
-   data_outputs = tensorflow.keras.utils.to_categorical(data_outputs)
+   data_outputs = torch.from_numpy(numpy.load("dataset_outputs.npy")).long()
 
    # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
    num_generations = 200 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
-   initial_population = keras_ga.population_weights # Initial population of network weights.
+   initial_population = torch_ga.population_weights # Initial population of network weights.
    parent_selection_type = "sss" # Type of parent selection.
    crossover_type = "single_point" # Type of the crossover operator.
    mutation_type = "random" # Type of the mutation operator.
@@ -928,7 +919,7 @@ Here is the complete code.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
@@ -936,21 +927,18 @@ Here is the complete code.
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
    # Fetch the parameters of the best solution.
-   best_solution_weights = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                 weights_vector=solution)
-   model.set_weights(best_solution_weights)
-   predictions = model.predict(data_inputs)
+   best_solution_weights = torchga.model_weights_as_dict(model=model,
+                                                         weights_vector=solution)
+   model.load_state_dict(best_solution_weights)
+   predictions = model(data_inputs)
    # print("Predictions : \n", predictions)
 
-   # Calculate the categorical crossentropy for the trained model.
-   cce = tensorflow.keras.losses.CategoricalCrossentropy()
-   print("Categorical Crossentropy : ", cce(data_outputs, predictions).numpy())
+   # Calculate the crossentropy for the trained model.
+   print("Crossentropy : ", loss_function(predictions, data_outputs).detach().numpy())
 
    # Calculate the classification accuracy for the trained model.
-   ca = tensorflow.keras.metrics.CategoricalAccuracy()
-   ca.update_state(data_outputs, predictions)
-   accuracy = ca.result().numpy()
-   print("Accuracy : ", accuracy)
+   accuracy = torch.sum(torch.max(predictions, axis=1).indices == data_outputs) / len(data_outputs)
+   print("Accuracy : ", accuracy.detach().numpy())
 
 Compared to the previous example, the only change is that the
 architecture uses convolutional and max-pooling layers. The shape of
@@ -958,23 +946,33 @@ each input sample is 100x100x3.
 
 .. code:: python
 
-   # Build the keras model using the functional API.
-   input_layer = tensorflow.keras.layers.Input(shape=(100, 100, 3))
-   conv_layer1 = tensorflow.keras.layers.Conv2D(filters=5,
-                                                kernel_size=7,
-                                                activation="relu")(input_layer)
-   max_pool1 = tensorflow.keras.layers.MaxPooling2D(pool_size=(5,5),
-                                                    strides=5)(conv_layer1)
-   conv_layer2 = tensorflow.keras.layers.Conv2D(filters=3,
-                                                kernel_size=3,
-                                                activation="relu")(max_pool1)
-   flatten_layer  = tensorflow.keras.layers.Flatten()(conv_layer2)
-   dense_layer = tensorflow.keras.layers.Dense(15, activation="relu")(flatten_layer)
-   output_layer = tensorflow.keras.layers.Dense(4, activation="softmax")(dense_layer)
+   input_layer = torch.nn.Conv2d(in_channels=3, out_channels=5, kernel_size=7)
+   relu_layer1 = torch.nn.ReLU()
+   max_pool1 = torch.nn.MaxPool2d(kernel_size=5, stride=5)
 
-   model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
+   conv_layer2 = torch.nn.Conv2d(in_channels=5, out_channels=3, kernel_size=3)
+   relu_layer2 = torch.nn.ReLU()
 
-.. _header-n170:
+   flatten_layer1 = torch.nn.Flatten()
+   # The value 768 is pre-computed by tracing the sizes of the layers' outputs.
+   dense_layer1 = torch.nn.Linear(in_features=768, out_features=15)
+   relu_layer3 = torch.nn.ReLU()
+
+   dense_layer2 = torch.nn.Linear(in_features=15, out_features=4)
+   output_layer = torch.nn.Softmax(1)
+
+   model = torch.nn.Sequential(input_layer,
+                               relu_layer1,
+                               max_pool1,
+                               conv_layer2,
+                               relu_layer2,
+                               flatten_layer1,
+                               dense_layer1,
+                               relu_layer3,
+                               dense_layer2,
+                               output_layer)
+
+.. _header-n156:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -997,8 +995,6 @@ Data <https://pygad.readthedocs.io/en/latest/README_pygad_cnn_ReadTheDocs.html#r
 section of the ``pygad.cnn`` module.
 
 Simply download these 2 files and read them according to the next code.
-Note that the class labels are one-hot encoded using the
-``tensorflow.keras.utils.to_categorical()`` function.
 
 .. code:: python
 
@@ -1007,31 +1003,19 @@ Note that the class labels are one-hot encoded using the
    data_inputs = numpy.load("dataset_inputs.npy")
 
    data_outputs = numpy.load("dataset_outputs.npy")
-   data_outputs = tensorflow.keras.utils.to_categorical(data_outputs)
 
 The next figure shows how the fitness value changes.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/93722654-cc55d780-fb98-11ea-8f95-7b65dc67f5c8.png
+.. figure:: https://user-images.githubusercontent.com/16560492/103469887-c7c4c180-4d38-11eb-98a7-1c5e73e918d0.png
    :alt: 
 
 Here are some statistics about the trained model. The model accuracy is
-75% after the 200 generations. Note that just running the code again may
-give different results.
+97.5% after the 200 generations. Note that just running the code again
+may give different results.
 
 .. code:: 
 
-   Fitness value of the best solution = 2.7462310258668805
+   Fitness value of the best solution = 1.3009520689219258
    Index of the best solution : 0
-   Categorical Crossentropy :  0.3641354
-   Accuracy :  0.75
-
-To improve the model performance, you can do the following:
-
--  Add more layers
-
--  Modify the existing layers.
-
--  Use different parameters for the layers.
-
--  Use different parameters for the genetic algorithm (e.g. number of
-   solution, number of generations, etc)
+   Crossentropy :  0.7686678
+   Accuracy :  0.975
