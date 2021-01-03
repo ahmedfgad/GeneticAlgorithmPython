@@ -3,6 +3,7 @@ import random
 import matplotlib.pyplot
 import pickle
 import time
+import warnings
 
 class GA:
     def __init__(self, 
@@ -23,7 +24,7 @@ class GA:
                  mutation_type="random",
                  mutation_probability=None,
                  mutation_by_replacement=False,
-                 mutation_percent_genes=10,
+                 mutation_percent_genes='default',
                  mutation_num_genes=None,
                  random_mutation_min_val=-1.0,
                  random_mutation_max_val=1.0,
@@ -37,7 +38,8 @@ class GA:
                  on_generation=None,
                  on_stop=None,
                  delay_after_gen=0.0,
-                 save_best_solutions=False):
+                 save_best_solutions=False,
+                 suppress_warnings=False):
 
         """
         The constructor of the GA class accepts all parameters required to create an instance of the GA class. It validates such parameters.
@@ -58,19 +60,19 @@ class GA:
         gene_type: The type of the gene. It works only when the 'gene_space' parameter is None (i.e. the population is created randomly). It is assigned to either the int or float types and forces all the genes to be of that type.
 
         parent_selection_type: Type of parent selection.
-        keep_parents: If 0, this means the parents of the current populaiton will not be used at all in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. In some cases, the parents are of high quality and thus we do not want to loose such some high quality solutions. If some parent selection operators like roulette wheel selection (RWS), the parents may not be of high quality and thus keeping the parents might degarde the quality of the population.
+        keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. For some parent selection operators like rank selection, the parents are of high quality and it is beneficial to keep them in the next generation. In some other parent selection operators like roulette wheel selection (RWS), it is not guranteed that the parents will be of high quality and thus keeping the parents might degarde the quality of the population.
         K_tournament: When the value of 'parent_selection_type' is 'tournament', the 'K_tournament' parameter specifies the number of solutions from which a parent is selected randomly.
 
         crossover_type: Type of the crossover opreator. If  crossover_type=None, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
         crossover_probability: The probability of selecting a solution for the crossover operation. If the solution probability is <= crossover_probability, the solution is selected. The value must be between 0 and 1 inclusive.
 
         mutation_type: Type of the mutation opreator. If mutation_type=None, then the mutation step is bypassed which means no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
-        mutation_probability: The probability of selecting a gene for the mutation operation. If the gene probability is <= mutation_probability, the gene is selected. The value must be between 0 and 1 inclusive. If specified, then no need for the parameters mutation_percent_genes, mutation_num_genes, random_mutation_min_val, and random_mutation_max_val.
+        mutation_probability: The probability of selecting a gene for the mutation operation. If the gene probability is <= mutation_probability, the gene is selected. It accepts either a single value for fixed mutation or a list/tuple/numpy.ndarray of 2 values for adaptive mutation. The values must be between 0 and 1 inclusive. If specified, then no need for the 2 parameters mutation_percent_genes and mutation_num_genes.
 
         mutation_by_replacement: An optional bool parameter. It works only when the selected type of mutation is random (mutation_type="random"). In this case, setting mutation_by_replacement=True means replace the gene by the randomly generated value. If False, then it has no effect and random mutation works by adding the random value to the gene.
 
-        mutation_percent_genes: Percentage of genes to mutate which defaults to 10%. This parameter has no action if the parameter mutation_num_genes exists.
-        mutation_num_genes: Number of genes to mutate which defaults to None. If the parameter mutation_num_genes exists, then no need for the parameter mutation_percent_genes.
+        mutation_percent_genes: Percentage of genes to mutate which defaults to the string 'default' which means 10%. This parameter has no action if any of the 2 parameters mutation_probability or mutation_num_genes exist.
+        mutation_num_genes: Number of genes to mutate which defaults to None. If the parameter mutation_num_genes exists, then no need for the parameter mutation_percent_genes. This parameter has no action if the mutation_probability parameter exists.
         random_mutation_min_val: The minimum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to -1.0.
         random_mutation_max_val: The maximum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to 1.0.
 
@@ -87,9 +89,17 @@ class GA:
 
         delay_after_gen: Added in PyGAD 2.4.0. It accepts a non-negative number specifying the number of seconds to wait after a generation completes and before going to the next generation. It defaults to 0.0 which means no delay after the generation.
         
-        save_best_solutions: Added in PyGAD 2.9.0. It True, then the best solution in each generation is saved into the 'best_solutions' attribute. Use this parameter with caution as it may cause memory overflow when either the number of generations or the number of genes is large.
+        save_best_solutions: Added in PyGAD 2.9.0 and its type is bool. If True, then the best solution in each generation is saved into the 'best_solutions' attribute. Use this parameter with caution as it may cause memory overflow when either the number of generations or the number of genes is large.
+
+        suppress_warnings: Added in PyGAD 2.10.0 and its type is bool. If True, then no warning messages will be displayed. It defaults to False.
         """
         
+        if type(suppress_warnings) is bool:
+            self.suppress_warnings = suppress_warnings
+        else:
+            self.valid_parameters = False
+            raise TypeError("The expected type of the 'suppress_warnings' parameter is bool but {suppress_warnings_type} found.".format(suppress_warnings_type=type(suppress_warnings)))
+
         self.gene_space_nested = False
         if type(gene_space) is type(None):
             pass
@@ -106,7 +116,7 @@ class GA:
                         else:
                             for val in el:
                                 if not (type(val) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]):
-                                    raise TypeError("All values in the sublists inside the 'gene_space' attribute must be numeric of type int/float but the value ({val}) of type {typ} found.".format(val=val, typ=type(val)))
+                                    raise TypeError("All values in the sublists inside the 'gene_space' attribute must be numeric of type int/float but ({val}) of type {typ} found.".format(val=val, typ=type(val)))
                         self.gene_space_nested = True
                     elif type(el)  == type(None):
                         self.gene_space_nested = True
@@ -115,7 +125,7 @@ class GA:
                         raise TypeError("Unexpected type {el_type} for the element indexed {index} of 'gene_space'. The accepted types are list/tuple/range/numpy.ndarray of numbers, a single number (int/float), or None.".format(index=index, el_type=type(el)))
         else:
             self.valid_parameters = False
-            raise TypeError("The expected type of 'gene_space' is list, tuple, range, or numpy.ndarray but {gene_space_type} found.".format(gene_space_type=type(gene_space)))
+            raise TypeError("The expected type of 'gene_space' is list, tuple, range, or numpy.ndarray but ({gene_space_type}) found.".format(gene_space_type=type(gene_space)))
 
         if self.gene_space_nested:
             if len(gene_space) != num_genes:
@@ -131,7 +141,7 @@ class GA:
             self.gene_type = gene_type
         else:
             self.valid_parameters = False
-            raise ValueError("The value passed to the 'gene_type' parameter must be either int or float but the value {gene_type} found.".format(gene_type=gene_type))
+            raise ValueError("The value passed to the 'gene_type' parameter must be either int or float but ({gene_type}) found.".format(gene_type=gene_type))
 
         if initial_population is None:
             if (sol_per_pop is None) or (num_genes is None):
@@ -141,20 +151,20 @@ class GA:
                 # Validating the number of solutions in the population (sol_per_pop)
                 if sol_per_pop <= 0:
                     self.valid_parameters = False
-                    raise ValueError("The number of solutions in the population (sol_per_pop) must be > 0 but {sol_per_pop} found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n".format(sol_per_pop=sol_per_pop))
+                    raise ValueError("The number of solutions in the population (sol_per_pop) must be > 0 but ({sol_per_pop}) found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n".format(sol_per_pop=sol_per_pop))
                 # Validating the number of gene.
                 if (num_genes <= 0):
                     self.valid_parameters = False
-                    raise ValueError("Number of genes cannot be <= 0 but {num_genes} found.\n".format(num_genes=num_genes))
+                    raise ValueError("The number of genes cannot be <= 0 but ({num_genes}) found.\n".format(num_genes=num_genes))
                 # When initial_population=None and the 2 parameters sol_per_pop and num_genes have valid integer values, then the initial population is created.
                 # Inside the initialize_population() method, the initial_population attribute is assigned to keep the initial population accessible.
                 self.num_genes = num_genes # Number of genes in the solution.
                 self.sol_per_pop = sol_per_pop # Number of solutions in the population.
                 self.initialize_population(self.init_range_low, self.init_range_high)
             else:
-                raise TypeError("The expected type of both the sol_per_pop and num_genes parameters is int but {sol_per_pop_type} and {num_genes_type} found.".format(sol_per_pop_type=type(sol_per_pop), num_genes_type=type(num_genes)))
+                raise TypeError("The expected type of both the sol_per_pop and num_genes parameters is int but ({sol_per_pop_type}) and {num_genes_type} found.".format(sol_per_pop_type=type(sol_per_pop), num_genes_type=type(num_genes)))
         elif numpy.array(initial_population).ndim != 2:
-            raise ValueError("A 2D list is expected to the initail_population parameter but a {initial_population_ndim}-D list found.".format(initial_population_ndim=numpy.array(initial_population).ndim))
+            raise ValueError("A 2D list is expected to the initail_population parameter but a ({initial_population_ndim}-D) list found.".format(initial_population_ndim=numpy.array(initial_population).ndim))
         else:
             self.initial_population = numpy.array(initial_population)
             self.population = self.initial_population.copy() # A NumPy array holding the initial population.
@@ -165,7 +175,7 @@ class GA:
         # Validating the number of parents to be selected for mating (num_parents_mating)
         if num_parents_mating <= 0:
             self.valid_parameters = False
-            raise ValueError("The number of parents mating (num_parents_mating) parameter must be > 0 but {num_parents_mating} found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n".format(num_parents_mating=num_parents_mating))
+            raise ValueError("The number of parents mating (num_parents_mating) parameter must be > 0 but ({num_parents_mating}) found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n".format(num_parents_mating=num_parents_mating))
 
         # Validating the number of parents to be selected for mating: num_parents_mating
         if (num_parents_mating > self.sol_per_pop):
@@ -199,13 +209,14 @@ class GA:
                 self.crossover_probability = crossover_probability
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the 'crossover_probability' parameter must be between 0 and 1 inclusive but {crossover_probability_value} found.".format(crossover_probability_value=crossover_probability))
+                raise ValueError("The value assigned to the 'crossover_probability' parameter must be between 0 and 1 inclusive but ({crossover_probability_value}) found.".format(crossover_probability_value=crossover_probability))
         else:
             self.valid_parameters = False
-            raise ValueError("Unexpected type for the 'crossover_probability' parameter. Float is expected by {crossover_probability_type} found.".format(crossover_probability_type=type(crossover_probability)))
+            raise ValueError("Unexpected type for the 'crossover_probability' parameter. Float is expected but ({crossover_probability_value}) of type {crossover_probability_type} found.".format(crossover_probability_value=crossover_probability, crossover_probability_type=type(crossover_probability)))
 
         # mutation: Refers to the method that applies the mutation operator based on the selected type of mutation in the mutation_type property.
         # Validating the mutation type: mutation_type
+        # "adaptive" mutation is supported starting from PyGAD 2.10.0
         if (mutation_type == "random"):
             self.mutation = self.random_mutation
         elif (mutation_type == "swap"):
@@ -214,6 +225,8 @@ class GA:
             self.mutation = self.scramble_mutation
         elif (mutation_type == "inversion"):
             self.mutation = self.inversion_mutation
+        elif (mutation_type == "adaptive"):
+            self.mutation = self.adaptive_mutation
         elif (mutation_type is None):
             self.mutation = None
         else:
@@ -222,53 +235,149 @@ class GA:
 
         self.mutation_type = mutation_type
 
-        if mutation_probability is None:
-            self.mutation_probability = None
-        elif type(mutation_probability) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
-            if mutation_probability >= 0 and mutation_probability <= 1:
-                self.mutation_probability = mutation_probability
+        if not (self.mutation_type is None):
+            if mutation_probability is None:
+                self.mutation_probability = None
+            elif (mutation_type != "adaptive"):
+                # Mutation probability is fixed not adaptive.
+                if type(mutation_probability) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                    if mutation_probability >= 0 and mutation_probability <= 1:
+                        self.mutation_probability = mutation_probability
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("The value assigned to the 'mutation_probability' parameter must be between 0 and 1 inclusive but ({mutation_probability_value}) found.".format(mutation_probability_value=mutation_probability))
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("Unexpected type for the 'mutation_probability' parameter. A numeric value is expected but ({mutation_probability_value}) of type {mutation_probability_type} found.".format(mutation_probability_value=mutation_probability, mutation_probability_type=type(mutation_probability)))
             else:
-                self.valid_parameters = False
-                raise ValueError("The value assigned to the 'mutation_probability' parameter must be between 0 and 1 inclusive but {mutation_probability_value} found.".format(mutation_probability_value=crossover_probability))
+                # Mutation probability is adaptive not fixed.
+                if type(mutation_probability) in [list, tuple, numpy.ndarray]:
+                    if len(mutation_probability) == 2:
+                        for el in mutation_probability:
+                            if type(el) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                                if el >= 0 and el <= 1:
+                                    pass
+                                else:
+                                    self.valid_parameters = False
+                                    raise ValueError("The values assigned to the 'mutation_probability' parameter must be between 0 and 1 inclusive but ({mutation_probability_value}) found.".format(mutation_probability_value=el))
+                            else:
+                                self.valid_parameters = False
+                                raise ValueError("Unexpected type for a value assigned to the 'mutation_probability' parameter. A numeric value is expected but ({mutation_probability_value}) of type {mutation_probability_type} found.".format(mutation_probability_value=el, mutation_probability_type=type(el)))
+                        if mutation_probability[0] < mutation_probability[1]:
+                            if not self.suppress_warnings: warnings.warn("The first element in the 'mutation_probability' parameter is {first_el} which is smaller than the second element {second_el}. This means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high qualitiy solutions while making little changes in the low quality solutions. Please make the first element higher than the second element.".format(first_el=mutation_probability[0], second_el=mutation_probability[1]))
+                        self.mutation_probability = mutation_probability
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("When mutation_type='adaptive', then the 'mutation_probability' parameter must have only 2 elements but ({mutation_probability_length}) element(s) found.".format(mutation_probability_length=len(mutation_probability)))
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("Unexpected type for the 'mutation_probability' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_probability_value}) of type {mutation_probability_type} found.".format(mutation_probability_value=mutation_probability, mutation_probability_type=type(mutation_probability)))
         else:
-            self.valid_parameters = False
-            raise ValueError("Unexpected type for the 'mutation_probability' parameter. Float is expected by {mutation_probability_type} found.".format(mutation_probability_type=type(mutation_probability)))
+            pass
 
         if not (self.mutation_type is None):
-            if (mutation_num_genes is None):
-                if (mutation_percent_genes < 0 or mutation_percent_genes > 100):
-                    self.valid_parameters = False
-                    raise ValueError("The percentage of selected genes for mutation (mutation_percent_genes) must be >= 0 and <= 100 inclusive but {mutation_percent_genes=mutation_percent_genes} found.\n".format(mutation_percent_genes=mutation_percent_genes))
+            if mutation_num_genes is None:
+                # The mutation_num_genes parameter does not exist. Checking whether adaptive mutation is used.
+                if (mutation_type != "adaptive"):
+                    # The percent of genes to mutate is fixed not adaptive.
+                    if type(mutation_percent_genes) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                        if (mutation_percent_genes <= 0 or mutation_percent_genes > 100):
+                            self.valid_parameters = False
+                            raise ValueError("The percentage of selected genes for mutation (mutation_percent_genes) must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n".format(mutation_percent_genes=mutation_percent_genes))
+                        else:
+                            if mutation_percent_genes == 'default'.lower():
+                                mutation_percent_genes = 10
+                            # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
+                            mutation_num_genes = numpy.uint32((mutation_percent_genes*self.num_genes)/100)
+                            # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
+                            if mutation_num_genes == 0:
+                                if not self.suppress_warnings: warnings.warn("The percentage of genes to mutate (mutation_percent_genes={mutation_percent}) resutled in selecting ({mutation_num}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.".format(mutation_percent=mutation_percent_genes, mutation_num=mutation_num_genes))
+                                mutation_num_genes = 1
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("Unexpected type for the 'mutation_percent_genes' parameter. A numeric value is expected but ({mutation_percent_genes_value}) of type {mutation_percent_genes_type} found.".format(mutation_percent_genes_value=mutation_percent_genes, mutation_percent_genes_type=type(mutation_percent_genes)))
                 else:
-                    # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
-                    if mutation_num_genes is None:
-                        mutation_num_genes = numpy.uint32((mutation_percent_genes*self.num_genes)/100)
-                        # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
-                        if mutation_num_genes == 0:
-                            mutation_num_genes = 1
-            elif (mutation_num_genes <= 0):
-                self.valid_parameters = False
-                raise ValueError("The number of selected genes for mutation (mutation_num_genes) cannot be <= 0 but {mutation_num_genes} found.\n".format(mutation_num_genes=mutation_num_genes))
-            elif (mutation_num_genes > self.num_genes):
-                self.valid_parameters = False
-                raise ValueError("The number of selected genes for mutation (mutation_num_genes) ({mutation_num_genes}) cannot be greater than the number of genes ({num_genes}).\n".format(mutation_num_genes=mutation_num_genes, num_genes=self.num_genes))
-            elif (type(mutation_num_genes) is not int):
-                self.valid_parameters = False
-                raise ValueError("The number of selected genes for mutation (mutation_num_genes) must be a positive integer >= 1 but {mutation_num_genes} found.\n".format(mutation_num_genes=mutation_num_genes))
+                    # The percent of genes to mutate is adaptive not fixed.
+                    if type(mutation_percent_genes) in [list, tuple, numpy.ndarray]:
+                        if len(mutation_percent_genes) == 2:
+                            mutation_num_genes = numpy.zeros_like(mutation_percent_genes, dtype=numpy.uint32)
+                            for idx, el in enumerate(mutation_percent_genes):
+                                if type(el) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                                    if (el <= 0 or el > 100):
+                                        self.valid_parameters = False
+                                        raise ValueError("The values assigned to the 'mutation_percent_genes' must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n".format(mutation_percent_genes=mutation_percent_genes))
+                                else:
+                                    self.valid_parameters = False
+                                    raise ValueError("Unexpected type for a value assigned to the 'mutation_percent_genes' parameter. An integer value is expected but ({mutation_percent_genes_value}) of type {mutation_percent_genes_type} found.".format(mutation_percent_genes_value=el, mutation_percent_genes_type=type(el)))
+                                # At this point of the loop, the current value assigned to the parameter 'mutation_percent_genes' is validated.
+                                # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
+                                mutation_num_genes[idx] = numpy.uint32((mutation_percent_genes[idx]*self.num_genes)/100)
+                                # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
+                                if mutation_num_genes[idx] == 0:
+                                    if not self.suppress_warnings: warnings.warn("The percentage of genes to mutate ({mutation_percent}) resutled in selecting ({mutation_num}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.".format(mutation_percent=mutation_percent_genes[idx], mutation_num=mutation_num_genes[idx]))
+                                    mutation_num_genes[idx] = 1
+                            if mutation_percent_genes[0] < mutation_percent_genes[1]:
+                                if not self.suppress_warnings: warnings.warn("The first element in the 'mutation_percent_genes' parameter is ({first_el}) which is smaller than the second element ({second_el}).\nThis means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high qualitiy solutions while making little changes in the low quality solutions.\nPlease make the first element higher than the second element.".format(first_el=mutation_percent_genes[0], second_el=mutation_percent_genes[1]))
+                            # At this point outside the loop, all values of the parameter 'mutation_percent_genes' are validated. Eveyrthing is OK.
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError("When mutation_type='adaptive', then the 'mutation_percent_genes' parameter must have only 2 elements but ({mutation_percent_genes_length}) element(s) found.".format(mutation_percent_genes_length=len(mutation_percent_genes)))
+                    else:
+                        if mutation_percent_genes != 'default'.lower():
+                            self.valid_parameters = False
+                            raise ValueError("Unexpected type for the 'mutation_percent_genes' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_percent_genes_value}) of type {mutation_percent_genes_type} found.".format(mutation_percent_genes_value=mutation_percent_genes, mutation_percent_genes_type=type(mutation_percent_genes)))
+            # The mutation_num_genes parameter exists. Checking whether adaptive mutation is used.
+            elif (mutation_type != "adaptive"):
+                # Number of genes to mutate is fixed not adaptive.
+                if type(mutation_num_genes) in [int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
+                    if (mutation_num_genes <= 0):
+                        self.valid_parameters = False
+                        raise ValueError("The number of selected genes for mutation (mutation_num_genes) cannot be <= 0 but ({mutation_num_genes}) found. If you do not want to use mutation, please set mutation_type=None\n".format(mutation_num_genes=mutation_num_genes))
+                    elif (mutation_num_genes > self.num_genes):
+                        self.valid_parameters = False
+                        raise ValueError("The number of selected genes for mutation (mutation_num_genes), which is ({mutation_num_genes}), cannot be greater than the number of genes ({num_genes}).\n".format(mutation_num_genes=mutation_num_genes, num_genes=self.num_genes))
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The 'mutation_num_genes' parameter is expected to be a positive integer but the value ({mutation_num_genes_value}) of type {mutation_num_genes_type} found.\n".format(mutation_num_genes_value=mutation_num_genes, mutation_num_genes_type=type(mutation_num_genes)))
+            else:
+                # Number of genes to mutate is adaptive not fixed.
+                if type(mutation_num_genes) in [list, tuple, numpy.ndarray]:
+                    if len(mutation_num_genes) == 2:
+                        for el in mutation_num_genes:
+                            if type(el) in [int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
+                                if (el <= 0):
+                                    self.valid_parameters = False
+                                    raise ValueError("The values assigned to the 'mutation_num_genes' cannot be <= 0 but ({mutation_num_genes_value}) found. If you do not want to use mutation, please set mutation_type=None\n".format(mutation_num_genes_value=el))
+                                elif (el > self.num_genes):
+                                    self.valid_parameters = False
+                                    raise ValueError("The values assigned to the 'mutation_num_genes' cannot be greater than the number of genes ({num_genes}) but ({mutation_num_genes_value}) found.\n".format(mutation_num_genes_value=el, num_genes=self.num_genes))
+                            else:
+                                self.valid_parameters = False
+                                raise ValueError("Unexpected type for a value assigned to the 'mutation_num_genes' parameter. An integer value is expected but ({mutation_num_genes_value}) of type {mutation_num_genes_type} found.".format(mutation_num_genes_value=el, mutation_num_genes_type=type(el)))
+                            # At this point of the loop, the current value assigned to the parameter 'mutation_num_genes' is validated.
+                        if mutation_num_genes[0] < mutation_num_genes[1]:
+                            if not self.suppress_warnings: warnings.warn("The first element in the 'mutation_num_genes' parameter is {first_el} which is smaller than the second element {second_el}. This means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high qualitiy solutions while making little changes in the low quality solutions. Please make the first element higher than the second element.".format(first_el=mutation_num_genes[0], second_el=mutation_num_genes[1]))
+                        # At this point outside the loop, all values of the parameter 'mutation_num_genes' are validated. Eveyrthing is OK.
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("When mutation_type='adaptive', then the 'mutation_num_genes' parameter must have only 2 elements but ({mutation_num_genes_length}) element(s) found.".format(mutation_num_genes_length=len(mutation_num_genes)))
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("Unexpected type for the 'mutation_num_genes' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_num_genes_value}) of type {mutation_num_genes_type} found.".format(mutation_num_genes_value=mutation_num_genes, mutation_num_genes_type=type(mutation_num_genes)))
         else:
             pass
 
         if not (type(mutation_by_replacement) is bool):
             self.valid_parameters = False
-            raise TypeError("The expected type of the 'mutation_by_replacement' parameter is bool but {mutation_by_replacement_type} found.".format(mutation_by_replacement_type=type(mutation_by_replacement)))
+            raise TypeError("The expected type of the 'mutation_by_replacement' parameter is bool but ({mutation_by_replacement_type}) found.".format(mutation_by_replacement_type=type(mutation_by_replacement)))
 
         self.mutation_by_replacement = mutation_by_replacement
         
         if self.mutation_type != "random" and self.mutation_by_replacement:
-            print("Warning: The mutation_by_replacement parameter is set to True while the mutation_type parameter is not set to random but {mut_type}. Note that the mutation_by_replacement parameter has an effect only when mutation_type='random'.".format(mut_type=mutation_type))
+            if not self.suppress_warnings: warnings.warn("The mutation_by_replacement parameter is set to True while the mutation_type parameter is not set to random but ({mut_type}). Note that the mutation_by_replacement parameter has an effect only when mutation_type='random'.".format(mut_type=mutation_type))
 
         if (self.mutation_type is None) and (self.crossover_type is None):
-            print("Warning: the 2 parameters mutation_type and crossover_type are None. This disables any type of evolution the genetic algorithm can make. As a result, the genetic algorithm cannot find a better solution that the best solution in the initial population.")
+            if not self.suppress_warnings: warnings.warn("The 2 parameters mutation_type and crossover_type are None. This disables any type of evolution the genetic algorithm can make. As a result, the genetic algorithm cannot find a better solution that the best solution in the initial population.")
 
         # select_parents: Refers to a method that selects the parents based on the parent selection type specified in the parent_selection_type attribute.
         # Validating the selected type of parent selection: parent_selection_type
@@ -291,10 +400,10 @@ class GA:
         if(parent_selection_type == "tournament"):
             if (K_tournament > self.sol_per_pop):
                 K_tournament = self.sol_per_pop
-                print("Warining: K of the tournament selection ({K_tournament}) should not be greater than the number of solutions within the population ({sol_per_pop}).\nK will be clipped to be equal to the number of solutions in the population (sol_per_pop).\n".format(K_tournament=K_tournament, sol_per_pop=self.sol_per_pop))
+                if not self.suppress_warnings: warnings.warn("K of the tournament selection ({K_tournament}) should not be greater than the number of solutions within the population ({sol_per_pop}).\nK will be clipped to be equal to the number of solutions in the population (sol_per_pop).\n".format(K_tournament=K_tournament, sol_per_pop=self.sol_per_pop))
             elif (K_tournament <= 0):
                 self.valid_parameters = False
-                raise ValueError("K of the tournament selection cannot be <=0 but {K_tournament} found.\n".format(K_tournament=K_tournament))
+                raise ValueError("K of the tournament selection cannot be <=0 but ({K_tournament}) found.\n".format(K_tournament=K_tournament))
 
         self.K_tournament = K_tournament
 
@@ -304,6 +413,9 @@ class GA:
             raise ValueError("Incorrect value to the keep_parents parameter: {keep_parents}. \nThe assigned value to the keep_parent parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Less than or equal to num_parents_mating\n3) Greater than or equal to -1.".format(keep_parents=keep_parents))
 
         self.keep_parents = keep_parents
+        
+        if parent_selection_type == "sss" and self.keep_parents == 0:
+            if not self.suppress_warnings: warnings.warn("The steady-state parent (sss) selection operator is used despite that no parents are kept in the next generation.")
 
         if (self.keep_parents == -1): # Keep all parents in the next population.
             self.num_offspring = self.sol_per_pop - self.num_parents_mating
@@ -322,7 +434,7 @@ class GA:
                 raise ValueError("The fitness function must accept 2 parameters representing the solution to which the fitness value is calculated and the solution index within the population.\nThe passed fitness function named '{funcname}' accepts {argcount} argument(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
         else:
             self.valid_parameters = False
-            raise ValueError("The value assigned to the fitness_func parameter is expected to be of type function but {fitness_func_type} found.".format(fitness_func_type=type(fitness_func)))
+            raise ValueError("The value assigned to the fitness_func parameter is expected to be of type function but ({fitness_func_type}) found.".format(fitness_func_type=type(fitness_func)))
 
         # Check if the on_start exists.
         if not (on_start is None):
@@ -336,7 +448,7 @@ class GA:
                     raise ValueError("The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the on_start parameter is expected to be of type function but {on_start_type} found.".format(on_start_type=type(on_start)))
+                raise ValueError("The value assigned to the on_start parameter is expected to be of type function but ({on_start_type}) found.".format(on_start_type=type(on_start)))
         else:
             self.on_start = None
 
@@ -352,7 +464,7 @@ class GA:
                     raise ValueError("The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the on_fitness parameter is expected to be of type function but {on_fitness_type} found.".format(on_fitness_type=type(on_fitness)))
+                raise ValueError("The value assigned to the on_fitness parameter is expected to be of type function but ({on_fitness_type}) found.".format(on_fitness_type=type(on_fitness)))
         else:
             self.on_fitness = None
 
@@ -368,7 +480,7 @@ class GA:
                     raise ValueError("The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_parents.__code__.co_name, argcount=on_parents.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the on_parents parameter is expected to be of type function but {on_parents_type} found.".format(on_parents_type=type(on_parents)))
+                raise ValueError("The value assigned to the on_parents parameter is expected to be of type function but ({on_parents_type}) found.".format(on_parents_type=type(on_parents)))
         else:
             self.on_parents = None
 
@@ -384,7 +496,7 @@ class GA:
                     raise ValueError("The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_crossover.__code__.co_name, argcount=on_crossover.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the on_crossover parameter is expected to be of type function but {on_crossover_type} found.".format(on_crossover_type=type(on_crossover)))
+                raise ValueError("The value assigned to the on_crossover parameter is expected to be of type function but ({on_crossover_type}) found.".format(on_crossover_type=type(on_crossover)))
         else:
             self.on_crossover = None
 
@@ -400,7 +512,7 @@ class GA:
                     raise ValueError("The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_mutation.__code__.co_name, argcount=on_mutation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the on_mutation parameter is expected to be of type function but {on_mutation_type} found.".format(on_mutation_type=type(on_mutation)))
+                raise ValueError("The value assigned to the on_mutation parameter is expected to be of type function but ({on_mutation_type}) found.".format(on_mutation_type=type(on_mutation)))
         else:
             self.on_mutation = None
 
@@ -412,13 +524,13 @@ class GA:
                 if (callback_generation.__code__.co_argcount == 1):
                     self.callback_generation = callback_generation
                     on_generation = callback_generation
-                    print("Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and will be removed in a later release of PyGAD. Please use the on_generation parameter instead.")
+                    if not self.suppress_warnings: warnings.warn("Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and will be removed in a later release of PyGAD. Please use the on_generation parameter instead.")
                 else:
                     self.valid_parameters = False
                     raise ValueError("The function assigned to the callback_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=callback_generation.__code__.co_name, argcount=callback_generation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the callback_generation parameter is expected to be of type function but {callback_generation_type} found.".format(callback_generation_type=type(callback_generation)))
+                raise ValueError("The value assigned to the callback_generation parameter is expected to be of type function but ({callback_generation_type}) found.".format(callback_generation_type=type(callback_generation)))
         else:
             self.callback_generation = None
 
@@ -434,7 +546,7 @@ class GA:
                     raise ValueError("The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_generation.__code__.co_name, argcount=on_generation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the on_generation parameter is expected to be of type function but {on_generation_type} found.".format(on_generation_type=type(on_generation)))
+                raise ValueError("The value assigned to the on_generation parameter is expected to be of type function but ({on_generation_type}) found.".format(on_generation_type=type(on_generation)))
         else:
             self.on_generation = None
 
@@ -450,7 +562,7 @@ class GA:
                     raise ValueError("The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_stop.__code__.co_name, argcount=on_stop.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise ValueError("The value assigned to the 'on_stop' parameter is expected to be of type function but {on_stop_type} found.".format(on_stop_type=type(on_stop)))
+                raise ValueError("The value assigned to the 'on_stop' parameter is expected to be of type function but ({on_stop_type}) found.".format(on_stop_type=type(on_stop)))
         else:
             self.on_stop = None
 
@@ -463,15 +575,15 @@ class GA:
                 raise ValueError("The value passed to the 'delay_after_gen' parameter must be a non-negative number. The value passed is {delay_after_gen} of type {delay_after_gen_type}.".format(delay_after_gen=delay_after_gen, delay_after_gen_type=type(delay_after_gen)))
         else:
             self.valid_parameters = False
-            raise ValueError("The value passed to the 'delay_after_gen' parameter must be of type int or float but {delay_after_gen_type} found.".format(delay_after_gen_type=type(delay_after_gen)))
+            raise ValueError("The value passed to the 'delay_after_gen' parameter must be of type int or float but ({delay_after_gen_type}) found.".format(delay_after_gen_type=type(delay_after_gen)))
 
         # save_best_solutions
         if type(save_best_solutions) is bool:
             if save_best_solutions == True:
-                print("Warning: Use the 'save_best_solutions' parameter with caution as it may cause memory overflow.")
+                if not self.suppress_warnings: warnings.warn("Use the 'save_best_solutions' parameter with caution as it may cause memory overflow.")
         else:
             self.valid_parameters = False
-            raise ValueError("The value passed to the 'save_best_solutions' parameter must be of type bool but {save_best_solutions_type} found.".format(save_best_solutions_type=type(save_best_solutions)))
+            raise ValueError("The value passed to the 'save_best_solutions' parameter must be of type bool but ({save_best_solutions_type}) found.".format(save_best_solutions_type=type(save_best_solutions)))
 
         # The number of completed generations.
         self.generations_completed = 0
@@ -632,9 +744,16 @@ class GA:
             if not (self.on_generation is None):
                 r = self.on_generation(self)
                 if type(r) is str and r.lower() == "stop":
+                    # Before aborting the loop, save the fitness value of the best solution.
+                    _, best_solution_fitness, _ = self.best_solution()
+                    self.best_solutions_fitness.append(best_solution_fitness)
                     break
 
             time.sleep(self.delay_after_gen)
+
+        # Save the fitness value of the best solution.
+        _, best_solution_fitness, _ = self.best_solution()
+        self.best_solutions_fitness.append(best_solution_fitness)
 
         self.best_solution_generation = numpy.where(numpy.array(self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
         # After the run() method completes, the run_completed flag is changed from False to True.
@@ -970,28 +1089,30 @@ class GA:
     def random_mutation(self, offspring):
 
         """
-        Applies the random mutation which changes the values of a number of genes randomly by selecting a random value between random_mutation_min_val and random_mutation_max_val to be added to the selected genes.
+        Applies the random mutation which changes the values of a number of genes randomly.
+        The random value is selected either using the 'gene_space' parameter or the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
         It accepts a single parameter:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
 
-        # If the mutation values are selected from the mutation space, the attribute 'gene_space' is True. Otherwise, it is set to False.
+        # If the mutation values are selected from the mutation space, the attribute 'gene_space' is not None. Otherwise, it is None.
+        # When the 'mutation_probability' parameter exists (i.e. not None), then it is used in the mutation. Otherwise, the 'mutation_num_genes' parameter is used.
 
-        # When the attribute 'gene_space' is False, the mutation values are selected randomly from the mutation space.
         if self.mutation_probability is None:
+            # When the 'mutation_probability' parameter does not exist (i.e. None), then the parameter 'mutation_num_genes' is used in the mutation.
             if not (self.gene_space is None):
+                # When the attribute 'gene_space' exists (i.e. not None), the mutation values are selected randomly from the space of values of each gene.
                 offspring = self.mutation_by_space(offspring)
-                # When the attribute 'gene_space' is False, the mutation values are selected randomly based on the continuous range specified by the 2 attributes 'random_mutation_min_val' and 'random_mutation_max_val'.
             else:
                 offspring = self.mutation_randomly(offspring)
         else:
+            # When the 'mutation_probability' parameter exists (i.e. not None), then it is used in the mutation.
             if self.gene_space != None:
+                # When the attribute 'gene_space' does not exist (i.e. None), the mutation values are selected randomly based on the continuous range specified by the 2 attributes 'random_mutation_min_val' and 'random_mutation_max_val'.
                 offspring = self.mutation_probs_by_space(offspring)
-                # When the attribute 'gene_space' is False, the mutation values are selected randomly based on the continuous range specified by the 2 attributes 'random_mutation_min_val' and 'random_mutation_max_val'.
             else:
                 offspring = self.mutation_probs_randomly(offspring)
-
 
         return offspring
 
@@ -1016,7 +1137,7 @@ class GA:
                     # If the gene space has only a single value, use it as the new gene value.
                     if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                         value_from_space = curr_gene_space
-                    # Keep the gene unchanged if the gene space is None.
+                    # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
                     elif curr_gene_space is None:
                         rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
                                                                         high=self.random_mutation_max_val,
@@ -1058,7 +1179,7 @@ class GA:
                         # If the gene space has only a single value, use it as the new gene value.
                         if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                             value_from_space = curr_gene_space
-                        # Keep the gene unchanged if the gene space is None.
+                        # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
                         elif curr_gene_space is None:
                             rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
                                                                             high=self.random_mutation_max_val,
@@ -1088,7 +1209,7 @@ class GA:
         It returns an array of the mutated offspring.
         """
 
-        # Random mutation changes a single gene in each offspring randomly.
+        # Random mutation changes one or more genes in each offspring randomly.
         for offspring_idx in range(offspring.shape[0]):
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
             for gene_idx in mutation_indices:
@@ -1113,7 +1234,7 @@ class GA:
         It returns an array of the mutated offspring.
         """
 
-        # Random mutation changes a single gene in each offspring randomly.
+        # Random mutation changes one or more gene in each offspring randomly.
         for offspring_idx in range(offspring.shape[0]):
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
@@ -1184,6 +1305,244 @@ class GA:
             offspring[idx, genes_range] = genes_to_scramble
         return offspring
 
+    def adaptive_mutation_population_fitness(self, offspring):
+        
+        """
+        A helper method to calculate the average fitness of the solutions before applying the adaptive mutation.
+        It accepts a single parameter:
+            -offspring: The offspring to mutate.
+        It returns the average fitness to be used in adaptive mutation.
+        """        
+
+        fitness = self.cal_pop_fitness()
+        temp_population = numpy.zeros_like(self.population)
+        if self.keep_parents == 0:
+            temp_population = offspring
+            num_parents = 0
+        else:
+            if self.keep_parents == -1:
+                num_parents = self.num_parents_mating
+            else:
+                num_parents = self.keep_parents
+            parents = self.steady_state_selection(fitness, num_parents=num_parents)
+            temp_population[0:parents.shape[0], :] = parents
+            temp_population[parents.shape[0]:, :] = offspring
+
+        for idx, sol in enumerate(temp_population):
+            fitness[idx] = self.fitness_func(sol, None)
+        average_fitness = numpy.mean(fitness)
+
+        return average_fitness, fitness[num_parents:]
+
+    def adaptive_mutation(self, offspring):
+
+        """
+        Applies the adaptive mutation which changes the values of a number of genes randomly. In adaptive mutation, the number of genes to mutate differs based on the fitness value of the solution.
+        The random value is selected either using the 'gene_space' parameter or the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
+        It accepts a single parameter:
+            -offspring: The offspring to mutate.
+        It returns an array of the mutated offspring.
+        """
+
+        # If the attribute 'gene_space' exists (i.e. not None), then the mutation values are selected from the 'gene_space' parameter according to the space of values of each gene. Otherwise, it is selected randomly based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
+        # When the 'mutation_probability' parameter exists (i.e. not None), then it is used in the mutation. Otherwise, the 'mutation_num_genes' parameter is used.
+
+        if self.mutation_probability is None:
+            # When the 'mutation_probability' parameter does not exist (i.e. None), then the parameter 'mutation_num_genes' is used in the mutation.
+            if not (self.gene_space is None):
+                # When the attribute 'gene_space' exists (i.e. not None), the mutation values are selected randomly from the space of values of each gene.
+                offspring = self.adaptive_mutation_by_space(offspring)
+            else:
+                # When the attribute 'gene_space' does not exist (i.e. None), the mutation values are selected randomly based on the continuous range specified by the 2 attributes 'random_mutation_min_val' and 'random_mutation_max_val'.
+                offspring = self.adaptive_mutation_randomly(offspring)
+        else:
+            # When the 'mutation_probability' parameter exists (i.e. not None), then it is used in the mutation.
+            if self.gene_space != None:
+                # When the attribute 'gene_space' exists (i.e. not None), the mutation values are selected randomly from the space of values of each gene.
+                offspring = self.adaptive_mutation_probs_by_space(offspring)
+            else:
+                # When the attribute 'gene_space' does not exist (i.e. None), the mutation values are selected randomly based on the continuous range specified by the 2 attributes 'random_mutation_min_val' and 'random_mutation_max_val'.
+                offspring = self.adaptive_mutation_probs_randomly(offspring)
+
+        return offspring
+
+    def adaptive_mutation_by_space(self, offspring):
+
+        """
+        Applies the adaptive mutation based on the 2 parameters 'mutation_num_genes' and 'gene_space'. 
+        A number of genes equal are selected randomly for mutation. This number depends on the fitness of the solution.
+        The random values are selected from the 'gene_space' parameter.
+        It accepts a single parameter:
+            -offspring: The offspring to mutate.
+        It returns an array of the mutated offspring.
+        """
+        
+        # For each offspring, a value from the gene space is selected randomly and assigned to the selected gene for mutation.
+
+        average_fitness, offspring_fitness = self.adaptive_mutation_population_fitness(offspring)
+
+        # Adaptive mutation changes one or more genes in each offspring randomly.
+        # The number of genes to mutate depends on the solution's fitness value.
+        for offspring_idx in range(offspring.shape[0]):
+            if offspring_fitness[offspring_idx] < average_fitness:
+                adaptive_mutation_num_genes = self.mutation_num_genes[0]
+            else:
+                adaptive_mutation_num_genes = self.mutation_num_genes[1]
+            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
+            for gene_idx in mutation_indices:
+
+                if self.gene_space_nested:
+                    # Returning the current gene space from the 'gene_space' attribute.
+                    curr_gene_space = self.gene_space[gene_idx]
+
+                    # If the gene space has only a single value, use it as the new gene value.
+                    if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                        value_from_space = curr_gene_space
+                    # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
+                    elif curr_gene_space is None:
+                        rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
+                                                                        high=self.random_mutation_max_val,
+                                                                        size=1))
+                        if self.mutation_by_replacement:
+                            value_from_space = rand_val
+                        else:
+                            value_from_space = offspring[offspring_idx, gene_idx] + rand_val
+                    else:
+                        # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
+                        value_from_space = random.choice(curr_gene_space)
+                else:
+                    # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
+                    value_from_space = random.choice(self.gene_space)
+
+                # Assinging the selected value from the space to the gene.
+                offspring[offspring_idx, gene_idx] = value_from_space
+
+        return offspring
+        
+    def adaptive_mutation_randomly(self, offspring):
+
+        """
+        Applies the adaptive mutation based on the 'mutation_num_genes' parameter. 
+        A number of genes equal are selected randomly for mutation. This number depends on the fitness of the solution.
+        The random values are selected based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
+        It accepts a single parameter:
+            -offspring: The offspring to mutate.
+        It returns an array of the mutated offspring.
+        """
+
+        average_fitness, offspring_fitness = self.adaptive_mutation_population_fitness(offspring)
+
+        # Adaptive random mutation changes one or more genes in each offspring randomly.
+        # The number of genes to mutate depends on the solution's fitness value.
+        for offspring_idx in range(offspring.shape[0]):
+            if offspring_fitness[offspring_idx] < average_fitness:
+                adaptive_mutation_num_genes = self.mutation_num_genes[0]
+            else:
+                adaptive_mutation_num_genes = self.mutation_num_genes[1]
+            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
+            for gene_idx in mutation_indices:
+                # Generating a random value.
+                random_value = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                                   high=self.random_mutation_max_val, 
+                                                                   size=1))
+                # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
+                if self.mutation_by_replacement:
+                    offspring[offspring_idx, gene_idx] = random_value
+                # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
+                else:
+                    offspring[offspring_idx, gene_idx] = offspring[offspring_idx, gene_idx] + random_value
+        return offspring
+        
+    def adaptive_mutation_probs_by_space(self, offspring):
+
+        """
+        Applies the adaptive mutation based on the 2 parameters 'mutation_probability' and 'gene_space'.
+        Based on whether the solution fitness is above or below a threshold, the mutation is applied diffrently by mutating high or low number of genes.
+        The random values are selected based on space of values for each gene.
+        It accepts a single parameter:
+            -offspring: The offspring to mutate.
+        It returns an array of the mutated offspring.
+        """
+
+        # For each offspring, a value from the gene space is selected randomly and assigned to the selected gene for mutation.
+
+        average_fitness, offspring_fitness = self.adaptive_mutation_population_fitness(offspring)
+
+        # Adaptive random mutation changes one or more genes in each offspring randomly.
+        # The probability of mutating a gene depends on the solution's fitness value.
+        for offspring_idx in range(offspring.shape[0]):
+            if offspring_fitness[offspring_idx] < average_fitness:
+                adaptive_mutation_probability = self.mutation_probability[0]
+            else:
+                adaptive_mutation_probability = self.mutation_probability[1]
+
+            probs = numpy.random.random(size=offspring.shape[1])
+            for gene_idx in range(offspring.shape[1]):
+                if probs[gene_idx] <= adaptive_mutation_probability:
+                    if self.gene_space_nested:
+                        # Returning the current gene space from the 'gene_space' attribute.
+                        curr_gene_space = self.gene_space[gene_idx]
+        
+                        # If the gene space has only a single value, use it as the new gene value.
+                        if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                            value_from_space = curr_gene_space
+                        # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
+                        elif curr_gene_space is None:
+                            rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
+                                                                            high=self.random_mutation_max_val,
+                                                                            size=1))
+                            if self.mutation_by_replacement:
+                                value_from_space = rand_val
+                            else:
+                                value_from_space = offspring[offspring_idx, gene_idx] + rand_val
+                        else:
+                            # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
+                            value_from_space = random.choice(curr_gene_space)
+                    else:
+                        # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
+                        value_from_space = random.choice(self.gene_space)
+
+                    # Assinging the selected value from the space to the gene.
+                    offspring[offspring_idx, gene_idx] = value_from_space
+
+        return offspring
+    
+    def adaptive_mutation_probs_randomly(self, offspring):
+
+        """
+        Applies the adaptive mutation based on the 'mutation_probability' parameter. 
+        Based on whether the solution fitness is above or below a threshold, the mutation is applied diffrently by mutating high or low number of genes.
+        The random values are selected based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
+        It accepts a single parameter:
+            -offspring: The offspring to mutate.
+        It returns an array of the mutated offspring.
+        """
+
+        average_fitness, offspring_fitness = self.adaptive_mutation_population_fitness(offspring)
+
+        # Adaptive random mutation changes one or more genes in each offspring randomly.
+        # The probability of mutating a gene depends on the solution's fitness value.
+        for offspring_idx in range(offspring.shape[0]):
+            if offspring_fitness[offspring_idx] < average_fitness:
+                adaptive_mutation_probability = self.mutation_probability[0]
+            else:
+                adaptive_mutation_probability = self.mutation_probability[1]
+
+            probs = numpy.random.random(size=offspring.shape[1])
+            for gene_idx in range(offspring.shape[1]):
+                if probs[gene_idx] <= adaptive_mutation_probability:
+                    # Generating a random value.
+                    random_value = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                                       high=self.random_mutation_max_val, 
+                                                                       size=1))
+                    # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
+                    if self.mutation_by_replacement:
+                        offspring[offspring_idx, gene_idx] = random_value
+                    # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
+                    else:
+                        offspring[offspring_idx, gene_idx] = offspring[offspring_idx, gene_idx] + random_value
+        return offspring
+
     def best_solution(self):
 
         """
@@ -1195,10 +1554,10 @@ class GA:
         """
 
 #        if self.generations_completed < 1:
-#            raise RuntimeError("The best_solution() method can only be called after completing at least 1 generation but {generations_completed} is completed.".format(generations_completed=self.generations_completed))
+#            raise RuntimeError("The best_solution() method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=self.generations_completed))
 
 #        if self.run_completed == False:
-#            raise ValueError("Warning calling the best_solution() method: \nThe run() method is not yet called and thus the GA did not evolve the solutions. Thus, the best solution is retireved from the initial random population without being evolved.\n")
+#            raise ValueError("Error calling the best_solution() method: \nThe run() method is not yet called and thus the GA did not evolve the solutions. Thus, the best solution is retireved from the initial random population without being evolved.\n")
 
         # Getting the best solution after finishing all generations.
         # At first, the fitness is calculated for each solution in the final generation.
@@ -1219,10 +1578,10 @@ class GA:
         """
 
         if self.generations_completed < 1:
-            raise RuntimeError("The plot_result() method can only be called after completing at least 1 generation but {generations_completed} is completed.".format(generations_completed=self.generations_completed))
+            raise RuntimeError("The plot_result() method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=self.generations_completed))
 
 #        if self.run_completed == False:
-#            print("Warning calling the plot_result() method: \nGA is not executed yet and there are no results to display. Please call the run() method before calling the plot_result() method.\n")
+#            if not self.suppress_warnings: warnings.warn("Warning calling the plot_result() method: \nGA is not executed yet and there are no results to display. Please call the run() method before calling the plot_result() method.\n")
 
         matplotlib.pyplot.figure()
         matplotlib.pyplot.plot(self.best_solutions_fitness, linewidth=linewidth)
