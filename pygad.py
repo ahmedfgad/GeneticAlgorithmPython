@@ -280,22 +280,35 @@ class GA:
                 # The mutation_num_genes parameter does not exist. Checking whether adaptive mutation is used.
                 if (mutation_type != "adaptive"):
                     # The percent of genes to mutate is fixed not adaptive.
-                    if type(mutation_percent_genes) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                    if mutation_percent_genes == 'default'.lower():
+                        mutation_percent_genes = 10
+                        # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
+                        mutation_num_genes = numpy.uint32((mutation_percent_genes*self.num_genes)/100)
+                        # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
+                        if mutation_num_genes == 0:
+                            if self.mutation_probability is None:
+                                if not self.suppress_warnings: warnings.warn("The percentage of genes to mutate (mutation_percent_genes={mutation_percent}) resutled in selecting ({mutation_num}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.".format(mutation_percent=mutation_percent_genes, mutation_num=mutation_num_genes))
+                            mutation_num_genes = 1
+
+                    elif type(mutation_percent_genes) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                         if (mutation_percent_genes <= 0 or mutation_percent_genes > 100):
                             self.valid_parameters = False
                             raise ValueError("The percentage of selected genes for mutation (mutation_percent_genes) must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n".format(mutation_percent_genes=mutation_percent_genes))
                         else:
+                            # If mutation_percent_genes equals the string "default", then it is replaced by the numeric value 10.
                             if mutation_percent_genes == 'default'.lower():
                                 mutation_percent_genes = 10
+
                             # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
                             mutation_num_genes = numpy.uint32((mutation_percent_genes*self.num_genes)/100)
                             # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
                             if mutation_num_genes == 0:
-                                if not self.suppress_warnings: warnings.warn("The percentage of genes to mutate (mutation_percent_genes={mutation_percent}) resutled in selecting ({mutation_num}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.".format(mutation_percent=mutation_percent_genes, mutation_num=mutation_num_genes))
+                                if self.mutation_probability is None:
+                                    if not self.suppress_warnings: warnings.warn("The percentage of genes to mutate (mutation_percent_genes={mutation_percent}) resutled in selecting ({mutation_num}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.".format(mutation_percent=mutation_percent_genes, mutation_num=mutation_num_genes))
                                 mutation_num_genes = 1
                     else:
                         self.valid_parameters = False
-                        raise ValueError("Unexpected type for the 'mutation_percent_genes' parameter. A numeric value is expected but ({mutation_percent_genes_value}) of type {mutation_percent_genes_type} found.".format(mutation_percent_genes_value=mutation_percent_genes, mutation_percent_genes_type=type(mutation_percent_genes)))
+                        raise ValueError("Unexpected value or type of the 'mutation_percent_genes' parameter. It only accepts the string 'default' or a numeric value but ({mutation_percent_genes_value}) of type {mutation_percent_genes_type} found.".format(mutation_percent_genes_value=mutation_percent_genes, mutation_percent_genes_type=type(mutation_percent_genes)))
                 else:
                     # The percent of genes to mutate is adaptive not fixed.
                     if type(mutation_percent_genes) in [list, tuple, numpy.ndarray]:
@@ -323,7 +336,7 @@ class GA:
                             self.valid_parameters = False
                             raise ValueError("When mutation_type='adaptive', then the 'mutation_percent_genes' parameter must have only 2 elements but ({mutation_percent_genes_length}) element(s) found.".format(mutation_percent_genes_length=len(mutation_percent_genes)))
                     else:
-                        if mutation_percent_genes != 'default'.lower():
+                        if self.mutation_probability is None:
                             self.valid_parameters = False
                             raise ValueError("Unexpected type for the 'mutation_percent_genes' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_percent_genes_value}) of type {mutation_percent_genes_type} found.".format(mutation_percent_genes_value=mutation_percent_genes, mutation_percent_genes_type=type(mutation_percent_genes)))
             # The mutation_num_genes parameter exists. Checking whether adaptive mutation is used.
@@ -691,7 +704,7 @@ class GA:
             if not (self.on_fitness is None):
                 self.on_fitness(self, fitness)
 
-            best_solution, best_solution_fitness, best_match_idx = self.best_solution()
+            best_solution, best_solution_fitness, best_match_idx = self.best_solution(pop_fitness=fitness)
 
             # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
             self.best_solutions_fitness.append(best_solution_fitness)
@@ -751,8 +764,9 @@ class GA:
 
             time.sleep(self.delay_after_gen)
 
+        last_gen_fitness = self.cal_pop_fitness()
         # Save the fitness value of the best solution.
-        _, best_solution_fitness, _ = self.best_solution()
+        _, best_solution_fitness, _ = self.best_solution(pop_fitness=last_gen_fitness)
         self.best_solutions_fitness.append(best_solution_fitness)
 
         self.best_solution_generation = numpy.where(numpy.array(self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
@@ -760,7 +774,7 @@ class GA:
         self.run_completed = True # Set to True only after the run() method completes gracefully.
 
         if not (self.on_stop is None):
-            self.on_stop(self, self.cal_pop_fitness())
+            self.on_stop(self, last_gen_fitness)
 
         # Converting the 'best_solutions' list into a NumPy array.
         self.best_solutions = numpy.array(self.best_solutions)
@@ -1543,11 +1557,13 @@ class GA:
                         offspring[offspring_idx, gene_idx] = offspring[offspring_idx, gene_idx] + random_value
         return offspring
 
-    def best_solution(self):
+    def best_solution(self, pop_fitness=None):
 
         """
         Returns information about the best solution found by the genetic algorithm.
-        The following is returned:
+        Accepts the following parameters:
+            pop_fitness: An optional parameter holding the fitness values of the solutions in the current population. If None, then the cal_pop_fitness() method is called to calculate the fitness of the population.
+        The following are returned:
             -best_solution: Best solution in the current population.
             -best_solution_fitness: Fitness value of the best solution.
             -best_match_idx: Index of the best solution in the current population.
@@ -1561,12 +1577,13 @@ class GA:
 
         # Getting the best solution after finishing all generations.
         # At first, the fitness is calculated for each solution in the final generation.
-        fitness = self.cal_pop_fitness()
+        if pop_fitness is None:
+            pop_fitness = self.cal_pop_fitness()
         # Then return the index of that solution corresponding to the best fitness.
-        best_match_idx = numpy.where(fitness == numpy.max(fitness))[0][0]
+        best_match_idx = numpy.where(pop_fitness == numpy.max(pop_fitness))[0][0]
 
         best_solution = self.population[best_match_idx, :]
-        best_solution_fitness = fitness[best_match_idx]
+        best_solution_fitness = pop_fitness[best_match_idx]
 
         return best_solution, best_solution_fitness, best_match_idx
 
