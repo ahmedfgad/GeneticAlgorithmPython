@@ -57,7 +57,7 @@ class GA:
         init_range_high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
         # It is OK to set the value of any of the 2 parameters ('init_range_high' and 'init_range_high') to be equal, higher or lower than the other parameter (i.e. init_range_low is not needed to be lower than init_range_high).
 
-        gene_type: The type of the gene. It works only when the 'gene_space' parameter is None (i.e. the population is created randomly). It is assigned to either the int or float types and forces all the genes to be of that type.
+        gene_type: The type of the gene. It works only when the 'gene_space' parameter is None (i.e. the population is created randomly). It is assigned to any of these types (int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64) and forces all the genes to be of that type.
 
         parent_selection_type: Type of parent selection.
         keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. For some parent selection operators like rank selection, the parents are of high quality and it is beneficial to keep them in the next generation. In some other parent selection operators like roulette wheel selection (RWS), it is not guranteed that the parents will be of high quality and thus keeping the parents might degarde the quality of the population.
@@ -115,12 +115,13 @@ class GA:
                             raise TypeError("The element indexed {index} of 'gene_space' with type {el_type} cannot be empty (i.e. its length must be >= 0).".format(index=index, el_type=type(el)))
                         else:
                             for val in el:
-                                if not (type(val) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]):
-                                    raise TypeError("All values in the sublists inside the 'gene_space' attribute must be numeric of type int/float but ({val}) of type {typ} found.".format(val=val, typ=type(val)))
+                                if not (type(val) in [type(None), int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]):
+                                    raise TypeError("All values in the sublists inside the 'gene_space' attribute must be numeric of type int/float/None but ({val}) of type {typ} found.".format(val=val, typ=type(val)))
                         self.gene_space_nested = True
                     elif type(el)  == type(None):
-                        self.gene_space_nested = True
-                    elif not (type(el) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]):
+                        pass
+                        # self.gene_space_nested = True
+                    elif not (type(el) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]):
                         self.valid_parameters = False
                         raise TypeError("Unexpected type {el_type} for the element indexed {index} of 'gene_space'. The accepted types are list/tuple/range/numpy.ndarray of numbers, a single number (int/float), or None.".format(index=index, el_type=type(el)))
         else:
@@ -137,11 +138,11 @@ class GA:
         self.init_range_low = init_range_low
         self.init_range_high = init_range_high
 
-        if gene_type in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+        if gene_type in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
             self.gene_type = gene_type
         else:
             self.valid_parameters = False
-            raise ValueError("The value passed to the 'gene_type' parameter must be either int or float but ({gene_type}) found.".format(gene_type=gene_type))
+            raise ValueError("The value passed to the 'gene_type' parameter must be either integer or floating-point number but the value ({gene_type_value}) of type {gene_type_type} found.".format(gene_type_value=gene_type, gene_type_type=type(gene_type)))
 
         if initial_population is None:
             if (sol_per_pop is None) or (num_genes is None):
@@ -204,7 +205,7 @@ class GA:
 
         if crossover_probability is None:
             self.crossover_probability = None
-        elif type(crossover_probability) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+        elif type(crossover_probability) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
             if crossover_probability >= 0 and crossover_probability <= 1:
                 self.crossover_probability = crossover_probability
             else:
@@ -240,7 +241,7 @@ class GA:
                 self.mutation_probability = None
             elif (mutation_type != "adaptive"):
                 # Mutation probability is fixed not adaptive.
-                if type(mutation_probability) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                if type(mutation_probability) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                     if mutation_probability >= 0 and mutation_probability <= 1:
                         self.mutation_probability = mutation_probability
                     else:
@@ -254,7 +255,7 @@ class GA:
                 if type(mutation_probability) in [list, tuple, numpy.ndarray]:
                     if len(mutation_probability) == 2:
                         for el in mutation_probability:
-                            if type(el) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                            if type(el) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                                 if el >= 0 and el <= 1:
                                     pass
                                 else:
@@ -290,7 +291,7 @@ class GA:
                                 if not self.suppress_warnings: warnings.warn("The percentage of genes to mutate (mutation_percent_genes={mutation_percent}) resutled in selecting ({mutation_num}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.".format(mutation_percent=mutation_percent_genes, mutation_num=mutation_num_genes))
                             mutation_num_genes = 1
 
-                    elif type(mutation_percent_genes) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                    elif type(mutation_percent_genes) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                         if (mutation_percent_genes <= 0 or mutation_percent_genes > 100):
                             self.valid_parameters = False
                             raise ValueError("The percentage of selected genes for mutation (mutation_percent_genes) must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n".format(mutation_percent_genes=mutation_percent_genes))
@@ -315,7 +316,7 @@ class GA:
                         if len(mutation_percent_genes) == 2:
                             mutation_num_genes = numpy.zeros_like(mutation_percent_genes, dtype=numpy.uint32)
                             for idx, el in enumerate(mutation_percent_genes):
-                                if type(el) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                                if type(el) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                                     if (el <= 0 or el > 100):
                                         self.valid_parameters = False
                                         raise ValueError("The values assigned to the 'mutation_percent_genes' must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n".format(mutation_percent_genes=mutation_percent_genes))
@@ -342,7 +343,7 @@ class GA:
             # The mutation_num_genes parameter exists. Checking whether adaptive mutation is used.
             elif (mutation_type != "adaptive"):
                 # Number of genes to mutate is fixed not adaptive.
-                if type(mutation_num_genes) in [int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
+                if type(mutation_num_genes) in [int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64]:
                     if (mutation_num_genes <= 0):
                         self.valid_parameters = False
                         raise ValueError("The number of selected genes for mutation (mutation_num_genes) cannot be <= 0 but ({mutation_num_genes}) found. If you do not want to use mutation, please set mutation_type=None\n".format(mutation_num_genes=mutation_num_genes))
@@ -357,7 +358,7 @@ class GA:
                 if type(mutation_num_genes) in [list, tuple, numpy.ndarray]:
                     if len(mutation_num_genes) == 2:
                         for el in mutation_num_genes:
-                            if type(el) in [int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
+                            if type(el) in [int, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64]:
                                 if (el <= 0):
                                     self.valid_parameters = False
                                     raise ValueError("The values assigned to the 'mutation_num_genes' cannot be <= 0 but ({mutation_num_genes_value}) found. If you do not want to use mutation, please set mutation_type=None\n".format(mutation_num_genes_value=el))
@@ -580,7 +581,7 @@ class GA:
             self.on_stop = None
 
         # delay_after_gen
-        if type(delay_after_gen) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+        if type(delay_after_gen) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
             if delay_after_gen >= 0.0:
                 self.delay_after_gen = delay_after_gen
             else:
@@ -645,22 +646,36 @@ class GA:
                                                                  high=high, 
                                                                  size=self.pop_size), dtype=self.gene_type) # A NumPy array holding the initial population.
         elif self.gene_space_nested:
-            self.population = numpy.zeros(shape=self.pop_size)
+            self.population = numpy.zeros(shape=self.pop_size, dtype=self.gene_type)
             for sol_idx in range(self.sol_per_pop):
                 for gene_idx in range(self.num_genes):
-                    curr_gene_space = self.gene_space[gene_idx]
-                    if type(curr_gene_space) in [list, tuple, range]:
-                        self.population[sol_idx, gene_idx] = random.choice(curr_gene_space)
-                    elif type(curr_gene_space)  == type(None):
-                        self.population[sol_idx, gene_idx] = self.gene_type(numpy.random.uniform(low=low,
+                    if type(self.gene_space[gene_idx]) in [list, tuple, range]:
+                        # Check if the gene space has None values. If any, then replace it with randomly generated values according to the 3 attributes init_range_low, init_range_high, and gene_type.
+                        for idx, val in enumerate(self.gene_space[gene_idx]):
+                            if val is None:
+                                self.gene_space[gene_idx][idx] = numpy.asarray(numpy.random.uniform(low=low, 
+                                               high=high, 
+                                               size=1), dtype=self.gene_type)[0]
+                        self.population[sol_idx, gene_idx] = random.choice(self.gene_space[gene_idx])
+                    elif type(self.gene_space[gene_idx]) == type(None):
+                        self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
                                        high=high, 
-                                       size=1))
-                    elif type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
-                        self.population[sol_idx, gene_idx] = curr_gene_space                
+                                       size=1), dtype=self.gene_type)[0]
+                        self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]
+                    elif type(self.gene_space[gene_idx]) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                        self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]             
         else:
+            # Replace all the None values with random values using the init_range_low, init_range_high, and gene_type attributes.
+            for idx, curr_gene_space in enumerate(self.gene_space):
+                if curr_gene_space is None:
+                    self.gene_space[idx] = numpy.asarray(numpy.random.uniform(low=low, 
+                                   high=high, 
+                                   size=1), dtype=self.gene_type)[0]
+
             # Creating the initial population by randomly selecting the genes' values from the values inside the 'gene_space' parameter.
-            self.population = numpy.random.choice(self.gene_space,
-                                                  size=self.pop_size) # A NumPy array holding the initial population.
+            self.population = numpy.asarray(numpy.random.choice(self.gene_space,
+                                                                size=self.pop_size),
+                            dtype=self.gene_type) # A NumPy array holding the initial population.
 
         # Keeping the initial population in the initial_population attribute.
         self.initial_population = self.population.copy()
@@ -1149,13 +1164,13 @@ class GA:
                     curr_gene_space = self.gene_space[gene_idx]
 
                     # If the gene space has only a single value, use it as the new gene value.
-                    if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                    if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                         value_from_space = curr_gene_space
                     # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
                     elif curr_gene_space is None:
-                        rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
-                                                                        high=self.random_mutation_max_val,
-                                                                        size=1))
+                        rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
+                                                        high=self.random_mutation_max_val,
+                                                        size=1)
                         if self.mutation_by_replacement:
                             value_from_space = rand_val
                         else:
@@ -1168,7 +1183,7 @@ class GA:
                     value_from_space = random.choice(self.gene_space)
 
                 # Assinging the selected value from the space to the gene.
-                offspring[offspring_idx, gene_idx] = value_from_space
+                offspring[offspring_idx, gene_idx] = self.gene_type(value_from_space)
                     
         return offspring
 
@@ -1191,13 +1206,13 @@ class GA:
                         curr_gene_space = self.gene_space[gene_idx]
         
                         # If the gene space has only a single value, use it as the new gene value.
-                        if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                        if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                             value_from_space = curr_gene_space
                         # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
                         elif curr_gene_space is None:
-                            rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
-                                                                            high=self.random_mutation_max_val,
-                                                                            size=1))
+                            rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
+                                                            high=self.random_mutation_max_val,
+                                                            size=1)
                             if self.mutation_by_replacement:
                                 value_from_space = rand_val
                             else:
@@ -1210,7 +1225,7 @@ class GA:
                         value_from_space = random.choice(self.gene_space)
 
                     # Assinging the selected value from the space to the gene.
-                    offspring[offspring_idx, gene_idx] = value_from_space
+                    offspring[offspring_idx, gene_idx] = self.gene_type(value_from_space)
                     
         return offspring
 
@@ -1228,15 +1243,15 @@ class GA:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
             for gene_idx in mutation_indices:
                 # Generating a random value.
-                random_value = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val, 
-                                                                   high=self.random_mutation_max_val, 
-                                                                   size=1))
+                random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                    high=self.random_mutation_max_val, 
+                                                    size=1)
                 # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                 if self.mutation_by_replacement:
-                    offspring[offspring_idx, gene_idx] = random_value
+                    offspring[offspring_idx, gene_idx] = self.gene_type(random_value)
                 # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                 else:
-                    offspring[offspring_idx, gene_idx] = offspring[offspring_idx, gene_idx] + random_value
+                    offspring[offspring_idx, gene_idx] = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
         return offspring
 
     def mutation_probs_randomly(self, offspring):
@@ -1254,15 +1269,15 @@ class GA:
             for gene_idx in range(offspring.shape[1]):
                 if probs[gene_idx] <= self.mutation_probability:
                     # Generating a random value.
-                    random_value = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val, 
-                                                                       high=self.random_mutation_max_val, 
-                                                                       size=1))
+                    random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                        high=self.random_mutation_max_val, 
+                                                        size=1)
                     # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                     if self.mutation_by_replacement:
-                        offspring[offspring_idx, gene_idx] = random_value
+                        offspring[offspring_idx, gene_idx] = self.gene_type(random_value)
                     # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                     else:
-                        offspring[offspring_idx, gene_idx] = offspring[offspring_idx, gene_idx] + random_value
+                        offspring[offspring_idx, gene_idx] = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
         return offspring
 
     def swap_mutation(self, offspring):
@@ -1286,7 +1301,7 @@ class GA:
     def inversion_mutation(self, offspring):
 
         """
-        Applies the inversion mutation which selects a subset of genes and inverts them.
+        Applies the inversion mutation which selects a subset of genes and inverts them (in order).
         It accepts a single parameter:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
@@ -1410,13 +1425,13 @@ class GA:
                     curr_gene_space = self.gene_space[gene_idx]
 
                     # If the gene space has only a single value, use it as the new gene value.
-                    if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                    if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                         value_from_space = curr_gene_space
                     # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
                     elif curr_gene_space is None:
-                        rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
-                                                                        high=self.random_mutation_max_val,
-                                                                        size=1))
+                        rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
+                                                        high=self.random_mutation_max_val,
+                                                        size=1)
                         if self.mutation_by_replacement:
                             value_from_space = rand_val
                         else:
@@ -1429,7 +1444,7 @@ class GA:
                     value_from_space = random.choice(self.gene_space)
 
                 # Assinging the selected value from the space to the gene.
-                offspring[offspring_idx, gene_idx] = value_from_space
+                offspring[offspring_idx, gene_idx] = self.gene_type(value_from_space)
 
         return offspring
         
@@ -1456,15 +1471,15 @@ class GA:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
             for gene_idx in mutation_indices:
                 # Generating a random value.
-                random_value = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val, 
-                                                                   high=self.random_mutation_max_val, 
-                                                                   size=1))
+                random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                    high=self.random_mutation_max_val, 
+                                                    size=1)
                 # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                 if self.mutation_by_replacement:
-                    offspring[offspring_idx, gene_idx] = random_value
+                    offspring[offspring_idx, gene_idx] = self.gene_type(random_value)
                 # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                 else:
-                    offspring[offspring_idx, gene_idx] = offspring[offspring_idx, gene_idx] + random_value
+                    offspring[offspring_idx, gene_idx] = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
         return offspring
         
     def adaptive_mutation_probs_by_space(self, offspring):
@@ -1498,13 +1513,13 @@ class GA:
                         curr_gene_space = self.gene_space[gene_idx]
         
                         # If the gene space has only a single value, use it as the new gene value.
-                        if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                        if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                             value_from_space = curr_gene_space
                         # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
                         elif curr_gene_space is None:
-                            rand_val = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val,
-                                                                            high=self.random_mutation_max_val,
-                                                                            size=1))
+                            rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
+                                                            high=self.random_mutation_max_val,
+                                                            size=1)
                             if self.mutation_by_replacement:
                                 value_from_space = rand_val
                             else:
@@ -1517,7 +1532,7 @@ class GA:
                         value_from_space = random.choice(self.gene_space)
 
                     # Assinging the selected value from the space to the gene.
-                    offspring[offspring_idx, gene_idx] = value_from_space
+                    offspring[offspring_idx, gene_idx] = self.gene_type(value_from_space)
 
         return offspring
     
@@ -1546,15 +1561,15 @@ class GA:
             for gene_idx in range(offspring.shape[1]):
                 if probs[gene_idx] <= adaptive_mutation_probability:
                     # Generating a random value.
-                    random_value = self.gene_type(numpy.random.uniform(low=self.random_mutation_min_val, 
-                                                                       high=self.random_mutation_max_val, 
-                                                                       size=1))
+                    random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                        high=self.random_mutation_max_val, 
+                                                        size=1)
                     # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                     if self.mutation_by_replacement:
-                        offspring[offspring_idx, gene_idx] = random_value
+                        offspring[offspring_idx, gene_idx] = self.gene_type(random_value)
                     # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                     else:
-                        offspring[offspring_idx, gene_idx] = offspring[offspring_idx, gene_idx] + random_value
+                        offspring[offspring_idx, gene_idx] = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
         return offspring
 
     def best_solution(self, pop_fitness=None):
