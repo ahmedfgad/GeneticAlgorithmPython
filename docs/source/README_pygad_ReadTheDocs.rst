@@ -132,10 +132,10 @@ The ``pygad.GA`` class constructor supports the following parameters:
    be used unchanged in the next generation. ``Adaptive`` mutation is
    supported starting from PyGAD 2.10.0. For more information about
    adaptive mutation, go the the `Adaptive
-   Mutation <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#adaptive-mutation>`__
+   Mutation <https://pygad.readthedocs.io/en/latest/README_pygad_torchga_ReadTheDocs.html#adaptive-mutation>`__
    section. For example about using adaptive mutation, check the `Use
    Adaptive Mutation in
-   PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#use-adaptive-mutation-in-pygad>`__
+   PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_torchga_ReadTheDocs.html#use-adaptive-mutation-in-pygad>`__
    section.
 
 -  ``mutation_probability=None``: The probability of selecting a gene

@@ -461,7 +461,7 @@ Release Date: 03 January 2021
 
 2.  Support of adaptive mutation where the mutation rate is determined
     by the fitness value of each solution. Read the `Adaptive
-    Mutation <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#adaptive-mutation>`__
+    Mutation <https://pygad.readthedocs.io/en/latest/README_pygad_torchga_ReadTheDocs.html#adaptive-mutation>`__
     section for more details. Also, read this paper: `Libelli, S.
     Marsili, and P. Alba. "Adaptive mutation in genetic algorithms."
     Soft computing 4.2 (2000):
@@ -508,6 +508,38 @@ Release Date: 03 January 2021
     the solutions in the population. If ``None``, then the
     ``cal_pop_fitness()`` method is called to calculate the fitness
     values of the population.
+
+.. _header-n698:
+
+PyGAD 2.10.1
+------------
+
+Release Date: 10 January 2021
+
+1. In the ``gene_space`` parameter, any ``None`` value (regardless of
+   its index or axis), is replaced by a randomly generated number based
+   on the 3 parameters ``init_range_low``, ``init_range_high``, and
+   ``gene_type``. So, the ``None`` value in ``[..., None, ...]`` or
+   ``[..., [..., None, ...], ...]`` are replaced with random values.
+   This gives more freedom in building the space of values for the
+   genes.
+
+2. All the numbers passed to the ``gene_space`` parameter are casted to
+   the type specified in the ``gene_type`` parameter.
+
+3. The ``numpy.uint`` data type is supported for the parameters that
+   accept integer values.
+
+4. In the ``pygad.kerasga`` module, the ``model_weights_as_vector()``
+   function uses the ``trainable`` attribute of the model's layers to
+   only return the trainable weights in the network. So, only the
+   trainable layers with their ``trainable`` attribute set to ``True``
+   (``trainable=True``), which is the default value, have their weights
+   evolved. All non-trainable layers with the ``trainable`` attribute
+   set to ``False`` (``trainable=False``) will not be evolved. Thanks to
+   `Prof. Tamer A. Farrag <https://github.com/tfarrag2000>`__ for
+   pointing about that at
+   `GitHub <https://github.com/ahmedfgad/KerasGA/issues/1>`__.
 
 .. _header-n554:
 

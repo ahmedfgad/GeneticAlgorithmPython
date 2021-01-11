@@ -1,4 +1,4 @@
-.. _header-n0:
+.. _header-n194:
 
 ``pygad.kerasga`` Module
 ========================
@@ -25,7 +25,7 @@ The contents of this module are:
 
 More details are given in the next sections.
 
-.. _header-n13:
+.. _header-n207:
 
 Steps Summary
 =============
@@ -45,7 +45,7 @@ follows:
 
 6. Run the genetic algorithm.
 
-.. _header-n28:
+.. _header-n222:
 
 Create Keras Model
 ==================
@@ -93,7 +93,7 @@ This is the same model created using the Functional API.
 
 Feel free to add the layers of your choice.
 
-.. _header-n44:
+.. _header-n238:
 
 ``pygad.kerasga.KerasGA`` Class
 ===============================
@@ -103,7 +103,7 @@ an initial population for the genetic algorithm based on a Keras model.
 The constructor, methods, and attributes within the class are discussed
 in this section.
 
-.. _header-n46:
+.. _header-n240:
 
 ``__init__()``
 --------------
@@ -116,7 +116,7 @@ parameters:
 -  ``num_solutions``: Number of solutions in the population. Each
    solution has different parameters of the model.
 
-.. _header-n53:
+.. _header-n247:
 
 Instance Attributes
 -------------------
@@ -134,7 +134,7 @@ Here is a list of all instance attributes:
 -  ``population_weights``: A nested list holding the weights of all
    solutions in the population.
 
-.. _header-n63:
+.. _header-n257:
 
 Methods in the ``KerasGA`` Class
 --------------------------------
@@ -142,7 +142,7 @@ Methods in the ``KerasGA`` Class
 This section discusses the methods available for instances of the
 ``pygad.kerasga.KerasGA`` class.
 
-.. _header-n65:
+.. _header-n259:
 
 ``create_population()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,14 +152,14 @@ genetic algorithm as a list of solutions where each solution represents
 different model parameters. The list of networks is assigned to the
 ``population_weights`` attribute of the instance.
 
-.. _header-n67:
+.. _header-n261:
 
 Functions in the ``pygad.kerasga`` Module
 =========================================
 
 This section discusses the functions in the ``pygad.kerasga`` module.
 
-.. _header-n69:
+.. _header-n263:
 
 ``pygad.kerasga.model_weights_as_vector()`` 
 --------------------------------------------
@@ -170,13 +170,19 @@ holding all model weights. The reason for representing the model weights
 as a vector is that the genetic algorithm expects all parameters of any
 solution to be in a 1D vector form.
 
+This function filters the layers based on the ``trainable`` attribute to
+see whether the layer weights are trained or not. For each layer, if its
+``trainable=False``, then its weights will not be evolved using the
+genetic algorithm. Otherwise, it will be represented in the chromosome
+and evolved.
+
 The function accepts the following parameters:
 
 -  ``model``: The Keras model.
 
 It returns a 1D vector holding the model weights.
 
-.. _header-n76:
+.. _header-n270:
 
 ``pygad.kerasga.model_weights_as_matrix()``
 -------------------------------------------
@@ -190,7 +196,7 @@ parameters:
 
 It returns the restored model weights after reshaping the vector.
 
-.. _header-n84:
+.. _header-n278:
 
 Examples
 ========
@@ -199,7 +205,7 @@ This section gives the complete code of some examples that build and
 train a Keras model using PyGAD. Each subsection builds a different
 network.
 
-.. _header-n86:
+.. _header-n280:
 
 Example 1: Regression Example
 -----------------------------
@@ -296,7 +302,7 @@ subsections discuss each part in the code.
    abs_error = mae(data_outputs, predictions).numpy()
    print("Absolute Error : ", abs_error)
 
-.. _header-n89:
+.. _header-n283:
 
 Create a Keras Model
 ~~~~~~~~~~~~~~~~~~~~
@@ -328,7 +334,7 @@ The model can also be build using the Keras Sequential Model API.
    model.add(dense_layer1)
    model.add(output_layer)
 
-.. _header-n94:
+.. _header-n288:
 
 Create an Instance of the ``pygad.kerasga.KerasGA`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -344,7 +350,7 @@ Change this number according to your needs.
    keras_ga = pygad.kerasga.KerasGA(model=model,
                                     num_solutions=10)
 
-.. _header-n97:
+.. _header-n291:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -369,7 +375,7 @@ output.
                                [1.3],
                                [2.5]])
 
-.. _header-n100:
+.. _header-n294:
 
 Build the Fitness Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -400,7 +406,7 @@ function to calculate the fitness value.
 
        return solution_fitness
 
-.. _header-n104:
+.. _header-n298:
 
 Create an Instance of the ``pygad.GA`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -435,7 +441,7 @@ accepts <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#in
                           keep_parents=keep_parents,
                           on_generation=callback_generation)
 
-.. _header-n108:
+.. _header-n302:
 
 Run the Genetic Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -508,7 +514,7 @@ The next code measures the trained model error.
 
    Absolute Error :  0.013740465
 
-.. _header-n124:
+.. _header-n318:
 
 Example 2: XOR Binary Classification
 ------------------------------------
@@ -679,7 +685,7 @@ Here is some information about the trained model. Its fitness value is
 
    Accuracy :  1.0
 
-.. _header-n144:
+.. _header-n338:
 
 Example 3: Image Multi-Class Classification (Dense Layers)
 ----------------------------------------------------------
@@ -789,7 +795,7 @@ cross entropy.
    cce = tensorflow.keras.losses.CategoricalCrossentropy()
    solution_fitness = 1.0 / (cce(data_outputs, predictions).numpy() + 0.00000001)
 
-.. _header-n149:
+.. _header-n343:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -839,7 +845,7 @@ Here are some statistics about the trained model.
    Categorical Crossentropy :  0.23823906
    Accuracy :  0.9852192
 
-.. _header-n164:
+.. _header-n358:
 
 Example 4: Image Multi-Class Classification (Conv Layers)
 ---------------------------------------------------------
@@ -974,7 +980,7 @@ each input sample is 100x100x3.
 
    model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
 
-.. _header-n170:
+.. _header-n364:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
