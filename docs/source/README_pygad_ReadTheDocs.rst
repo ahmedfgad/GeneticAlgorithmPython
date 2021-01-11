@@ -67,9 +67,7 @@ The ``pygad.GA`` class constructor supports the following parameters:
    when the parameter ``gene_space`` is ``None`` (which is its default
    value). Starting from PyGAD 2.9.0, the ``gene_type`` parameter can be
    assigned to a numeric value of any of these types: ``int``,
-   ``float``, ``numpy.int``, ``numpy.int8``, ``numpy.int16``,
-   ``numpy.int32``, ``numpy.int64``, ``numpy.float``, ``numpy.float16``,
-   ``numpy.float32``, or ``numpy.float64``.
+   ``float``, and ``numpy.int/uint/float(8-64)``.
 
 -  ``init_range_low=-4``: The lower value of the random range from which
    the gene values in the initial population are selected.
