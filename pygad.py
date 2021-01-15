@@ -661,9 +661,9 @@ class GA:
                         self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
                                        high=high, 
                                        size=1), dtype=self.gene_type)[0]
-                        self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]
+                        self.population[sol_idx, gene_idx] = self.gene_space[gene_idx].copy()
                     elif type(self.gene_space[gene_idx]) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
-                        self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]             
+                        self.population[sol_idx, gene_idx] = self.gene_space[gene_idx].copy()
         else:
             # Replace all the None values with random values using the init_range_low, init_range_high, and gene_type attributes.
             for idx, curr_gene_space in enumerate(self.gene_space):
@@ -727,6 +727,7 @@ class GA:
             # Appending the best solution to the best_solutions list.
             if self.save_best_solutions:
                 self.best_solutions.append(best_solution)
+                print("AAAAAAAAA ", self.best_solutions)
 
             # Selecting the best parents in the population for mating.
             parents = self.select_parents(fitness, num_parents=self.num_parents_mating)
@@ -809,7 +810,7 @@ class GA:
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
         parents = numpy.empty((num_parents, self.population.shape[1]))
         for parent_num in range(num_parents):
-            parents[parent_num, :] = self.population[fitness_sorted[parent_num], :]
+            parents[parent_num, :] = self.population[fitness_sorted[parent_num], :].copy()
         return parents
 
     def rank_selection(self, fitness, num_parents):
@@ -827,7 +828,7 @@ class GA:
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
         parents = numpy.empty((num_parents, self.population.shape[1]))
         for parent_num in range(num_parents):
-            parents[parent_num, :] = self.population[fitness_sorted[parent_num], :]
+            parents[parent_num, :] = self.population[fitness_sorted[parent_num], :].copy()
         return parents
 
     def random_selection(self, fitness, num_parents):
@@ -845,7 +846,7 @@ class GA:
         rand_indices = numpy.random.randint(low=0.0, high=fitness.shape[0], size=num_parents)
 
         for parent_num in range(num_parents):
-            parents[parent_num, :] = self.population[rand_indices[parent_num], :]
+            parents[parent_num, :] = self.population[rand_indices[parent_num], :].copy()
         return parents
 
     def tournament_selection(self, fitness, num_parents):
@@ -863,7 +864,7 @@ class GA:
             rand_indices = numpy.random.randint(low=0.0, high=len(fitness), size=self.K_tournament)
             K_fitnesses = fitness[rand_indices]
             selected_parent_idx = numpy.where(K_fitnesses == numpy.max(K_fitnesses))[0][0]
-            parents[parent_num, :] = self.population[rand_indices[selected_parent_idx], :]
+            parents[parent_num, :] = self.population[rand_indices[selected_parent_idx], :].copy()
         return parents
 
     def roulette_wheel_selection(self, fitness, num_parents):
@@ -897,7 +898,7 @@ class GA:
             rand_prob = numpy.random.rand()
             for idx in range(probs.shape[0]):
                 if (rand_prob >= probs_start[idx] and rand_prob < probs_end[idx]):
-                    parents[parent_num, :] = self.population[idx, :]
+                    parents[parent_num, :] = self.population[idx, :].copy()
                     break
         return parents
 
@@ -935,7 +936,7 @@ class GA:
             rand_pointer = first_pointer + parent_num*pointers_distance
             for idx in range(probs.shape[0]):
                 if (rand_pointer >= probs_start[idx] and rand_pointer < probs_end[idx]):
-                    parents[parent_num, :] = self.population[idx, :]
+                    parents[parent_num, :] = self.population[idx, :].copy()
                     break
         return parents
 
@@ -1161,7 +1162,7 @@ class GA:
 
                 if self.gene_space_nested:
                     # Returning the current gene space from the 'gene_space' attribute.
-                    curr_gene_space = self.gene_space[gene_idx]
+                    curr_gene_space = self.gene_space[gene_idx].copy()
 
                     # If the gene space has only a single value, use it as the new gene value.
                     if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
@@ -1203,7 +1204,7 @@ class GA:
                 if probs[gene_idx] <= self.mutation_probability:
                     if self.gene_space_nested:
                         # Returning the current gene space from the 'gene_space' attribute.
-                        curr_gene_space = self.gene_space[gene_idx]
+                        curr_gene_space = self.gene_space[gene_idx].copy()
         
                         # If the gene space has only a single value, use it as the new gene value.
                         if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
@@ -1422,7 +1423,7 @@ class GA:
 
                 if self.gene_space_nested:
                     # Returning the current gene space from the 'gene_space' attribute.
-                    curr_gene_space = self.gene_space[gene_idx]
+                    curr_gene_space = self.gene_space[gene_idx].copy()
 
                     # If the gene space has only a single value, use it as the new gene value.
                     if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
@@ -1510,7 +1511,7 @@ class GA:
                 if probs[gene_idx] <= adaptive_mutation_probability:
                     if self.gene_space_nested:
                         # Returning the current gene space from the 'gene_space' attribute.
-                        curr_gene_space = self.gene_space[gene_idx]
+                        curr_gene_space = self.gene_space[gene_idx].copy()
         
                         # If the gene space has only a single value, use it as the new gene value.
                         if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
@@ -1597,7 +1598,7 @@ class GA:
         # Then return the index of that solution corresponding to the best fitness.
         best_match_idx = numpy.where(pop_fitness == numpy.max(pop_fitness))[0][0]
 
-        best_solution = self.population[best_match_idx, :]
+        best_solution = self.population[best_match_idx, :].copy()
         best_solution_fitness = pop_fitness[best_match_idx]
 
         return best_solution, best_solution_fitness, best_match_idx
