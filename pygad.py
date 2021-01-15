@@ -727,7 +727,6 @@ class GA:
             # Appending the best solution to the best_solutions list.
             if self.save_best_solutions:
                 self.best_solutions.append(best_solution)
-                print("AAAAAAAAA ", self.best_solutions)
 
             # Selecting the best parents in the population for mating.
             parents = self.select_parents(fitness, num_parents=self.num_parents_mating)
