@@ -1240,7 +1240,7 @@ values:
 
 1. The first value is the mutation rate for the low-quality solutions.
 
-2. The second value is the mutation rate for the low-quality solutions.
+2. The second value is the mutation rate for the high-quality solutions.
 
 PyGAD expects that the first value is higher than the second value and
 thus a warning is printed in case the first value is lower than the
