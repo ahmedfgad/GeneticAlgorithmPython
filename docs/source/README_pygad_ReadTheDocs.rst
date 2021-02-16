@@ -1,4 +1,4 @@
-.. _header-n513:
+.. _header-n0:
 
 ``pygad`` Module
 ================
@@ -9,7 +9,7 @@ This section of the PyGAD's library documentation discusses the
 Using the ``pygad`` module, instances of the genetic algorithm can be
 created, run, saved, and loaded.
 
-.. _header-n517:
+.. _header-n5:
 
 ``pygad.GA`` Class
 ==================
@@ -19,7 +19,7 @@ class named ``GA`` for building the genetic algorithm. The constructor,
 methods, function, and attributes within the class are discussed in this
 section.
 
-.. _header-n519:
+.. _header-n7:
 
 ``__init__()``
 --------------
@@ -130,10 +130,10 @@ The ``pygad.GA`` class constructor supports the following parameters:
    be used unchanged in the next generation. ``Adaptive`` mutation is
    supported starting from PyGAD 2.10.0. For more information about
    adaptive mutation, go the the `Adaptive
-   Mutation <https://pygad.readthedocs.io/en/latest/README_pygad_torchga_ReadTheDocs.html#adaptive-mutation>`__
+   Mutation <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#adaptive-mutation>`__
    section. For example about using adaptive mutation, check the `Use
    Adaptive Mutation in
-   PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_torchga_ReadTheDocs.html#use-adaptive-mutation-in-pygad>`__
+   PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#use-adaptive-mutation-in-pygad>`__
    section.
 
 -  ``mutation_probability=None``: The probability of selecting a gene
@@ -199,10 +199,19 @@ The ``pygad.GA`` class constructor supports the following parameters:
    range specified by the 2 parameters ``init_range_low`` and
    ``init_range_high`` and its mutation value is selected randomly from
    the range specified by the 2 parameters ``random_mutation_min_val``
-   and ``random_mutation_max_val``. ``gene_space`` is added in PyGAD
-   2.5.0. Check the **Release History** section of the documentation for
-   more details. In PyGAD 2.9.0, NumPy arrays can be assigned to the
-   ``gene_space`` parameter.
+   and ``random_mutation_max_val``. ``gene_space`` is added in `PyGAD
+   2.5.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-5-0>`__.
+   Check the `Release
+   History <https://pygad.readthedocs.io/en/latest/Footer.html>`__
+   section of the documentation for more details. In `PyGAD
+   2.9.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-9-0>`__,
+   NumPy arrays can be assigned to the ``gene_space`` parameter. In
+   `PyGAD
+   2.11.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-11-0>`__,
+   the ``gene_space`` parameter itself or any of its elements can be
+   assigned to a dictionary to specify the lower and upper limits of the
+   genes. For example, ``{'low': 2, 'high': 4}`` means the minimum and
+   maximum values are 2 and 4, respectively.
 
 -  ``on_start=None``: Accepts a function to be called only once before
    the genetic algorithm starts its evolution. This function must accept
@@ -289,7 +298,7 @@ that the best solution in the initial population.
 The parameters are validated within the constructor. If at least a
 parameter is not validated, an exception is thrown.
 
-.. _header-n593:
+.. _header-n81:
 
 Other Instance Attributes & Methods
 -----------------------------------
@@ -301,7 +310,7 @@ attributes and methods added to the instances of the **pygad.GA** class:
 
 The next 2 subsections list such attributes and methods.
 
-.. _header-n596:
+.. _header-n84:
 
 Other Attributes
 ~~~~~~~~~~~~~~~~
@@ -330,7 +339,7 @@ Other Attributes
    generation. It only exists when the ``save_best_solutions`` parameter
    in the ``pygad.GA`` class constructor is set to ``True``.
 
-.. _header-n614:
+.. _header-n102:
 
 Other Methods
 ~~~~~~~~~~~~~
@@ -357,7 +366,7 @@ Other Methods
 The next sections discuss the methods available in the **pygad.GA**
 class.
 
-.. _header-n627:
+.. _header-n115:
 
 ``initialize_population()``
 ---------------------------
@@ -384,7 +393,7 @@ This method assigns the values of the following 3 instance attributes:
 
 3. ``initial_population``: Keeping the initial population.
 
-.. _header-n643:
+.. _header-n131:
 
 ``cal_pop_fitness()``
 ---------------------
@@ -398,7 +407,7 @@ constructor for each solution.
 
 It returns an array of the solutions' fitness values.
 
-.. _header-n647:
+.. _header-n135:
 
 ``run()``
 ---------
@@ -442,7 +451,7 @@ After the ``run()`` method completes, the following takes place:
 
 -  The ``run_completed`` attribute is set to ``True``.
 
-.. _header-n666:
+.. _header-n154:
 
 Parent Selection Methods
 ------------------------
@@ -460,49 +469,49 @@ All of such methods return an array of the selected parents.
 
 The next subsections list the supported methods for parent selection.
 
-.. _header-n675:
+.. _header-n163:
 
 ``steady_state_selection()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Selects the parents using the steady-state selection technique.
 
-.. _header-n677:
+.. _header-n165:
 
 ``rank_selection()``
 ~~~~~~~~~~~~~~~~~~~~
 
 Selects the parents using the rank selection technique.
 
-.. _header-n679:
+.. _header-n167:
 
 ``random_selection()``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Selects the parents randomly.
 
-.. _header-n681:
+.. _header-n169:
 
 ``tournament_selection()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Selects the parents using the tournament selection technique.
 
-.. _header-n683:
+.. _header-n171:
 
 ``roulette_wheel_selection()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Selects the parents using the roulette wheel selection technique.
 
-.. _header-n685:
+.. _header-n173:
 
 ``stochastic_universal_selection()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Selects the parents using the stochastic universal selection technique.
 
-.. _header-n687:
+.. _header-n175:
 
 Crossover Methods
 -----------------
@@ -519,7 +528,7 @@ All of such methods return an array of the produced offspring.
 
 The next subsections list the supported methods for crossover.
 
-.. _header-n696:
+.. _header-n184:
 
 ``single_point_crossover()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -527,7 +536,7 @@ The next subsections list the supported methods for crossover.
 Applies the single-point crossover. It selects a point randomly at which
 crossover takes place between the pairs of parents.
 
-.. _header-n698:
+.. _header-n186:
 
 ``two_points_crossover()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -535,7 +544,7 @@ crossover takes place between the pairs of parents.
 Applies the 2 points crossover. It selects the 2 points randomly at
 which crossover takes place between the pairs of parents.
 
-.. _header-n700:
+.. _header-n188:
 
 ``uniform_crossover()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -543,7 +552,7 @@ which crossover takes place between the pairs of parents.
 Applies the uniform crossover. For each gene, a parent out of the 2
 mating parents is selected randomly and the gene is copied from it.
 
-.. _header-n702:
+.. _header-n190:
 
 ``scattered_crossover()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -551,7 +560,7 @@ mating parents is selected randomly and the gene is copied from it.
 Applies the scattered crossover. It randomly selects the gene from one
 of the 2 parents.
 
-.. _header-n704:
+.. _header-n192:
 
 Mutation Methods
 ----------------
@@ -565,7 +574,7 @@ All of such methods return an array of the mutated offspring.
 
 The next subsections list the supported methods for mutation.
 
-.. _header-n711:
+.. _header-n199:
 
 ``random_mutation()``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -579,7 +588,7 @@ specified by the 2 attributes ``random_mutation_min_val`` and
 ``random_mutation_max_val``. The random value is added to the selected
 gene.
 
-.. _header-n714:
+.. _header-n202:
 
 ``swap_mutation()``
 ~~~~~~~~~~~~~~~~~~~
@@ -587,7 +596,7 @@ gene.
 Applies the swap mutation which interchanges the values of 2 randomly
 selected genes.
 
-.. _header-n716:
+.. _header-n204:
 
 ``inversion_mutation()``
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -595,7 +604,7 @@ selected genes.
 Applies the inversion mutation which selects a subset of genes and
 inverts them.
 
-.. _header-n718:
+.. _header-n206:
 
 ``scramble_mutation()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -603,7 +612,7 @@ inverts them.
 Applies the scramble mutation which selects a subset of genes and
 shuffles their order randomly.
 
-.. _header-n720:
+.. _header-n208:
 
 ``adaptive_mutation()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -611,7 +620,7 @@ shuffles their order randomly.
 Applies the adaptive mutation which selects a subset of genes and
 shuffles their order randomly.
 
-.. _header-n722:
+.. _header-n210:
 
 ``best_solution()``
 -------------------
@@ -635,7 +644,7 @@ It returns the following:
 -  ``best_match_idx``: Index of the best solution in the current
    population.
 
-.. _header-n736:
+.. _header-n224:
 
 ``plot_result()``
 -----------------
@@ -658,7 +667,7 @@ Starting from PyGAD 2.5.0, a new optional parameter named ``linewidth``
 is added to specify the width of the curve in the plot. It defaults to
 ``3.0``.
 
-.. _header-n748:
+.. _header-n236:
 
 ``save()``
 ----------
@@ -670,7 +679,7 @@ Accepts the following parameter:
 -  ``filename``: Name of the file to save the instance. No extension is
    needed.
 
-.. _header-n754:
+.. _header-n242:
 
 Functions in ``pygad``
 ======================
@@ -679,7 +688,7 @@ Besides the methods available in the **pygad.GA** class, this section
 discusses the functions available in pygad. Up to this time, there is
 only a single function named ``load()``.
 
-.. _header-n756:
+.. _header-n244:
 
 ``pygad.load()``
 ----------------
@@ -696,7 +705,7 @@ Accepts the following parameter:
 
 Returns the genetic algorithm instance.
 
-.. _header-n763:
+.. _header-n251:
 
 Steps to Use ``pygad``
 ======================
@@ -721,7 +730,7 @@ To use the ``pygad`` module, here is a summary of the required steps:
 
 Let's discuss how to do each of these steps.
 
-.. _header-n783:
+.. _header-n271:
 
 Preparing the ``fitness_func`` Parameter 
 -----------------------------------------
@@ -781,7 +790,7 @@ an exception is thrown.
 By creating this function, you almost did an awesome step towards using
 PyGAD.
 
-.. _header-n799:
+.. _header-n287:
 
 Preparing Other Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -809,7 +818,7 @@ Here is an example for preparing the other parameters:
    mutation_type = "random"
    mutation_percent_genes = 10
 
-.. _header-n802:
+.. _header-n290:
 
 The ``callback_generation`` Parameter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -846,7 +855,7 @@ generation.
 After the parameters are prepared, we can import PyGAD and build an
 instance of the **pygad.GA** class.
 
-.. _header-n809:
+.. _header-n297:
 
 Import the ``pygad``
 --------------------
@@ -860,7 +869,7 @@ The next step is to import PyGAD as follows:
 The **pygad.GA** class holds the implementation of all methods for
 running the genetic algorithm.
 
-.. _header-n813:
+.. _header-n301:
 
 Create an Instance of the ``pygad.GA`` Class
 --------------------------------------------
@@ -884,7 +893,7 @@ for creating the initial population.
                           mutation_type=mutation_type,
                           mutation_percent_genes=mutation_percent_genes)
 
-.. _header-n816:
+.. _header-n304:
 
 Run the Genetic Algorithm
 -------------------------
@@ -908,7 +917,7 @@ by doing the following tasks:
 
 4. Repeat the process for the specified number of generations.
 
-.. _header-n829:
+.. _header-n317:
 
 Plotting Results
 ----------------
@@ -924,7 +933,7 @@ generations.
 .. figure:: https://user-images.githubusercontent.com/16560492/78830005-93111d00-79e7-11ea-9d8e-a8d8325a6101.png
    :alt: 
 
-.. _header-n833:
+.. _header-n321:
 
 Information about the Best Solution
 -----------------------------------
@@ -954,7 +963,7 @@ fitness** is reached could be fetched.
    if ga_instance.best_solution_generation != -1:
        print("Best fitness value reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
 
-.. _header-n845:
+.. _header-n333:
 
 Saving & Loading the Results
 ----------------------------
@@ -987,7 +996,7 @@ any property.
 
    print(loaded_ga_instance.best_solution())
 
-.. _header-n852:
+.. _header-n340:
 
 Crossover, Mutation, and Parent Selection
 =========================================
@@ -997,7 +1006,7 @@ the crossover & mutation operators. More features will be added in the
 future. To ask for a new feature, please check the **Ask for Feature**
 section.
 
-.. _header-n854:
+.. _header-n342:
 
 Supported Crossover Operations
 ------------------------------
@@ -1011,7 +1020,7 @@ The supported crossover operations at this time are:
 
 3. Uniform: Implemented using the ``uniform_crossover()`` method.
 
-.. _header-n863:
+.. _header-n351:
 
 Supported Mutation Operations
 -----------------------------
@@ -1026,7 +1035,7 @@ The supported mutation operations at this time are:
 
 4. Scramble: Implemented using the ``scramble_mutation()`` method.
 
-.. _header-n874:
+.. _header-n362:
 
 Supported Parent Selection Operations
 -------------------------------------
@@ -1048,7 +1057,7 @@ The supported parent selection techniques at this time are:
 
 6. Tournament: Implemented using the ``tournament_selection()`` method.
 
-.. _header-n889:
+.. _header-n377:
 
 Life Cycle of PyGAD
 ===================
@@ -1143,7 +1152,7 @@ argument, here is the output.
 
    on_stop()
 
-.. _header-n896:
+.. _header-n384:
 
 Adaptive Mutation
 =================
@@ -1205,7 +1214,7 @@ The next figure summarizes the previous steps.
 
 This strategy is applied in PyGAD.
 
-.. _header-n918:
+.. _header-n406:
 
 Use Adaptive Mutation in PyGAD
 ------------------------------
@@ -1309,7 +1318,86 @@ Here is an example that uses adaptive mutation.
 
    ga_instance.plot_result(title="PyGAD with Adaptive Mutation", linewidth=5)
 
-.. _header-n947:
+.. _header-n435:
+
+Limit the Gene Value Range
+==========================
+
+In `PyGAD
+2.11.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-11-0>`__,
+the ``gene_space`` parameter supported a new feature to allow
+customizing the range of accepted values for each gene. Let's take a
+quick review of the ``gene_space`` parameter to build over it.
+
+The ``gene_space`` parameter allows the user to feed the space of values
+of each gene. This way the accepted values for each gene is retracted to
+the user-defined values. Assume there is a problem that has 3 genes
+where each gene has different set of values as follows:
+
+1. Gene 1: ``[0.4, 12, -5, 21.2]``
+
+2. Gene 2: ``[-2, 0.3]``
+
+3. Gene 3: ``[1.2, 63.2, 7.4]``
+
+Then, the ``gene_space`` for this problem is as given below. Note that
+the order is very important.
+
+.. code:: python
+
+   gene_space = [[0.4, 12, -5, 21.2],
+                 [-2, 0.3],
+                 [1.2, 63.2, 7.4]]
+
+In case all genes share the same set of values, then simply feed a
+single list to the ``gene_space`` parameter as follows. In this case,
+all genes can only take values from this list of 6 values.
+
+.. code:: python
+
+   gene_space = [33, 7, 0.5, 95. 6.3, 0.74]
+
+The previous example restricts the gene values to just a set of fixed
+number of discrete values. In case you want to use a range of discrete
+values to the gene, then you can use the ``range()`` function. For
+example, ``range(1, 7)`` means the set of allowed values for the gene
+are ``1, 2, 3, 4, 5, and 6``. You can also use the ``numpy.arange()`` or
+``numpy.linspace()`` functions for the same purpose.
+
+The previous discussion only works with a range of discrete values not
+continuous values. In `PyGAD
+2.11.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-11-0>`__,
+the ``gene_space`` parameter can be assigned a dictionary that allows
+the gene to have values from a continuous range.
+
+Assuming you want to restrict the gene within this half-open range [1 to
+5) where 1 is included and 5 is not. Then simply create a dictionary
+with 2 items where the keys of the 2 items are:
+
+1. ``'low'``: The minimum value in the range which is 1 in the example.
+
+2. ``'high'``: The maximum value in the range which is 5 in the example.
+
+The dictionary will look like that:
+
+.. code:: python
+
+   {'low': 1,
+    'high': 5}
+
+It is not acceptable to add more than 2 items in the dictionary or use
+other keys than ``'low'`` and ``'high'``.
+
+For a 3-gene problem, the next code creates a dictionary for each gene
+to restrict its values in a continuous range. For the first gene, it can
+take any floating-point value from the range that starts from 1
+(inclusive) and ends at 5 (exclusive).
+
+.. code:: python
+
+   gene_space = [{'low': 1, 'high': 5}, {'low': 0.3, 'high': 1.4}, {'low': -0.2, 'high': 4.5}]
+
+.. _header-n462:
 
 Examples
 ========
@@ -1317,7 +1405,7 @@ Examples
 This section gives the complete code of some examples that use
 ``pygad``. Each subsection builds a different example.
 
-.. _header-n949:
+.. _header-n464:
 
 Linear Model Optimization
 -------------------------
@@ -1419,7 +1507,7 @@ which optimizes a linear model. Its complete code is listed below.
    loaded_ga_instance = pygad.load(filename=filename)
    loaded_ga_instance.plot_result()
 
-.. _header-n952:
+.. _header-n467:
 
 Reproducing Images
 ------------------
@@ -1440,7 +1528,7 @@ available at these links:
 -  `LinkedIn <https://www.linkedin.com/pulse/reproducing-images-using-genetic-algorithm-python-ahmed-gad>`__:
    https://www.linkedin.com/pulse/reproducing-images-using-genetic-algorithm-python-ahmed-gad
 
-.. _header-n960:
+.. _header-n475:
 
 Project Steps
 ~~~~~~~~~~~~~
@@ -1462,7 +1550,7 @@ The steps to follow in order to reproduce an image are as follows:
 
 The next sections discusses the code of each of these steps.
 
-.. _header-n976:
+.. _header-n491:
 
 Read an Image
 ~~~~~~~~~~~~~
@@ -1492,7 +1580,7 @@ range from which the random values are selected during mutation and also
 the range of the values used in the initial population. So, be
 consistent.
 
-.. _header-n983:
+.. _header-n498:
 
 Prepare the Fitness Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1542,7 +1630,7 @@ its code is listed below.
 
        return numpy.reshape(a=vector, newshape=shape)
 
-.. _header-n989:
+.. _header-n504:
 
 Create an Instance of the ``pygad.GA`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1578,7 +1666,7 @@ the full list of parameters.
                           random_mutation_min_val=0.0,
                           random_mutation_max_val=1.0)
 
-.. _header-n994:
+.. _header-n509:
 
 Run PyGAD
 ~~~~~~~~~
@@ -1589,7 +1677,7 @@ Simply, call the ``run()`` method to run PyGAD.
 
    ga_instance.run()
 
-.. _header-n997:
+.. _header-n512:
 
 Plot Results
 ~~~~~~~~~~~~
@@ -1606,7 +1694,7 @@ Here is the plot after 20,000 generations.
 .. figure:: https://user-images.githubusercontent.com/16560492/82232124-77762c00-992e-11ea-9fc6-14a1cd7a04ff.png
    :alt: 
 
-.. _header-n1002:
+.. _header-n517:
 
 Calculate Some Statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1628,7 +1716,7 @@ Here is some information about the best solution.
    matplotlib.pyplot.title("PyGAD & GARI for Reproducing Images")
    matplotlib.pyplot.show()
 
-.. _header-n1005:
+.. _header-n520:
 
 Evolution by Generation
 ~~~~~~~~~~~~~~~~~~~~~~~
