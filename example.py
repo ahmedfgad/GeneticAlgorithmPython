@@ -30,9 +30,6 @@ num_parents_mating = 10 # Number of solutions to be selected as parents in the m
 sol_per_pop = 20 # Number of solutions in the population.
 num_genes = len(function_inputs)
 
-init_range_low = -2
-init_range_high = 5
-
 parent_selection_type = "sss" # Type of parent selection.
 keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
@@ -56,8 +53,6 @@ ga_instance = pygad.GA(num_generations=num_generations,
                        fitness_func=fitness_function,
                        sol_per_pop=sol_per_pop,
                        num_genes=num_genes,
-                       init_range_low=init_range_low,
-                       init_range_high=init_range_high,
                        parent_selection_type=parent_selection_type,
                        keep_parents=keep_parents,
                        crossover_type=crossover_type,
