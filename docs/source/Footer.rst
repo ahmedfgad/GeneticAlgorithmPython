@@ -1120,7 +1120,7 @@ Contact Us
 .. figure:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :alt: 
 
-.. |image0| image:: D:\Gad - GitHub Projects\PyGAD\Korean-1.jpg
+.. |image0| image:: https://user-images.githubusercontent.com/16560492/108586306-85bd0280-731b-11eb-874c-7ac4ce1326cd.jpg
    :target: https://data-newbie.tistory.com/m/685
 .. |image1| image:: https://miro.medium.com/max/700/0*gvOX4zfdt9Vovo3T.jpg
    :target: https://erencan34.medium.com/pygad-ile-genetik-algoritmay%C4%B1-kullanarak-keras-modelleri-nas%C4%B1l-e%C4%9Fitilir-cf92639a478c
