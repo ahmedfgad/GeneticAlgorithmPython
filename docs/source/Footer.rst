@@ -1122,11 +1122,11 @@ Contact Us
 
 .. |image0| image:: https://user-images.githubusercontent.com/16560492/108586306-85bd0280-731b-11eb-874c-7ac4ce1326cd.jpg
    :target: https://data-newbie.tistory.com/m/685
-.. |image1| image:: https://miro.medium.com/max/700/0*gvOX4zfdt9Vovo3T.jpg
+.. |image1| image:: https://user-images.githubusercontent.com/16560492/108586601-85be0200-731d-11eb-98a4-161c75a1f099.jpg
    :target: https://erencan34.medium.com/pygad-ile-genetik-algoritmay%C4%B1-kullanarak-keras-modelleri-nas%C4%B1l-e%C4%9Fitilir-cf92639a478c
-.. |image2| image:: https://miro.medium.com/max/700/0*-1K57shFWoMtbehs.png
+.. |image2| image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :target: https://thebojda.medium.com/tensorflow-alapoz%C3%B3-10-24f7767d4a2c
-.. |image3| image:: https://neurohive.io/wp-content/uploads/2020/08/Snimok-ekrana-2020-08-15-v-8.24.50-PM.png
+.. |image3| image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :target: https://neurohive.io/ru/frameworki/pygad-biblioteka-dlya-implementacii-geneticheskogo-algoritma
 .. |image4| image:: https://user-images.githubusercontent.com/16560492/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png
    :target: https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad
