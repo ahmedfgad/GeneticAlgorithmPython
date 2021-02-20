@@ -185,7 +185,8 @@ class GA:
         elif numpy.array(initial_population).ndim != 2:
             raise ValueError("A 2D list is expected to the initail_population parameter but a ({initial_population_ndim}-D) list found.".format(initial_population_ndim=numpy.array(initial_population).ndim))
         else:
-            self.initial_population = numpy.array(initial_population)
+            # Forcing the initial_population array to have the data type assigned to the gene_type parameter.
+            self.initial_population = numpy.array(initial_population, dtype=self.gene_type)
             self.population = self.initial_population.copy() # A NumPy array holding the initial population.
             self.num_genes = self.initial_population.shape[1] # Number of genes in the solution.
             self.sol_per_pop = self.initial_population.shape[0]  # Number of solutions in the population.
@@ -647,6 +648,11 @@ class GA:
         self.save_best_solutions = save_best_solutions
         self.best_solutions = [] # Holds the best solution in each generation.
 
+        self.last_generation_fitness = None # A list holding the fitness values of all solutions in the last generation.
+        self.last_generation_parents = None # A list holding the parents of the last generation.
+        self.last_generation_offspring_crossover = None # A list holding the offspring after applying crossover in the last generation.
+        self.last_generation_offspring_mutation = None # A list holding the offspring after applying mutation in the last generation.
+
     def initialize_population(self, low, high):
 
         """
@@ -748,12 +754,12 @@ class GA:
             self.on_start(self)
 
         for generation in range(self.num_generations):
-            # Measuring the fitness of each chromosome in the population.
-            fitness = self.cal_pop_fitness()
+            # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
+            self.last_generation_fitness = self.cal_pop_fitness()
             if not (self.on_fitness is None):
-                self.on_fitness(self, fitness)
+                self.on_fitness(self, self.last_generation_fitness)
 
-            best_solution, best_solution_fitness, best_match_idx = self.best_solution(pop_fitness=fitness)
+            best_solution, best_solution_fitness, best_match_idx = self.best_solution(pop_fitness=self.last_generation_fitness)
 
             # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
             self.best_solutions_fitness.append(best_solution_fitness)
@@ -763,42 +769,42 @@ class GA:
                 self.best_solutions.append(best_solution)
 
             # Selecting the best parents in the population for mating.
-            parents = self.select_parents(fitness, num_parents=self.num_parents_mating)
+            self.last_generation_parents = self.select_parents(self.last_generation_fitness, num_parents=self.num_parents_mating)
             if not (self.on_parents is None):
-                self.on_parents(self, parents)
+                self.on_parents(self, self.last_generation_parents)
 
             # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
             if self.crossover_type is None:
                 if self.num_offspring <= self.keep_parents:
-                    offspring_crossover = parents[0:self.num_offspring]
+                    self.last_generation_offspring_crossover = self.last_generation_parents[0:self.num_offspring]
                 else:
-                    offspring_crossover = numpy.concatenate((parents, self.population[0:(self.num_offspring - parents.shape[0])]))
+                    self.last_generation_offspring_crossover = numpy.concatenate((self.last_generation_parents, self.population[0:(self.num_offspring - self.last_generation_parents.shape[0])]))
             else:
                 # Generating offspring using crossover.
-                offspring_crossover = self.crossover(parents,
+                self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
                                                      offspring_size=(self.num_offspring, self.num_genes))
                 if not (self.on_crossover is None):
-                    self.on_crossover(self, offspring_crossover)
+                    self.on_crossover(self, self.last_generation_offspring_crossover)
 
             # If self.mutation_type=None, then no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
             if self.mutation_type is None:
-                offspring_mutation = offspring_crossover
+                self.last_generation_offspring_mutation = self.last_generation_offspring_crossover
             else:
                 # Adding some variations to the offspring using mutation.
-                offspring_mutation = self.mutation(offspring_crossover)
+                self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover)
                 if not (self.on_mutation is None):
-                    self.on_mutation(self, offspring_mutation)
+                    self.on_mutation(self, self.last_generation_offspring_mutation)
 
             if (self.keep_parents == 0):
-                self.population = offspring_mutation
+                self.population = self.last_generation_offspring_mutation
             elif (self.keep_parents == -1):
                 # Creating the new population based on the parents and offspring.
-                self.population[0:parents.shape[0], :] = parents
-                self.population[parents.shape[0]:, :] = offspring_mutation
+                self.population[0:self.last_generation_parents.shape[0], :] = self.last_generation_parents
+                self.population[self.last_generation_parents.shape[0]:, :] = self.last_generation_offspring_mutation
             elif (self.keep_parents > 0):
-                parents_to_keep = self.steady_state_selection(fitness, num_parents=self.keep_parents)
+                parents_to_keep = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_parents)
                 self.population[0:parents_to_keep.shape[0], :] = parents_to_keep
-                self.population[parents_to_keep.shape[0]:, :] = offspring_mutation
+                self.population[parents_to_keep.shape[0]:, :] = self.last_generation_offspring_mutation
 
             self.generations_completed = generation + 1 # The generations_completed attribute holds the number of the last completed generation.
 
@@ -813,9 +819,9 @@ class GA:
 
             time.sleep(self.delay_after_gen)
 
-        last_gen_fitness = self.cal_pop_fitness()
+        self.last_generation_fitness = self.cal_pop_fitness()
         # Save the fitness value of the best solution.
-        _, best_solution_fitness, _ = self.best_solution(pop_fitness=last_gen_fitness)
+        _, best_solution_fitness, _ = self.best_solution(pop_fitness=self.last_generation_fitness)
         self.best_solutions_fitness.append(best_solution_fitness)
 
         self.best_solution_generation = numpy.where(numpy.array(self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
@@ -823,7 +829,7 @@ class GA:
         self.run_completed = True # Set to True only after the run() method completes gracefully.
 
         if not (self.on_stop is None):
-            self.on_stop(self, last_gen_fitness)
+            self.on_stop(self, self.last_generation_fitness)
 
         # Converting the 'best_solutions' list into a NumPy array.
         self.best_solutions = numpy.array(self.best_solutions)
@@ -1410,7 +1416,7 @@ class GA:
         It returns the average fitness to be used in adaptive mutation.
         """        
 
-        fitness = self.cal_pop_fitness()
+        fitness = self.last_generation_fitness.copy()
         temp_population = numpy.zeros_like(self.population)
         if self.keep_parents == 0:
             temp_population = offspring
