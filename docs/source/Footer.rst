@@ -624,8 +624,8 @@ Release Date: 20 February 2021
 Thanks to `Marios
 Giouvanakis <https://www.researchgate.net/profile/Marios-Giouvanakis>`__,
 a PhD candidate in Electrical & Computer Engineer, `Aristotle University
-of Thessaloniki, Greece <https://www.auth.gr/en>`__, for emailing me
-about these issues.
+of Thessaloniki (Αριστοτέλειο Πανεπιστήμιο Θεσσαλονίκης),
+Greece <https://www.auth.gr/en>`__, for emailing me about these issues.
 
 .. _header-n242:
 
