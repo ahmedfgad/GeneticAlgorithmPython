@@ -40,13 +40,16 @@ regularly. Please contact us if you want a feature to be supported.
 Donation
 ========
 
-You can donate to PyGAD via `Open
-Collective <https://opencollective.com/pygad>`__:
-`opencollective.com/pygad <https://opencollective.com/pygad>`__.
+You can donate to PyGAD via:
 
-To donate using PayPal, use either this link:
-`paypal.me/ahmedfgad <https://paypal.me/ahmedfgad>`__ or the e-mail
-address ahmed.f.gad@gmail.com.
+-  `Open Collective <https://opencollective.com/pygad>`__:
+   `opencollective.com/pygad <https://opencollective.com/pygad>`__
+
+-  PayPal: Use either this link:
+   `paypal.me/ahmedfgad <https://paypal.me/ahmedfgad>`__ or the e-mail
+   address ahmed.f.gad@gmail.com
+
+-  Interac e-Transfer: Use e-mail address ahmed.f.gad@gmail.com
 
 .. _header-n62:
 

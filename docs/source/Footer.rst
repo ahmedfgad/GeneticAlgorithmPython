@@ -250,7 +250,9 @@ Release date: 19 July 2020
    ``pygad.GA`` class constructor. It is used to specify the possible
    values for each gene in case the user wants to restrict the gene
    values. It is useful if the gene space is restricted to a certain
-   range or to discrete values.
+   range or to discrete values. Thanks to `Prof. Tamer A.
+   Farrag <https://github.com/tfarrag2000>`__ for requesting this useful
+   feature.
 
 Assuming that all genes have the same global space which include the
 values 0.3, 5.2, -4, and 8, then those values can be assigned to the
@@ -590,6 +592,43 @@ Release Date: 16 February 2021
 
 .. _header-n234:
 
+PyGAD 2.12.0
+------------
+
+Release Date: 20 February 2021
+
+1. 4 new instance attributes are added to hold temporary results after
+   each generation: ``last_generation_fitness`` holds the fitness values
+   of the solutions in the last generation, ``last_generation_parents``
+   holds the parents selected from the last generation,
+   ``last_generation_offspring_crossover`` holds the offspring generated
+   after applying the crossover in the last generation, and
+   ``last_generation_offspring_mutation`` holds the offspring generated
+   after applying the mutation in the last generation. You can access
+   these attributes inside the ``on_generation()`` method for example.
+
+2. A bug fixed when the ``initial_population`` parameter is used. The
+   bug occurred due to a mismatch between the data type of the array
+   assigned to ``initial_population`` and the gene type in the
+   ``gene_type`` attribute. Assuming that the array assigned to the
+   ``initial_population`` parameter is
+   ``((1, 1), (3, 3), (5, 5), (7, 7))`` which has type ``int``. When
+   ``gene_type`` is set to ``float``, then the genes will not be float
+   but casted to ``int`` because the defined array has ``int`` type. The
+   bug is fixed by forcing the array assigned to ``initial_population``
+   to have the data type in the ``gene_type`` attribute. Check the
+   `issue at
+   GitHub <https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/27>`__:
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/27
+
+Thanks to `Marios
+Giouvanakis <https://www.researchgate.net/profile/Marios-Giouvanakis>`__,
+a PhD candidate in Electrical & Computer Engineer, `Aristotle University
+of Thessaloniki (Αριστοτέλειο Πανεπιστήμιο Θεσσαλονίκης),
+Greece <https://www.auth.gr/en>`__, for emailing me about these issues.
+
+.. _header-n242:
+
 PyGAD Projects at GitHub
 ========================
 
@@ -598,7 +637,7 @@ https://pypi.org/project/pygad. PyGAD is built out of a number of
 open-source GitHub projects. A brief note about these projects is given
 in the next subsections.
 
-.. _header-n236:
+.. _header-n244:
 
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 --------------------------------------------------------------------------------
@@ -609,7 +648,7 @@ GitHub Link: https://github.com/ahmedfgad/GeneticAlgorithmPython
 is the first project which is an open-source Python 3 project for
 implementing the genetic algorithm based on NumPy.
 
-.. _header-n239:
+.. _header-n247:
 
 `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__
 ----------------------------------------------------
@@ -623,7 +662,7 @@ neural network without using a training algorithm. Currently, it only
 supports classification and later regression will be also supported.
 Moreover, only one class is supported per sample.
 
-.. _header-n242:
+.. _header-n250:
 
 `NeuralGenetic <https://github.com/ahmedfgad/NeuralGenetic>`__
 --------------------------------------------------------------
@@ -636,7 +675,7 @@ projects
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 and `NumPyANN <https://github.com/ahmedfgad/NumPyANN>`__.
 
-.. _header-n245:
+.. _header-n253:
 
 `NumPyCNN <https://github.com/ahmedfgad/NumPyCNN>`__
 ----------------------------------------------------
@@ -648,7 +687,7 @@ convolutional neural networks using NumPy. The purpose of this project
 is to only implement the **forward pass** of a convolutional neural
 network without using a training algorithm.
 
-.. _header-n248:
+.. _header-n256:
 
 `CNNGenetic <https://github.com/ahmedfgad/CNNGenetic>`__
 --------------------------------------------------------
@@ -660,7 +699,7 @@ convolutional neural networks using the genetic algorithm. It uses the
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 project for building the genetic algorithm.
 
-.. _header-n251:
+.. _header-n259:
 
 `KerasGA <https://github.com/ahmedfgad/KerasGA>`__
 --------------------------------------------------
@@ -673,7 +712,7 @@ the
 `GeneticAlgorithmPython <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__
 project for building the genetic algorithm.
 
-.. _header-n254:
+.. _header-n262:
 
 `TorchGA <https://github.com/ahmedfgad/TorchGA>`__
 --------------------------------------------------
@@ -689,7 +728,22 @@ project for building the genetic algorithm.
 `pygad.torchga <https://github.com/ahmedfgad/TorchGA>`__:
 https://github.com/ahmedfgad/TorchGA
 
-.. _header-n258:
+.. _header-n266:
+
+Stackoverflow Questions about PyGAD
+===================================
+
+.. _header-n267:
+
+`How can I save a matplotlib plot that is the output of a function in jupyter? <https://stackoverflow.com/questions/66055330/how-can-i-save-a-matplotlib-plot-that-is-the-output-of-a-function-in-jupyter>`__
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+.. _header-n268:
+
+`How do I query the best solution of a pyGAD GA instance? <https://stackoverflow.com/questions/65757722/how-do-i-query-the-best-solution-of-a-pygad-ga-instance>`__
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+.. _header-n269:
 
 Submitting Issues
 =================
@@ -703,10 +757,11 @@ into this GitHub project
 (https://github.com/ahmedfgad/GeneticAlgorithmPython) in case something
 is not working properly or to ask for questions.
 
-If this is not a proper option for you, then check the **Contact Us**
+If this is not a proper option for you, then check the `Contact
+Us <https://pygad.readthedocs.io/en/latest/Footer.html#contact-us>`__
 section for more contact details.
 
-.. _header-n262:
+.. _header-n273:
 
 Ask for Feature
 ===============
@@ -723,7 +778,7 @@ to ahmed.f.gad@gmail.com.
 
 Also check the **Contact Us** section for more contact details.
 
-.. _header-n266:
+.. _header-n277:
 
 Projects Built using PyGAD
 ==========================
@@ -742,7 +797,144 @@ Within your message, please send the following details:
 
 -  Preferably, a link that directs the readers to your project
 
-.. _header-n277:
+.. _header-n288:
+
+PyGAD in Other Languages
+========================
+
+.. _header-n289:
+
+Korean
+------
+
+.. _header-n290:
+
+`[PyGAD] Python 에서 Genetic Algorithm 을 사용해보기 <https://data-newbie.tistory.com/m/685>`__
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+|image0|
+
+파이썬에서 genetic algorithm을 사용하는 패키지들을 다 사용해보진
+않았지만, 확장성이 있어보이고, 시도할 일이 있어서 살펴봤다.
+
+이 패키지에서 가장 인상 깊었던 것은 neural network에서 hyper parameter
+탐색을 gradient descent 방식이 아닌 GA로도 할 수 있다는 것이다.
+
+개인적으로 이 부분이 어느정도 초기치를 잘 잡아줄 수 있는 역할로도 쓸 수
+있고, Loss가 gradient descent 하기 어려운 구조에서 대안으로 쓸 수 있을
+것으로도 생각된다.
+
+일단 큰 흐름은 다음과 같이 된다.
+
+사실 완전히 흐름이나 각 parameter에 대한 이해는 부족한 상황
+
+.. _header-n297:
+
+Turkish
+-------
+
+.. _header-n298:
+
+`PyGAD ile Genetik Algoritmayı Kullanarak Keras Modelleri Nasıl Eğitilir <https://erencan34.medium.com/pygad-ile-genetik-algoritmay%C4%B1-kullanarak-keras-modelleri-nas%C4%B1l-e%C4%9Fitilir-cf92639a478c>`__
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is a translation of an original English tutorial published at
+Paperspace: `How To Train Keras Models Using the Genetic Algorithm with
+PyGAD <https://blog.paperspace.com/train-keras-models-using-genetic-algorithm-with-pygad>`__
+
+|image1|
+
+PyGAD, genetik algoritma oluşturmak ve makine öğrenimi algoritmalarını
+eğitmek için kullanılan açık kaynaklı bir Python kitaplığıdır. Genetik
+algoritmayı farklı problem türleri ile çalışacak şekilde özelleştirmek
+için çok çeşitli parametreler sunar.
+
+PyGAD, sinir ağları (NN’ler) ve evrişimli sinir ağları (CNN’ler)
+oluşturmayı ve eğitmeyi destekleyen kendi modüllerine sahiptir. Bu
+modüllerin iyi çalışmasına rağmen, herhangi bir ek optimizasyon önlemi
+olmaksızın Python’da uygulanırlar. Bu, basit problemler için bile
+nispeten yüksek hesaplama sürelerine yol açar.
+
+En son PyGAD sürümü 2.8.0 (20 Eylül 2020'de piyasaya sürüldü), Keras
+modellerini eğitmek için yeni bir modülü destekliyor. Keras Python’da
+oluşturulmuş olsa da hızlıdır. Bunun nedeni, Keras’ın arka uç olarak
+TensorFlow kullanması ve TensorFlow’un oldukça optimize edilmiş
+olmasıdır.
+
+Bu öğreticide, PyGAD kullanılarak Keras modellerinin nasıl eğitileceği
+anlatılmaktadır. Tartışma, Sıralı Modeli veya İşlevsel API’yi kullanarak
+Keras modellerini oluşturmayı, Keras model parametrelerinin ilk
+popülasyonunu oluşturmayı, uygun bir uygunluk işlevi oluşturmayı ve daha
+fazlasını içerir.
+
+.. _header-n305:
+
+Hungarian
+---------
+
+.. _header-n306:
+
+`Tensorflow alapozó 10. Neurális hálózatok tenyésztése genetikus algoritmussal PyGAD és OpenAI Gym használatával <https://thebojda.medium.com/tensorflow-alapoz%C3%B3-10-24f7767d4a2c>`__
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+|image2|
+
+Hogy kontextusba helyezzem a genetikus algoritmusokat, ismételjük kicsit
+át, hogy hogyan működik a gradient descent és a backpropagation, ami a
+neurális hálók tanításának általános módszere. Az erről írt cikkemet itt
+tudjátok elolvasni.
+
+A hálózatok tenyésztéséhez a
+`PyGAD <https://pygad.readthedocs.io/en/latest/>`__ nevű
+programkönyvtárat használjuk, így mindenek előtt ezt kell telepítenünk,
+valamint a Tensorflow-t és a Gym-et, amit Colabban már eleve telepítve
+kapunk.
+
+Maga a PyGAD egy teljesen általános genetikus algoritmusok futtatására
+képes rendszer. Ennek a kiterjesztése a KerasGA, ami az általános motor
+Tensorflow (Keras) neurális hálókon történő futtatását segíti. A 47.
+sorban létrehozott KerasGA objektum ennek a kiterjesztésnek a része és
+arra szolgál, hogy a paraméterként átadott modellből a második
+paraméterben megadott számosságú populációt hozzon létre. Mivel a
+hálózatunk 386 állítható paraméterrel rendelkezik, ezért a DNS-ünk itt
+386 elemből fog állni. A populáció mérete 10 egyed, így a kezdő
+populációnk egy 10x386 elemű mátrix lesz. Ezt adjuk át az 51. sorban az
+initial_population paraméterben.
+
+.. _header-n311:
+
+Russian
+-------
+
+.. _header-n312:
+
+`PyGAD: библиотека для имплементации генетического алгоритма <https://neurohive.io/ru/frameworki/pygad-biblioteka-dlya-implementacii-geneticheskogo-algoritma>`__
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+|image3|
+
+PyGAD — это библиотека для имплементации генетического алгоритма. Кроме
+того, библиотека предоставляет доступ к оптимизированным реализациям
+алгоритмов машинного обучения. PyGAD разрабатывали на Python 3.
+
+Библиотека PyGAD поддерживает разные типы скрещивания, мутации и
+селекции родителя. PyGAD позволяет оптимизировать проблемы с помощью
+генетического алгоритма через кастомизацию целевой функции.
+
+Кроме генетического алгоритма, библиотека содержит оптимизированные
+имплементации алгоритмов машинного обучения. На текущий момент PyGAD
+поддерживает создание и обучение нейросетей для задач классификации.
+
+Библиотека находится в стадии активной разработки. Создатели планируют
+добавление функционала для решения бинарных задач и имплементации новых
+алгоритмов.
+
+PyGAD разрабатывали на Python 3.7.3. Зависимости включают в себя NumPy
+для создания и манипуляции массивами и Matplotlib для визуализации. Один
+из изкейсов использования инструмента — оптимизация весов, которые
+удовлетворяют заданной функции.
+
+.. _header-n319:
 
 For More Information
 ====================
@@ -750,7 +942,7 @@ For More Information
 There are different resources that can be used to get started with the
 genetic algorithm and building it in Python.
 
-.. _header-n279:
+.. _header-n321:
 
 Tutorial: Implementing Genetic Algorithm in Python
 --------------------------------------------------
@@ -772,9 +964,9 @@ tutorial <https://www.linkedin.com/pulse/genetic-algorithm-implementation-python
 is prepared based on a previous version of the project but it still a
 good resource to start with coding the genetic algorithm.
 
-|image0|
+|image4|
 
-.. _header-n290:
+.. _header-n332:
 
 Tutorial: Introduction to Genetic Algorithm
 -------------------------------------------
@@ -791,9 +983,9 @@ which is available at these links:
 
 -  `KDnuggets <https://towardsdatascience.com/introduction-to-optimization-with-genetic-algorithm-2f5001d9964b>`__
 
-|image1|
+|image5|
 
-.. _header-n300:
+.. _header-n342:
 
 Tutorial: Build Neural Networks in Python
 -----------------------------------------
@@ -811,9 +1003,9 @@ available at these links:
 
 -  `KDnuggets <https://www.kdnuggets.com/2019/02/artificial-neural-network-implementation-using-numpy-and-image-classification.html>`__
 
-|image2|
+|image6|
 
-.. _header-n310:
+.. _header-n352:
 
 Tutorial: Optimize Neural Networks with Genetic Algorithm
 ---------------------------------------------------------
@@ -831,9 +1023,9 @@ available at these links:
 
 -  `KDnuggets <https://www.kdnuggets.com/2019/03/artificial-neural-networks-optimization-genetic-algorithm-python.html>`__
 
-|image3|
+|image7|
 
-.. _header-n320:
+.. _header-n362:
 
 Tutorial: Building CNN in Python
 --------------------------------
@@ -857,9 +1049,9 @@ tutorial <https://www.linkedin.com/pulse/building-convolutional-neural-network-u
 is prepared based on a previous version of the project but it still a
 good resource to start with coding CNNs.
 
-|image4|
+|image8|
 
-.. _header-n333:
+.. _header-n375:
 
 Tutorial: Derivation of CNN from FCNN
 -------------------------------------
@@ -876,9 +1068,9 @@ which is available at these links:
 
 -  `KDnuggets <https://www.kdnuggets.com/2018/04/derivation-convolutional-neural-network-fully-connected-step-by-step.html>`__
 
-|image5|
+|image9|
 
-.. _header-n343:
+.. _header-n385:
 
 Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 --------------------------------------------------------------------------
@@ -904,7 +1096,7 @@ Find the book at these links:
 .. figure:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
    :alt: 
 
-.. _header-n358:
+.. _header-n400:
 
 Contact Us
 ==========
@@ -928,15 +1120,23 @@ Contact Us
 .. figure:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :alt: 
 
-.. |image0| image:: https://user-images.githubusercontent.com/16560492/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png
+.. |image0| image:: D:\Gad - GitHub Projects\PyGAD\Korean-1.jpg
+   :target: https://data-newbie.tistory.com/m/685
+.. |image1| image:: https://miro.medium.com/max/700/0*gvOX4zfdt9Vovo3T.jpg
+   :target: https://erencan34.medium.com/pygad-ile-genetik-algoritmay%C4%B1-kullanarak-keras-modelleri-nas%C4%B1l-e%C4%9Fitilir-cf92639a478c
+.. |image2| image:: https://miro.medium.com/max/700/0*-1K57shFWoMtbehs.png
+   :target: https://thebojda.medium.com/tensorflow-alapoz%C3%B3-10-24f7767d4a2c
+.. |image3| image:: https://neurohive.io/wp-content/uploads/2020/08/Snimok-ekrana-2020-08-15-v-8.24.50-PM.png
+   :target: https://neurohive.io/ru/frameworki/pygad-biblioteka-dlya-implementacii-geneticheskogo-algoritma
+.. |image4| image:: https://user-images.githubusercontent.com/16560492/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png
    :target: https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad
-.. |image1| image:: https://user-images.githubusercontent.com/16560492/82078259-26252d00-96e1-11ea-9a02-52a99e1054b9.jpg
+.. |image5| image:: https://user-images.githubusercontent.com/16560492/82078259-26252d00-96e1-11ea-9a02-52a99e1054b9.jpg
    :target: https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad
-.. |image2| image:: https://user-images.githubusercontent.com/16560492/82078281-30472b80-96e1-11ea-8017-6a1f4383d602.jpg
+.. |image6| image:: https://user-images.githubusercontent.com/16560492/82078281-30472b80-96e1-11ea-8017-6a1f4383d602.jpg
    :target: https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad
-.. |image3| image:: https://user-images.githubusercontent.com/16560492/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg
+.. |image7| image:: https://user-images.githubusercontent.com/16560492/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg
    :target: https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad
-.. |image4| image:: https://user-images.githubusercontent.com/16560492/82431022-6c3a1200-9a8e-11ea-8f1b-b055196d76e3.png
+.. |image8| image:: https://user-images.githubusercontent.com/16560492/82431022-6c3a1200-9a8e-11ea-8f1b-b055196d76e3.png
    :target: https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad
-.. |image5| image:: https://user-images.githubusercontent.com/16560492/82431369-db176b00-9a8e-11ea-99bd-e845192873fc.png
+.. |image9| image:: https://user-images.githubusercontent.com/16560492/82431369-db176b00-9a8e-11ea-99bd-e845192873fc.png
    :target: https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad
