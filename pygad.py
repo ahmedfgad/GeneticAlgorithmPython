@@ -39,7 +39,8 @@ class GA:
                  on_stop=None,
                  delay_after_gen=0.0,
                  save_best_solutions=False,
-                 suppress_warnings=False):
+                 suppress_warnings=False,
+                 allow_duplicate_genes=True):
 
         """
         The constructor of the GA class accepts all parameters required to create an instance of the GA class. It validates such parameters.
@@ -88,10 +89,12 @@ class GA:
         on_stop: Accepts a function to be called only once exactly before the genetic algorithm stops or when it completes all the generations. This function must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of fitness values of the last population's solutions. Added in PyGAD 2.6.0. 
 
         delay_after_gen: Added in PyGAD 2.4.0. It accepts a non-negative number specifying the number of seconds to wait after a generation completes and before going to the next generation. It defaults to 0.0 which means no delay after the generation.
-        
+
         save_best_solutions: Added in PyGAD 2.9.0 and its type is bool. If True, then the best solution in each generation is saved into the 'best_solutions' attribute. Use this parameter with caution as it may cause memory overflow when either the number of generations or the number of genes is large.
 
         suppress_warnings: Added in PyGAD 2.10.0 and its type is bool. If True, then no warning messages will be displayed. It defaults to False.
+
+        allow_duplicate_genes: Added in PyGAD 2.13.0. If True, then a solution/chromosome may have duplicate gene values. If False, then each gene will have a unique value in its solution.
         """
         
         if type(suppress_warnings) is bool:
@@ -150,7 +153,7 @@ class GA:
         else:
             self.valid_parameters = False
             raise TypeError("The expected type of 'gene_space' is list, tuple, range, or numpy.ndarray but ({gene_space_type}) found.".format(gene_space_type=type(gene_space)))
-
+            
         self.gene_space = gene_space
 
         self.init_range_low = init_range_low
@@ -178,8 +181,15 @@ class GA:
                 # When initial_population=None and the 2 parameters sol_per_pop and num_genes have valid integer values, then the initial population is created.
                 # Inside the initialize_population() method, the initial_population attribute is assigned to keep the initial population accessible.
                 self.num_genes = num_genes # Number of genes in the solution.
+
+                # In case the 'gene_space' parameter is nested, then make sure the number of its elements equals to the number of genes.
+                if self.gene_space_nested:
+                    if len(gene_space) != self.num_genes:
+                        self.valid_parameters = False
+                        raise TypeError("When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len_gene_space}) != num_genes ({len_num_genes})".format(len_gene_space=len(gene_space), len_num_genes=self.num_genes))
+
                 self.sol_per_pop = sol_per_pop # Number of solutions in the population.
-                self.initialize_population(self.init_range_low, self.init_range_high)
+                self.initialize_population(self.init_range_low, self.init_range_high, allow_duplicate_genes, True, gene_type)
             else:
                 raise TypeError("The expected type of both the sol_per_pop and num_genes parameters is int but ({sol_per_pop_type}) and {num_genes_type} found.".format(sol_per_pop_type=type(sol_per_pop), num_genes_type=type(num_genes)))
         elif numpy.array(initial_population).ndim != 2:
@@ -434,7 +444,7 @@ class GA:
             self.select_parents = self.rank_selection
         else:
             self.valid_parameters = False
-            raise ValueError("Undefined parent selection type: {parent_selection_type}. \nThe assigned value to the parent_selection_type argument does not refer to one of the supported parent selection techniques which are: \n-sss (for steady state selection)\n-rws (for roulette wheel selection)\n-sus (for stochastic universal selection)\n-rank (for rank selection)\n-random (for random selection)\n-tournament (for tournament selection).\n".format(parent_selection_type))
+            raise ValueError("Undefined parent selection type: {parent_selection_type}. \nThe assigned value to the parent_selection_type argument does not refer to one of the supported parent selection techniques which are: \n-sss (for steady state selection)\n-rws (for roulette wheel selection)\n-sus (for stochastic universal selection)\n-rank (for rank selection)\n-random (for random selection)\n-tournament (for tournament selection).\n".format(parent_selection_type=parent_selection_type))
 
         if(parent_selection_type == "tournament"):
             if (K_tournament > self.sol_per_pop):
@@ -624,6 +634,12 @@ class GA:
             self.valid_parameters = False
             raise ValueError("The value passed to the 'save_best_solutions' parameter must be of type bool but ({save_best_solutions_type}) found.".format(save_best_solutions_type=type(save_best_solutions)))
 
+        if not (type(allow_duplicate_genes) is bool):
+            self.valid_parameters = False
+            raise TypeError("The expected type of the 'allow_duplicate_genes' parameter is bool but ({allow_duplicate_genes_type}) found.".format(allow_duplicate_genes_type=type(allow_duplicate_genes)))
+
+        self.allow_duplicate_genes = allow_duplicate_genes
+
         # The number of completed generations.
         self.generations_completed = 0
 
@@ -633,6 +649,17 @@ class GA:
         # Parameters of the genetic algorithm.
         self.num_generations = abs(num_generations)
         self.parent_selection_type = parent_selection_type
+
+        if type(random_mutation_min_val) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+            if type(random_mutation_max_val) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                if random_mutation_min_val == random_mutation_max_val:
+                    if not self.suppress_warnings: warnings.warn("The values of the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val' are equal and this causes a fixed change to all genes.")
+            else:
+                self.valid_parameters = False
+                raise TypeError("The expected type of the 'random_mutation_max_val' parameter is numeric but ({random_mutation_max_val_type}) found.".format(random_mutation_max_val_type=type(random_mutation_max_val)))
+        else:
+            self.valid_parameters = False
+            raise TypeError("The expected type of the 'random_mutation_min_val' parameter is numeric but ({random_mutation_min_val_type}) found.".format(random_mutation_min_val_type=type(random_mutation_min_val)))
 
         # Parameters of the mutation operation.
         self.mutation_percent_genes = mutation_percent_genes
@@ -653,7 +680,33 @@ class GA:
         self.last_generation_offspring_crossover = None # A list holding the offspring after applying crossover in the last generation.
         self.last_generation_offspring_mutation = None # A list holding the offspring after applying mutation in the last generation.
 
-    def initialize_population(self, low, high):
+    def solve_duplicate_genes(self, solution, random_mutation_min_val, random_mutation_max_val, mutation_by_replacement, gene_type, num_trials=10):
+        new_solution = solution.copy()
+        _, unique_gene_indices = numpy.unique(solution, return_index=True)
+        not_unique_indices = set(range(len(solution))) - set(unique_gene_indices)
+        num_unsolved_duplicates = 0
+        if len(not_unique_indices) > 0:
+            for duplicate_index in not_unique_indices:
+                for trial_index in range(num_trials):
+                    temp_val = numpy.random.uniform(low=random_mutation_min_val,
+                                                    high=random_mutation_max_val,
+                                                    size=1)
+                    if mutation_by_replacement:
+                        temp_val = gene_type(temp_val)
+                    else:
+                        temp_val = gene_type(new_solution[duplicate_index] + temp_val)
+                    if temp_val in new_solution and trial_index == (num_trials - 1):
+                        num_unsolved_duplicates = num_unsolved_duplicates + 1
+                        if not self.suppress_warnings: warnings.warn("Failed to find a unique value for gene with index {gene_idx}".format(gene_idx=duplicate_index))
+                    elif temp_val in new_solution:
+                        continue
+                    else:
+                        new_solution[duplicate_index] = temp_val
+                        break
+
+        return new_solution, not_unique_indices, num_unsolved_duplicates
+
+    def initialize_population(self, low, high, allow_duplicate_genes, mutation_by_replacement, gene_type):
 
         """
         Creates an initial population randomly as a NumPy array. The array is saved in the instance attribute named 'population'.
@@ -675,6 +728,15 @@ class GA:
             self.population = numpy.asarray(numpy.random.uniform(low=low, 
                                                                  high=high, 
                                                                  size=self.pop_size), dtype=self.gene_type) # A NumPy array holding the initial population.
+            if allow_duplicate_genes == False:
+                for solution_idx in range(self.population.shape[0]):
+                    self.population[solution_idx], _, _ = self.solve_duplicate_genes(solution=self.population[solution_idx],
+                                                                                     random_mutation_min_val=low, 
+                                                                                     random_mutation_max_val=high,
+                                                                                     mutation_by_replacement=True,
+                                                                                     gene_type=gene_type,
+                                                                                     num_trials=10)
+
         elif self.gene_space_nested:
             self.population = numpy.zeros(shape=self.pop_size, dtype=self.gene_type)
             for sol_idx in range(self.sol_per_pop):
@@ -698,6 +760,7 @@ class GA:
                         self.population[sol_idx, gene_idx] = self.gene_space[gene_idx].copy()
                     elif type(self.gene_space[gene_idx]) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
                         self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]
+
         else:
             # Replace all the None values with random values using the init_range_low, init_range_high, and gene_type attributes.
             for idx, curr_gene_space in enumerate(self.gene_space):
@@ -716,6 +779,13 @@ class GA:
                 self.population = numpy.asarray(numpy.random.choice(self.gene_space,
                                                                     size=self.pop_size),
                                 dtype=self.gene_type) # A NumPy array holding the initial population.
+
+        if not (self.gene_type is None):
+            if allow_duplicate_genes == False:
+                for sol_idx in range(self.population.shape[0]):
+                    self.population[sol_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[sol_idx],
+                                                                                         gene_type=self.gene_type,
+                                                                                         num_trials=10)
 
         # Keeping the initial population in the initial_population attribute.
         self.initial_population = self.population.copy()
@@ -753,9 +823,10 @@ class GA:
         if not (self.on_start is None):
             self.on_start(self)
 
+        # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
+        self.last_generation_fitness = self.cal_pop_fitness()
+
         for generation in range(self.num_generations):
-            # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
-            self.last_generation_fitness = self.cal_pop_fitness()
             if not (self.on_fitness is None):
                 self.on_fitness(self, self.last_generation_fitness)
 
@@ -808,6 +879,9 @@ class GA:
 
             self.generations_completed = generation + 1 # The generations_completed attribute holds the number of the last completed generation.
 
+            # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
+            self.last_generation_fitness = self.cal_pop_fitness()
+
             # If the callback_generation attribute is not None, then cal the callback function after the generation.
             if not (self.on_generation is None):
                 r = self.on_generation(self)
@@ -819,7 +893,6 @@ class GA:
 
             time.sleep(self.delay_after_gen)
 
-        self.last_generation_fitness = self.cal_pop_fitness()
         # Save the fitness value of the best solution.
         _, best_solution_fitness, _ = self.best_solution(pop_fitness=self.last_generation_fitness)
         self.best_solutions_fitness.append(best_solution_fitness)
@@ -1225,8 +1298,16 @@ class GA:
                                                                 size=1)
                     else:
                         # Selecting a value randomly based on the current gene's space in the 'gene_space' attribute.
-                        values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
-                        value_from_space = random.choice(values_to_select_from)
+                        # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
+                        if len(curr_gene_space) == 1:
+                            value_from_space = curr_gene_space[0]
+                        # If the gene space has more than 1 value, then select a new one that is different from the current value.
+                        else:
+                            values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
+                            if len(values_to_select_from) == 0:
+                                value_from_space = offspring[offspring_idx, gene_idx]
+                            else:
+                                value_from_space = random.choice(values_to_select_from)
                 else:
                     # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
                     if type(self.gene_space) is dict:
@@ -1237,13 +1318,97 @@ class GA:
                     else:
                         # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
                         values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
-                        value_from_space = random.choice(values_to_select_from)
+                        if len(values_to_select_from) == 0:
+                            value_from_space = offspring[offspring_idx, gene_idx]
+                        else:
+                            value_from_space = random.choice(values_to_select_from)
                     # value_from_space = random.choice(self.gene_space)
 
                 # Assinging the selected value from the space to the gene.
                 offspring[offspring_idx, gene_idx] = self.gene_type(value_from_space)
                     
+                if self.allow_duplicate_genes == False:
+                    offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
+                                                                                         gene_type=self.gene_type,
+                                                                                         num_trials=10)
         return offspring
+
+    def get_gene_space(self, solution, gene_idx, gene_type):
+        if self.gene_space_nested:
+            # Returning the current gene space from the 'gene_space' attribute.
+            if type(self.gene_space[gene_idx]) in [numpy.ndarray, list]:
+                curr_gene_space = self.gene_space[gene_idx].copy()
+            else:
+                curr_gene_space = self.gene_space[gene_idx]
+            
+            # If the gene space has only a single value, use it as the new gene value.
+            if type(curr_gene_space) in [int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64]:
+                value_from_space = curr_gene_space
+                # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
+            elif curr_gene_space is None:
+                rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
+                                                high=self.random_mutation_max_val,
+                                                size=1)
+                if self.mutation_by_replacement:
+                    value_from_space = rand_val
+                else:
+                    value_from_space = solution[gene_idx] + rand_val
+            elif type(curr_gene_space) is dict:
+                # The gene's space of type dict specifies the lower and upper limits of a gene.
+                value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
+                                                        high=curr_gene_space['high'],
+                                                        size=1)
+            else:
+                # Selecting a value randomly based on the current gene's space in the 'gene_space' attribute.
+                # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
+                if len(curr_gene_space) == 1:
+                    value_from_space = curr_gene_space[0]
+                    if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the space of the gene with index {gene_idx} has only a single value. There is no way to prevent duplicates.".format(gene_idx=gene_idx))
+                # If the gene space has more than 1 value, then select a new one that is different from the current value.
+                else:
+                    values_to_select_from = list(set(curr_gene_space) - set([solution[gene_idx]]))
+                    if len(values_to_select_from) == 0:
+                        if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the gene space does not have enough values to prevent duplicates.")
+                        value_from_space = solution[gene_idx]
+                    else:
+                        value_from_space = random.choice(values_to_select_from)
+        else:
+            # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
+            if type(self.gene_space) is dict:
+                # When the gene_space is assigned a dict object, then it specifies the lower and upper limits of all genes in the space.
+                value_from_space = numpy.random.uniform(low=self.gene_space['low'],
+                                                        high=self.gene_space['high'],
+                                                        size=1)
+            else:
+                # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
+                values_to_select_from = list(set(self.gene_space) - set(solution))
+                if len(values_to_select_from) == 0:
+                    if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the gene space does not have enough values to prevent duplicates.")
+                    value_from_space = solution[gene_idx]
+                else:
+                    value_from_space = random.choice(values_to_select_from)
+        return gene_type(value_from_space)
+
+    def solve_duplicate_genes_by_space(self, solution, gene_type, num_trials=10):
+        new_solution = solution.copy()
+        _, unique_gene_indices = numpy.unique(solution, return_index=True)
+        not_unique_indices = set(range(len(solution))) - set(unique_gene_indices)
+        num_unsolved_duplicates = 0
+        if len(not_unique_indices) > 0:
+            for duplicate_index in not_unique_indices:
+                for trial_index in range(num_trials):
+                    temp_val = self.get_gene_space(solution, duplicate_index, gene_type)
+                    if temp_val in new_solution and trial_index == (num_trials - 1):
+                        num_unsolved_duplicates = num_unsolved_duplicates + 1
+                        if not self.suppress_warnings: warnings.warn("Failed to find a unique value for gene with index {gene_idx}".format(gene_idx=duplicate_index))
+                    elif temp_val in new_solution:
+                        continue
+                    else:
+                        new_solution[duplicate_index] = self.gene_type(temp_val)
+                        break
+
+        return new_solution, not_unique_indices, num_unsolved_duplicates
+
 
     def mutation_probs_by_space(self, offspring):
 
@@ -1285,8 +1450,16 @@ class GA:
                                                                     size=1)
                         else:
                             # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
-                            values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
-                            value_from_space = random.choice(values_to_select_from)
+                            # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
+                            if len(curr_gene_space) == 1:
+                                value_from_space = curr_gene_space[0]
+                            # If the gene space has more than 1 value, then select a new one that is different from the current value.
+                            else:
+                                values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
+                                if len(values_to_select_from) == 0:
+                                    value_from_space = offspring[offspring_idx, gene_idx]
+                                else:
+                                    value_from_space = random.choice(values_to_select_from)
                     else:
                         # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
                         if type(self.gene_space) is dict:
@@ -1295,7 +1468,10 @@ class GA:
                                                                     size=1)
                         else:
                             values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
-                            value_from_space = random.choice(values_to_select_from)
+                            if len(values_to_select_from) == 0:
+                                value_from_space = offspring[offspring_idx, gene_idx]
+                            else:
+                                value_from_space = random.choice(values_to_select_from)
 
                     # Assigning the selected value from the space to the gene.
                     offspring[offspring_idx, gene_idx] = self.gene_type(value_from_space)
@@ -1321,10 +1497,21 @@ class GA:
                                                     size=1)
                 # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                 if self.mutation_by_replacement:
-                    offspring[offspring_idx, gene_idx] = self.gene_type(random_value)
+                    random_value = self.gene_type(random_value)
                 # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                 else:
-                    offspring[offspring_idx, gene_idx] = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
+                    random_value = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
+
+                offspring[offspring_idx, gene_idx] = random_value
+
+                if self.allow_duplicate_genes == False:
+                    offspring[offspring_idx], _, _ = self.solve_duplicate_genes(solution=offspring[offspring_idx],
+                                                                                random_mutation_min_val=self.random_mutation_min_val,
+                                                                                random_mutation_max_val=self.random_mutation_max_val,
+                                                                                mutation_by_replacement=self.mutation_by_replacement,
+                                                                                gene_type=self.gene_type,
+                                                                                num_trials=10)
+
         return offspring
 
     def mutation_probs_randomly(self, offspring):
@@ -1347,10 +1534,20 @@ class GA:
                                                         size=1)
                     # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                     if self.mutation_by_replacement:
-                        offspring[offspring_idx, gene_idx] = self.gene_type(random_value)
+                        random_value = self.gene_type(random_value)
                     # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                     else:
-                        offspring[offspring_idx, gene_idx] = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
+                        random_value = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
+
+                    offspring[offspring_idx, gene_idx] = random_value
+
+                    if self.allow_duplicate_genes == False:
+                        offspring[offspring_idx], _, _ = self.solve_duplicate_genes(solution=offspring[offspring_idx],
+                                                                                    random_mutation_min_val=self.random_mutation_min_val,
+                                                                                    random_mutation_max_val=self.random_mutation_max_val,
+                                                                                    mutation_by_replacement=self.mutation_by_replacement,
+                                                                                    gene_type=self.gene_type,
+                                                                                    num_trials=10)
         return offspring
 
     def swap_mutation(self, offspring):
@@ -1519,8 +1716,16 @@ class GA:
                                                                     size=1)
                     else:
                         # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
-                        values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
-                        value_from_space = random.choice(values_to_select_from)
+                        # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
+                        if len(curr_gene_space) == 1:
+                            value_from_space = curr_gene_space[0]
+                        # If the gene space has more than 1 value, then select a new one that is different from the current value.
+                        else:
+                            values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
+                            if len(values_to_select_from) == 0:
+                                value_from_space = offspring[offspring_idx, gene_idx]
+                            else:
+                                value_from_space = random.choice(values_to_select_from)
                 else:
                     # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
                     if type(self.gene_space) is dict:
@@ -1529,7 +1734,10 @@ class GA:
                                                                 size=1)
                     else:
                         values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
-                        value_from_space = random.choice(values_to_select_from)
+                        if len(values_to_select_from) == 0:
+                            value_from_space = offspring[offspring_idx, gene_idx]
+                        else:
+                            value_from_space = random.choice(values_to_select_from)
 
                 # Assinging the selected value from the space to the gene.
                 offspring[offspring_idx, gene_idx] = self.gene_type(value_from_space)
@@ -1564,10 +1772,20 @@ class GA:
                                                     size=1)
                 # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                 if self.mutation_by_replacement:
-                    offspring[offspring_idx, gene_idx] = self.gene_type(random_value)
+                    random_value = self.gene_type(random_value)
                 # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                 else:
-                    offspring[offspring_idx, gene_idx] = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
+                    random_value = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
+
+                offspring[offspring_idx, gene_idx] = random_value
+
+                if self.allow_duplicate_genes == False:
+                    offspring[offspring_idx], _, _ = self.solve_duplicate_genes(solution=offspring[offspring_idx],
+                                                                                random_mutation_min_val=self.random_mutation_min_val,
+                                                                                random_mutation_max_val=self.random_mutation_max_val,
+                                                                                mutation_by_replacement=self.mutation_by_replacement,
+                                                                                gene_type=self.gene_type,
+                                                                                num_trials=10)
         return offspring
         
     def adaptive_mutation_probs_by_space(self, offspring):
@@ -1622,8 +1840,16 @@ class GA:
                                                                     size=1)
                         else:
                             # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
-                            values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
-                            value_from_space = random.choice(values_to_select_from)
+                            # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
+                            if len(curr_gene_space) == 1:
+                                value_from_space = curr_gene_space[0]
+                            # If the gene space has more than 1 value, then select a new one that is different from the current value.
+                            else:
+                                values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
+                                if len(values_to_select_from) == 0:
+                                    value_from_space = offspring[offspring_idx, gene_idx]
+                                else:
+                                    value_from_space = random.choice(values_to_select_from)
                     else:
                         # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
                         if type(self.gene_space) is dict:
@@ -1632,7 +1858,10 @@ class GA:
                                                                     size=1)
                         else:
                             values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
-                            value_from_space = random.choice(values_to_select_from)
+                            if len(values_to_select_from) == 0:
+                                value_from_space = offspring[offspring_idx, gene_idx]
+                            else:
+                                value_from_space = random.choice(values_to_select_from)
 
                     # Assinging the selected value from the space to the gene.
                     offspring[offspring_idx, gene_idx] = self.gene_type(value_from_space)
@@ -1669,10 +1898,20 @@ class GA:
                                                         size=1)
                     # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                     if self.mutation_by_replacement:
-                        offspring[offspring_idx, gene_idx] = self.gene_type(random_value)
+                        random_value = self.gene_type(random_value)
                     # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                     else:
-                        offspring[offspring_idx, gene_idx] = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
+                        random_value = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
+
+                    offspring[offspring_idx, gene_idx] = random_value
+
+                    if self.allow_duplicate_genes == False:
+                        offspring[offspring_idx], _, _ = self.solve_duplicate_genes(solution=offspring[offspring_idx],
+                                                                                    random_mutation_min_val=self.random_mutation_min_val,
+                                                                                    random_mutation_max_val=self.random_mutation_max_val,
+                                                                                    mutation_by_replacement=self.mutation_by_replacement,
+                                                                                    gene_type=self.gene_type,
+                                                                                    num_trials=10)
         return offspring
 
     def best_solution(self, pop_fitness=None):
