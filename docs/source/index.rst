@@ -10,15 +10,17 @@
 Welcome to PyGAD's documentation!
 =================================
 
-`PyGAD <https://pypi.org/project/pygad>`__ is an open-source Python
-library for building the genetic algorithm and optimizing machine
-learning algorithms.
+`PyGAD <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ is an
+open-source Python library for building the genetic algorithm and
+optimizing machine learning algorithms.
 
-`PyGAD <https://pypi.org/project/pygad>`__ supports different types of
-crossover, mutation, and parent selection operators.
-`PyGAD <https://pypi.org/project/pygad>`__ allows different types of
-problems to be optimized using the genetic algorithm by customizing the
-fitness function.
+`PyGAD <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ supports
+different types of crossover, mutation, and parent selection operators.
+`PyGAD <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ allows
+different types of problems to be optimized using the genetic algorithm
+by customizing the fitness function.
+
+|image1|
 
 .. figure:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :alt: 
@@ -35,10 +37,10 @@ classification problems.
 The library is under active development and more features added
 regularly. Please contact us if you want a feature to be supported.
 
-.. _header-n59:
+.. _header-n69:
 
-Donation
-========
+Donation & Support
+==================
 
 You can donate to PyGAD via:
 
@@ -50,6 +52,9 @@ You can donate to PyGAD via:
    address ahmed.f.gad@gmail.com
 
 -  Interac e-Transfer: Use e-mail address ahmed.f.gad@gmail.com
+
+-  Buy a product at `Teespring <https://pygad.creator-spring.com/>`__:
+   `pygad.creator-spring.com <https://pygad.creator-spring.com>`__
 
 .. _header-n62:
 
