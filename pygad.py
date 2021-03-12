@@ -1868,45 +1868,10 @@ class GA:
                                                                                              num_trials=10)
         return offspring
 
-    def unique_int_gene_from_range(self, solution, gene_index, min_val, max_val, mutation_by_replacement, gene_type):
-
-        """
-        Finds a unique integer value for the gene.
-
-        solution: A solution with duplicate values.
-        gene_index: Index of the gene to find a unique value.
-        min_val: Identical to the self.random_mutation_min_val attribute.
-        max_val: Identical to the self.random_mutation_max_val attribute.
-        mutation_by_replacement: Identical to the self.mutation_by_replacement attribute.
-        gene_type: Exactly the same as the self.gene_type attribute.
-
-        Returns:
-            selected_value: The new value of the gene. It may be identical to the original gene value in case there are no possible unique values for the gene.
-        """
-
-        all_gene_values = numpy.arange(min_val, max_val, dtype=gene_type)
-    
-        if mutation_by_replacement:
-            pass
-        else:
-            all_gene_values = all_gene_values + solution[gene_index]
-    
-        values_to_select_from = list(set(all_gene_values) - set(solution))
-    
-        if len(values_to_select_from) == 0:
-            if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but there is no enough values to prevent duplicates.")
-            selected_value = solution[gene_index]
-        else:
-            selected_value = random.choice(values_to_select_from)
-    
-        selected_value = gene_type(selected_value)
-
-        return selected_value
-
     def solve_duplicate_genes_randomly(self, solution, min_val, max_val, mutation_by_replacement, gene_type, num_trials=10):
 
         """
-        Solves the duplicates in a solution randomly.
+        Solves the duplicates in a solution by randomly selecting new values for the duplicating genes.
         
         solution: A solution with duplicate values.
         min_val: Identical to the self.random_mutation_min_val attribute.
@@ -1965,7 +1930,7 @@ class GA:
     def solve_duplicate_genes_by_space(self, solution, gene_type, num_trials=10):
 
         """
-        Solves the duplicates in a solution.
+        Solves the duplicates in a solution by selecting values for the duplicating genes from the gene space.
         
         solution: A solution with duplicate values.
         gene_type: Exactly the same as the self.gene_type attribute.
@@ -1987,8 +1952,8 @@ class GA:
         # For a solution like [3 2 0 0], the indices of the 2 duplicating genes are 2 and 3.
         # The next call to the find_unique_value() method tries to change the value of the gene with index 3 to solve the duplicate.
         if len(not_unique_indices) > 0:
-            new_solution, not_unique_indices, num_unsolved_duplicates = self.find_unique_values_by_space(new_solution=new_solution, 
-                                                                                                         gene_type=gene_type, 
+            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(new_solution=new_solution, 
+                                                                                                   gene_type=gene_type, 
                                                                                                    not_unique_indices=not_unique_indices, 
                                                                                                    num_trials=10)
         else:
@@ -1998,10 +1963,10 @@ class GA:
         # If there are no possible values for the gene 3 with index 3 to solve the duplicate, try to change the value of the other gene with index 2.
         if len(not_unique_indices) > 0:
             not_unique_indices = set(numpy.where(new_solution == new_solution[list(not_unique_indices)[0]])[0]) - set([list(not_unique_indices)[0]])
-            new_solution, not_unique_indices, num_unsolved_duplicates = self.find_unique_values_by_space(new_solution=new_solution, 
-                                                                                                         gene_type=gene_type, 
-                                                                                                         not_unique_indices=not_unique_indices, 
-                                                                                                         num_trials=10)
+            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(new_solution=new_solution, 
+                                                                                                   gene_type=gene_type, 
+                                                                                                   not_unique_indices=not_unique_indices, 
+                                                                                                   num_trials=10)
         else:
             # If there exist duplicate genes, then changing either of the 2 duplicating genes (with indices 2 and 3) will not solve the problem.
             # This problem can be solved by randomly changing one of the non-duplicating genes that may make a room for a unique value in one the 2 duplicating genes.
@@ -2027,7 +1992,9 @@ class GA:
         if len(not_unique_indices) > 0:
             for duplicate_index in not_unique_indices:
                 for trial_index in range(num_trials):
-                    temp_val = self.get_gene_value_from_space(solution, duplicate_index, gene_type)
+                    temp_val = self.unique_gene_by_space(solution=solution, 
+                                                         gene_idx=duplicate_index, 
+                                                         gene_type=gene_type)
 
                     if temp_val in new_solution and trial_index == (num_trials - 1):
                         # print("temp_val, duplicate_index", temp_val, duplicate_index, new_solution)
@@ -2047,11 +2014,47 @@ class GA:
 
         return new_solution, not_unique_indices, num_unsolved_duplicates
 
-    def find_unique_values_by_space(self, new_solution, gene_type, not_unique_indices, num_trials=10):
+    def unique_int_gene_from_range(self, solution, gene_index, min_val, max_val, mutation_by_replacement, gene_type):
 
         """
-        Loops through all the duplicating genes to find a unique value that from their gene space to solve the duplicates.
-        
+        Finds a unique integer value for the gene.
+
+        solution: A solution with duplicate values.
+        gene_index: Index of the gene to find a unique value.
+        min_val: Identical to the self.random_mutation_min_val attribute.
+        max_val: Identical to the self.random_mutation_max_val attribute.
+        mutation_by_replacement: Identical to the self.mutation_by_replacement attribute.
+        gene_type: Exactly the same as the self.gene_type attribute.
+
+        Returns:
+            selected_value: The new value of the gene. It may be identical to the original gene value in case there are no possible unique values for the gene.
+        """
+
+        all_gene_values = numpy.arange(min_val, max_val, dtype=gene_type)
+    
+        if mutation_by_replacement:
+            pass
+        else:
+            all_gene_values = all_gene_values + solution[gene_index]
+    
+        values_to_select_from = list(set(all_gene_values) - set(solution))
+    
+        if len(values_to_select_from) == 0:
+            if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but there is no enough values to prevent duplicates.")
+            selected_value = solution[gene_index]
+        else:
+            selected_value = random.choice(values_to_select_from)
+    
+        selected_value = gene_type(selected_value)
+
+        return selected_value
+
+    def unique_genes_by_space(self, new_solution, gene_type, not_unique_indices, num_trials=10):
+
+        """
+        Loops through all the duplicating genes to find unique values that from their gene spaces to solve the duplicates.
+        For each duplicating gene, a call to the unique_gene_by_space() is made.
+
         new_solution: A solution with duplicate values.
         gene_type: Exactly the same as the self.gene_type attribute.
         not_unique_indices: Indices with duplicating values.
@@ -2066,9 +2069,9 @@ class GA:
         num_unsolved_duplicates = 0
         for duplicate_index in not_unique_indices:
             for trial_index in range(num_trials):
-                temp_val = self.get_gene_value_from_space(new_solution, 
-                                                          duplicate_index, 
-                                                          gene_type)
+                temp_val = self.unique_gene_by_space(solution=new_solution, 
+                                                     gene_idx=duplicate_index, 
+                                                     gene_type=gene_type)
 
                 if temp_val in new_solution and trial_index == (num_trials - 1):
                     # print("temp_val, duplicate_index", temp_val, duplicate_index, new_solution)
@@ -2088,7 +2091,7 @@ class GA:
 
         return new_solution, not_unique_indices, num_unsolved_duplicates
 
-    def get_gene_value_from_space(self, solution, gene_idx, gene_type):
+    def unique_gene_by_space(self, solution, gene_idx, gene_type):
 
         """
         Returns a unique gene value for a single gene based on its value space to solve the duplicates.
