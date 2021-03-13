@@ -1,50 +1,50 @@
 # GeneticAlgorithmPython: Building Genetic Algorithm in Python
 
-[This project](https://github.com/ahmedfgad/GeneticAlgorithmPython) is part of [PyGAD](https://pypi.org/project/pygad) which is an open-source Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. 
+[This project](https://github.com/ahmedfgad/GeneticAlgorithmPython) is part of [PyGAD](https://pypi.org/project/pygad) which is an open-source Python 3 library for building genetic algorithms and optimizing machine learning algorithms. 
 
-Check documentation of the [GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython) project in the PyGAD's documentation: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html
+Check the [GeneticAlgorithmPython project documentation](https://github.com/ahmedfgad/GeneticAlgorithmPython) project in PyGAD's documentation: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html
 
 [![Downloads](https://pepy.tech/badge/pygad)](https://pepy.tech/project/pygad)
 
 ![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
 
-[PyGAD](https://pypi.org/project/pygad) supports different types of crossover, mutation, and parent selection. [PyGAD](https://pypi.org/project/pygad) allows different types of problems to be optimized using the genetic algorithm by customizing the fitness function. 
+[PyGAD](https://pypi.org/project/pygad) supports different types of crossover, mutation, and parent selection. [PyGAD](https://pypi.org/project/pygad) allows different types of problem to be optimized, using genetic algorithms, by customizing the fitness function. 
 
-The library is under active development and more features are added regularly. If you want a feature to be supported, please check the **Contact Us** section to send a request.
+The library is under active development, and more features are added regularly. If you want a feature to be supported, please check the **Contact Us** section to send a request.
 
 # Donation
 
-You can donate via [Open Collective](https://opencollective.com/pygad): [opencollective.com/pygad](https://opencollective.com/pygad). 
+You can donate using [Open Collective](https://opencollective.com/pygad): [opencollective.com/pygad](https://opencollective.com/pygad). 
 
-To donate using PayPal, use either this link: [paypal.me/ahmedfgad](https://paypal.me/ahmedfgad) or the e-mail address ahmed.f.gad@gmail.com.
+To donate using PayPal, use either [this link: paypal.me/ahmedfgad](https://paypal.me/ahmedfgad), or the e-mail address <tt><u>ahmed.f.gad@gmail.com</u></tt>.
 
 # Tutorial Project
 
-**IMPORTANT** If you are coming for the code of the tutorial titled  [**Genetic Algorithm Implementation in Python**](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad), then it has been moved to the [Tutorial Project](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/Tutorial Project) directory on 06 May 2020.
+> **IMPORTANT**: If you're looking for code from the tutorial "[**Genetic Algorithm Implementation in Python**](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad)", then it was moved to [Tutorial Project](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/Tutorial Project) on 06 May 2020.
 
 # Installation
 
-To install [PyGAD](https://pypi.org/project/pygad), simply use pip to download and install the library from [PyPI](https://pypi.org/project/pygad) (Python Package Index). The library lives a PyPI at this page https://pypi.org/project/pygad.
+To install [PyGAD](https://pypi.org/project/pygad), simply use pip to download and install the library from [PyPI](https://pypi.org/project/pygad) (Python Package Index). [There is a PyPI library page, also](https://pypi.org/project/pygad).
 
-For Windows, issue the following command:
+For Windows, run the following command:
 
 ```python
 pip install pygad
 ```
 
-For Linux and Mac, replace `pip` by use `pip3` because the library only supports Python 3.
+For Linux and Mac, make sure to use `pip3`, because the library only supports Python 3, and so `pip` won't work.
 
 ```python
 pip3 install pygad
 ```
 
-PyGAD is developed in Python 3.7.3 and depends on NumPy for creating and manipulating arrays and Matplotlib for creating figures. The exact NumPy version used in developing PyGAD is 1.16.4. For Matplotlib, the version is 3.1.0.
+PyGAD is developed in Python 3.7.3, and depends on NumPy for creation and and manipulation of arrays, as well as Matplotlib for creation of figures. The exact NumPy version used in developing PyGAD is 1.16.4. For Matplotlib, the version is 3.1.0.
 
-To get started with PyGAD, please read the documentation at [Read The Docs](https://pygad.readthedocs.io/) https://pygad.readthedocs.io.
+To get started with PyGAD, please [read the documentation at Read The Docs](https://pygad.readthedocs.io/) (https://pygad.readthedocs.io).
 
 # PyGAD Source Code
 
-The source code of the PyGAD' modules is found in the following GitHub projects:
+PyGAD's module source is found in the following GitHub projects:
 
 - [pygad](https://github.com/ahmedfgad/GeneticAlgorithmPython): (https://github.com/ahmedfgad/GeneticAlgorithmPython)
 - [pygad.nn](https://github.com/ahmedfgad/NumPyANN): https://github.com/ahmedfgad/NumPyANN
@@ -54,13 +54,13 @@ The source code of the PyGAD' modules is found in the following GitHub projects:
 - [pygad.kerasga](https://github.com/ahmedfgad/KerasGA): https://github.com/ahmedfgad/KerasGA
 - [pygad.torchga](https://github.com/ahmedfgad/TorchGA): https://github.com/ahmedfgad/TorchGA
 
-The documentation of PyGAD is available at [Read The Docs](https://pygad.readthedocs.io/) https://pygad.readthedocs.io.
+PyGAD documentation is available at [Read The Docs](https://pygad.readthedocs.io/) https://pygad.readthedocs.io.
 
 # PyGAD Documentation
 
-The documentation of the PyGAD library is available at [Read The Docs](https://pygad.readthedocs.io) at this link: https://pygad.readthedocs.io. It discusses the modules supported by PyGAD, all its classes, methods, attribute, and functions. For each module, a number of examples are given.
+The documentation of the PyGAD library is available at [Read The Docs](https://pygad.readthedocs.io) at this link: https://pygad.readthedocs.io. It discusses the modules supported by PyGAD, its classes, methods, attributes, and functions. For each module, a number of examples are given.
 
-If there is an issue using PyGAD, feel free to post at issue in this [GitHub repository](https://github.com/ahmedfgad/GeneticAlgorithmPython) https://github.com/ahmedfgad/GeneticAlgorithmPython or by sending an e-mail to ahmed.f.gad@gmail.com. 
+If there is an issue using PyGAD, feel free to [post an issue in this GitHub repository](https://github.com/ahmedfgad/GeneticAlgorithmPython) https://github.com/ahmedfgad/GeneticAlgorithmPython or by sending an e-mail to ahmed.f.gad@gmail.com. 
 
 If you built a project that uses PyGAD, then please drop an e-mail to ahmed.f.gad@gmail.com with the following information so that your project is included in the documentation.
 
@@ -157,7 +157,7 @@ on_stop()
 
 # Example
 
-Check the [PyGAD's documentation](https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html) for information about the implementation of this example.
+Check [PyGAD's documentation](https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html) for information about this implementation.
 
 ```python
 import pygad
@@ -259,19 +259,19 @@ There are different resources that can be used to get started with the genetic a
 
 ## Tutorial: Implementing Genetic Algorithm in Python
 
-To start with coding the genetic algorithm, you can check the tutorial titled [**Genetic Algorithm Implementation in Python**](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad) available at these links:
+To start writing genetic algorithms, read the tutorial [**Genetic Algorithm Implementation in Python**](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad), also available at these links:
 
 - [LinkedIn](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad)
 - [Towards Data Science](https://towardsdatascience.com/genetic-algorithm-implementation-in-python-5ab67bb124a6)
 - [KDnuggets](https://www.kdnuggets.com/2018/07/genetic-algorithm-implementation-python.html)
 
-[This tutorial](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad) is prepared based on a previous version of the project but it still a good resource to start with coding the genetic algorithm.
+Older content: [This tutorial](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad) is prepared based on a previous version of the project but it still a good resource to start with coding the genetic algorithm.
 
 [![Genetic Algorithm Implementation in Python](https://user-images.githubusercontent.com/16560492/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png)](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad)
 
 ## Tutorial: Introduction to Genetic Algorithm
 
-Get started with the genetic algorithm by reading the tutorial titled [**Introduction to Optimization with Genetic Algorithm**](https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad) which is available at these links:
+To understand genetic algorithms, read [**Introduction to Optimization with Genetic Algorithm**](https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad), also available at these links:
 
 * [LinkedIn](https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad)
 * [Towards Data Science](https://www.kdnuggets.com/2018/03/introduction-optimization-with-genetic-algorithm.html)
@@ -281,7 +281,7 @@ Get started with the genetic algorithm by reading the tutorial titled [**Introdu
 
 ## Tutorial: Build Neural Networks in Python
 
-Read about building neural networks in Python through the tutorial titled [**Artificial Neural Network Implementation using NumPy and Classification of the Fruits360 Image Dataset**](https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad) available at these links:
+Read about building neural networks in Python: [**Artificial Neural Network Implementation using NumPy and Classification of the Fruits360 Image Dataset**](https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad), also available at these links:
 
 * [LinkedIn](https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad)
 * [Towards Data Science](https://towardsdatascience.com/artificial-neural-network-implementation-using-numpy-and-classification-of-the-fruits360-image-3c56affa4491)
@@ -291,7 +291,7 @@ Read about building neural networks in Python through the tutorial titled [**Art
 
 ## Tutorial: Optimize Neural Networks with Genetic Algorithm
 
-Read about training neural networks using the genetic algorithm through the tutorial titled [**Artificial Neural Networks Optimization using Genetic Algorithm with Python**](https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad) available at these links:
+Read about training neural networks with genetic algorithms: [**Artificial Neural Networks Optimization using Genetic Algorithm with Python**](https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad) available at these links:
 
 - [LinkedIn](https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad)
 - [Towards Data Science](https://towardsdatascience.com/artificial-neural-networks-optimization-using-genetic-algorithm-with-python-1fe8ed17733e)
@@ -301,20 +301,20 @@ Read about training neural networks using the genetic algorithm through the tuto
 
 ## Tutorial: Building CNN in Python
 
-To start with coding the genetic algorithm, you can check the tutorial titled [**Building Convolutional Neural Network using NumPy from Scratch**](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad) available at these links:
+To start using genetic algorithms, read [**Building Convolutional Neural Network using NumPy from Scratch**](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad), also available at these links:
 
 - [LinkedIn](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)
 - [Towards Data Science](https://towardsdatascience.com/building-convolutional-neural-network-using-numpy-from-scratch-b30aac50e50a)
 - [KDnuggets](https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html)
 - [Chinese Translation](http://m.aliyun.com/yunqi/articles/585741)
 
-[This tutorial](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)) is prepared based on a previous version of the project but it still a good resource to start with coding CNNs.
+Older content: [This tutorial](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)) is prepared based on a previous version of the project but it still a good resource to start with coding CNNs.
 
 [![Building CNN in Python](https://user-images.githubusercontent.com/16560492/82431022-6c3a1200-9a8e-11ea-8f1b-b055196d76e3.png)](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)
 
 ## Tutorial: Derivation of CNN from FCNN
 
-Get started with the genetic algorithm by reading the tutorial titled [**Derivation of Convolutional Neural Network from Fully Connected Network Step-By-Step**](https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad) which is available at these links:
+Get started: [**Derivation of Convolutional Neural Network from Fully Connected Network Step-By-Step**](https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad) which is available at these links:
 
 * [LinkedIn](https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad)
 * [Towards Data Science](https://towardsdatascience.com/derivation-of-convolutional-neural-network-from-fully-connected-network-step-by-step-b42ebafa5275)
@@ -324,7 +324,7 @@ Get started with the genetic algorithm by reading the tutorial titled [**Derivat
 
 ## Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 
-You can also check my book cited as [**Ahmed Fawzy Gad 'Practical Computer Vision Applications Using Deep Learning with CNNs'. Dec. 2018, Apress, 978-1-4842-4167-7**](https://www.amazon.com/Practical-Computer-Vision-Applications-Learning/dp/1484241665) which discusses neural networks, convolutional neural networks, deep learning, genetic algorithm, and more.
+You can also read my book: [**Ahmed Fawzy Gad 'Practical Computer Vision Applications Using Deep Learning with CNNs'. Dec. 2018, Apress, 978-1-4842-4167-7**](https://www.amazon.com/Practical-Computer-Vision-Applications-Learning/dp/1484241665) which discusses neural networks, convolutional neural networks, deep learning, genetic algorithms, and more.
 
 Find the book at these links:
 
