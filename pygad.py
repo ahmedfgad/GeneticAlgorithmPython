@@ -240,24 +240,24 @@ class GA:
 
         # crossover: Refers to the method that applies the crossover operator based on the selected type of crossover in the crossover_type property.
         # Validating the crossover type: crossover_type
-        if not (type(crossover_type) is str):
+        if (crossover_type is None):
+            self.crossover = None
+        elif not (type(crossover_type) is str):
             self.valid_parameters = False
             raise TypeError("The expected type of the 'crossover_type' parameter is str but ({crossover_type}) found.".format(crossover_type=type(crossover_type)))
-
-        crossover_type = crossover_type.lower()
-        if (crossover_type == "single_point"):
-            self.crossover = self.single_point_crossover
-        elif (crossover_type == "two_points"):
-            self.crossover = self.two_points_crossover
-        elif (crossover_type == "uniform"):
-            self.crossover = self.uniform_crossover
-        elif (crossover_type == "scattered"):
-            self.crossover = self.scattered_crossover
-        elif (crossover_type is None):
-            self.crossover = None
-        else:
-            self.valid_parameters = False
-            raise ValueError("Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) argument does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover)\n-scattered (for scattered crossover).\n".format(crossover_type=crossover_type))
+        else: # type crossover_type is str
+            crossover_type = crossover_type.lower()
+            if (crossover_type == "single_point"):
+                self.crossover = self.single_point_crossover
+            elif (crossover_type == "two_points"):
+                self.crossover = self.two_points_crossover
+            elif (crossover_type == "uniform"):
+                self.crossover = self.uniform_crossover
+            elif (crossover_type == "scattered"):
+                self.crossover = self.scattered_crossover
+            else:
+                self.valid_parameters = False
+                raise ValueError("Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) argument does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover)\n-scattered (for scattered crossover).\n".format(crossover_type=crossover_type))
 
         self.crossover_type = crossover_type
 
@@ -277,26 +277,26 @@ class GA:
         # mutation: Refers to the method that applies the mutation operator based on the selected type of mutation in the mutation_type property.
         # Validating the mutation type: mutation_type
         # "adaptive" mutation is supported starting from PyGAD 2.10.0
-        if not (type(mutation_type) is str):
+        if mutation_type is None:
+            self.mutation = None
+        elif not (type(mutation_type) is str):
             self.valid_parameters = False
             raise TypeError("The expected type of the 'mutation_type' parameter is str but ({mutation_type}) found.".format(mutation_type=type(mutation_type)))
-
-        mutation_type = mutation_type.lower()
-        if (mutation_type == "random"):
-            self.mutation = self.random_mutation
-        elif (mutation_type == "swap"):
-            self.mutation = self.swap_mutation
-        elif (mutation_type == "scramble"):
-            self.mutation = self.scramble_mutation
-        elif (mutation_type == "inversion"):
-            self.mutation = self.inversion_mutation
-        elif (mutation_type == "adaptive"):
-            self.mutation = self.adaptive_mutation
-        elif (mutation_type is None):
-            self.mutation = None
-        else:
-            self.valid_parameters = False
-            raise ValueError("Undefined mutation type. \nThe assigned value to the mutation_type argument ({mutation_type}) does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation)\n-adaptive (for adaptive mutation).\n".format(mutation_type=mutation_type))
+        else: # type mutation_type is str
+            mutation_type = mutation_type.lower()
+            if (mutation_type == "random"):
+                self.mutation = self.random_mutation
+            elif (mutation_type == "swap"):
+                self.mutation = self.swap_mutation
+            elif (mutation_type == "scramble"):
+                self.mutation = self.scramble_mutation
+            elif (mutation_type == "inversion"):
+                self.mutation = self.inversion_mutation
+            elif (mutation_type == "adaptive"):
+                self.mutation = self.adaptive_mutation
+            else:
+                self.valid_parameters = False
+                raise ValueError("Undefined mutation type. \nThe assigned value to the mutation_type argument ({mutation_type}) does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation)\n-adaptive (for adaptive mutation).\n".format(mutation_type=mutation_type))
 
         self.mutation_type = mutation_type
 
