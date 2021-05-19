@@ -1,6 +1,6 @@
 # GeneticAlgorithmPython: Building Genetic Algorithm in Python
 
-[This project](https://github.com/ahmedfgad/GeneticAlgorithmPython) is part of [PyGAD](https://pypi.org/project/pygad) which is an open-source Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. 
+[This project](https://github.com/ahmedfgad/GeneticAlgorithmPython) is part of [PyGAD](https://pypi.org/project/pygad) which is an open-source Python 3 library for building the genetic algorithm and optimizing machine learning algorithms (Keras & PyTorch). 
 
 Check documentation of the [GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython) project in the PyGAD's documentation: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html
 
@@ -26,13 +26,7 @@ To donate using PayPal, use either this link: [paypal.me/ahmedfgad](https://payp
 
 To install [PyGAD](https://pypi.org/project/pygad), simply use pip to download and install the library from [PyPI](https://pypi.org/project/pygad) (Python Package Index). The library lives a PyPI at this page https://pypi.org/project/pygad.
 
-For Windows, issue the following command:
-
-```python
-pip install pygad
-```
-
-For Linux and Mac, replace `pip` by use `pip3` because the library only supports Python 3.
+Install PyGAD with the following command:
 
 ```python
 pip3 install pygad
