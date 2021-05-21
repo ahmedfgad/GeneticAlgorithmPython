@@ -1578,12 +1578,16 @@ class GA:
                         random_value = self.gene_type(random_value)
                     else:
                         random_value = self.gene_type[gene_idx](random_value)
-                # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
+                        if type(random_value) is numpy.ndarray:
+                            random_value = random_value[0]
+               # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                 else:
                     if self.gene_type_single == True:
                         random_value = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
                     else:
                         random_value = self.gene_type[gene_idx](offspring[offspring_idx, gene_idx] + random_value)
+                        if type(random_value) is numpy.ndarray:
+                            random_value = random_value[0]
 
                 offspring[offspring_idx, gene_idx] = random_value
 
@@ -1621,12 +1625,16 @@ class GA:
                             random_value = self.gene_type(random_value)
                         else:
                             random_value = self.gene_type[gene_idx](random_value)
+                            if type(random_value) is numpy.ndarray:
+                                random_value = random_value[0]
                     # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                     else:
                         if self.gene_type_single == True:
                             random_value = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
                         else:
                             random_value = self.gene_type[gene_idx](offspring[offspring_idx, gene_idx] + random_value)
+                            if type(random_value) is numpy.ndarray:
+                                random_value = random_value[0]
 
                     offspring[offspring_idx, gene_idx] = random_value
 
@@ -1872,12 +1880,16 @@ class GA:
                         random_value = self.gene_type(random_value)
                     else:
                         random_value = self.gene_type[gene_idx](random_value)
+                        if type(random_value) is numpy.ndarray:
+                            random_value = random_value[0]
                 # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                 else:
                     if self.gene_type_single == True:
                         random_value = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
                     else:
                         random_value = self.gene_type[gene_idx](offspring[offspring_idx, gene_idx] + random_value)
+                        if type(random_value) is numpy.ndarray:
+                            random_value = random_value[0]
 
                 offspring[offspring_idx, gene_idx] = random_value
 
@@ -2011,12 +2023,16 @@ class GA:
                             random_value = self.gene_type(random_value)
                         else:
                             random_value = self.gene_type[gene_idx](random_value)
+                            if type(random_value) is numpy.ndarray:
+                                random_value = random_value[0]
                     # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
                     else:
                         if self.gene_type_single == True:
                             random_value = self.gene_type(offspring[offspring_idx, gene_idx] + random_value)
                         else:
                             random_value = self.gene_type[gene_idx](offspring[offspring_idx, gene_idx] + random_value)
+                            if type(random_value) is numpy.ndarray:
+                                random_value = random_value[0]
 
                     offspring[offspring_idx, gene_idx] = random_value
 
