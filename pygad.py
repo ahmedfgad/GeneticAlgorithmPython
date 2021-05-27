@@ -829,9 +829,9 @@ class GA:
                                                                                                         size=1), dtype=self.gene_type[gene_idx])[0]
                             self.population[sol_idx, gene_idx] = random.choice(self.gene_space[gene_idx])
                         elif type(self.gene_space[gene_idx]) is dict:
-                            self.population[sol_idx, gene_idx] = numpy.random.uniform(low=self.gene_space[gene_idx]['low'],
-                                                                                      high=self.gene_space[gene_idx]['high'],
-                                                                                      size=1)
+                            self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=self.gene_space[gene_idx]['low'],
+                                                                                                    high=self.gene_space[gene_idx]['high'],
+                                                                                                    size=1), dtype=self.gene_type[gene_idx])[0]
                         elif type(self.gene_space[gene_idx]) == type(None):
                             self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
                                                                                            high=high, 
@@ -853,7 +853,7 @@ class GA:
                     self.population = numpy.asarray(numpy.random.uniform(low=self.gene_space['low'],
                                                                          high=self.gene_space['high'],
                                                                          size=self.pop_size),
-                            dtype=self.gene_type) # A NumPy array holding the initial population.
+                                                    dtype=self.gene_type) # A NumPy array holding the initial population.
                 else:
                     self.population = numpy.asarray(numpy.random.choice(self.gene_space,
                                                                         size=self.pop_size),
