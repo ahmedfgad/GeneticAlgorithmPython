@@ -21,7 +21,6 @@ different types of crossover, mutation, and parent selection operators.
 different types of problems to be optimized using the genetic algorithm
 by customizing the fitness function.
 
-|image1|
 
 .. figure:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :alt: 

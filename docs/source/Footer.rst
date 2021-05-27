@@ -652,8 +652,11 @@ Release Date: 12 March 2021
 
 .. _pygad-2140:
 
-PyGAD 2.14.0 
+PyGAD 2.14.0
 ------------
+
+PyGAD 2.14.0 has an issue that is solved in PyGAD 2.14.1. Please
+consider using 2.14.1 not 2.14.0.
 
 Release Date: 19 May 2021
 
@@ -667,7 +670,11 @@ Release Date: 19 May 2021
    ``list/tuple/numpy.ndarray`` of numeric data types for the genes.
    This helps to control the data type of each individual gene.
    Previously, the ``gene_type`` can be assigned only to a single data
-   type that is applied for all genes.
+   type that is applied for all genes. Thanks to `Rainer
+   Engel <https://www.linkedin.com/in/rainer-matthias-engel-5ba47a9>`__
+   for asking about this feature in `this
+   discussion <https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/43>`__:
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/43
 
 3. A new ``bool`` attribute named ``gene_type_single`` is added to the
    ``pygad.GA`` class. It is ``True`` when there is a single data type
@@ -690,6 +697,26 @@ Release Date: 19 May 2021
 6. Some changes in the documentation according to `issue
    #32 <https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/32>`__:
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/32
+
+.. _pygad-2142:
+
+PyGAD 2.14.2
+------------
+
+Release Date: 27 May 2021
+
+1. Some bug fixes when the ``gene_type`` parameter is nested. Thanks to
+   `Rainer
+   Engel <https://www.linkedin.com/in/rainer-matthias-engel-5ba47a9>`__
+   for opening `a
+   discussion <https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/43#discussioncomment-763342>`__
+   to report this bug:
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/43#discussioncomment-763342
+
+`Rainer
+Engel <https://www.linkedin.com/in/rainer-matthias-engel-5ba47a9>`__
+helped a lot in suggesting new features and suggesting enhancements in
+2.14.0 to 2.14.2 releases.
 
 PyGAD Projects at GitHub
 ========================
