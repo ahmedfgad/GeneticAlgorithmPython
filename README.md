@@ -1,10 +1,10 @@
-# GeneticAlgorithmPython: Building Genetic Algorithm in Python
+# PyGAD: Genetic Algorithm in Python
 
 [This project](https://github.com/ahmedfgad/GeneticAlgorithmPython) is part of [PyGAD](https://pypi.org/project/pygad) which is an open-source Python 3 library for building the genetic algorithm and optimizing machine learning algorithms (Keras & PyTorch). 
 
 Check documentation of the [GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython) project in the PyGAD's documentation: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html
 
-[![Downloads](https://pepy.tech/badge/pygad)](https://pepy.tech/project/pygad)
+[![Downloads](https://pepy.tech/badge/pygad)](https://pepy.tech/project/pygad) ![](https://readthedocs.org/projects/pygad/badge)
 
 ![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
 
