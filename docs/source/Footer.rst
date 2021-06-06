@@ -718,6 +718,19 @@ Engel <https://www.linkedin.com/in/rainer-matthias-engel-5ba47a9>`__
 helped a lot in suggesting new features and suggesting enhancements in
 2.14.0 to 2.14.2 releases.
 
+.. _pygad-2143:
+
+PyGAD 2.14.3
+------------
+
+Release Date: 6 June 2021
+
+1. Some bug fixes when setting the ``save_best_solutions`` parameter to
+   ``True``. Previously, the best solution for generation ``i`` was
+   added into the ``best_solutions`` attribute at generation ``i+1``.
+   Now, the ``best_solutions`` attribute is updated by each best
+   solution at its exact generation.
+
 PyGAD Projects at GitHub
 ========================
 
