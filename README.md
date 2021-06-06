@@ -1,10 +1,10 @@
-# PyGAD: Genetic Algorithm in Python
+# PyGAD:  Genetic Algorithm in Python
 
-[This project](https://github.com/ahmedfgad/GeneticAlgorithmPython) is part of [PyGAD](https://pypi.org/project/pygad) which is an open-source Python 3 library for building the genetic algorithm and optimizing machine learning algorithms (Keras & PyTorch). 
+[PyGAD](https://pypi.org/project/pygad) is an open-source easy-to-use Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. It supports Keras and PyTorch.
 
-Check documentation of the [GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython) project in the PyGAD's documentation: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html
+Check documentation of the [PyGAD](https://pygad.readthedocs.io/en/latest).
 
-[![Downloads](https://pepy.tech/badge/pygad)](https://pepy.tech/project/pygad) ![](https://readthedocs.org/projects/pygad/badge)
+[![Downloads](https://pepy.tech/badge/pygad)](https://pepy.tech/project/pygad) ![Docs](https://readthedocs.org/projects/pygad/badge)
 
 ![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
 
@@ -18,10 +18,6 @@ You can donate via [Open Collective](https://opencollective.com/pygad): [opencol
 
 To donate using PayPal, use either this link: [paypal.me/ahmedfgad](https://paypal.me/ahmedfgad) or the e-mail address ahmed.f.gad@gmail.com.
 
-# Tutorial Project
-
-**IMPORTANT** If you are coming for the code of the tutorial titled  [**Genetic Algorithm Implementation in Python**](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad), then it has been moved to the [Tutorial Project](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/Tutorial Project) directory on 06 May 2020.
-
 # Installation
 
 To install [PyGAD](https://pypi.org/project/pygad), simply use pip to download and install the library from [PyPI](https://pypi.org/project/pygad) (Python Package Index). The library lives a PyPI at this page https://pypi.org/project/pygad.
@@ -29,7 +25,7 @@ To install [PyGAD](https://pypi.org/project/pygad), simply use pip to download a
 Install PyGAD with the following command:
 
 ```python
-pip3 install pygad
+pip install pygad
 ```
 
 PyGAD is developed in Python 3.7.3 and depends on NumPy for creating and manipulating arrays and Matplotlib for creating figures. The exact NumPy version used in developing PyGAD is 1.16.4. For Matplotlib, the version is 3.1.0.
@@ -334,8 +330,6 @@ Find the book at these links:
 
 * E-mail: ahmed.f.gad@gmail.com
 * [LinkedIn](https://www.linkedin.com/in/ahmedfgad)
-* [Amazon Author Page](https://amazon.com/author/ahmedgad)
-* [Heartbeat](https://heartbeat.fritz.ai/@ahmedfgad)
 * [Paperspace](https://blog.paperspace.com/author/ahmed)
 * [KDnuggets](https://kdnuggets.com/author/ahmed-gad)
 * [TowardsDataScience](https://towardsdatascience.com/@ahmedfgad)
