@@ -937,18 +937,18 @@ class GA:
         # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
         self.last_generation_fitness = self.cal_pop_fitness()
 
+        best_solution, best_solution_fitness, best_match_idx = self.best_solution(pop_fitness=self.last_generation_fitness)
+
+        # Appending the best solution in the initial population to the best_solutions list.
+        if self.save_best_solutions:
+            self.best_solutions.append(best_solution)
+
         for generation in range(self.num_generations):
             if not (self.on_fitness is None):
                 self.on_fitness(self, self.last_generation_fitness)
 
-            best_solution, best_solution_fitness, best_match_idx = self.best_solution(pop_fitness=self.last_generation_fitness)
-
             # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
             self.best_solutions_fitness.append(best_solution_fitness)
-
-            # Appending the best solution to the best_solutions list.
-            if self.save_best_solutions:
-                self.best_solutions.append(best_solution)
 
             # Selecting the best parents in the population for mating.
             self.last_generation_parents = self.select_parents(self.last_generation_fitness, num_parents=self.num_parents_mating)
@@ -992,6 +992,12 @@ class GA:
 
             # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
             self.last_generation_fitness = self.cal_pop_fitness()
+
+            best_solution, best_solution_fitness, best_match_idx = self.best_solution(pop_fitness=self.last_generation_fitness)
+
+            # Appending the best solution to the best_solutions list.
+            if self.save_best_solutions:
+                self.best_solutions.append(best_solution)
 
             # If the callback_generation attribute is not None, then cal the callback function after the generation.
             if not (self.on_generation is None):
