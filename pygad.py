@@ -2530,7 +2530,7 @@ class GA:
 
         return best_solution, best_solution_fitness, best_match_idx
 
-    def plot_result(self, title="PyGAD - Iteration vs. Fitness", xlabel="Generation", ylabel="Fitness", linewidth=3, save_as=None):
+    def plot_result(self, title="PyGAD - Iteration vs. Fitness", xlabel="Generation", ylabel="Fitness", linewidth=3, save_dir=None):
 
         """
         Creates and shows a plot that summarizes how the fitness value evolved by generation. Can only be called after completing at least 1 generation. If no generation is completed, an exception is raised.
@@ -2540,7 +2540,7 @@ class GA:
             xlabel: Label on the X-axis.
             ylabel: Label on the Y-axis.
             linewidth: Line width of the plot.
-            save_as: save image instead of showing it.
+            save_dir: Directory to save the figure.
 
         Returns the figure.
         """
@@ -2557,10 +2557,10 @@ class GA:
         matplotlib.pyplot.xlabel(xlabel)
         matplotlib.pyplot.ylabel(ylabel)
 
-        if save_as is None:
-            matplotlib.pyplot.show()        # show plot
-        else:
-            fig.savefig(f'{save_as}.png')   # save as image
+        if not save_dir is None:
+            matplotlib.pyplot.savefig(fname=save_dir, 
+                                      bbox_inches='tight')
+        matplotlib.pyplot.show()
 
         return fig
 
