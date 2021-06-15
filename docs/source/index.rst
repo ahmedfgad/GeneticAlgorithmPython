@@ -12,7 +12,8 @@ Welcome to PyGAD's documentation!
 
 `PyGAD <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ is an
 open-source Python library for building the genetic algorithm and
-optimizing machine learning algorithms.
+optimizing machine learning algorithms. It works with
+`Keras <https://keras.io>`__ and `PyTorch <https://pytorch.org>`__.
 
 `PyGAD <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ supports
 different types of crossover, mutation, and parent selection operators.
@@ -20,7 +21,6 @@ different types of crossover, mutation, and parent selection operators.
 different types of problems to be optimized using the genetic algorithm
 by customizing the fitness function.
 
-|image1|
 
 .. figure:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :alt: 
@@ -37,7 +37,7 @@ classification problems.
 The library is under active development and more features added
 regularly. Please contact us if you want a feature to be supported.
 
-.. _header-n69:
+.. _donation--support:
 
 Donation & Support
 ==================
@@ -56,8 +56,6 @@ You can donate to PyGAD via:
 -  Buy a product at `Teespring <https://pygad.creator-spring.com/>`__:
    `pygad.creator-spring.com <https://pygad.creator-spring.com>`__
 
-.. _header-n62:
-
 Installation
 ============
 
@@ -66,14 +64,7 @@ download and install the library from
 `PyPI <https://pypi.org/project/pygad>`__ (Python Package Index). The
 library lives a PyPI at this page https://pypi.org/project/pygad.
 
-For Windows, issue the following command:
-
-.. code:: python
-
-   pip install pygad
-
-For Linux and Mac, replace ``pip`` by use ``pip3`` because the library
-only supports Python 3.
+Install PyGAD with the following command:
 
 .. code:: python
 
