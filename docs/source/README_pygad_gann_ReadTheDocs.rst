@@ -1,4 +1,4 @@
-.. _header-n0:
+.. _pygadgann-module:
 
 ``pygad.gann`` Module
 =====================
@@ -10,7 +10,7 @@ The ``pygad.gann`` module trains neural networks (for either
 classification or regression) using the genetic algorithm. It makes use
 of the 2 modules ``pygad`` and ``pygad.nn``.
 
-.. _header-n4:
+.. _pygadganngann-class:
 
 ``pygad.gann.GANN`` Class
 =========================
@@ -20,7 +20,7 @@ training neural networks using the genetic algorithm. The constructor,
 methods, function, and attributes within the class are discussed in this
 section.
 
-.. _header-n6:
+.. _init:
 
 ``__init__()``
 --------------
@@ -68,8 +68,6 @@ In order to validate the parameters passed to the ``pygad.gann.GANN``
 class constructor, the ``pygad.gann.validate_network_parameters()``
 function is called.
 
-.. _header-n23:
-
 Instance Attributes
 -------------------
 
@@ -84,15 +82,13 @@ which are:
 -  ``population_networks``: A list holding references to all the
    solutions (i.e. neural networks) used in the population.
 
-.. _header-n30:
-
 Methods in the GANN Class
 -------------------------
 
 This section discusses the methods available for instances of the
 ``pygad.gann.GANN`` class.
 
-.. _header-n32:
+.. _createpopulation:
 
 ``create_population()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,7 +106,7 @@ The method returns the list holding the references to the networks. This
 list is later assigned to the ``population_networks`` attribute of the
 instance.
 
-.. _header-n36:
+.. _updatepopulationtrainedweights:
 
 ``update_population_trained_weights()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,14 +124,14 @@ Accepts the following parameters:
    all networks as matrices. Such matrices are to be assigned to the
    ``trained_weights`` attribute of all layers of all networks.
 
-.. _header-n42:
+.. _functions-in-the-pygadgann-module:
 
 Functions in the ``pygad.gann`` Module
 ======================================
 
 This section discusses the functions in the ``pygad.gann`` module.
 
-.. _header-n44:
+.. _pygadgannvalidatenetworkparameters:
 
 ``pygad.gann.validate_network_parameters()``
 --------------------------------------------
@@ -162,7 +158,7 @@ layers (i.e. the length of the ``num_neurons_hidden_layers`` parameter).
 Returns a list holding the name(s) of the activation function(s) of the
 hidden layer(s).
 
-.. _header-n50:
+.. _pygadganncreatenetwork:
 
 ``pygad.gann.create_network()``
 -------------------------------
@@ -187,10 +183,10 @@ Returns the reference to the last layer in the network architecture
 which is the output layer. Based on such a reference, all network layers
 can be fetched.
 
-.. _header-n55:
+.. _pygadgannpopulationasvectors:
 
 ``pygad.gann.population_as_vectors()`` 
----------------------------------------
+--------------------------------------
 
 Accepts the population as networks and returns a list holding all
 weights of the layers of each solution (i.e. network) in the population
@@ -209,7 +205,7 @@ Accepts the following parameters:
 Returns a list holding the weights vectors for all solutions (i.e.
 networks).
 
-.. _header-n63:
+.. _pygadgannpopulationasmatrices:
 
 ``pygad.gann.population_as_matrices()``
 ---------------------------------------
@@ -232,8 +228,6 @@ Accepts the following parameters:
 
 Returns a list holding the weights matrices for all solutions (i.e.
 networks).
-
-.. _header-n73:
 
 Steps to Build and Train Neural Networks using Genetic Algorithm
 ================================================================
@@ -264,8 +258,6 @@ using the genetic algorithm are as follows:
 -  Calculating some statistics.
 
 Let's start covering all of these steps.
-
-.. _header-n99:
 
 Prepare the Training Data
 -------------------------
@@ -310,7 +302,7 @@ For the XOR example, there are 2 classes and thus their labels are 0 and
 Note that the project only supports classification problems where each
 sample is assigned to only one class.
 
-.. _header-n107:
+.. _create-an-instance-of-the-pygadganngann-class:
 
 Create an Instance of the ``pygad.gann.GANN`` Class
 ---------------------------------------------------
@@ -363,8 +355,6 @@ The activation function used for the output layer is ``softmax``. The
 After creating the instance of the ``pygad.gann.GANN`` class next is to
 fetch the weights of the population as a list of vectors.
 
-.. _header-n128:
-
 Fetch the Population Weights as Vectors
 ---------------------------------------
 
@@ -388,8 +378,6 @@ prepare 2 functions which are:
 1. Fitness function.
 
 2. Callback function after each generation.
-
-.. _header-n139:
 
 Prepare the Fitness Function
 ----------------------------
@@ -429,8 +417,6 @@ fitness value is returned.
        solution_fitness = (correct_predictions/data_outputs.size)*100
 
        return solution_fitness
-
-.. _header-n150:
 
 Prepare the Generation Callback Function
 ----------------------------------------
@@ -478,7 +464,7 @@ solutions within the population.
 After preparing the fitness and callback function, next is to create an
 instance of the ``pygad.GA`` class.
 
-.. _header-n159:
+.. _create-an-instance-of-the-pygadga-class:
 
 Create an Instance of the ``pygad.GA`` Class
 --------------------------------------------
@@ -525,7 +511,7 @@ Here is an example.
 The last step for training the neural networks using the genetic
 algorithm is calling the ``run()`` method.
 
-.. _header-n164:
+.. _run-the-created-instance-of-the-pygadga-class:
 
 Run the Created Instance of the ``pygad.GA`` Class
 --------------------------------------------------
@@ -538,18 +524,16 @@ specified in its ``num_generations`` parameter.
 
    ga_instance.run()
 
-.. _header-n167:
-
 Plot the Fitness Values
 -----------------------
 
-After the ``run()`` method completes, the ``plot_result()`` method can
+After the ``run()`` method completes, the ``plot_fitness()`` method can
 be called to show how the fitness values evolve by generation. A fitness
 value (i.e. accuracy) of 100 is reached after around 180 generations.
 
 .. code:: python
 
-   ga_instance.plot_result()
+   ga_instance.plot_fitness()
 
 .. figure:: https://user-images.githubusercontent.com/16560492/82078638-c11e0700-96e1-11ea-8aa9-c36761c5e9c7.png
    :alt: 
@@ -559,8 +543,6 @@ thus a classification accuracy of 100 can be reached using a less number
 of generations. On the other hand, a different initial population might
 cause 100% accuracy to be reached using more generations or not reached
 at all.
-
-.. _header-n172:
 
 Information about the Best Solution
 -----------------------------------
@@ -605,8 +587,6 @@ fitness value is reached after 182 generations.
 
    Best solution reached after 182 generations.
 
-.. _header-n187:
-
 Making Predictions using the Trained Weights
 --------------------------------------------
 
@@ -622,8 +602,6 @@ the labels correctly.
 .. code:: 
 
    Predictions of the trained network : [0. 1. 1. 0.]
-
-.. _header-n191:
 
 Calculating Some Statistics
 ---------------------------
@@ -647,16 +625,12 @@ addition to the classification accuracy.
    print("Number of wrong classifications : 0
    Classification accuracy : 100
 
-.. _header-n195:
-
 Examples
 ========
 
 This section gives the complete code of some examples that build and
 train neural networks using the genetic algorithm. Each subsection
 builds a different network.
-
-.. _header-n197:
 
 XOR Classification
 ------------------
@@ -767,7 +741,7 @@ its complete code is listed below.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result()
+   ga_instance.plot_fitness()
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
@@ -790,8 +764,6 @@ its complete code is listed below.
    print("Number of correct classifications : {num_correct}.".format(num_correct=num_correct))
    print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
    print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
-
-.. _header-n200:
 
 Image Classification
 --------------------
@@ -919,7 +891,7 @@ according to the ``num_neurons_output`` parameter of the
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result()
+   ga_instance.plot_fitness()
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
@@ -960,8 +932,6 @@ The next figure shows how fitness value evolves by generation.
 
 .. figure:: https://user-images.githubusercontent.com/16560492/82152993-21898180-9865-11ea-8387-b995f88b83f7.png
    :alt: 
-
-.. _header-n215:
 
 Regression Example 1
 --------------------
@@ -1098,7 +1068,7 @@ for regression.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result()
+   ga_instance.plot_fitness()
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
@@ -1124,8 +1094,6 @@ used.
 
 .. figure:: https://user-images.githubusercontent.com/16560492/92948154-3cf24b00-f459-11ea-94ea-952b66ab2145.png
    :alt: 
-
-.. _header-n233:
 
 Regression Example 2 - Fish Weight Prediction
 ---------------------------------------------
@@ -1266,7 +1234,7 @@ Here is the complete code.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result()
+   ga_instance.plot_fitness()
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
@@ -1291,4 +1259,4 @@ The next figure shows how the fitness value changes for the 500
 generations used.
 
 .. figure:: https://user-images.githubusercontent.com/16560492/92948486-bbe78380-f459-11ea-9e31-0d4c7269d606.png
-   :alt:
+   :alt: 

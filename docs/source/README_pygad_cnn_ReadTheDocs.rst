@@ -1,4 +1,4 @@
-.. _header-n0:
+.. _pygadcnn-module:
 
 ``pygad.cnn`` Module
 ====================
@@ -15,8 +15,6 @@ predictions, and more.
 
 Later, the **pygad.gacnn** module is used to train the **pygad.cnn**
 network using the genetic algorithm built in the **pygad** module.
-
-.. _header-n5:
 
 Supported Layers
 ================
@@ -61,7 +59,7 @@ attributes that do the same function which are:
 In addition to such attributes, the layers may have some additional
 attributes. The next subsections discuss such layers.
 
-.. _header-n36:
+.. _pygadcnninput2d-class:
 
 ``pygad.cnn.Input2D`` Class
 ---------------------------
@@ -100,7 +98,7 @@ Here is how to access the attributes within the instance of the
 
 This is everything about the input layer.
 
-.. _header-n50:
+.. _pygadcnnconv2d-class:
 
 ``pygad.cnn.Conv2D`` Class
 --------------------------
@@ -208,7 +206,7 @@ the number of input neurons.
 
    print("Input shape =", input_shape)
 
-.. _header-n87:
+.. _pygadcnnmaxpooling2d-class:
 
 ``pygad.cnn.MaxPooling2D`` Class
 --------------------------------
@@ -234,7 +232,7 @@ created which are:
 
 -  ``layer_output``
 
-.. _header-n104:
+.. _pygadcnnaveragepooling2d-class:
 
 ``pygad.cnn.AveragePooling2D`` Class
 ------------------------------------
@@ -243,7 +241,7 @@ The ``pygad.cnn.AveragePooling2D`` class is similar to the
 ``pygad.cnn.MaxPooling2D`` class except that it applies the max pooling
 operation rather than average pooling.
 
-.. _header-n106:
+.. _pygadcnnflatten-class:
 
 ``pygad.cnn.Flatten`` Class
 ---------------------------
@@ -262,7 +260,7 @@ The following instance attributes exist:
 
 -  ``layer_output``
 
-.. _header-n118:
+.. _pygadcnnrelu-class:
 
 ``pygad.cnn.ReLU`` Class
 ------------------------
@@ -282,7 +280,7 @@ The following instance attributes exist:
 
 -  ``layer_output``
 
-.. _header-n131:
+.. _pygadcnnsigmoid-class:
 
 ``pygad.cnn.Sigmoid`` Class
 ---------------------------
@@ -291,7 +289,7 @@ The ``pygad.cnn.Sigmoid`` class is similar to the ``pygad.cnn.ReLU``
 class except that it applies the sigmoid function rather than the ReLU
 function.
 
-.. _header-n133:
+.. _pygadcnndense-class:
 
 ``pygad.cnn.Dense`` Class
 -------------------------
@@ -324,7 +322,7 @@ created which are:
 
 -  ``layer_output``
 
-.. _header-n154:
+.. _pygadcnnmodel-class:
 
 ``pygad.cnn.Model`` Class
 =========================
@@ -349,14 +347,12 @@ There are a number of methods in the ``pygad.cnn.Model`` class which
 serves in training, testing, and retrieving information about the model.
 These methods are discussed in the next subsections.
 
-.. _header-n165:
+.. _getlayers:
 
 ``get_layers()``
 ----------------
 
 Creates a list of all layers in the CNN model. It accepts no parameters.
-
-.. _header-n167:
 
 ``train()``
 -----------
@@ -376,7 +372,7 @@ It is important to note that no learning algorithm is used for training
 the pygad.cnn. Just the learning rate is used for making some changes
 which is better than leaving the weights unchanged.
 
-.. _header-n177:
+.. _feedsample:
 
 ``feed_sample()``
 -----------------
@@ -384,7 +380,7 @@ which is better than leaving the weights unchanged.
 Feeds a sample in the CNN layers and returns results of the last layer
 in the pygad.cnn.
 
-.. _header-n179:
+.. _updateweights:
 
 ``update_weights()``
 --------------------
@@ -393,8 +389,6 @@ Updates the CNN weights using the learning rate. It is important to note
 that no learning algorithm is used for training the pygad.cnn. Just the
 learning rate is used for making some changes which is better than
 leaving the weights unchanged.
-
-.. _header-n181:
 
 ``predict()``
 -------------
@@ -407,14 +401,10 @@ Accepts the following parameter:
 
 It returns a list holding the samples predictions.
 
-.. _header-n188:
-
 ``summary()``
 -------------
 
 Prints a summary of the CNN architecture.
-
-.. _header-n190:
 
 Supported Activation Functions
 ==============================
@@ -428,8 +418,6 @@ The supported activation functions in the convolution layer are:
 
 The dense layer supports these functions besides the ``softmax``
 function implemented in the ``pygad.cnn.softmax()`` function.
-
-.. _header-n198:
 
 Steps to Build a Neural Network
 ===============================
@@ -450,8 +438,6 @@ a neural network. The summary of the steps are as follows:
 -  Making Predictions
 
 -  Calculating Some Statistics
-
-.. _header-n215:
 
 Reading the Data
 ----------------
@@ -519,8 +505,6 @@ according to the next 2 lines:
 
 After the data is prepared, next is to create the network architecture.
 
-.. _header-n242:
-
 Building the Network Architecture
 ---------------------------------
 
@@ -580,8 +564,6 @@ neurons equal to the number of classes in the dataset which is 4.
 After the network architecture is prepared, the next step is to create a
 CNN model.
 
-.. _header-n248:
-
 Building Model
 --------------
 
@@ -596,8 +578,6 @@ class. Here is an example.
 
 After the model is created, a summary of the model architecture can be
 printed.
-
-.. _header-n252:
 
 Model Summary
 -------------
@@ -626,8 +606,6 @@ summary of the CNN model.
    <class 'pygad.cnn.Dense'>
    ----------------------------------------
 
-.. _header-n256:
-
 Training the Network
 --------------------
 
@@ -641,8 +619,6 @@ using the the ``pygad.cnn.train()`` method.
 
 After training the network, the next step is to make predictions.
 
-.. _header-n260:
-
 Making Predictions
 ------------------
 
@@ -655,8 +631,6 @@ predictions. Here is an example.
 
 It is not expected to have high accuracy in the predictions because no
 training algorithm is used.
-
-.. _header-n264:
 
 Calculating Some Statistics
 ---------------------------
@@ -679,16 +653,12 @@ classification accuracy is high because no training algorithm is used.
 Please check the documentation of the ``pygad.gacnn`` module for
 training the CNN using the genetic algorithm.
 
-.. _header-n268:
-
 Examples
 ========
 
 This section gives the complete code of some examples that build neural
 networks using ``pygad.cnn``. Each subsection builds a different
 network.
-
-.. _header-n270:
 
 Image Classification
 --------------------

@@ -248,60 +248,12 @@ Release date: 19 July 2020
    ``pygad.GA`` class constructor. It is used to specify the possible
    values for each gene in case the user wants to restrict the gene
    values. It is useful if the gene space is restricted to a certain
-   range or to discrete values. Thanks to `Prof. Tamer A.
+   range or to discrete values. For more information, check the `More
+   about the ``gene_space``
+   Parameter <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#more-about-the-gene-space-parameter>`__
+   section. Thanks to `Prof. Tamer A.
    Farrag <https://github.com/tfarrag2000>`__ for requesting this useful
    feature.
-
-Assuming that all genes have the same global space which include the
-values 0.3, 5.2, -4, and 8, then those values can be assigned to the
-``gene_space`` parameter as a list, tuple, or range. Here is a list
-assigned to this parameter. By doing that, then the gene values are
-restricted to those assigned to the ``gene_space`` parameter.
-
-.. code:: python
-
-   gene_space = [0.3, 5.2, -4, 8]
-
-If some genes have different spaces, then ``gene_space`` should accept a
-nested list or tuple. In this case, its elements could be:
-
-1. List, tuple, or range: It holds the individual gene space.
-
-2. Number (int/float): A single value to be assigned to the gene. This
-   means this gene will have the same value across all generations.
-
-3. ``None``: A gene with its space set to ``None`` is initialized
-   randomly from the range specified by the 2 parameters
-   ``init_range_low`` and ``init_range_high``. For mutation, its value
-   is mutated based on a random value from the range specified by the 2
-   parameters ``random_mutation_min_val`` and
-   ``random_mutation_max_val``. If all elements in the ``gene_space``
-   parameter are ``None``, the parameter will not have any effect.
-
-Assuming that a chromosome has 2 genes and each gene has a different
-value space. Then the ``gene_space`` could be assigned a nested
-list/tuple where each element determines the space of a gene. According
-to the next code, the space of the first gene is [0.4, -5] which has 2
-values and the space for the second gene is [0.5, -3.2, 8.8, -9] which
-has 4 values.
-
-.. code:: python
-
-   gene_space = [[0.4, -5], [0.5, -3.2, 8.2, -9]]
-
-For a 2 gene chromosome, if the first gene space is restricted to the
-discrete values from 0 to 4 and the second gene is restricted to the
-values from 10 to 19, then it could be specified according to the next
-code.
-
-.. code:: python
-
-   gene_space = [range(5), range(10, 20)]
-
-If the user did not assign the initial population to the
-``initial_population`` parameter, the initial population is created
-randomly based on the ``gene_space`` parameter. Moreover, the mutation
-is applied based on this parameter.
 
 .. _pygad-260:
 
@@ -670,7 +622,10 @@ Release Date: 19 May 2021
    ``list/tuple/numpy.ndarray`` of numeric data types for the genes.
    This helps to control the data type of each individual gene.
    Previously, the ``gene_type`` can be assigned only to a single data
-   type that is applied for all genes. Thanks to `Rainer
+   type that is applied for all genes. For more information, check the
+   `More about the ``gene_type``
+   Parameter <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#more-about-the-gene-type-parameter>`__
+   section. Thanks to `Rainer
    Engel <https://www.linkedin.com/in/rainer-matthias-engel-5ba47a9>`__
    for asking about this feature in `this
    discussion <https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/43>`__:
@@ -730,6 +685,117 @@ Release Date: 6 June 2021
    added into the ``best_solutions`` attribute at generation ``i+1``.
    Now, the ``best_solutions`` attribute is updated by each best
    solution at its exact generation.
+
+.. _pygad-2150:
+
+PyGAD 2.15.0
+------------
+
+Release Date: 17 June 2021
+
+1.  Control the precision of all genes/individual genes. Thanks to
+    `Rainer <https://github.com/rengel8>`__ for asking about this
+    feature:
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/43#discussioncomment-763452
+
+2.  A new attribute named ``last_generation_parents_indices`` holds the
+    indices of the selected parents in the last generation.
+
+3.  In adaptive mutation, no need to recalculate the fitness values of
+    the parents selected in the last generation as these values can be
+    returned based on the ``last_generation_fitness`` and
+    ``last_generation_parents_indices`` attributes. This speeds-up the
+    adaptive mutation.
+
+4.  When a sublist has a value of ``None`` in the ``gene_space``
+    parameter (e.g. ``gene_space=[[1, 2, 3], [5, 6, None]]``), then its
+    value will be randomly generated for each solution rather than being
+    generated once for all solutions. Previously, a value of ``None`` in
+    a sublist of the ``gene_space`` parameter was identical across all
+    solutions.
+
+5.  The dictionary assigned to the ``gene_space`` parameter itself or
+    one of its elements has a new key called ``"step"`` to specify the
+    step of moving from the start to the end of the range specified by
+    the 2 existing keys ``"low"`` and ``"high"``. An example is
+    ``{"low": 0, "high": 30, "step": 2}`` to have only even values for
+    the gene(s) starting from 0 to 30. For more information, check the
+    `More about the ``gene_space``
+    Parameter <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#more-about-the-gene-space-parameter>`__
+    section.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/48
+
+6.  A new function called ``predict()`` is added in both the
+    ``pygad.kerasga`` and ``pygad.torchga`` modules to make predictions.
+    This makes it easier than using custom code each time a prediction
+    is to be made.
+
+7.  A new parameter called ``stop_criteria`` allows the user to specify
+    one or more stop criteria to stop the evolution based on some
+    conditions. Each criterion is passed as ``str`` which has a stop
+    word. The current 2 supported words are ``reach`` and ``saturate``.
+    ``reach`` stops the ``run()`` method if the fitness value is equal
+    to or greater than a given fitness value. An example for ``reach``
+    is ``"reach_40"`` which stops the evolution if the fitness is >= 40.
+    ``saturate`` means stop the evolution if the fitness saturates for a
+    given number of consecutive generations. An example for ``saturate``
+    is ``"saturate_7"`` which means stop the ``run()`` method if the
+    fitness does not change for 7 consecutive generations. Thanks to
+    `Rainer <https://github.com/rengel8>`__ for asking about this
+    feature:
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/44
+
+8.  A new bool parameter, defaults to ``False``, named
+    ``save_solutions`` is added to the constructor of the ``pygad.GA``
+    class. If ``True``, then all solutions in each generation are
+    appended into an attribute called ``solutions`` which is NumPy
+    array.
+
+9.  The ``plot_result()`` method is renamed to ``plot_fitness()``. The
+    users should migrate to the new name as the old name will be removed
+    in the future.
+
+10. Four new optional parameters are added to the ``plot_fitness()``
+    function in the ``pygad.GA`` class which are ``font_size=14``,
+    ``save_dir=None``, ``color="#3870FF"``, and ``plot_type="plot"``.
+    Use ``font_size`` to change the font of the plot title and labels.
+    ``save_dir`` accepts the directory to which the figure is saved. It
+    defaults to ``None`` which means do not save the figure. ``color``
+    changes the color of the plot. ``plot_type`` changes the plot type
+    which can be either ``"plot"`` (default), ``"scatter"``, or
+    ``"bar"``.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/47
+
+11. The default value of the ``title`` parameter in the
+    ``plot_fitness()`` method is ``"PyGAD - Generation vs. Fitness"``
+    rather than ``"PyGAD - Iteration vs. Fitness"``.
+
+12. A new method named ``plot_new_solution_rate()`` creates, shows, and
+    returns a figure showing the rate of new/unique solutions explored
+    in each generation. It accepts the same parameters as in the
+    ``plot_fitness()`` method. This method only works when
+    ``save_solutions=True`` in the ``pygad.GA`` class's constructor.
+
+13. A new method named ``plot_genes()`` creates, shows, and returns a
+    figure to show how each gene changes per each generation. It accepts
+    similar parameters like the ``plot_fitness()`` method in addition to
+    the ``graph_type``, ``fill_color``, and ``solutions`` parameters.
+    The ``graph_type`` parameter can be either ``"plot"`` (default),
+    ``"boxplot"``, or ``"histogram"``. ``fill_color`` accepts the fill
+    color which works when ``graph_type`` is either ``"boxplot"`` or
+    ``"histogram"``. ``solutions`` can be either ``"all"`` or ``"best"``
+    to decide whether all solutions or only best solutions are used.
+
+14. The ``gene_type`` parameter now supports controlling the precision
+    of ``float`` data types. For a gene, rather than assigning just the
+    data type like ``float``, assign a
+    ``list``/``tuple``/``numpy.ndarray`` with 2 elements where the first
+    one is the type and the second one is the precision. For example,
+    ``[float, 2]`` forces a gene with a value like ``0.1234`` to be
+    ``0.12``. For more information, check the `More about the
+    ``gene_type``
+    Parameter <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#more-about-the-gene-type-parameter>`__
+    section.
 
 PyGAD Projects at GitHub
 ========================

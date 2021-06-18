@@ -1,4 +1,4 @@
-.. _header-n0:
+.. _pygadgacnn-module:
 
 ``pygad.gacnn`` Module
 ======================
@@ -10,7 +10,7 @@ The ``pygad.gacnn`` module trains convolutional neural networks using
 the genetic algorithm. It makes use of the 2 modules ``pygad`` and
 ``pygad.cnn``.
 
-.. _header-n4:
+.. _pygadgacnngacnn-class:
 
 ``pygad.gacnn.GACNN`` Class
 ===========================
@@ -20,7 +20,7 @@ training convolutional neural networks (CNNs) using the genetic
 algorithm. The constructor, methods, function, and attributes within the
 class are discussed in this section.
 
-.. _header-n6:
+.. _init:
 
 ``__init__()``
 --------------
@@ -39,8 +39,6 @@ parameters:
    CNNs are created where their parameters are optimized using the
    genetic algorithm.
 
-.. _header-n14:
-
 Instance Attributes
 -------------------
 
@@ -52,15 +50,13 @@ which is:
 -  ``population_networks``: A list holding references to all the
    solutions (i.e. CNNs) used in the population.
 
-.. _header-n19:
-
 Methods in the GACNN Class
 --------------------------
 
 This section discusses the methods available for instances of the
 ``pygad.gacnn.GACNN`` class.
 
-.. _header-n21:
+.. _createpopulation:
 
 ``create_population()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,7 +68,7 @@ are copied from the CNN model passed to constructor of the GACNN class.
 The list of networks is assigned to the ``population_networks``
 attribute of the instance.
 
-.. _header-n24:
+.. _updatepopulationtrainedweights:
 
 ``update_population_trained_weights()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,17 +85,17 @@ Accepts the following parameters:
    all networks as matrices. Such matrices are to be assigned to the
    ``trained_weights`` attribute of all layers of all networks.
 
-.. _header-n30:
+.. _functions-in-the-pygadgacnn-module:
 
 Functions in the ``pygad.gacnn`` Module
 =======================================
 
 This section discusses the functions in the ``pygad.gacnn`` module.
 
-.. _header-n32:
+.. _pygadgacnnpopulationasvectors:
 
 ``pygad.gacnn.population_as_vectors()`` 
-----------------------------------------
+---------------------------------------
 
 Accepts the population as a list of references to the
 ``pygad.cnn.Model`` class and returns a list holding all weights of the
@@ -118,7 +114,7 @@ Accepts the following parameters:
 Returns a list holding the weights vectors for all solutions (i.e.
 networks).
 
-.. _header-n40:
+.. _pygadgacnnpopulationasmatrices:
 
 ``pygad.gacnn.population_as_matrices()``
 ----------------------------------------
@@ -141,8 +137,6 @@ Accepts the following parameters:
 
 Returns a list holding the weights matrices for all solutions (i.e.
 networks).
-
-.. _header-n50:
 
 Steps to Build and Train CNN using Genetic Algorithm
 ====================================================
@@ -173,8 +167,6 @@ using the genetic algorithm are as follows:
 -  Calculating some statistics.
 
 Let's start covering all of these steps.
-
-.. _header-n76:
 
 Prepare the Training Data
 -------------------------
@@ -218,8 +210,6 @@ the number of classes.
 Note that the project only supports that each sample is assigned to only
 one class.
 
-.. _header-n89:
-
 Building the Network Architecture
 ---------------------------------
 
@@ -246,8 +236,6 @@ Here is an example for a CNN architecture.
 After the network architecture is prepared, the next step is to create a
 CNN model.
 
-.. _header-n93:
-
 Building Model
 --------------
 
@@ -262,8 +250,6 @@ class. Here is an example.
 
 After the model is created, a summary of the model architecture can be
 printed.
-
-.. _header-n97:
 
 Model Summary
 -------------
@@ -287,7 +273,7 @@ summary of the CNN model.
 The next step is to create an instance of the ``pygad.gacnn.GACNN``
 class.
 
-.. _header-n102:
+.. _create-an-instance-of-the-pygadgacnngacnn-class:
 
 Create an Instance of the ``pygad.gacnn.GACNN`` Class
 -----------------------------------------------------
@@ -310,8 +296,6 @@ specified by the ``model`` parameter.
 
 After creating the instance of the ``pygad.gacnn.GACNN`` class, next is
 to fetch the weights of the population as a list of vectors.
-
-.. _header-n107:
 
 Fetch the Population Weights as Vectors
 ---------------------------------------
@@ -342,8 +326,6 @@ prepare 2 functions which are:
 1. Fitness function.
 
 2. Callback function after each generation.
-
-.. _header-n120:
 
 Prepare the Fitness Function
 ----------------------------
@@ -382,8 +364,6 @@ fitness value is returned.
        solution_fitness = (correct_predictions/data_outputs.size)*100
 
        return solution_fitness
-
-.. _header-n132:
 
 Prepare the Generation Callback Function
 ----------------------------------------
@@ -430,7 +410,7 @@ solutions within the population.
 After preparing the fitness and callback function, next is to create an
 instance of the ``pygad.GA`` class.
 
-.. _header-n141:
+.. _create-an-instance-of-the-pygadga-class:
 
 Create an Instance of the ``pygad.GA`` Class
 --------------------------------------------
@@ -449,32 +429,17 @@ number of generations is 10.
 
    mutation_percent_genes = 5
 
-   parent_selection_type = "sss"
-
-   crossover_type = "single_point"
-
-   mutation_type = "random"
-
-   keep_parents = 1
-
-   init_range_low = -2
-   init_range_high = 5
-
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
                           mutation_percent_genes=mutation_percent_genes,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
 
 The last step for training the neural networks using the genetic
 algorithm is calling the ``run()`` method.
 
-.. _header-n145:
+.. _run-the-created-instance-of-the-pygadga-class:
 
 Run the Created Instance of the ``pygad.GA`` Class
 --------------------------------------------------
@@ -487,22 +452,18 @@ specified in its ``num_generations`` parameter.
 
    ga_instance.run()
 
-.. _header-n148:
-
 Plot the Fitness Values
 -----------------------
 
-After the ``run()`` method completes, the ``plot_result()`` method can
+After the ``run()`` method completes, the ``plot_fitness()`` method can
 be called to show how the fitness values evolve by generation.
 
 .. code:: python
 
-   ga_instance.plot_result()
+   ga_instance.plot_fitness()
 
 .. figure:: https://user-images.githubusercontent.com/16560492/83429675-ab744580-a434-11ea-8f21-9d3804b50d15.png
    :alt: 
-
-.. _header-n152:
 
 Information about the Best Solution
 -----------------------------------
@@ -533,8 +494,6 @@ Here is how such information is returned.
    Index of the best solution : 0
    Best fitness value reached after 4 generations.
 
-.. _header-n164:
-
 Making Predictions using the Trained Weights
 --------------------------------------------
 
@@ -546,8 +505,6 @@ the labels correctly.
 
    predictions = pygad.cnn.predict(last_layer=GANN_instance.population_networks[solution_idx], data_inputs=data_inputs)
    print("Predictions of the trained network : {predictions}".format(predictions=predictions))
-
-.. _header-n167:
 
 Calculating Some Statistics
 ---------------------------
@@ -571,16 +528,12 @@ addition to the classification accuracy.
    Number of wrong classifications : 13.
    Classification accuracy : 83.75.
 
-.. _header-n171:
-
 Examples
 ========
 
 This section gives the complete code of some examples that build and
 train neural networks using the genetic algorithm. Each subsection
 builds a different network.
-
-.. _header-n173:
 
 Image Classification
 --------------------
@@ -675,29 +628,17 @@ complete code is listed below.
 
    mutation_percent_genes = 0.1 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
 
-   parent_selection_type = "sss" # Type of parent selection.
-
-   crossover_type = "single_point" # Type of the crossover operator.
-
-   mutation_type = "random" # Type of the mutation operator.
-
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
-
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
                           mutation_percent_genes=mutation_percent_genes,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
 
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result()
+   ga_instance.plot_fitness()
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()

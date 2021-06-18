@@ -35,13 +35,15 @@ The ``pygad.GA`` class constructor supports the following parameters:
 
 -  ``fitness_func``: Accepts a function that must accept 2 parameters (a
    single solution and its index in the population) and return the
-   fitness value of the solution. Available starting from
-   `PyGAD <https://pypi.org/project/pygad>`__ 1.0.17 until 1.0.20 with a
-   single parameter representing the solution. Changed in
-   `PyGAD <https://pypi.org/project/pygad>`__ 2.0.0 and higher to
-   include a second parameter representing the solution index. Check the
-   **Preparing the ``fitness_func`` Parameter** section for information
-   about creating such a function.
+   fitness value of the solution. Available starting from `PyGAD
+   1.0.17 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-1-0-17>`__
+   until
+   `1.0.20 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-1-0-20>`__
+   with a single parameter representing the solution. Changed in `PyGAD
+   2.0.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-0-0>`__
+   and higher to include a second parameter representing the solution
+   index. Check the **Preparing the ``fitness_func`` Parameter** section
+   for information about creating such a function.
 
 -  ``initial_population``: A user-defined initial population. It is
    useful when the user wants to start the generations with a custom
@@ -51,7 +53,9 @@ The ``pygad.GA`` class constructor supports the following parameters:
    population using the ``sol_per_pop`` and ``num_genes`` parameters. An
    exception is raised if the ``initial_population`` is ``None`` while
    any of the 2 parameters (``sol_per_pop`` or ``num_genes``) is also
-   ``None``. Introduced in PyGAD 2.0.0 and higher.
+   ``None``. Introduced in `PyGAD
+   2.0.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-0-0>`__
+   and higher.
 
 -  ``sol_per_pop``: Number of solutions (i.e. chromosomes) within the
    population. This parameter has no action if ``initial_population``
@@ -64,26 +68,33 @@ The ``pygad.GA`` class constructor supports the following parameters:
 -  ``gene_type=float``: Controls the gene type. It can be assigned to a
    single data type that is applied to all genes or can specify the data
    type of each individual gene. It defaults to ``float`` which means
-   all genes are of ``float`` data type. Starting from PyGAD 2.9.0, the
-   ``gene_type`` parameter can be assigned to a numeric value of any of
-   these types: ``int``, ``float``, and ``numpy.int/uint/float(8-64)``.
-   Starting from PyGAD 2.14.0, it can be assigned to a ``list``,
-   ``tuple``, or a ``numpy.ndarray`` which hold a data type for each
-   gene. This helps to control the data type of each individual gene.
+   all genes are of ``float`` data type. Starting from `PyGAD
+   2.9.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-9-0>`__,
+   the ``gene_type`` parameter can be assigned to a numeric value of any
+   of these types: ``int``, ``float``, and
+   ``numpy.int/uint/float(8-64)``. Starting from `PyGAD
+   2.14.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-14-0>`__,
+   it can be assigned to a ``list``, ``tuple``, or a ``numpy.ndarray``
+   which hold a data type for each gene (e.g.
+   ``gene_type=[int, float, numpy.int8]``). This helps to control the
+   data type of each individual gene. In `PyGAD
+   2.15.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-15-0>`__,
+   a precision for the ``float`` data types can be specified (e.g.
+   ``gene_type=[float, 2]``.
 
 -  ``init_range_low=-4``: The lower value of the random range from which
    the gene values in the initial population are selected.
-   ``init_range_low`` defaults to ``-4``. Available in
-   `PyGAD <https://pypi.org/project/pygad>`__ 1.0.20 and higher. This
-   parameter has no action if the ``initial_population`` parameter
-   exists.
+   ``init_range_low`` defaults to ``-4``. Available in `PyGAD
+   1.0.20 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-1-0-20>`__
+   and higher. This parameter has no action if the
+   ``initial_population`` parameter exists.
 
 -  ``init_range_high=4``: The upper value of the random range from which
    the gene values in the initial population are selected.
-   ``init_range_high`` defaults to ``+4``. Available in
-   `PyGAD <https://pypi.org/project/pygad>`__ 1.0.20 and higher. This
-   parameter has no action if the ``initial_population`` parameter
-   exists.
+   ``init_range_high`` defaults to ``+4``. Available in `PyGAD
+   1.0.20 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-1-0-20>`__
+   and higher. This parameter has no action if the
+   ``initial_population`` parameter exists.
 
 -  ``parent_selection_type="sss"``: The parent selection type. Supported
    types are ``sss`` (for steady-state selection), ``rws`` (for roulette
@@ -107,31 +118,37 @@ The ``pygad.GA`` class constructor supports the following parameters:
    Supported types are ``single_point`` (for single-point crossover),
    ``two_points`` (for two points crossover), ``uniform`` (for uniform
    crossover), and ``scattered`` (for scattered crossover). Scattered
-   crossover is supported from PyGAD 2.9.0 and higher. It defaults to
-   ``single_point``. Starting from PyGAD 2.2.2 and higher, if
-   ``crossover_type=None``, then the crossover step is bypassed which
-   means no crossover is applied and thus no offspring will be created
-   in the next generations. The next generation will use the solutions
-   in the current population.
+   crossover is supported from PyGAD
+   `2.9.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-9-0>`__
+   and higher. It defaults to ``single_point``. Starting from `PyGAD
+   2.2.2 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-2-2>`__
+   and higher, if ``crossover_type=None``, then the crossover step is
+   bypassed which means no crossover is applied and thus no offspring
+   will be created in the next generations. The next generation will use
+   the solutions in the current population.
 
 -  ``crossover_probability=None``: The probability of selecting a parent
    for applying the crossover operation. Its value must be between 0.0
    and 1.0 inclusive. For each parent, a random value between 0.0 and
    1.0 is generated. If this random value is less than or equal to the
    value assigned to the ``crossover_probability`` parameter, then the
-   parent is selected. Added in PyGAD 2.5.0 and higher.
+   parent is selected. Added in `PyGAD
+   2.5.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-5-0>`__
+   and higher.
 
 -  ``mutation_type="random"``: Type of the mutation operation. Supported
    types are ``random`` (for random mutation), ``swap`` (for swap
    mutation), ``inversion`` (for inversion mutation), ``scramble`` (for
    scramble mutation), and ``adaptive`` (for adaptive mutation). It
-   defaults to ``random``. Starting from PyGAD 2.2.2 and higher, if
-   ``mutation_type=None``, then the mutation step is bypassed which
-   means no mutation is applied and thus no changes are applied to the
-   offspring created using the crossover operation. The offspring will
-   be used unchanged in the next generation. ``Adaptive`` mutation is
-   supported starting from PyGAD 2.10.0. For more information about
-   adaptive mutation, go the the `Adaptive
+   defaults to ``random``. Starting from `PyGAD
+   2.2.2 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-2-2>`__
+   and higher, if ``mutation_type=None``, then the mutation step is
+   bypassed which means no mutation is applied and thus no changes are
+   applied to the offspring created using the crossover operation. The
+   offspring will be used unchanged in the next generation. ``Adaptive``
+   mutation is supported starting from `PyGAD
+   2.10.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-10-0>`__.
+   For more information about adaptive mutation, go the the `Adaptive
    Mutation <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#adaptive-mutation>`__
    section. For example about using adaptive mutation, check the `Use
    Adaptive Mutation in
@@ -145,7 +162,9 @@ The ``pygad.GA`` class constructor supports the following parameters:
    or equal to the value assigned to the ``mutation_probability``
    parameter, then the gene is selected. If this parameter exists, then
    there is no need for the 2 parameters ``mutation_percent_genes`` and
-   ``mutation_num_genes``. Added in PyGAD 2.5.0 and higher.
+   ``mutation_num_genes``. Added in `PyGAD
+   2.5.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-5-0>`__
+   and higher.
 
 -  ``mutation_by_replacement=False``: An optional bool parameter. It
    works only when the selected type of mutation is random
@@ -153,8 +172,11 @@ The ``pygad.GA`` class constructor supports the following parameters:
    ``mutation_by_replacement=True`` means replace the gene by the
    randomly generated value. If False, then it has no effect and random
    mutation works by adding the random value to the gene. Supported in
-   PyGAD 2.2.2 and higher. Check the changes in PyGAD 2.2.2 under the
-   Release History section for an example.
+   `PyGAD
+   2.2.2 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-2-2>`__
+   and higher. Check the changes in `PyGAD
+   2.2.2 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-2-2>`__
+   under the Release History section for an example.
 
 -  ``mutation_percent_genes="default"``: Percentage of genes to mutate.
    It defaults to the string ``"default"`` which is later translated
@@ -163,36 +185,43 @@ The ``pygad.GA`` class constructor supports the following parameters:
    of genes to mutate is deduced which is assigned to the
    ``mutation_num_genes`` parameter. The ``mutation_percent_genes``
    parameter has no action if ``mutation_probability`` or
-   ``mutation_num_genes`` exist. Starting from PyGAD 2.2.2 and higher,
-   this parameter has no action if ``mutation_type`` is ``None``.
+   ``mutation_num_genes`` exist. Starting from `PyGAD
+   2.2.2 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-2-2>`__
+   and higher, this parameter has no action if ``mutation_type`` is
+   ``None``.
 
 -  ``mutation_num_genes=None``: Number of genes to mutate which defaults
    to ``None`` meaning that no number is specified. The
    ``mutation_num_genes`` parameter has no action if the parameter
-   ``mutation_probability`` exists. Starting from PyGAD 2.2.2 and
-   higher, this parameter has no action if ``mutation_type`` is
+   ``mutation_probability`` exists. Starting from `PyGAD
+   2.2.2 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-2-2>`__
+   and higher, this parameter has no action if ``mutation_type`` is
    ``None``.
 
 -  ``random_mutation_min_val=-1.0``: For ``random`` mutation, the
    ``random_mutation_min_val`` parameter specifies the start value of
    the range from which a random value is selected to be added to the
-   gene. It defaults to ``-1``. Starting from PyGAD 2.2.2 and higher,
-   this parameter has no action if ``mutation_type`` is ``None``.
+   gene. It defaults to ``-1``. Starting from `PyGAD
+   2.2.2 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-2-2>`__
+   and higher, this parameter has no action if ``mutation_type`` is
+   ``None``.
 
 -  ``random_mutation_max_val=1.0``: For ``random`` mutation, the
    ``random_mutation_max_val`` parameter specifies the end value of the
    range from which a random value is selected to be added to the gene.
-   It defaults to ``+1``. Starting from PyGAD 2.2.2 and higher, this
-   parameter has no action if ``mutation_type`` is ``None``.
+   It defaults to ``+1``. Starting from `PyGAD
+   2.2.2 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-2-2>`__
+   and higher, this parameter has no action if ``mutation_type`` is
+   ``None``.
 
 -  ``gene_space=None``: It is used to specify the possible values for
    each gene in case the user wants to restrict the gene values. It is
    useful if the gene space is restricted to a certain range or to
    discrete values. It accepts a ``list``, ``tuple``, ``range``, or
    ``numpy.ndarray``. When all genes have the same global space, specify
-   their values as a list/tuple/range/numpy.ndarray. For example,
-   ``gene_space = [0.3, 5.2, -4, 8]`` restricts the gene values to the 4
-   specified values. If each gene has its own space, then the
+   their values as a ``list``/``tuple``/``range``/``numpy.ndarray``. For
+   example, ``gene_space = [0.3, 5.2, -4, 8]`` restricts the gene values
+   to the 4 specified values. If each gene has its own space, then the
    ``gene_space`` parameter can be nested like
    ``[[0.4, -5], [0.5, -3.2, 8.2, -9], ...]`` where the first sublist
    determines the values for the first gene, the second sublist for the
@@ -203,8 +232,8 @@ The ``pygad.GA`` class constructor supports the following parameters:
    the range specified by the 2 parameters ``random_mutation_min_val``
    and ``random_mutation_max_val``. ``gene_space`` is added in `PyGAD
    2.5.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-5-0>`__.
-   Check the `Release
-   History <https://pygad.readthedocs.io/en/latest/Footer.html>`__
+   Check the `Release History of PyGAD
+   2.5.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-5-0>`__
    section of the documentation for more details. In `PyGAD
    2.9.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-9-0>`__,
    NumPy arrays can be assigned to the ``gene_space`` parameter. In
@@ -213,78 +242,116 @@ The ``pygad.GA`` class constructor supports the following parameters:
    the ``gene_space`` parameter itself or any of its elements can be
    assigned to a dictionary to specify the lower and upper limits of the
    genes. For example, ``{'low': 2, 'high': 4}`` means the minimum and
-   maximum values are 2 and 4, respectively.
+   maximum values are 2 and 4, respectively. In `PyGAD
+   2.15.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-15-0>`__,
+   a new key called ``"step"`` is supported to specify the step of
+   moving from the start to the end of the range specified by the 2
+   existing keys ``"low"`` and ``"high"``.
 
 -  ``on_start=None``: Accepts a function to be called only once before
    the genetic algorithm starts its evolution. This function must accept
    a single parameter representing the instance of the genetic
-   algorithm. Added in PyGAD 2.6.0.
+   algorithm. Added in `PyGAD
+   2.6.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-6-0>`__.
 
 -  ``on_fitness=None``: Accepts a function to be called after
    calculating the fitness values of all solutions in the population.
    This function must accept 2 parameters: the first one represents the
    instance of the genetic algorithm and the second one is a list of all
-   solutions' fitness values. Added in PyGAD 2.6.0.
+   solutions' fitness values. Added in `PyGAD
+   2.6.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-6-0>`__.
 
 -  ``on_parents=None``: Accepts a function to be called after selecting
    the parents that mates. This function must accept 2 parameters: the
    first one represents the instance of the genetic algorithm and the
-   second one represents the selected parents. Added in PyGAD 2.6.0.
+   second one represents the selected parents. Added in `PyGAD
+   2.6.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-6-0>`__.
 
 -  ``on_crossover=None``: Accepts a function to be called each time the
    crossover operation is applied. This function must accept 2
    parameters: the first one represents the instance of the genetic
    algorithm and the second one represents the offspring generated using
-   crossover. Added in PyGAD 2.6.0.
+   crossover. Added in `PyGAD
+   2.6.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-6-0>`__.
 
 -  ``on_mutation=None``: Accepts a function to be called each time the
    mutation operation is applied. This function must accept 2
    parameters: the first one represents the instance of the genetic
    algorithm and the second one represents the offspring after applying
-   the mutation. Added in PyGAD 2.6.0.
+   the mutation. Added in `PyGAD
+   2.6.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-6-0>`__.
 
 -  ``callback_generation=None``: Accepts a function to be called after
    each generation. This function must accept a single parameter
    representing the instance of the genetic algorithm. Supported in
-   PyGAD 2.0.0 and higher. In PyGAD 2.4.0, if this function returned the
-   string ``stop``, then the ``run()`` method stops at the current
-   generation without completing the remaining generations. Check the
-   **Release History** section of the documentation for an example.
-   Starting from PyGAD 2.6.0, the ``callback_generation`` parameter is
-   deprecated and should be replaced by the ``on_generation`` parameter.
-   The ``callback_generation`` parameter will be removed in a later
-   version.
+   `PyGAD
+   2.0.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-0-0>`__
+   and higher. In `PyGAD
+   2.4.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-4-0>`__,
+   if this function returned the string ``stop``, then the ``run()``
+   method stops at the current generation without completing the
+   remaining generations. Check the **Release History** section of the
+   documentation for an example. Starting from `PyGAD
+   2.6.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-6-0>`__,
+   the ``callback_generation`` parameter is deprecated and should be
+   replaced by the ``on_generation`` parameter. The
+   ``callback_generation`` parameter will be removed in a later version.
 
 -  ``on_generation=None``: Accepts a function to be called after each
    generation. This function must accept a single parameter representing
    the instance of the genetic algorithm. If the function returned the
    string ``stop``, then the ``run()`` method stops without completing
-   the other generations. Added in PyGAD 2.6.0.
+   the other generations. Added in `PyGAD
+   2.6.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-6-0>`__.
 
 -  ``on_stop=None``: Accepts a function to be called only once exactly
    before the genetic algorithm stops or when it completes all the
    generations. This function must accept 2 parameters: the first one
    represents the instance of the genetic algorithm and the second one
    is a list of fitness values of the last population's solutions. Added
-   in PyGAD 2.6.0.
+   in `PyGAD
+   2.6.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-6-0>`__.
 
 -  ``delay_after_gen=0.0``: It accepts a non-negative number specifying
    the time in seconds to wait after a generation completes and before
    going to the next generation. It defaults to ``0.0`` which means no
-   delay after the generation. Available in PyGAD 2.4.0 and higher.
+   delay after the generation. Available in `PyGAD
+   2.4.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-4-0>`__
+   and higher.
 
 -  ``save_best_solutions=False``: When ``True``, then the best solution
    after each generation is saved into an attribute named
    ``best_solutions``. If ``False`` (default), then no solutions are
    saved and the ``best_solutions`` attribute will be empty. Supported
-   in PyGAD 2.9.0.
+   in `PyGAD
+   2.9.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-9-0>`__.
+
+-  ``save_solutions=False``: If ``True``, then all solutions in each
+   generation are appended into an attribute called ``solutions`` which
+   is NumPy array. Supported in `PyGAD
+   2.15.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-15-0>`__.
 
 -  ``suppress_warnings=False``: A bool parameter to control whether the
    warning messages are printed or not. It defaults to ``False``.
 
--  ``allow_duplicate_genes=True``: Added in PyGAD 2.13.0. If ``True``,
-   then a solution/chromosome may have duplicate gene values. If
-   ``False``, then each gene will have a unique value in its solution.
+-  ``allow_duplicate_genes=True``: Added in `PyGAD
+   2.13.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-13-0>`__.
+   If ``True``, then a solution/chromosome may have duplicate gene
+   values. If ``False``, then each gene will have a unique value in its
+   solution.
+
+-  ``stop_criteria=None``: Some criteria to stop the evolution. Added in
+   `PyGAD
+   2.15.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-15-0>`__.
+   Each criterion is passed as ``str`` which has a stop word. The
+   current 2 supported words are ``reach`` and ``saturate``. ``reach``
+   stops the ``run()`` method if the fitness value is equal to or
+   greater than a given fitness value. An example for ``reach`` is
+   ``"reach_40"`` which stops the evolution if the fitness is >= 40.
+   ``saturate`` means stop the evolution if the fitness saturates for a
+   given number of consecutive generations. An example for ``saturate``
+   is ``"saturate_7"`` which means stop the ``run()`` method if the
+   fitness does not change for 7 consecutive generations.
 
 The user doesn't have to specify all of such parameters while creating
 an instance of the GA class. A very important parameter you must care
@@ -302,7 +369,20 @@ make. As a result, the genetic algorithm cannot find a better solution
 that the best solution in the initial population.
 
 The parameters are validated within the constructor. If at least a
-parameter is not validated, an exception is thrown.
+parameter is not correct, an exception is thrown.
+
+.. _plotting-methods-in-pygadga-class:
+
+Plotting Methods in ``pygad.GA`` Class
+--------------------------------------
+
+-  ``plot_fitness()``: Shows how the fitness evolves by generation.
+
+-  ``plot_genes()``: Shows how the gene value changes for each
+   generation.
+
+-  ``plot_new_solution_rate()``: Shows the number of new solutions
+   explored in each solution.
 
 Class Attributes
 ----------------
@@ -377,6 +457,10 @@ Other Attributes
    ``tuple``, or ``numpy.ndarray``, then the value of
    ``gene_type_single`` will be ``False``. `Added in PyGAD
    2.14.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-14-0>`__.
+
+-  ``last_generation_parents_indices``: This attribute holds the indices
+   of the selected parents in the last generation. Supported in `PyGAD
+   2.15.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-15-0>`__.
 
 Note that the attributes with its name start with ``last_generation_``
 are updated after each generation.
@@ -694,18 +778,20 @@ It returns the following:
 -  ``best_match_idx``: Index of the best solution in the current
    population.
 
-.. _plotresult:
+.. _plotfitness-1:
 
-``plot_result()``
------------------
+``plot_fitness()``
+------------------
 
-Creates and shows a plot that summarizes how the fitness value evolved
-by generation. It can only be called after completing at least 1
-generation.
+Previously named ``plot_result()``, this method creates, shows, and
+returns a figure that summarizes how the fitness value evolves by
+generation. It works only after completing at least 1 generation.
 
 If no generation is completed (at least 1), an exception is raised.
 
-In PyGAD 2.3.0 and higher, this function accepts 3 optional parameters:
+Starting from `PyGAD
+2.15.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-15-0>`__
+and higher, this method accepts the following parameters:
 
 1. ``title``: Title of the figure.
 
@@ -713,9 +799,108 @@ In PyGAD 2.3.0 and higher, this function accepts 3 optional parameters:
 
 3. ``ylabel``: Y-axis label.
 
-Starting from PyGAD 2.5.0, a new optional parameter named ``linewidth``
-is added to specify the width of the curve in the plot. It defaults to
-``3.0``.
+4. ``linewidth``: Line width of the plot. Defaults to ``3``.
+
+5. ``font_size``: Font size for the labels and title. Defaults to
+   ``14``.
+
+6. ``plot_type``: Type of the plot which can be either ``"plot"``
+   (default), ``"scatter"``, or ``"bar"``.
+
+7. ``color``: Color of the plot which defaults to ``"#3870FF"``.
+
+8. ``save_dir``: Directory to save the figure.
+
+.. _plotnewsolutionrate-1:
+
+``plot_new_solution_rate()``
+----------------------------
+
+The ``plot_new_solution_rate()`` method creates, shows, and returns a
+figure that shows the number of new solutions explored in each
+generation. This method works only when ``save_solutions=True`` in the
+constructor of the ``pygad.GA`` class. It also works only after
+completing at least 1 generation.
+
+If no generation is completed (at least 1), an exception is raised.
+
+This method accepts the following parameters:
+
+1. ``title``: Title of the figure.
+
+2. ``xlabel``: X-axis label.
+
+3. ``ylabel``: Y-axis label.
+
+4. ``linewidth``: Line width of the plot. Defaults to ``3``.
+
+5. ``font_size``: Font size for the labels and title. Defaults to
+   ``14``.
+
+6. ``plot_type``: Type of the plot which can be either ``"plot"``
+   (default), ``"scatter"``, or ``"bar"``.
+
+7. ``color``: Color of the plot which defaults to ``"#3870FF"``.
+
+8. ``save_dir``: Directory to save the figure.
+
+.. _plotgenes-1:
+
+``plot_genes()``
+----------------
+
+The ``plot_genes()`` method creates, shows, and returns a figure that
+describes each gene. It has different options to create the figures
+which helps to:
+
+1. Explore the gene value for each generation by creating a normal plot.
+
+2. Create a histogram for each gene.
+
+3. Create a boxplot.
+
+This is controlled by the ``graph_type`` parameter.
+
+It works only after completing at least 1 generation. If no generation
+is completed, an exception is raised. If no generation is completed (at
+least 1), an exception is raised.
+
+This method accepts the following parameters:
+
+1.  ``title``: Title of the figure.
+
+2.  ``xlabel``: X-axis label.
+
+3.  ``ylabel``: Y-axis label.
+
+4.  ``linewidth``: Line width of the plot. Defaults to ``3``.
+
+5.  ``font_size``: Font size for the labels and title. Defaults to
+    ``14``.
+
+6.  ``plot_type``: Type of the plot which can be either ``"plot"``
+    (default), ``"scatter"``, or ``"bar"``.
+
+7.  ``graph_type``: Type of the graph which can be either ``"plot"``
+    (default), ``"boxplot"``, or ``"histogram"``.
+
+8.  ``fill_color``: Fill color of the graph which defaults to
+    ``"#3870FF"``. This has no effect if ``graph_type="plot"``.
+
+9.  ``color``: Color of the plot which defaults to ``"#3870FF"``.
+
+10. ``solutions``: Defaults to ``"all"`` which means use all solutions.
+    If ``"best"`` then only the best solutions are used.
+
+11. ``save_dir``: Directory to save the figure.
+
+An exception is raised if:
+
+-  ``solutions="all"`` while ``save_solutions=False`` in the constructor
+   of the ``pygad.GA`` class. .
+
+-  ``solutions="best"`` while ``save_best_solutions=False`` in the
+   constructor of the ``pygad.GA`` class. .
 
 ``save()``
 ----------
@@ -760,7 +945,7 @@ To use the ``pygad`` module, here is a summary of the required steps:
 
 2. Preparing Other Parameters.
 
-3. Import pygad.
+3. Import ``pygad``.
 
 4. Create an Instance of the **pygad.GA** Class.
 
@@ -798,7 +983,7 @@ Let's discuss an example:
 
    | Given the following function:
    |  y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
-   |  where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
+   |  where (x1,x2,x3,x4,x5,x6)=(4, -2, 3.5, 5, -11, -4.7) and y=44
    | What are the best values for the 6 weights (w1 to w6)? We are going
      to use the genetic algorithm to optimize this function.
 
@@ -811,7 +996,7 @@ Here is a function that does that:
 
 .. code:: python
 
-   function_inputs = [4,-2,3.5,5,-11,-4.7] # Function inputs.
+   function_inputs = [4, -2, 3.5, 5, -11, -4.7] # Function inputs.
    desired_output = 44 # Function output.
 
    def fitness_func(solution, solution_idx):
@@ -821,11 +1006,12 @@ Here is a function that does that:
 
 Such a user-defined function must accept 2 parameters:
 
-1. 1D vector representing a single solution. Introduced in PyGAD 1.0.17
-   and higher.
+1. 1D vector representing a single solution. Introduced in `PyGAD
+   1.0.17 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-1-0-17>`__.
 
-2. Solution index within the population. Introduced in PyGAD 2.0.0 and
-   higher.
+2. Solution index within the population. Introduced in `PyGAD
+   2.0.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-0-0>`__
+   and higher.
 
 The ``__code__`` object is used to check if this function accepts the
 required number of parameters. If more or fewer parameters are passed,
@@ -869,13 +1055,15 @@ This parameter should be replaced by ``on_generation``. The
 ``callback_generation`` parameter will be removed in a later release of
 PyGAD.
 
-In PyGAD 2.0.0 and higher, an optional parameter named
-``callback_generation`` is supported which allows the user to call a
-function (with a single parameter) after each generation. Here is a
-simple function that just prints the current generation number and the
-fitness value of the best solution in the current generation. The
-``generations_completed`` attribute of the GA class returns the number
-of the last completed generation.
+In `PyGAD
+2.0.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-0-0>`__
+and higher, an optional parameter named ``callback_generation`` is
+supported which allows the user to call a function (with a single
+parameter) after each generation. Here is a simple function that just
+prints the current generation number and the fitness value of the best
+solution in the current generation. The ``generations_completed``
+attribute of the GA class returns the number of the last completed
+generation.
 
 .. code:: python
 
@@ -958,13 +1146,13 @@ by doing the following tasks:
 Plotting Results
 ----------------
 
-There is a method named ``plot_result()`` which creates a figure
+There is a method named ``plot_fitness()`` which creates a figure
 summarizing how the fitness values of the solutions change with the
 generations.
 
 .. code:: python
 
-   ga_instance.plot_result()
+   ga_instance.plot_fitness()
 
 .. figure:: https://user-images.githubusercontent.com/16560492/78830005-93111d00-79e7-11ea-9d8e-a8d8325a6101.png
    :alt: 
@@ -1336,7 +1524,7 @@ Here is an example that uses adaptive mutation.
    # Running the GA to optimize the parameters of the function.
    ga_instance.run()
 
-   ga_instance.plot_result(title="PyGAD with Adaptive Mutation", linewidth=5)
+   ga_instance.plot_fitness(title="PyGAD with Adaptive Mutation", linewidth=5)
 
 Limit the Gene Value Range
 ==========================
@@ -1441,6 +1629,66 @@ exceeds 70, then the string ``"stop"`` is returned.
    def func_generation(ga_instance):
        if ga_instance.best_solution()[1] >= 70:
            return "stop"
+
+Stop Criteria
+=============
+
+In `PyGAD
+2.15.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-15-0>`__,
+a new parameter named ``stop_criteria`` is added to the constructor of
+the ``pygad.GA`` class. It helps to stop the evolution based on some
+criteria. It can be assigned to one or more criterion.
+
+Each criterion is passed as ``str`` that consists of 2 parts:
+
+1. Stop word.
+
+2. Number.
+
+It takes this form:
+
+.. code:: python
+
+   "word_num"
+
+The current 2 supported words are ``reach`` and ``saturate``.
+
+The ``reach`` word stops the ``run()`` method if the fitness value is
+equal to or greater than a given fitness value. An example for ``reach``
+is ``"reach_40"`` which stops the evolution if the fitness is >= 40.
+
+``saturate`` stops the evolution if the fitness saturates for a given
+number of consecutive generations. An example for ``saturate`` is
+``"saturate_7"`` which means stop the ``run()`` method if the fitness
+does not change for 7 consecutive generations.
+
+Here is an example that stops the evolution if either the fitness value
+reached ``127.4`` or if the fitness saturates for ``15`` generations.
+
+.. code:: python
+
+   import pygad
+   import numpy
+
+   equation_inputs = [4, -2, 3.5, 8, 9, 4]
+   desired_output = 44
+
+   def fitness_func(solution, solution_idx):
+       output = numpy.sum(solution * equation_inputs)
+
+       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
+
+       return fitness
+
+   ga_instance = pygad.GA(num_generations=200,
+                          sol_per_pop=10,
+                          num_parents_mating=4,
+                          num_genes=len(equation_inputs),
+                          fitness_func=fitness_func,
+                          stop_criteria=["reach_127.4", "saturate_15"])
+
+   ga_instance.run()
+   print("Number of generations passed is {generations_completed}".format(generations_completed=ga_instance.generations_completed))
 
 Prevent Duplicates in Gene Values
 =================================
@@ -1600,6 +1848,709 @@ non-duplicating genes that may make a room for a unique value in one the
 duplicates. The resultant gene is then ``[3 4 2 0]``. **But this option
 is not yet supported in PyGAD.**
 
+.. _more-about-the-genespace-parameter:
+
+More about the ``gene_space`` Parameter
+=======================================
+
+The ``gene_space`` parameter customizes the space of values of each
+gene.
+
+Assuming that all genes have the same global space which include the
+values 0.3, 5.2, -4, and 8, then those values can be assigned to the
+``gene_space`` parameter as a list, tuple, or range. Here is a list
+assigned to this parameter. By doing that, then the gene values are
+restricted to those assigned to the ``gene_space`` parameter.
+
+.. code:: python
+
+   gene_space = [0.3, 5.2, -4, 8]
+
+If some genes have different spaces, then ``gene_space`` should accept a
+nested list or tuple. In this case, the elements could be:
+
+1. Number (of ``int``, ``float``, or ``NumPy`` data types): A single
+   value to be assigned to the gene. This means this gene will have the
+   same value across all generations.
+
+2. ``list``, ``tuple``, ``numpy.ndarray``, or any range like ``range``,
+   ``numpy.arange()``, or ``numpy.linspace``: It holds the space for
+   each individual gene. But this space is usually discrete. That is
+   there is a set of finite values to select from.
+
+3. ``dict``: To sample a value for a gene from a continuous range. The
+   dictionary must have 2 mandatory keys which are ``"low"`` and
+   ``"high"`` in addition to an optional key which is ``"step"``. A
+   random value is returned between the values assigned to the items
+   with ``"low"`` and ``"high"`` keys. If the ``"step"`` exists, then
+   this works as the previous options (i.e. discrete set of values).
+
+4. ``None``: A gene with its space set to ``None`` is initialized
+   randomly from the range specified by the 2 parameters
+   ``init_range_low`` and ``init_range_high``. For mutation, its value
+   is mutated based on a random value from the range specified by the 2
+   parameters ``random_mutation_min_val`` and
+   ``random_mutation_max_val``. If all elements in the ``gene_space``
+   parameter are ``None``, the parameter will not have any effect.
+
+Assuming that a chromosome has 2 genes and each gene has a different
+value space. Then the ``gene_space`` could be assigned a nested
+list/tuple where each element determines the space of a gene.
+
+According to the next code, the space of the first gene is ``[0.4, -5]``
+which has 2 values and the space for the second gene is
+``[0.5, -3.2, 8.8, -9]`` which has 4 values.
+
+.. code:: python
+
+   gene_space = [[0.4, -5], [0.5, -3.2, 8.2, -9]]
+
+For a 2 gene chromosome, if the first gene space is restricted to the
+discrete values from 0 to 4 and the second gene is restricted to the
+values from 10 to 19, then it could be specified according to the next
+code.
+
+.. code:: python
+
+   gene_space = [range(5), range(10, 20)]
+
+The ``gene_space`` can also be assigned to a single range, as given
+below, where the values of all genes are sampled from the same range.
+
+.. code:: python
+
+   gene_space = numpy.arange(15)
+
+The ``gene_space`` can be assigned a dictionary to sample a value from a
+continuous range.
+
+.. code:: python
+
+   gene_space = {"low": 4, "high": 30}
+
+A step also can be assigned to the dictionary. This works as if a range
+is used.
+
+.. code:: python
+
+   gene_space = {"low": 4, "high": 30, "step": 2.5}
+
+If a ``None`` is assigned to only a single gene, then its value will be
+randomly generated initially using the ``init_range_low`` and
+``init_range_high`` parameters in the ``pygad.GA`` class's constructor.
+During mutation, the value are sampled from the range defined by the 2
+parameters ``random_mutation_min_val`` and ``random_mutation_max_val``.
+This is an example where the second gene is given a ``None`` value.
+
+.. code:: python
+
+   gene_space = [range(5), None, numpy.linspace(10, 20, 300)]
+
+If the user did not assign the initial population to the
+``initial_population`` parameter, the initial population is created
+randomly based on the ``gene_space`` parameter. Moreover, the mutation
+is applied based on this parameter.
+
+.. _more-about-the-genetype-parameter:
+
+More about the ``gene_type`` Parameter
+======================================
+
+The ``gene_type`` parameter allows the user to control the data type for
+all genes at once or each individual gene. In `PyGAD
+2.15.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-15-0>`__,
+the ``gene_type`` parameter also supports customizing the precision for
+``float`` data types. As a result, the ``gene_type`` parameter helps to:
+
+1. Select a data type for all genes with or without precision.
+
+2. Select a data type for each individual gene with or without
+   precision.
+
+Let's discuss things by examples.
+
+Data Type for All Genes without Precision
+-----------------------------------------
+
+The data type for all genes can be specified by assigning the numeric
+data type directly to the ``gene_type`` parameter. This is an example to
+make all genes of ``int`` data types.
+
+.. code:: python
+
+   gene_type=int
+
+Given that the supported numeric data types of PyGAD include Python's
+``int`` and ``float`` in addition to all numeric types of ``NumPy``,
+then any of these types can be assigned to the ``gene_type`` parameter.
+
+If no precision is specified for a ``float`` data type, then the
+complete floating-point number is kept.
+
+The next code uses an ``int`` data type for all genes where the genes in
+the initial and final population are only integers.
+
+.. code:: python
+
+   import pygad
+   import numpy
+
+   equation_inputs = [4, -2, 3.5, 8, -2]
+   desired_output = 2671.1234
+
+   def fitness_func(solution, solution_idx):
+       output = numpy.sum(solution * equation_inputs)
+       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
+       return fitness
+
+   ga_instance = pygad.GA(num_generations=10,
+                          sol_per_pop=5,
+                          num_parents_mating=2,
+                          num_genes=len(equation_inputs),
+                          fitness_func=fitness_func,
+                          gene_type=int)
+
+   print("Initial Population")
+   print(ga_instance.initial_population)
+
+   ga_instance.run()
+
+   print("Final Population")
+   print(ga_instance.population)
+
+.. code:: python
+
+   Initial Population
+   [[ 1 -1  2  0 -3]
+    [ 0 -2  0 -3 -1]
+    [ 0 -1 -1  2  0]
+    [-2  3 -2  3  3]
+    [ 0  0  2 -2 -2]]
+
+   Final Population
+   [[ 1 -1  2  2  0]
+    [ 1 -1  2  2  0]
+    [ 1 -1  2  2  0]
+    [ 1 -1  2  2  0]
+    [ 1 -1  2  2  0]]
+
+Data Type for All Genes with Precision
+--------------------------------------
+
+A precision can only be specified for a ``float`` data type and cannot
+be specified for integers. Here is an example to use a precision of 3
+for the ``numpy.float`` data type. In this case, all genes are of type
+``numpy.float`` and their maximum precision is 3.
+
+.. code:: python
+
+   gene_type=[numpy.float, 3]
+
+The next code uses prints the initial and final population where the
+genes are of type ``float`` with precision 3.
+
+.. code:: python
+
+   import pygad
+   import numpy
+
+   equation_inputs = [4, -2, 3.5, 8, -2]
+   desired_output = 2671.1234
+
+   def fitness_func(solution, solution_idx):
+       output = numpy.sum(solution * equation_inputs)
+       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
+
+       return fitness
+
+   ga_instance = pygad.GA(num_generations=10,
+                          sol_per_pop=5,
+                          num_parents_mating=2,
+                          num_genes=len(equation_inputs),
+                          fitness_func=fitness_func,
+                          gene_type=[float, 3])
+
+   print("Initial Population")
+   print(ga_instance.initial_population)
+
+   ga_instance.run()
+
+   print("Final Population")
+   print(ga_instance.population)
+
+.. code:: python
+
+   Initial Population
+   [[-2.417 -0.487  3.623  2.457 -2.362]
+    [-1.231  0.079 -1.63   1.629 -2.637]
+    [ 0.692 -2.098  0.705  0.914 -3.633]
+    [ 2.637 -1.339 -1.107 -0.781 -3.896]
+    [-1.495  1.378 -1.026  3.522  2.379]]
+
+   Final Population
+   [[ 1.714 -1.024  3.623  3.185 -2.362]
+    [ 0.692 -1.024  3.623  3.185 -2.362]
+    [ 0.692 -1.024  3.623  3.375 -2.362]
+    [ 0.692 -1.024  4.041  3.185 -2.362]
+    [ 1.714 -0.644  3.623  3.185 -2.362]]
+
+Data Type for each Individual Gene without Precision
+----------------------------------------------------
+
+In `PyGAD
+2.14.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-14-0>`__,
+the ``gene_type`` parameter allows customizing the gene type for each
+individual gene. This is by using a ``list``/``tuple``/``numpy.ndarray``
+with number of elements equal to the number of genes. For each element,
+a type is specified for the corresponding gene.
+
+This is an example for a 5-gene problem where different types are
+assigned to the genes.
+
+.. code:: python
+
+   gene_type=[int, float, numpy.float16, numpy.int8, numpy.float]
+
+This is a complete code that prints the initial and final population for
+a custom-gene data type.
+
+.. code:: python
+
+   import pygad
+   import numpy
+
+   equation_inputs = [4, -2, 3.5, 8, -2]
+   desired_output = 2671.1234
+
+   def fitness_func(solution, solution_idx):
+       output = numpy.sum(solution * equation_inputs)
+       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
+       return fitness
+
+   ga_instance = pygad.GA(num_generations=10,
+                          sol_per_pop=5,
+                          num_parents_mating=2,
+                          num_genes=len(equation_inputs),
+                          fitness_func=fitness_func,
+                          gene_type=[int, float, numpy.float16, numpy.int8, numpy.float])
+
+   print("Initial Population")
+   print(ga_instance.initial_population)
+
+   ga_instance.run()
+
+   print("Final Population")
+   print(ga_instance.population)
+
+.. code:: python
+
+   Initial Population
+   [[0 0.8615522360026828 0.7021484375 -2 3.5301821368185866]
+    [-3 2.648189378595294 -3.830078125 1 -0.9586271572917742]
+    [3 3.7729827570110714 1.2529296875 -3 1.395741994211889]
+    [0 1.0490687178053282 1.51953125 -2 0.7243617940450235]
+    [0 -0.6550158436937226 -2.861328125 -2 1.8212734549263097]]
+
+   Final Population
+   [[3 3.7729827570110714 2.055 0 0.7243617940450235]
+    [3 3.7729827570110714 1.458 0 -0.14638754050305036]
+    [3 3.7729827570110714 1.458 0 0.0869406120516778]
+    [3 3.7729827570110714 1.458 0 0.7243617940450235]
+    [3 3.7729827570110714 1.458 0 -0.14638754050305036]]
+
+Data Type for each Individual Gene with Precision
+-------------------------------------------------
+
+The precision can also be specified for the ``float`` data types as in
+the next line where the second gene precision is 2 and last gene
+precision is 1.
+
+.. code:: python
+
+   gene_type=[int, [float, 2], numpy.float16, numpy.int8, [numpy.float, 1]]
+
+This is a complete example where the initial and final populations are
+printed where the genes comply with the data types and precisions
+specified.
+
+.. code:: python
+
+   import pygad
+   import numpy
+
+   equation_inputs = [4, -2, 3.5, 8, -2]
+   desired_output = 2671.1234
+
+   def fitness_func(solution, solution_idx):
+       output = numpy.sum(solution * equation_inputs)
+       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
+       return fitness
+
+   ga_instance = pygad.GA(num_generations=10,
+                          sol_per_pop=5,
+                          num_parents_mating=2,
+                          num_genes=len(equation_inputs),
+                          fitness_func=fitness_func,
+                          gene_type=[int, [float, 2], numpy.float16, numpy.int8, [numpy.float, 1]])
+
+   print("Initial Population")
+   print(ga_instance.initial_population)
+
+   ga_instance.run()
+
+   print("Final Population")
+   print(ga_instance.population)
+
+.. code:: python
+
+   Initial Population
+   [[-2 -1.22 1.716796875 -1 0.2]
+    [-1 -1.58 -3.091796875 0 -1.3]
+    [3 3.35 -0.107421875 1 -3.3]
+    [-2 -3.58 -1.779296875 0 0.6]
+    [2 -3.73 2.65234375 3 -0.5]]
+
+   Final Population
+   [[2 -4.22 3.47 3 -1.3]
+    [2 -3.73 3.47 3 -1.3]
+    [2 -4.22 3.47 2 -1.3]
+    [2 -4.58 3.47 3 -1.3]
+    [2 -3.73 3.47 3 -1.3]]
+
+Visualization in PyGAD
+======================
+
+This section discusses the different options to visualize the results in
+PyGAD through these methods:
+
+1. ``plot_fitness()``
+
+2. ``plot_genes()``
+
+3. ``plot_new_solution_rate()``
+
+In the following code, the ``save_solutions`` flag is set to ``True``
+which means all solutions are saved in the ``solutions`` attribute. The
+code runs for only 10 generations.
+
+.. code:: python
+
+   import pygad
+   import numpy
+
+   equation_inputs = [4, -2, 3.5, 8, -2, 3.5, 8]
+   desired_output = 2671.1234
+
+   def fitness_func(solution, solution_idx):
+       output = numpy.sum(solution * equation_inputs)
+       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
+       return fitness
+
+   ga_instance = pygad.GA(num_generations=10,
+                          sol_per_pop=10,
+                          num_parents_mating=5,
+                          num_genes=len(equation_inputs),
+                          fitness_func=fitness_func,
+                          gene_space=[range(1, 10), range(10, 20), range(15, 30), range(20, 40), range(25, 50), range(10, 30), range(20, 50)],
+                          gene_type=int,
+                          save_solutions=True)
+
+   ga_instance.run()
+
+Let's explore how to visualize the results by the above mentioned
+methods.
+
+.. _plotfitness-2:
+
+``plot_fitness()``
+------------------
+
+The ``plot_fitness()`` method shows the fitness value for each
+generation.
+
+.. _plottypeplot-1:
+
+``plot_type="plot"``
+~~~~~~~~~~~~~~~~~~~~
+
+The simplest way to call this method is as follows leaving the
+``plot_type`` with its default value ``"plot"`` to create a continuous
+line connecting the fitness values across all generations:
+
+.. code:: python
+
+   ga_instance.plot_fitness()
+   # ga_instance.plot_fitness(plot_type="plot")
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122472609-d02f5280-cf8e-11eb-88a7-f9366ff6e7c6.png
+   :alt: 
+
+.. _plottypescatter-1:
+
+``plot_type="scatter"``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``plot_type`` can also be set to ``"scatter"`` to create a scatter
+graph with each individual fitness represented as a dot. The size of
+these dots can be changed using the ``linewidth`` parameter.
+
+.. code:: python
+
+   ga_instance.plot_fitness(plot_type="scatter")
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122473159-75e2c180-cf8f-11eb-942d-31279b286dbd.png
+   :alt: 
+
+.. _plottypebar-1:
+
+``plot_type="bar"``
+~~~~~~~~~~~~~~~~~~~
+
+The third value for the ``plot_type`` parameter is ``"bar"`` to create a
+bar graph with each individual fitness represented as a bar.
+
+.. code:: python
+
+   ga_instance.plot_fitness(plot_type="bar")
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122473340-b7736c80-cf8f-11eb-89c5-4f7db3b653cc.png
+   :alt: 
+
+.. _plotnewsolutionrate-2:
+
+``plot_new_solution_rate()``
+----------------------------
+
+The ``plot_new_solution_rate()`` method presents the number of new
+solutions explored in each generation. This helps to figure out if the
+genetic algorithm is able to find new solutions as an indication of more
+possible evolution. If no new solutions are explored, this is an
+indication that no further evolution is possible.
+
+The ``plot_new_solution_rate()`` method accepts the same parameters as
+in the ``plot_fitness()`` method with 3 possible values for
+``plot_type`` parameter.
+
+.. _plottypeplot-2:
+
+``plot_type="plot"``
+~~~~~~~~~~~~~~~~~~~~
+
+The default value for the ``plot_type`` parameter is ``"plot"``.
+
+.. code:: python
+
+   ga_instance.plot_new_solution_rate()
+   # ga_instance.plot_new_solution_rate(plot_type="plot")
+
+The next figure shows that, for example, generation 6 has the least
+number of new solutions which is 4. The number of new solutions in the
+first generation is always equal to the number of solutions in the
+population (i.e. the value assigned to the ``sol_per_pop`` parameter in
+the constructor of the ``pygad.GA`` class) which is 10 in this example.
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122475815-3322e880-cf93-11eb-9648-bf66f823234b.png
+   :alt: 
+
+.. _plottypescatter-2:
+
+``plot_type="scatter"``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The previous graph can be represented as scattered points by setting
+``plot_type="scatter"``.
+
+.. code:: python
+
+   ga_instance.plot_new_solution_rate(plot_type="scatter")
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122476108-adec0380-cf93-11eb-80ac-7588bf90492f.png
+   :alt: 
+
+.. _plottypebar-2:
+
+``plot_type="bar"``
+~~~~~~~~~~~~~~~~~~~
+
+By setting ``plot_type="scatter"``, each value is represented as a
+vertical bar.
+
+.. code:: python
+
+   ga_instance.plot_new_solution_rate(plot_type="bar")
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122476173-c2c89700-cf93-11eb-9e77-d39737cd3a96.png
+   :alt: 
+
+.. _plotgenes-2:
+
+``plot_genes()``
+----------------
+
+The ``plot_genes()`` method is the third option to visualize the PyGAD
+results. This method has 3 control variables:
+
+1. ``graph_type="plot"``: Can be ``"plot"`` (default), ``"boxplot"``, or
+   ``"histogram"``.
+
+2. ``plot_type="plot"``: Identical to the ``plot_type`` parameter
+   explored in the ``plot_fitness()`` and ``plot_new_solution_rate()``
+   methods.
+
+3. ``solutions="all"``: Can be ``"all"`` (default) or ``"best"``.
+
+These 3 parameters controls the style of the output figure.
+
+The ``graph_type`` parameter selects the type of the graph which helps
+to explore the gene values as:
+
+1. A normal plot.
+
+2. A histogram.
+
+3. A box and whisker plot.
+
+The ``plot_type`` parameter works only when the type of the graph is set
+to ``"plot"``.
+
+The ``solutions`` parameter selects whether the genes come from **all**
+solutions in the population or from just the **best** solutions.
+
+.. _graphtypeplot:
+
+``graph_type="plot"``
+~~~~~~~~~~~~~~~~~~~~~
+
+When ``graph_type="plot"``, then the figure creates a normal graph where
+the relationship between the gene values and the generation numbers is
+represented as a continuous plot, scattered points, or bars.
+
+.. _plottypeplot-3:
+
+``plot_type="plot"``
+^^^^^^^^^^^^^^^^^^^^
+
+Because the default value for both ``graph_type`` and ``plot_type`` is
+``"plot"``, then all of the lines below creates the same figure. This
+figure is helpful to know whether a gene value lasts for more
+generations as an indication of the best value for this gene. For
+example, the value 16 for the gene with index 5 (at column 2 and row 2
+of the next graph) lasted for 83 generations.
+
+.. code:: python
+
+   ga_instance.plot_genes()
+
+   ga_instance.plot_genes(graph_type="plot")
+
+   ga_instance.plot_genes(plot_type="plot")
+
+   ga_instance.plot_genes(graph_type="plot", 
+                          plot_type="plot")
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122477158-4a62d580-cf95-11eb-8c93-9b6e74cb814c.png
+   :alt: 
+
+As the default value for the ``solutions`` parameter is ``"all"``, then
+the following method calls generate the same plot.
+
+.. code:: python
+
+   ga_instance.plot_genes(solutions="all")
+
+   ga_instance.plot_genes(graph_type="plot",
+                          solutions="all")
+
+   ga_instance.plot_genes(plot_type="plot",
+                          solutions="all")
+
+   ga_instance.plot_genes(graph_type="plot", 
+                          plot_type="plot",
+                          solutions="all")
+
+.. _plottypescatter-3:
+
+``plot_type="scatter"``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The following calls of the ``plot_genes()`` method create the same
+scatter plot.
+
+.. code:: python
+
+   ga_instance.plot_genes(plot_type="scatter")
+
+   ga_instance.plot_genes(graph_type="plot", 
+                          plot_type="scatter", 
+                          solutions='all')
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122477273-73836600-cf95-11eb-828f-f357c7b0f815.png
+   :alt: 
+
+.. _plottypebar-3:
+
+``plot_type="bar"``
+^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+   ga_instance.plot_genes(plot_type="bar")
+
+   ga_instance.plot_genes(graph_type="plot", 
+                          plot_type="bar", 
+                          solutions='all')
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122477370-99106f80-cf95-11eb-8643-865b55e6b844.png
+   :alt: 
+
+.. _graphtypeboxplot:
+
+``graph_type="boxplot"``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+By setting ``graph_type`` to ``"boxplot"``, then a box and whisker graph
+is created. Now, the ``plot_type`` parameter has no effect.
+
+The following 2 calls of the ``plot_genes()`` method create the same
+figure as the default value for the ``solutions`` parameter is
+``"all"``.
+
+.. code:: python
+
+   ga_instance.plot_genes(graph_type="boxplot")
+
+   ga_instance.plot_genes(graph_type="boxplot", 
+                          solutions='all')
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122479260-beeb4380-cf98-11eb-8f08-23707929b12c.png
+   :alt: 
+
+.. _graphtypehistogram:
+
+``graph_type="histogram"``
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For ``graph_type="boxplot"``, then a histogram is created for each gene.
+Similar to ``graph_type="boxplot"``, the ``plot_type`` parameter has no
+effect.
+
+The following 2 calls of the ``plot_genes()`` method create the same
+figure as the default value for the ``solutions`` parameter is
+``"all"``.
+
+.. code:: python
+
+   ga_instance.plot_genes(graph_type="histogram")
+
+   ga_instance.plot_genes(graph_type="histogram", 
+                          solutions='all')
+
+.. figure:: https://user-images.githubusercontent.com/16560492/122477314-8007be80-cf95-11eb-9c95-da3f49204151.png
+   :alt: 
+
+All the previous figures can be created for only the best solutions by
+setting ``solutions="best"``.
+
 Parallel Processing in PyGAD
 ============================
 
@@ -1693,7 +2644,7 @@ which optimizes a linear model. Its complete code is listed below.
    # Running the GA to optimize the parameters of the function.
    ga_instance.run()
 
-   ga_instance.plot_result()
+   ga_instance.plot_fitness()
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution(ga_instance.last_generation_fitness)
@@ -1713,7 +2664,7 @@ which optimizes a linear model. Its complete code is listed below.
 
    # Loading the saved GA instance.
    loaded_ga_instance = pygad.load(filename=filename)
-   loaded_ga_instance.plot_result()
+   loaded_ga_instance.plot_fitness()
 
 Reproducing Images
 ------------------
@@ -1879,11 +2830,11 @@ Plot Results
 ~~~~~~~~~~~~
 
 After the ``run()`` method completes, the fitness values of all
-generations can be viewed in a plot using the ``plot_result()`` method.
+generations can be viewed in a plot using the ``plot_fitness()`` method.
 
 .. code:: python
 
-   ga_instance.plot_result()
+   ga_instance.plot_fitness()
 
 Here is the plot after 20,000 generations.
 

@@ -1,10 +1,11 @@
-.. _header-n194:
+.. _pygadkerasga-module:
 
 ``pygad.kerasga`` Module
 ========================
 
 This section of the PyGAD's library documentation discusses the
-**pygad.kerasga** module.
+`pygad.kerasga <https://pygad.readthedocs.io/en/latest/README_pygad_kerasga_ReadTheDocs.html>`__
+module.
 
 The ``pygad.kerarsga`` module has helper a class and 2 functions to
 train Keras models using the genetic algorithm (PyGAD). The Keras model
@@ -23,9 +24,10 @@ The contents of this module are:
 3. ``model_weights_as_matrix()``: A function to restore the Keras model
    weights from a vector.
 
-More details are given in the next sections.
+4. ``predict()``: A function to make predictions based on the Keras
+   model and a solution.
 
-.. _header-n207:
+More details are given in the next sections.
 
 Steps Summary
 =============
@@ -44,8 +46,6 @@ follows:
 5. Create an instance of the ``pygad.GA`` class.
 
 6. Run the genetic algorithm.
-
-.. _header-n222:
 
 Create Keras Model
 ==================
@@ -93,7 +93,7 @@ This is the same model created using the Functional API.
 
 Feel free to add the layers of your choice.
 
-.. _header-n238:
+.. _pygadkerasgakerasga-class:
 
 ``pygad.kerasga.KerasGA`` Class
 ===============================
@@ -103,7 +103,7 @@ an initial population for the genetic algorithm based on a Keras model.
 The constructor, methods, and attributes within the class are discussed
 in this section.
 
-.. _header-n240:
+.. _init:
 
 ``__init__()``
 --------------
@@ -115,8 +115,6 @@ parameters:
 
 -  ``num_solutions``: Number of solutions in the population. Each
    solution has different parameters of the model.
-
-.. _header-n247:
 
 Instance Attributes
 -------------------
@@ -134,15 +132,13 @@ Here is a list of all instance attributes:
 -  ``population_weights``: A nested list holding the weights of all
    solutions in the population.
 
-.. _header-n257:
-
 Methods in the ``KerasGA`` Class
 --------------------------------
 
 This section discusses the methods available for instances of the
 ``pygad.kerasga.KerasGA`` class.
 
-.. _header-n259:
+.. _createpopulation:
 
 ``create_population()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -152,17 +148,17 @@ genetic algorithm as a list of solutions where each solution represents
 different model parameters. The list of networks is assigned to the
 ``population_weights`` attribute of the instance.
 
-.. _header-n261:
+.. _functions-in-the-pygadkerasga-module:
 
 Functions in the ``pygad.kerasga`` Module
 =========================================
 
 This section discusses the functions in the ``pygad.kerasga`` module.
 
-.. _header-n263:
+.. _pygadkerasgamodelweightsasvector:
 
 ``pygad.kerasga.model_weights_as_vector()`` 
---------------------------------------------
+-------------------------------------------
 
 The ``model_weights_as_vector()`` function accepts a single parameter
 named ``model`` representing the Keras model. It returns a vector
@@ -182,7 +178,7 @@ The function accepts the following parameters:
 
 It returns a 1D vector holding the model weights.
 
-.. _header-n270:
+.. _pygadkerasgamodelweightsasmatrix:
 
 ``pygad.kerasga.model_weights_as_matrix()``
 -------------------------------------------
@@ -196,7 +192,21 @@ parameters:
 
 It returns the restored model weights after reshaping the vector.
 
-.. _header-n278:
+.. _pygadkerasgapredict:
+
+``pygad.kerasga.predict()``
+---------------------------
+
+The ``predict()`` function makes a prediction based on a solution. It
+accepts the following parameters:
+
+1. ``model``: The Keras model.
+
+2. ``solution``: The solution evolved.
+
+3. ``data``: The test data inputs.
+
+It returns the predictions for the data samples.
 
 Examples
 ========
@@ -204,8 +214,6 @@ Examples
 This section gives the complete code of some examples that build and
 train a Keras model using PyGAD. Each subsection builds a different
 network.
-
-.. _header-n280:
 
 Example 1: Regression Example
 -----------------------------
@@ -223,12 +231,10 @@ subsections discuss each part in the code.
    def fitness_func(solution, sol_idx):
        global data_inputs, data_outputs, keras_ga, model
 
-       model_weights_matrix = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                    weights_vector=solution)
+       predictions = pygad.kerasga.predict(model=model,
+                                           solution=solution,
+                                           data=data_inputs)
 
-       model.set_weights(weights=model_weights_matrix)
-       
-       predictions = model.predict(data_inputs)
        mae = tensorflow.keras.losses.MeanAbsoluteError()
        abs_error = mae(data_outputs, predictions).numpy() + 0.00000001
        solution_fitness = 1.0/abs_error
@@ -264,45 +270,32 @@ subsections discuss each part in the code.
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = keras_ga.population_weights # Initial population of network weights
-   parent_selection_type = "sss" # Type of parent selection.
-   crossover_type = "single_point" # Type of the crossover operator.
-   mutation_type = "random" # Type of the mutation operator.
-   mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          mutation_percent_genes=mutation_percent_genes,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
 
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_fitness(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
-   # Fetch the parameters of the best solution.
-   best_solution_weights = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                 weights_vector=solution)
-   model.set_weights(best_solution_weights)
-   predictions = model.predict(data_inputs)
+   # Make prediction based on the best solution.
+   predictions = pygad.kerasga.predict(model=model,
+                                       solution=solution,
+                                       data=data_inputs)
    print("Predictions : \n", predictions)
 
    mae = tensorflow.keras.losses.MeanAbsoluteError()
    abs_error = mae(data_outputs, predictions).numpy()
    print("Absolute Error : ", abs_error)
-
-.. _header-n283:
 
 Create a Keras Model
 ~~~~~~~~~~~~~~~~~~~~
@@ -334,7 +327,7 @@ The model can also be build using the Keras Sequential Model API.
    model.add(dense_layer1)
    model.add(output_layer)
 
-.. _header-n288:
+.. _create-an-instance-of-the-pygadkerasgakerasga-class:
 
 Create an Instance of the ``pygad.kerasga.KerasGA`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -350,7 +343,7 @@ Change this number according to your needs.
    keras_ga = pygad.kerasga.KerasGA(model=model,
                                     num_solutions=10)
 
-.. _header-n291:
+.. _prepare-the-training-data-1:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -375,8 +368,6 @@ output.
                                [1.3],
                                [2.5]])
 
-.. _header-n294:
-
 Build the Fitness Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -384,29 +375,28 @@ The fourth step is to build the fitness function. This function must
 accept 2 parameters representing the solution and its index within the
 population.
 
-The next fitness function calculates the mean absolute error (MAE) of
-the Keras model based on the parameters in the solution. The reciprocal
-of the MAE is used as the fitness value. Feel free to use any other loss
-function to calculate the fitness value.
+The next fitness function returns the model predictions based on the
+current solution using the ``predict()`` function. Then, it calculates
+the mean absolute error (MAE) of the Keras model based on the parameters
+in the solution. The reciprocal of the MAE is used as the fitness value.
+Feel free to use any other loss function to calculate the fitness value.
 
 .. code:: python
 
    def fitness_func(solution, sol_idx):
        global data_inputs, data_outputs, keras_ga, model
 
-       model_weights_matrix = kerasga.model_weights_as_matrix(model=model,
-                                                              weights_vector=solution)
+       predictions = pygad.kerasga.predict(model=model,
+                                           solution=solution,
+                                           data=data_inputs)
 
-       model.set_weights(weights=model_weights_matrix)
-       
-       predictions = model.predict(data_inputs)
        mae = tensorflow.keras.losses.MeanAbsoluteError()
        abs_error = mae(data_outputs, predictions).numpy() + 0.00000001
        solution_fitness = 1.0/abs_error
 
        return solution_fitness
 
-.. _header-n298:
+.. _create-an-instance-of-the-pygadga-class:
 
 Create an Instance of the ``pygad.GA`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -424,24 +414,12 @@ accepts <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#in
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = keras_ga.population_weights # Initial population of network weights
-   parent_selection_type = "sss" # Type of parent selection.
-   crossover_type = "single_point" # Type of the crossover operator.
-   mutation_type = "random" # Type of the mutation operator.
-   mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          mutation_percent_genes=mutation_percent_genes,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
-
-.. _header-n302:
 
 Run the Genetic Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -455,11 +433,11 @@ The sixth and last step is to run the genetic algorithm by calling the
 
 After the PyGAD completes its execution, then there is a figure that
 shows how the fitness value changes by generation. Call the
-``plot_result()`` method to show the figure.
+``plot_fitness()`` method to show the figure.
 
 .. code:: python
 
-   ga_instance.plot_result(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_fitness(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
 
 Here is the figure.
 
@@ -481,17 +459,15 @@ To get information about the best solution found by PyGAD, use the
    Fitness value of the best solution = 72.77768757825352
    Index of the best solution : 0
 
-The next code restores the trained model weights using the
-``model_weights_as_matrix()`` function. The restored weights are used to
-calculate the predicted values.
+The next code makes prediction using the ``predict()`` function to
+return the model predictions based on the best solution.
 
 .. code:: python
 
    # Fetch the parameters of the best solution.
-   best_solution_weights = kerasga.model_weights_as_matrix(model=model,
-                                                           weights_vector=solution)
-   model.set_weights(best_solution_weights)
-   predictions = model.predict(data_inputs)
+   predictions = pygad.kerasga.predict(model=model,
+                                       solution=solution,
+                                       data=data_inputs)
    print("Predictions : \n", predictions)
 
 .. code:: python
@@ -514,8 +490,6 @@ The next code measures the trained model error.
 
    Absolute Error :  0.013740465
 
-.. _header-n318:
-
 Example 2: XOR Binary Classification
 ------------------------------------
 
@@ -533,12 +507,9 @@ previous example.
    def fitness_func(solution, sol_idx):
        global data_inputs, data_outputs, keras_ga, model
 
-       model_weights_matrix = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                    weights_vector=solution)
-
-       model.set_weights(weights=model_weights_matrix)
-
-       predictions = model.predict(data_inputs)
+       predictions = pygad.kerasga.predict(model=model,
+                                           solution=solution,
+                                           data=data_inputs)
 
        bce = tensorflow.keras.losses.BinaryCrossentropy()
        solution_fitness = 1.0 / (bce(data_outputs, predictions).numpy() + 0.00000001)
@@ -576,40 +547,29 @@ previous example.
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = keras_ga.population_weights # Initial population of network weights.
-   parent_selection_type = "sss" # Type of parent selection.
-   crossover_type = "single_point" # Type of the crossover operator.
-   mutation_type = "random" # Type of the mutation operator.
-   mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    # Create an instance of the pygad.GA class
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          mutation_percent_genes=mutation_percent_genes,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_fitness(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
-   # Fetch the parameters of the best solution.
-   best_solution_weights = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                 weights_vector=solution)
-   model.set_weights(best_solution_weights)
-   predictions = model.predict(data_inputs)
+   # Make predictions based on the best solution.
+   predictions = pygad.kerasga.predict(model=model,
+                                       solution=solution,
+                                       data=data_inputs)
    print("Predictions : \n", predictions)
 
    # Calculate the binary crossentropy for the trained model.
@@ -685,8 +645,6 @@ Here is some information about the trained model. Its fitness value is
 
    Accuracy :  1.0
 
-.. _header-n338:
-
 Example 3: Image Multi-Class Classification (Dense Layers)
 ----------------------------------------------------------
 
@@ -702,12 +660,9 @@ Here is the code.
    def fitness_func(solution, sol_idx):
        global data_inputs, data_outputs, keras_ga, model
 
-       model_weights_matrix = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                      weights_vector=solution)
-
-       model.set_weights(weights=model_weights_matrix)
-
-       predictions = model.predict(data_inputs)
+       predictions = pygad.kerasga.predict(model=model,
+                                           solution=solution,
+                                           data=data_inputs)
 
        cce = tensorflow.keras.losses.CategoricalCrossentropy()
        solution_fitness = 1.0 / (cce(data_outputs, predictions).numpy() + 0.00000001)
@@ -740,40 +695,29 @@ Here is the code.
    num_generations = 100 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = keras_ga.population_weights # Initial population of network weights.
-   parent_selection_type = "sss" # Type of parent selection.
-   crossover_type = "single_point" # Type of the crossover operator.
-   mutation_type = "random" # Type of the mutation operator.
-   mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    # Create an instance of the pygad.GA class
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          mutation_percent_genes=mutation_percent_genes,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_fitness(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
-   # Fetch the parameters of the best solution.
-   best_solution_weights = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                   weights_vector=solution)
-   model.set_weights(best_solution_weights)
-   predictions = model.predict(data_inputs)
+   # Make predictions based on the best solution.
+   predictions = pygad.kerasga.predict(model=model,
+                                       solution=solution,
+                                       data=data_inputs)
    # print("Predictions : \n", predictions)
 
    # Calculate the categorical crossentropy for the trained model.
@@ -795,7 +739,7 @@ cross entropy.
    cce = tensorflow.keras.losses.CategoricalCrossentropy()
    solution_fitness = 1.0 / (cce(data_outputs, predictions).numpy() + 0.00000001)
 
-.. _header-n343:
+.. _prepare-the-training-data-2:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -845,8 +789,6 @@ Here are some statistics about the trained model.
    Categorical Crossentropy :  0.23823906
    Accuracy :  0.9852192
 
-.. _header-n358:
-
 Example 4: Image Multi-Class Classification (Conv Layers)
 ---------------------------------------------------------
 
@@ -865,12 +807,9 @@ Here is the complete code.
    def fitness_func(solution, sol_idx):
        global data_inputs, data_outputs, keras_ga, model
 
-       model_weights_matrix = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                    weights_vector=solution)
-
-       model.set_weights(weights=model_weights_matrix)
-
-       predictions = model.predict(data_inputs)
+       predictions = pygad.kerasga.predict(model=model,
+                                           solution=solution,
+                                           data=data_inputs)
 
        cce = tensorflow.keras.losses.CategoricalCrossentropy()
        solution_fitness = 1.0 / (cce(data_outputs, predictions).numpy() + 0.00000001)
@@ -912,40 +851,29 @@ Here is the complete code.
    num_generations = 200 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = keras_ga.population_weights # Initial population of network weights.
-   parent_selection_type = "sss" # Type of parent selection.
-   crossover_type = "single_point" # Type of the crossover operator.
-   mutation_type = "random" # Type of the mutation operator.
-   mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    # Create an instance of the pygad.GA class
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          mutation_percent_genes=mutation_percent_genes,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_fitness(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
-   # Fetch the parameters of the best solution.
-   best_solution_weights = pygad.kerasga.model_weights_as_matrix(model=model,
-                                                                 weights_vector=solution)
-   model.set_weights(best_solution_weights)
-   predictions = model.predict(data_inputs)
+   # Make predictions based on the best solution.
+   predictions = pygad.kerasga.predict(model=model,
+                                       solution=solution,
+                                       data=data_inputs)
    # print("Predictions : \n", predictions)
 
    # Calculate the categorical crossentropy for the trained model.
@@ -980,7 +908,7 @@ each input sample is 100x100x3.
 
    model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
 
-.. _header-n364:
+.. _prepare-the-training-data-3:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -7,7 +7,7 @@
 
 
 
-Welcome to PyGAD's documentation!
+PyGAD - Python Genetic Algorithm!
 =================================
 
 `PyGAD <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ is an

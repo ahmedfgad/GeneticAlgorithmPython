@@ -1,4 +1,4 @@
-.. _header-n0:
+.. _pygadtorchga-module:
 
 ``pygad.torchga`` Module
 ========================
@@ -20,9 +20,10 @@ The contents of this module are:
 3. ``model_weights_as_dict()``: A function to restore the PyTorch model
    weights from a vector.
 
-More details are given in the next sections.
+4. ``predict()``: A function to make predictions based on the PyTorch
+   model and a solution.
 
-.. _header-n13:
+More details are given in the next sections.
 
 Steps Summary
 =============
@@ -41,8 +42,6 @@ follows:
 5. Create an instance of the ``pygad.GA`` class.
 
 6. Run the genetic algorithm.
-
-.. _header-n28:
 
 Create PyTorch Model
 ====================
@@ -68,7 +67,7 @@ Here is an example of a PyTorch model.
 
 Feel free to add the layers of your choice.
 
-.. _header-n33:
+.. _pygadtorchgatorchga-class:
 
 ``pygad.torchga.TorchGA`` Class
 ===============================
@@ -78,7 +77,7 @@ an initial population for the genetic algorithm based on a PyTorch
 model. The constructor, methods, and attributes within the class are
 discussed in this section.
 
-.. _header-n35:
+.. _init:
 
 ``__init__()``
 --------------
@@ -90,8 +89,6 @@ parameters:
 
 -  ``num_solutions``: Number of solutions in the population. Each
    solution has different parameters of the model.
-
-.. _header-n42:
 
 Instance Attributes
 -------------------
@@ -109,15 +106,13 @@ Here is a list of all instance attributes:
 -  ``population_weights``: A nested list holding the weights of all
    solutions in the population.
 
-.. _header-n52:
-
 Methods in the ``TorchGA`` Class
 --------------------------------
 
 This section discusses the methods available for instances of the
 ``pygad.torchga.TorchGA`` class.
 
-.. _header-n54:
+.. _createpopulation:
 
 ``create_population()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -127,17 +122,17 @@ genetic algorithm as a list of solutions where each solution represents
 different model parameters. The list of networks is assigned to the
 ``population_weights`` attribute of the instance.
 
-.. _header-n56:
+.. _functions-in-the-pygadtorchga-module:
 
 Functions in the ``pygad.torchga`` Module
 =========================================
 
 This section discusses the functions in the ``pygad.torchga`` module.
 
-.. _header-n58:
+.. _pygadtorchgamodelweightsasvector:
 
 ``pygad.torchga.model_weights_as_vector()`` 
---------------------------------------------
+-------------------------------------------
 
 The ``model_weights_as_vector()`` function accepts a single parameter
 named ``model`` representing the PyTorch model. It returns a vector
@@ -151,7 +146,7 @@ The function accepts the following parameters:
 
 It returns a 1D vector holding the model weights.
 
-.. _header-n65:
+.. _pygadtorchmodelweightsasdict:
 
 ``pygad.torch.model_weights_as_dict()``
 ---------------------------------------
@@ -168,7 +163,21 @@ It returns the restored model weights in the same form used by the
 to the ``load_state_dict()`` method for setting the PyTorch model's
 parameters.
 
-.. _header-n73:
+.. _pygadtorchgapredict:
+
+``pygad.torchga.predict()``
+---------------------------
+
+The ``predict()`` function makes a prediction based on a solution. It
+accepts the following parameters:
+
+1. ``model``: The PyTorch model.
+
+2. ``solution``: The solution evolved.
+
+3. ``data``: The test data inputs.
+
+It returns the predictions for the data samples.
 
 Examples
 ========
@@ -176,8 +185,6 @@ Examples
 This section gives the complete code of some examples that build and
 train a PyTorch model using PyGAD. Each subsection builds a different
 network.
-
-.. _header-n75:
 
 Example 1: Regression Example
 -----------------------------
@@ -194,13 +201,10 @@ subsections discuss each part in the code.
    def fitness_func(solution, sol_idx):
        global data_inputs, data_outputs, torch_ga, model, loss_function
 
-       model_weights_dict = torchga.model_weights_as_dict(model=model,
-                                                          weights_vector=solution)
+       predictions = pygad.torchga.predict(model=model, 
+                                           solution=solution, 
+                                           data=data_inputs)
 
-       # Use the current solution as the model parameters.
-       model.load_state_dict(model_weights_dict)
-
-       predictions = model(data_inputs)
        abs_error = loss_function(predictions, data_outputs).detach().numpy() + 0.00000001
 
        solution_fitness = 1.0 / abs_error
@@ -243,44 +247,31 @@ subsections discuss each part in the code.
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = torch_ga.population_weights # Initial population of network weights
-   parent_selection_type = "sss" # Type of parent selection.
-   crossover_type = "single_point" # Type of the crossover operator.
-   mutation_type = "random" # Type of the mutation operator.
-   mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          mutation_percent_genes=mutation_percent_genes,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
 
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
-   # Fetch the parameters of the best solution.
-   best_solution_weights = torchga.model_weights_as_dict(model=model,
-                                                         weights_vector=solution)
-   model.load_state_dict(best_solution_weights)
-   predictions = model(data_inputs)
+   # Make predictions based on the best solution.
+   predictions = pygad.torchga.predict(model=model, 
+                                       solution=solution, 
+                                       data=data_inputs)
    print("Predictions : \n", predictions.detach().numpy())
 
    abs_error = loss_function(predictions, data_outputs)
    print("Absolute Error : ", abs_error.detach().numpy())
-
-.. _header-n78:
 
 Create a PyTorch model
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -301,7 +292,7 @@ Functional API.
                                relu_layer,
                                output_layer)
 
-.. _header-n81:
+.. _create-an-instance-of-the-pygadtorchgatorchga-class:
 
 Create an Instance of the ``pygad.torchga.TorchGA`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -317,7 +308,7 @@ Change this number according to your needs.
    torch_ga = torchga.TorchGA(model=model,
                               num_solutions=10)
 
-.. _header-n84:
+.. _prepare-the-training-data-1:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -342,8 +333,6 @@ output.
                                [1.3],
                                [2.5]])
 
-.. _header-n87:
-
 Build the Fitness Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -363,20 +352,17 @@ other loss function to calculate the fitness value.
    def fitness_func(solution, sol_idx):
        global data_inputs, data_outputs, torch_ga, model, loss_function
 
-       model_weights_dict = torchga.model_weights_as_dict(model=model,
-                                                          weights_vector=solution)
+       predictions = pygad.torchga.predict(model=model, 
+                                           solution=solution, 
+                                           data=data_inputs)
 
-       # Use the current solution as the model parameters.
-       model.load_state_dict(model_weights_dict)
-
-       predictions = model(data_inputs)
        abs_error = loss_function(predictions, data_outputs).detach().numpy() + 0.00000001
 
        solution_fitness = 1.0 / abs_error
 
        return solution_fitness
 
-.. _header-n91:
+.. _create-an-instance-of-the-pygadga-class:
 
 Create an Instance of the ``pygad.GA`` Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -394,24 +380,12 @@ accepts <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#in
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = torch_ga.population_weights # Initial population of network weights
-   parent_selection_type = "sss" # Type of parent selection.
-   crossover_type = "single_point" # Type of the crossover operator.
-   mutation_type = "random" # Type of the mutation operator.
-   mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          mutation_percent_genes=mutation_percent_genes,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
-
-.. _header-n95:
 
 Run the Genetic Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -425,11 +399,11 @@ The sixth and last step is to run the genetic algorithm by calling the
 
 After the PyGAD completes its execution, then there is a figure that
 shows how the fitness value changes by generation. Call the
-``plot_result()`` method to show the figure.
+``plot_fitness()`` method to show the figure.
 
 .. code:: python
 
-   ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
 Here is the figure.
 
@@ -457,10 +431,9 @@ calculate the predicted values.
 
 .. code:: python
 
-   best_solution_weights = torchga.model_weights_as_dict(model=model,
-                                                         weights_vector=solution)
-   model.load_state_dict(best_solution_weights)
-   predictions = model(data_inputs)
+   predictions = pygad.torchga.predict(model=model, 
+                                       solution=solution, 
+                                       data=data_inputs)
    print("Predictions : \n", predictions.detach().numpy())
 
 .. code:: python
@@ -482,8 +455,6 @@ The next code measures the trained model error.
 
    Absolute Error :  0.006876422
 
-.. _header-n111:
-
 Example 2: XOR Binary Classification
 ------------------------------------
 
@@ -500,13 +471,9 @@ previous example.
    def fitness_func(solution, sol_idx):
        global data_inputs, data_outputs, torch_ga, model, loss_function
 
-       model_weights_dict = torchga.model_weights_as_dict(model=model,
-                                                          weights_vector=solution)
-
-       # Use the current solution as the model parameters.
-       model.load_state_dict(model_weights_dict)
-
-       predictions = model(data_inputs)
+       predictions = pygad.torchga.predict(model=model, 
+                                           solution=solution, 
+                                           data=data_inputs)
 
        solution_fitness = 1.0 / (loss_function(predictions, data_outputs).detach().numpy() + 0.00000001)
 
@@ -550,40 +517,29 @@ previous example.
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = torch_ga.population_weights # Initial population of network weights.
-   parent_selection_type = "sss" # Type of parent selection.
-   crossover_type = "single_point" # Type of the crossover operator.
-   mutation_type = "random" # Type of the mutation operator.
-   mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    # Create an instance of the pygad.GA class
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          mutation_percent_genes=mutation_percent_genes,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
-   # Fetch the parameters of the best solution.
-   best_solution_weights = torchga.model_weights_as_dict(model=model,
-                                                         weights_vector=solution)
-   model.load_state_dict(best_solution_weights)
-   predictions = model(data_inputs)
+   # Make predictions based on the best solution.
+   predictions = pygad.torchga.predict(model=model, 
+                                       solution=solution, 
+                                       data=data_inputs)
    print("Predictions : \n", predictions.detach().numpy())
 
    # Calculate the binary crossentropy for the trained model.
@@ -661,8 +617,6 @@ Here is some information about the trained model. Its fitness value is
 
    Accuracy :  1.0
 
-.. _header-n131:
-
 Example 3: Image Multi-Class Classification (Dense Layers)
 ----------------------------------------------------------
 
@@ -678,12 +632,9 @@ Here is the code.
    def fitness_func(solution, sol_idx):
        global data_inputs, data_outputs, torch_ga, model, loss_function
 
-       model_weights_dict = torchga.model_weights_as_dict(model=model,
-                                                          weights_vector=solution)
-
-       model.load_state_dict(model_weights_dict)
-
-       predictions = model(data_inputs)
+       predictions = pygad.torchga.predict(model=model, 
+                                           solution=solution, 
+                                           data=data_inputs)
 
        solution_fitness = 1.0 / (loss_function(predictions, data_outputs).detach().numpy() + 0.00000001)
 
@@ -723,29 +674,19 @@ Here is the code.
    num_generations = 200 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = torch_ga.population_weights # Initial population of network weights.
-   parent_selection_type = "sss" # Type of parent selection.
-   crossover_type = "single_point" # Type of the crossover operator.
-   mutation_type = "random" # Type of the mutation operator.
-   mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    # Create an instance of the pygad.GA class
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          mutation_percent_genes=mutation_percent_genes,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
@@ -773,7 +714,7 @@ multiple classes (4) and thus the loss is measured using cross entropy.
 
    loss_function = torch.nn.CrossEntropyLoss()
 
-.. _header-n136:
+.. _prepare-the-training-data-2:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -818,8 +759,6 @@ Here are some statistics about the trained model.
    Crossentropy :  0.74366045
    Accuracy :  1.0
 
-.. _header-n150:
-
 Example 4: Image Multi-Class Classification (Conv Layers)
 ---------------------------------------------------------
 
@@ -838,12 +777,9 @@ Here is the complete code.
    def fitness_func(solution, sol_idx):
        global data_inputs, data_outputs, torch_ga, model, loss_function
 
-       model_weights_dict = torchga.model_weights_as_dict(model=model,
-                                                          weights_vector=solution)
-
-       model.load_state_dict(model_weights_dict)
-
-       predictions = model(data_inputs)
+       predictions = pygad.torchga.predict(model=model, 
+                                           solution=solution, 
+                                           data=data_inputs)
 
        solution_fitness = 1.0 / (loss_function(predictions, data_outputs).detach().numpy() + 0.00000001)
 
@@ -897,40 +833,29 @@ Here is the complete code.
    num_generations = 200 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = torch_ga.population_weights # Initial population of network weights.
-   parent_selection_type = "sss" # Type of parent selection.
-   crossover_type = "single_point" # Type of the crossover operator.
-   mutation_type = "random" # Type of the mutation operator.
-   mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
-   keep_parents = -1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    # Create an instance of the pygad.GA class
    ga_instance = pygad.GA(num_generations=num_generations, 
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          parent_selection_type=parent_selection_type,
-                          crossover_type=crossover_type,
-                          mutation_type=mutation_type,
-                          mutation_percent_genes=mutation_percent_genes,
-                          keep_parents=keep_parents,
                           on_generation=callback_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
 
    # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
-   ga_instance.plot_result(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
+   ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
 
-   # Fetch the parameters of the best solution.
-   best_solution_weights = torchga.model_weights_as_dict(model=model,
-                                                         weights_vector=solution)
-   model.load_state_dict(best_solution_weights)
-   predictions = model(data_inputs)
+   # Make predictions based on the best solution.
+   predictions = pygad.torchga.predict(model=model, 
+                                       solution=solution, 
+                                       data=data_inputs)
    # print("Predictions : \n", predictions)
 
    # Calculate the crossentropy for the trained model.
@@ -972,7 +897,7 @@ each input sample is 100x100x3.
                                dense_layer2,
                                output_layer)
 
-.. _header-n156:
+.. _prepare-the-training-data-3:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
