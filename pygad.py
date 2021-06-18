@@ -1198,7 +1198,7 @@ class GA:
                 self.population[0:self.last_generation_parents.shape[0], :] = self.last_generation_parents
                 self.population[self.last_generation_parents.shape[0]:, :] = self.last_generation_offspring_mutation
             elif (self.keep_parents > 0):
-                parents_to_keep = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_parents)
+                parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_parents)
                 self.population[0:parents_to_keep.shape[0], :] = parents_to_keep
                 self.population[parents_to_keep.shape[0]:, :] = self.last_generation_offspring_mutation
 
