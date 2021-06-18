@@ -1103,6 +1103,9 @@ models.
 
 |image2|
 
+`A Guide to Genetic ‘Learning’ Algorithms for Optimization <https://towardsdatascience.com/a-guide-to-genetic-learning-algorithms-for-optimization-e1067cdc77e7>`__
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 PyGAD in Other Languages
 ========================
 
