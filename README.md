@@ -307,6 +307,21 @@ Find the book at these links:
 
 ![Fig04](https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg)
 
+# Citing PyGAD - Bibtex Formatted Citation
+
+If you used PyGAD, please consider adding a citation to the following paper about PyGAD:
+
+```
+@misc{gad2021pygad,
+      title={PyGAD: An Intuitive Genetic Algorithm Python Library}, 
+      author={Ahmed Fawzy Gad},
+      year={2021},
+      eprint={2106.06158},
+      archivePrefix={arXiv},
+      primaryClass={cs.NE}
+}
+```
+
 # Contact Us
 
 * E-mail: ahmed.f.gad@gmail.com
