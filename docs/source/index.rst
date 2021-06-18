@@ -214,7 +214,29 @@ PyGAD's Modules
 
 The documentation discusses each of these modules.
 
+PyGAD Citation - Bibtex Formatted
+==============
 
+If you used PyGAD, please consider citing its paper with the following
+details:
+
+.. code:: 
+
+   @misc{gad2021pygad,
+
+         title={PyGAD: An Intuitive Genetic Algorithm Python Library}, 
+
+         author={Ahmed Fawzy Gad},
+
+         year={2021},
+
+         eprint={2106.06158},
+
+         archivePrefix={arXiv},
+
+         primaryClass={cs.NE}
+
+   }
 
 
 .. _header-n4:
