@@ -797,6 +797,16 @@ Release Date: 17 June 2021
     Parameter <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#more-about-the-gene-type-parameter>`__
     section.
 
+.. _pygad-2151:
+
+PyGAD 2.15.1
+------------
+
+Release Date: 18 June 2021
+
+1. Fix a bug when ``keep_parents`` is set to a positive integer.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/49
+
 PyGAD Projects at GitHub
 ========================
 
@@ -1263,6 +1273,33 @@ PyGAD разрабатывали на Python 3.7.3. Зависимости вк�
 удовлетворяют заданной функции.
 
 |image8|
+
+Papers using PyGAD
+==================
+
+A number of research papers used PyGAD and here are some of them:
+
+-  Jaros, Marta, and Jiri Jaros. "Performance-Cost Optimization of
+   Moldable Scientific Workflows."
+
+-  Koch, Chris, and Edgar Dobriban. "AttenGen: Generating Live
+   Attenuated Vaccine Candidates using Machine Learning." (2021).
+
+-  Thorat, Divya. *Enhanced genetic algorithm to reduce makespan of
+   multiple jobs in map-reduce application on serverless platform*.
+   Diss. Dublin, National College of Ireland, 2020.
+
+-  Bhardwaj, Bhavya, et al. "Windfarm optimization using Nelder-Mead and
+   Particle Swarm optimization." *2021 7th International Conference on
+   Electrical Energy Systems (ICEES)*. IEEE, 2021.
+
+-  Bernardo, Reginald Christian S. and J. Said. “Towards a
+   model-independent reconstruction approach for late-time Hubble data.”
+   (2021).
+
+-  Duong, Tri Dung, Qian Li, and Guandong Xu. "Prototype-based
+   Counterfactual Explanation for Causal Classification." *arXiv
+   preprint arXiv:2105.00703* (2021).
 
 For More Information
 ====================
