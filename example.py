@@ -40,7 +40,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 # Running the GA to optimize the parameters of the function.
 ga_instance.run()
 
-ga_instance.plot_result()
+ga_instance.plot_fitness()
 
 # Returning the details of the best solution.
 solution, solution_fitness, solution_idx = ga_instance.best_solution(ga_instance.last_generation_fitness)
@@ -60,4 +60,4 @@ ga_instance.save(filename=filename)
 
 # Loading the saved GA instance.
 loaded_ga_instance = pygad.load(filename=filename)
-loaded_ga_instance.plot_result()
+loaded_ga_instance.plot_fitness()

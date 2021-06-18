@@ -181,18 +181,6 @@ num_parents_mating = 7 # Number of solutions to be selected as parents in the ma
 sol_per_pop = 50 # Number of solutions in the population.
 num_genes = len(function_inputs)
 
-init_range_low = -2
-init_range_high = 5
-
-parent_selection_type = "sss" # Type of parent selection.
-keep_parents = 7 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
-
-crossover_type = "single_point" # Type of the crossover operator.
-
-# Parameters of the mutation operation.
-mutation_type = "random" # Type of the mutation operator.
-mutation_percent_genes = 10 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists or when mutation_type is None.
-
 last_fitness = 0
 def callback_generation(ga_instance):
     global last_fitness
@@ -207,20 +195,13 @@ ga_instance = pygad.GA(num_generations=num_generations,
                        fitness_func=fitness_function,
                        sol_per_pop=sol_per_pop, 
                        num_genes=num_genes,
-                       init_range_low=init_range_low,
-                       init_range_high=init_range_high,
-                       parent_selection_type=parent_selection_type,
-                       keep_parents=keep_parents,
-                       crossover_type=crossover_type,
-                       mutation_type=mutation_type,
-                       mutation_percent_genes=mutation_percent_genes,
                        on_generation=callback_generation)
 
 # Running the GA to optimize the parameters of the function.
 ga_instance.run()
 
 # After the generations complete, some plots are showed that summarize the how the outputs/fitenss values evolve over generations.
-ga_instance.plot_result()
+ga_instance.plot_fitness()
 
 # Returning the details of the best solution.
 solution, solution_fitness, solution_idx = ga_instance.best_solution()
@@ -240,7 +221,7 @@ ga_instance.save(filename=filename)
 
 # Loading the saved GA instance.
 loaded_ga_instance = pygad.load(filename=filename)
-loaded_ga_instance.plot_result()
+loaded_ga_instance.plot_fitness()
 ```
 
 # For More Information
