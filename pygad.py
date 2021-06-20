@@ -338,9 +338,17 @@ class GA:
         # Validating the crossover type: crossover_type
         if (crossover_type is None):
             self.crossover = None
+        elif callable(crossover_type):
+            # Check if the crossover_type is a function that accepts 2 paramaters.
+            if (crossover_type.__code__.co_argcount == 3):
+                # The crossover function assigned to the crossover_type parameter is validated.
+                self.crossover = crossover_type
+            else:
+                self.valid_parameters = False
+                raise ValueError("When 'crossover_type' is assigned to a function, then this crossover function must accept 2 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed crossover function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=crossover_type.__code__.co_name, argcount=crossover_type.__code__.co_argcount))
         elif not (type(crossover_type) is str):
             self.valid_parameters = False
-            raise TypeError("The expected type of the 'crossover_type' parameter is str but ({crossover_type}) found.".format(crossover_type=type(crossover_type)))
+            raise TypeError("The expected type of the 'crossover_type' parameter is either callable or str but ({crossover_type}) found.".format(crossover_type=type(crossover_type)))
         else: # type crossover_type is str
             crossover_type = crossover_type.lower()
             if (crossover_type == "single_point"):
@@ -353,7 +361,7 @@ class GA:
                 self.crossover = self.scattered_crossover
             else:
                 self.valid_parameters = False
-                raise ValueError("Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) argument does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover)\n-scattered (for scattered crossover).\n".format(crossover_type=crossover_type))
+                raise ValueError("Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) parameter does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover)\n-scattered (for scattered crossover).\n".format(crossover_type=crossover_type))
 
         self.crossover_type = crossover_type
 
@@ -375,9 +383,17 @@ class GA:
         # "adaptive" mutation is supported starting from PyGAD 2.10.0
         if mutation_type is None:
             self.mutation = None
+        elif callable(mutation_type):
+            # Check if the mutation_type is a function that accepts 1 paramater.
+            if (mutation_type.__code__.co_argcount == 2):
+                # The mutation function assigned to the mutation_type parameter is validated.
+                self.mutation = mutation_type
+            else:
+                self.valid_parameters = False
+                raise ValueError("When 'mutation_type' is assigned to a function, then this mutation function must accept 2 parameters:\n1) The offspring to be mutated.\n2) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed mutation function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=mutation_type.__code__.co_name, argcount=mutation_type.__code__.co_argcount))
         elif not (type(mutation_type) is str):
             self.valid_parameters = False
-            raise TypeError("The expected type of the 'mutation_type' parameter is str but ({mutation_type}) found.".format(mutation_type=type(mutation_type)))
+            raise TypeError("The expected type of the 'mutation_type' parameter is either callable or str but ({mutation_type}) found.".format(mutation_type=type(mutation_type)))
         else: # type mutation_type is str
             mutation_type = mutation_type.lower()
             if (mutation_type == "random"):
@@ -392,7 +408,7 @@ class GA:
                 self.mutation = self.adaptive_mutation
             else:
                 self.valid_parameters = False
-                raise ValueError("Undefined mutation type. \nThe assigned value to the mutation_type argument ({mutation_type}) does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation)\n-adaptive (for adaptive mutation).\n".format(mutation_type=mutation_type))
+                raise ValueError("Undefined mutation type. \nThe assigned string value to the 'mutation_type' parameter ({mutation_type}) does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation)\n-adaptive (for adaptive mutation).\n".format(mutation_type=mutation_type))
 
         self.mutation_type = mutation_type
 
@@ -553,26 +569,35 @@ class GA:
 
         # select_parents: Refers to a method that selects the parents based on the parent selection type specified in the parent_selection_type attribute.
         # Validating the selected type of parent selection: parent_selection_type
-        if not (type(parent_selection_type) is str):
+        if callable(parent_selection_type):
+            # Check if the parent_selection_type is a function that accepts 3 paramaters.
+            if (parent_selection_type.__code__.co_argcount == 3):
+                # population: Added in PyGAD 2.16.0. It should used only to support custom parent selection functions. Otherwise, it should be left to None to retirve the population by self.population.
+                # The parent selection function assigned to the parent_selection_type parameter is validated.
+                self.select_parents = parent_selection_type
+            else:
+                self.valid_parameters = False
+                raise ValueError("When 'parent_selection_type' is assigned to a user-defined function, then this parent selection function must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed parent selection function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=parent_selection_type.__code__.co_name, argcount=parent_selection_type.__code__.co_argcount))
+        elif not (type(parent_selection_type) is str):
             self.valid_parameters = False
-            raise TypeError("The expected type of the 'parent_selection_type' parameter is str but ({parent_selection_type}) found.".format(parent_selection_type=type(parent_selection_type)))
-
-        parent_selection_type = parent_selection_type.lower()
-        if (parent_selection_type == "sss"):
-            self.select_parents = self.steady_state_selection
-        elif (parent_selection_type == "rws"):
-            self.select_parents = self.roulette_wheel_selection
-        elif (parent_selection_type == "sus"):
-            self.select_parents = self.stochastic_universal_selection
-        elif (parent_selection_type == "random"):
-            self.select_parents = self.random_selection
-        elif (parent_selection_type == "tournament"):
-            self.select_parents = self.tournament_selection
-        elif (parent_selection_type == "rank"):
-            self.select_parents = self.rank_selection
+            raise TypeError("The expected type of the 'parent_selection_type' parameter is either callable or str but ({parent_selection_type}) found.".format(parent_selection_type=type(parent_selection_type)))
         else:
-            self.valid_parameters = False
-            raise ValueError("Undefined parent selection type: {parent_selection_type}. \nThe assigned value to the parent_selection_type argument does not refer to one of the supported parent selection techniques which are: \n-sss (for steady state selection)\n-rws (for roulette wheel selection)\n-sus (for stochastic universal selection)\n-rank (for rank selection)\n-random (for random selection)\n-tournament (for tournament selection).\n".format(parent_selection_type=parent_selection_type))
+            parent_selection_type = parent_selection_type.lower()
+            if (parent_selection_type == "sss"):
+                self.select_parents = self.steady_state_selection
+            elif (parent_selection_type == "rws"):
+                self.select_parents = self.roulette_wheel_selection
+            elif (parent_selection_type == "sus"):
+                self.select_parents = self.stochastic_universal_selection
+            elif (parent_selection_type == "random"):
+                self.select_parents = self.random_selection
+            elif (parent_selection_type == "tournament"):
+                self.select_parents = self.tournament_selection
+            elif (parent_selection_type == "rank"):
+                self.select_parents = self.rank_selection
+            else:
+                self.valid_parameters = False
+                raise ValueError("Undefined parent selection type: {parent_selection_type}. \nThe assigned value to the 'parent_selection_type' parameter does not refer to one of the supported parent selection techniques which are: \n-sss (for steady state selection)\n-rws (for roulette wheel selection)\n-sus (for stochastic universal selection)\n-rank (for rank selection)\n-random (for random selection)\n-tournament (for tournament selection).\n".format(parent_selection_type=parent_selection_type))
 
         # For tournament selection, validate the K value.
         if(parent_selection_type == "tournament"):
@@ -610,7 +635,7 @@ class GA:
                 self.fitness_func = fitness_func
             else:
                 self.valid_parameters = False
-                raise ValueError("The fitness function must accept 2 parameters representing the solution to which the fitness value is calculated and the solution index within the population.\nThe passed fitness function named '{funcname}' accepts {argcount} argument(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
+                raise ValueError("The fitness function must accept 2 parameters:\n1) A solution to calculate its fitness value.\n2) The solution's index within the population.\n\nThe passed fitness function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
         else:
             self.valid_parameters = False
             raise ValueError("The value assigned to the fitness_func parameter is expected to be of type function but ({fitness_func_type}) found.".format(fitness_func_type=type(fitness_func)))
@@ -624,7 +649,7 @@ class GA:
                     self.on_start = on_start
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_start parameter is expected to be of type function but ({on_start_type}) found.".format(on_start_type=type(on_start)))
@@ -640,7 +665,7 @@ class GA:
                     self.on_fitness = on_fitness
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_fitness parameter is expected to be of type function but ({on_fitness_type}) found.".format(on_fitness_type=type(on_fitness)))
@@ -656,7 +681,7 @@ class GA:
                     self.on_parents = on_parents
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_parents.__code__.co_name, argcount=on_parents.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_parents.__code__.co_name, argcount=on_parents.__code__.co_argcount))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_parents parameter is expected to be of type function but ({on_parents_type}) found.".format(on_parents_type=type(on_parents)))
@@ -672,7 +697,7 @@ class GA:
                     self.on_crossover = on_crossover
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_crossover.__code__.co_name, argcount=on_crossover.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_crossover.__code__.co_name, argcount=on_crossover.__code__.co_argcount))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_crossover parameter is expected to be of type function but ({on_crossover_type}) found.".format(on_crossover_type=type(on_crossover)))
@@ -688,7 +713,7 @@ class GA:
                     self.on_mutation = on_mutation
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_mutation.__code__.co_name, argcount=on_mutation.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_mutation.__code__.co_name, argcount=on_mutation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_mutation parameter is expected to be of type function but ({on_mutation_type}) found.".format(on_mutation_type=type(on_mutation)))
@@ -706,7 +731,7 @@ class GA:
                     if not self.suppress_warnings: warnings.warn("Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and will be removed in a later release of PyGAD. Please use the on_generation parameter instead.")
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the callback_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=callback_generation.__code__.co_name, argcount=callback_generation.__code__.co_argcount))
+                    raise ValueError("The function assigned to the callback_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=callback_generation.__code__.co_name, argcount=callback_generation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the callback_generation parameter is expected to be of type function but ({callback_generation_type}) found.".format(callback_generation_type=type(callback_generation)))
@@ -722,7 +747,7 @@ class GA:
                     self.on_generation = on_generation
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_generation.__code__.co_name, argcount=on_generation.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_generation.__code__.co_name, argcount=on_generation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_generation parameter is expected to be of type function but ({on_generation_type}) found.".format(on_generation_type=type(on_generation)))
@@ -738,7 +763,7 @@ class GA:
                     self.on_stop = on_stop
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{funcname}' accepts {argcount} argument(s).".format(funcname=on_stop.__code__.co_name, argcount=on_stop.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_stop.__code__.co_name, argcount=on_stop.__code__.co_argcount))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the 'on_stop' parameter is expected to be of type function but ({on_stop_type}) found.".format(on_stop_type=type(on_stop)))
@@ -1165,7 +1190,10 @@ class GA:
                 self.solutions_fitness.extend(self.last_generation_fitness)
 
             # Selecting the best parents in the population for mating.
-            self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness, num_parents=self.num_parents_mating)
+            if callable(self.parent_selection_type):
+                self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness, self.num_parents_mating, self)
+            else:
+                self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness, num_parents=self.num_parents_mating)
             if not (self.on_parents is None):
                 self.on_parents(self, self.last_generation_parents)
 
@@ -1177,8 +1205,13 @@ class GA:
                     self.last_generation_offspring_crossover = numpy.concatenate((self.last_generation_parents, self.population[0:(self.num_offspring - self.last_generation_parents.shape[0])]))
             else:
                 # Generating offspring using crossover.
-                self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
-                                                     offspring_size=(self.num_offspring, self.num_genes))
+                if callable(self.crossover_type):
+                    self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
+                                                                              (self.num_offspring, self.num_genes),
+                                                                              self)
+                else:
+                    self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
+                                                                              offspring_size=(self.num_offspring, self.num_genes))
                 if not (self.on_crossover is None):
                     self.on_crossover(self, self.last_generation_offspring_crossover)
 
@@ -1187,7 +1220,10 @@ class GA:
                 self.last_generation_offspring_mutation = self.last_generation_offspring_crossover
             else:
                 # Adding some variations to the offspring using mutation.
-                self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover)
+                if callable(self.mutation_type):
+                    self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover, self)
+                else:
+                    self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover)
                 if not (self.on_mutation is None):
                     self.on_mutation(self, self.last_generation_offspring_mutation)
 
@@ -2433,7 +2469,7 @@ class GA:
         num_trials: Maximum number of trials to change the gene value to solve the duplicates.
 
         Returns:
-            new_solution: Solution after trying to solve its duplicates. If no duplicates solved, then it is identical to the passed solution argument.
+            new_solution: Solution after trying to solve its duplicates. If no duplicates solved, then it is identical to the passed solution parameter.
             not_unique_indices: Indices of the genes with duplicate values.
             num_unsolved_duplicates: Number of unsolved duplicates.
         """
@@ -2519,7 +2555,7 @@ class GA:
         num_trials: Maximum number of trials to change the gene value to solve the duplicates.
 
         Returns:
-            new_solution: Solution after trying to solve its duplicates. If no duplicates solved, then it is identical to the passed solution argument.
+            new_solution: Solution after trying to solve its duplicates. If no duplicates solved, then it is identical to the passed solution parameter.
             not_unique_indices: Indices of the genes with duplicate values.
             num_unsolved_duplicates: Number of unsolved duplicates.
         """
@@ -2675,7 +2711,7 @@ class GA:
         num_trials: Maximum number of trials to change the gene value to solve the duplicates.
 
         Returns:
-            new_solution: Solution after trying to solve all of its duplicates. If no duplicates solved, then it is identical to the passed solution argument.
+            new_solution: Solution after trying to solve all of its duplicates. If no duplicates solved, then it is identical to the passed solution parameter.
             not_unique_indices: Indices of the genes with duplicate values.
             num_unsolved_duplicates: Number of unsolved duplicates.
         """
