@@ -807,6 +807,32 @@ Release Date: 18 June 2021
 1. Fix a bug when ``keep_parents`` is set to a positive integer.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/49
 
+.. _pygad-2152:
+
+PyGAD 2.15.2
+------------
+
+Release Date: 18 June 2021
+
+1. Fix a bug when using the ``kerasga`` or ``torchga`` modules.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/51
+
+.. _pygad-2160:
+
+PyGAD 2.16.0
+------------
+
+Release Date: 19 June 2021
+
+1. A user-defined function can be passed to the ``mutation_type``,
+   ``crossover_type``, and ``parent_selection_type`` parameters in the
+   ``pygad.GA`` class to create a custom mutation, crossover, and parent
+   selection operators. Check the `User-Defined Crossover, Mutation, and
+   Parent Selection
+   Operators <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
+   section for more details.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50
+
 PyGAD Projects at GitHub
 ========================
 
@@ -1274,20 +1300,20 @@ PyGAD разрабатывали на Python 3.7.3. Зависимости вк�
 
 |image8|
 
-Papers using PyGAD
-==================
+Research Papers using PyGAD
+===========================
 
 A number of research papers used PyGAD and here are some of them:
 
 -  Jaros, Marta, and Jiri Jaros. "Performance-Cost Optimization of
    Moldable Scientific Workflows."
 
--  Koch, Chris, and Edgar Dobriban. "AttenGen: Generating Live
-   Attenuated Vaccine Candidates using Machine Learning." (2021).
-
 -  Thorat, Divya. *Enhanced genetic algorithm to reduce makespan of
    multiple jobs in map-reduce application on serverless platform*.
    Diss. Dublin, National College of Ireland, 2020.
+
+-  Koch, Chris, and Edgar Dobriban. "AttenGen: Generating Live
+   Attenuated Vaccine Candidates using Machine Learning." (2021).
 
 -  Bhardwaj, Bhavya, et al. "Windfarm optimization using Nelder-Mead and
    Particle Swarm optimization." *2021 7th International Conference on
@@ -1300,6 +1326,10 @@ A number of research papers used PyGAD and here are some of them:
 -  Duong, Tri Dung, Qian Li, and Guandong Xu. "Prototype-based
    Counterfactual Explanation for Causal Classification." *arXiv
    preprint arXiv:2105.00703* (2021).
+
+-  Farrag, Tamer Ahmed, and Ehab E. Elattar. "Optimized Deep Stacked
+   Long Short-Term Memory Network for Long-Term Load Forecasting." *IEEE
+   Access* 9 (2021): 68511-68522.
 
 For More Information
 ====================
