@@ -255,7 +255,7 @@ class GA:
         else:
             self.valid_parameters = False
             raise ValueError("The value passed to the 'gene_type' parameter must be either a single integer, floating-point, list, tuple, or numpy.ndarray but ({gene_type_val}) of type {gene_type_type} found.".format(gene_type_val=gene_type, gene_type_type=type(gene_type)))
-        
+
         # Build the initial population
         if initial_population is None:
             if (sol_per_pop is None) or (num_genes is None):
@@ -1178,6 +1178,7 @@ class GA:
         # Appending the solutions in the initial population to the solutions list.
         if self.save_solutions:
             self.solutions.extend(self.population.copy())
+            self.solutions_fitness.extend(self.last_generation_fitness)
 
         for generation in range(self.num_generations):
             if not (self.on_fitness is None):
@@ -1185,9 +1186,6 @@ class GA:
 
             # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
             self.best_solutions_fitness.append(best_solution_fitness)
-            
-            if self.save_solutions:
-                self.solutions_fitness.extend(self.last_generation_fitness)
 
             # Selecting the best parents in the population for mating.
             if callable(self.parent_selection_type):
@@ -1252,6 +1250,7 @@ class GA:
             # Appending the solutions in the current generation to the solutions list.
             if self.save_solutions:
                 self.solutions.extend(self.population.copy())
+                self.solutions_fitness.extend(self.last_generation_fitness)
 
             # If the callback_generation attribute is not None, then cal the callback function after the generation.
             if not (self.on_generation is None):
