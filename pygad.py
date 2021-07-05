@@ -47,7 +47,8 @@ class GA:
                  save_best_solutions=False,
                  save_solutions=False,
                  suppress_warnings=False,
-                 stop_criteria=None):
+                 stop_criteria=None,
+                 custom_cal_pop_fitness=None):
 
         """
         The constructor of the GA class accepts all parameters required to create an instance of the GA class. It validates such parameters.
@@ -105,7 +106,11 @@ class GA:
         allow_duplicate_genes: Added in PyGAD 2.13.0. If True, then a solution/chromosome may have duplicate gene values. If False, then each gene will have a unique value in its solution.
 
         stop_criteria: Added in PyGAD 2.15.0. It is assigned to some criteria to stop the evolution if at least one criterion holds.
+        
+        custom_cal_pop_fitness: Custom function that returns a numpy array of fitness values. If this parameter is set to None, then the fitness_func will be used. The length of the array should match the number of solutions that should be calculated. You can use this parameter, e.g,  to insert a function that uses all cores of your machine to calculate the fitness values.
         """
+
+        self.custom_cal_pop_fitness = custom_cal_pop_fitness
 
         # If suppress_warnings is bool and its valud is False, then print warning messages.
         if type(suppress_warnings) is bool:
@@ -1141,6 +1146,10 @@ class GA:
 
         if self.valid_parameters == False:
             raise ValueError("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
+
+        if self.custom_cal_pop_fitness is not None:
+            pop_fitness = self.custom_cal_pop_fitness()
+            return pop_fitness
 
         pop_fitness = []
         # Calculating the fitness value of each solution in the current population.
