@@ -1145,7 +1145,17 @@ class GA:
         pop_fitness = []
         # Calculating the fitness value of each solution in the current population.
         for sol_idx, sol in enumerate(self.population):
-            fitness = self.fitness_func(sol, sol_idx)
+
+            # Check if the parent's fitness value is already calculated. If so, use it instead of calling the fitness function.
+            if not (self.last_generation_parents is None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
+                # Index of the parent in the parents array (self.last_generation_parents). This is not its index within the population.
+                parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
+                # Index of the parent in the population.
+                parent_idx = self.last_generation_parents_indices[parent_idx]
+                # Use the parent's index to return its pre-calculated fitness value.
+                fitness = self.last_generation_fitness[parent_idx]
+            else:
+                fitness = self.fitness_func(sol, sol_idx)
             pop_fitness.append(fitness)
 
         pop_fitness = numpy.array(pop_fitness)
@@ -1174,7 +1184,7 @@ class GA:
         # Appending the best solution in the initial population to the best_solutions list.
         if self.save_best_solutions:
             self.best_solutions.append(best_solution)
-        
+
         # Appending the solutions in the initial population to the solutions list.
         if self.save_solutions:
             self.solutions.extend(self.population.copy())
@@ -1377,7 +1387,7 @@ class GA:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
         else:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
-        
+
         parents_indices = []
 
         for parent_num in range(num_parents):
