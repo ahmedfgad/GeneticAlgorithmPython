@@ -833,6 +833,64 @@ Release Date: 19 June 2021
    section for more details.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50
 
+.. _pygad-2161:
+
+PyGAD 2.16.1
+------------
+
+Release Date: 28 September 2021
+
+1. Reuse the fitness of previously explored solutions rather than
+   recalculating them. This feature only works if
+   ``save_solutions=True``.
+
+2. The user can use the ``tqdm`` library to show a progress bar.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50
+
+.. code:: python
+
+   import pygad
+   import numpy
+   import tqdm
+
+   equation_inputs = [4,-2,3.5]
+   desired_output = 44
+
+   def fitness_func(solution, solution_idx):
+       output = numpy.sum(solution * equation_inputs)
+       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
+       return fitness
+
+   num_generations = 10000
+   with tqdm.tqdm(total=num_generations) as pbar:
+       ga_instance = pygad.GA(num_generations=num_generations,
+                              sol_per_pop=5,
+                              num_parents_mating=2,
+                              num_genes=len(equation_inputs),
+                              fitness_func=fitness_func,
+                              on_generation=lambda _: pbar.update(1))
+       
+       ga_instance.run()
+
+   ga_instance.plot_result()
+
+1. Solved the issue of unequal length between the ``solutions`` and
+   ``solutions_fitness`` when the ``save_solutions`` parameter is set to
+   ``True``. Now, the fitness of the last population is appended to the
+   ``solutions_fitness`` array.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/64
+
+2. There was an issue of getting the length of these 4 variables
+   (``solutions``, ``solutions_fitness``, ``best_solutions``, and
+   ``best_solutions_fitness``) doubled after each call of the ``run()``
+   method. This is solved by resetting these variables at the beginning
+   of the ``run()`` method.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/62
+
+3. Bug fixes when adaptive mutation is used
+   (``mutation_type="adaptive"``).
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/65
+
 PyGAD Projects at GitHub
 ========================
 
