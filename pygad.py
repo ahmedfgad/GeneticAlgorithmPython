@@ -1169,7 +1169,14 @@ class GA:
         """
 
         if self.valid_parameters == False:
-            raise ValueError("ERROR calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
+            raise ValueError("Error calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
+
+        # Reset the variables that store the solutions and their fitness after each generation. If not reset, then for each call to the run() method the new solutions and their fitness values will be appended to the old variables and their length double. Some errors arise if not reset.
+        # If, in the future, new variables are created that get appended after each generation, please consider resetting them here.
+        self.best_solutions = [] # Holds the best solution in each generation.
+        self.best_solutions_fitness = [] # A list holding the fitness value of the best solution for each generation.
+        self.solutions = [] # Holds the solutions in each generation.
+        self.solutions_fitness = [] # Holds the fitness of the solutions in each generation.
 
         if not (self.on_start is None):
             self.on_start(self)
@@ -1290,6 +1297,10 @@ class GA:
 
             time.sleep(self.delay_after_gen)
 
+        # Save the fitness of the last generation.
+        if self.save_solutions:
+            self.solutions_fitness.extend(self.last_generation_fitness)
+
         # Save the fitness value of the best solution.
         _, best_solution_fitness, _ = self.best_solution(pop_fitness=self.last_generation_fitness)
         self.best_solutions_fitness.append(best_solution_fitness)
@@ -1316,7 +1327,7 @@ class GA:
             -num_parents: The number of parents to be selected.
         It returns an array of the selected parents.
         """
-
+        
         fitness_sorted = sorted(range(len(fitness)), key=lambda k: fitness[k])
         fitness_sorted.reverse()
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
@@ -2075,16 +2086,25 @@ class GA:
 
         fitness = self.last_generation_fitness.copy()
         temp_population = numpy.zeros_like(self.population)
-        temp_population[0:self.last_generation_parents.shape[0], :] = self.last_generation_parents.copy()
-        temp_population[self.last_generation_parents.shape[0]:, :] = offspring
-        
+
+        if (self.keep_parents == 0):
+            parents_to_keep = []
+        elif (self.keep_parents == -1):
+            parents_to_keep = self.last_generation_parents.copy()
+            temp_population[0:len(parents_to_keep), :] = parents_to_keep
+        elif (self.keep_parents > 0):
+            parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_parents)
+            temp_population[0:len(parents_to_keep), :] = parents_to_keep
+
+        temp_population[len(parents_to_keep):, :] = offspring
+
         fitness[:self.last_generation_parents.shape[0]] = self.last_generation_fitness[self.last_generation_parents_indices]
 
-        for idx in range(self.last_generation_parents.shape[0], fitness.shape[0]):
+        for idx in range(len(parents_to_keep), fitness.shape[0]):
             fitness[idx] = self.fitness_func(temp_population[idx], None)
         average_fitness = numpy.mean(fitness)
 
-        return average_fitness, fitness[self.last_generation_parents.shape[0]:]
+        return average_fitness, fitness[len(parents_to_keep):]
 
     def adaptive_mutation(self, offspring):
 
@@ -3433,7 +3453,7 @@ class GA:
                                       bbox_inches='tight')
 
         matplotlib.pyplot.show()
-    
+
         return fig
 
     def save(self, filename):
@@ -3460,5 +3480,5 @@ def load(filename):
     except FileNotFoundError:
         raise FileNotFoundError("Error reading the file {filename}. Please check your inputs.".format(filename=filename))
     except:
-        raise BaseException("Error loading the file. Please check if the file exists.")
+        raise BaseException("Error loading the file. If the file already exists, please reload all the functions previously used (e.g. fitness function).")
     return ga_in
