@@ -8,13 +8,18 @@ Given the following function:
 What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize this function.
 """
 
-function_inputs = [4,-2,3.5,5,-11,-4.7] # Function inputs.
-desired_output = 44 # Function output.
 
-def fitness_func(solution, solution_idx):
+def fitness_func(solution, solution_idx, args):
+    # additional function inputs are given by args
+    function_inputs = args[0]
+    desired_output = args[1]
     output = numpy.sum(solution*function_inputs)
     fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
     return fitness
+
+
+function_inputs = [4,-2,3.5,5,-11,-4.7] # Function inputs.
+desired_output = 44 # Function output.
 
 num_generations = 100 # Number of generations.
 num_parents_mating = 10 # Number of solutions to be selected as parents in the mating pool.
@@ -30,11 +35,13 @@ def on_generation(ga_instance):
     print("Change     = {change}".format(change=ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1] - last_fitness))
     last_fitness = ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1]
 
+
 ga_instance = pygad.GA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating,
                        sol_per_pop=sol_per_pop,
                        num_genes=num_genes,
                        fitness_func=fitness_func,
+                       args=(function_inputs, desired_output),
                        on_generation=on_generation)
 
 # Running the GA to optimize the parameters of the function.

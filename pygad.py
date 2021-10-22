@@ -15,6 +15,7 @@ class GA:
                  num_generations, 
                  num_parents_mating, 
                  fitness_func,
+                 args=None,
                  initial_population=None,
                  sol_per_pop=None, 
                  num_genes=None,
@@ -55,7 +56,8 @@ class GA:
         num_generations: Number of generations.
         num_parents_mating: Number of solutions to be selected as parents in the mating pool.
 
-        fitness_func: Accepts a function that must accept 2 parameters (a single solution and its index in the population) and return the fitness value of the solution. Available starting from PyGAD 1.0.17 until 1.0.20 with a single parameter representing the solution. Changed in PyGAD 2.0.0 and higher to include the second parameter representing the solution index.
+        fitness_func: Accepts a function that must accept more than 1 parameters (a single solution, its index in the population and parameters) and return the fitness value of the solution. Available starting from PyGAD 1.0.17 until 1.0.20 with a single parameter representing the solution. Changed in PyGAD 2.0.0 and higher to include the second parameter representing the solution index.
+        args: Accepts fixed parameters to be used in the fitness function
 
         initial_population: A user-defined initial population. It is useful when the user wants to start the generations with a custom initial population. It defaults to None which means no initial population is specified by the user. In this case, PyGAD creates an initial population using the 'sol_per_pop' and 'num_genes' parameters. An exception is raised if the 'initial_population' is None while any of the 2 parameters ('sol_per_pop' or 'num_genes') is also None.
         sol_per_pop: Number of solutions in the population. 
@@ -630,15 +632,17 @@ class GA:
 
         # Check if the fitness_func is a function.
         if callable(fitness_func):
-            # Check if the fitness function accepts 2 paramaters.
-            if (fitness_func.__code__.co_argcount == 2):
+            # Check if the fitness function accepts more than one paramater.
+            if (fitness_func.__code__.co_argcount >= 2):
                 self.fitness_func = fitness_func
             else:
                 self.valid_parameters = False
-                raise ValueError("The fitness function must accept 2 parameters:\n1) A solution to calculate its fitness value.\n2) The solution's index within the population.\n\nThe passed fitness function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
+                raise ValueError("The fitness function must accept more than one parameter:\n1) A solution to calculate its fitness value.\n2) The solution's index within the population.3) (optional) parameters\n\nThe passed fitness function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
         else:
             self.valid_parameters = False
             raise ValueError("The value assigned to the fitness_func parameter is expected to be of type function but ({fitness_func_type}) found.".format(fitness_func_type=type(fitness_func)))
+
+        self.args = args
 
         # Check if the on_start exists.
         if not (on_start is None):
@@ -1155,7 +1159,7 @@ class GA:
                 # Use the parent's index to return its pre-calculated fitness value.
                 fitness = self.last_generation_fitness[parent_idx]
             else:
-                fitness = self.fitness_func(sol, sol_idx)
+                fitness = self.fitness_func(sol, sol_idx, self.args)
             pop_fitness.append(fitness)
 
         pop_fitness = numpy.array(pop_fitness)
