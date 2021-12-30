@@ -878,9 +878,10 @@ class GA:
             raise TypeError("The expected value of the 'stop_criteria' is a single string or a list/tuple/numpy.ndarray of strings but the value {stop_criteria_val} of type {stop_criteria_type} found.".format(stop_criteria_val=stop_criteria, stop_criteria_type=type(stop_criteria)))
 
         # Added warning for multiprocessing
+        self.use_multiprocess = use_multiprocess
+        self.max_workers = max_workers
         if self.use_multiprocess == False and self.max_workers != 2:
             if not self.suppress_warnings:  warnings.warn("You have designated a non-default number of workers, but 'use_multiprocess' is set to False. Multiprocessing will not be used in this run. Set 'use_multiprocess' to True if you want to use those workers that you set.")
-        
 
         # The number of completed generations.
         self.generations_completed = 0
