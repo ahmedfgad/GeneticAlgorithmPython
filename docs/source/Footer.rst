@@ -845,7 +845,7 @@ Release Date: 28 September 2021
    ``save_solutions=True``.
 
 2. The user can use the ``tqdm`` library to show a progress bar.
-   https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50.
 
 .. code:: python
 
@@ -873,6 +873,50 @@ Release Date: 28 September 2021
        ga_instance.run()
 
    ga_instance.plot_result()
+
+But this work does not work if the ``ga_instance`` will be pickled (i.e.
+the ``save()`` method will be called.
+
+.. code:: python
+
+   ga_instance.save("test")
+
+To solve this issue, define a function and pass it to the
+``on_generation`` parameter. In the next code, the
+``on_generation_progress()`` function is defined which updates the
+progress bar.
+
+.. code:: python
+
+   import pygad
+   import numpy
+   import tqdm
+
+   equation_inputs = [4,-2,3.5]
+   desired_output = 44
+
+   def fitness_func(solution, solution_idx):
+       output = numpy.sum(solution * equation_inputs)
+       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
+       return fitness
+
+   def on_generation_progress(ga):
+       pbar.update(1)
+
+   num_generations = 100
+   with tqdm.tqdm(total=num_generations) as pbar:
+       ga_instance = pygad.GA(num_generations=num_generations,
+                              sol_per_pop=5,
+                              num_parents_mating=2,
+                              num_genes=len(equation_inputs),
+                              fitness_func=fitness_func,
+                              on_generation=on_generation_progress)
+
+       ga_instance.run()
+
+   ga_instance.plot_result()
+
+   ga_instance.save("test")
 
 1. Solved the issue of unequal length between the ``solutions`` and
    ``solutions_fitness`` when the ``save_solutions`` parameter is set to
@@ -1366,8 +1410,8 @@ A number of research papers used PyGAD and here are some of them:
 -  Jaros, Marta, and Jiri Jaros. "Performance-Cost Optimization of
    Moldable Scientific Workflows."
 
--  Thorat, Divya. *Enhanced genetic algorithm to reduce makespan of
-   multiple jobs in map-reduce application on serverless platform*.
+-  Thorat, Divya. "Enhanced genetic algorithm to reduce makespan of
+   multiple jobs in map-reduce application on serverless platform".
    Diss. Dublin, National College of Ireland, 2020.
 
 -  Koch, Chris, and Edgar Dobriban. "AttenGen: Generating Live
@@ -1388,6 +1432,19 @@ A number of research papers used PyGAD and here are some of them:
 -  Farrag, Tamer Ahmed, and Ehab E. Elattar. "Optimized Deep Stacked
    Long Short-Term Memory Network for Long-Term Load Forecasting." *IEEE
    Access* 9 (2021): 68511-68522.
+
+-  Antunes, E. D. O., Caetano, M. F., Marotta, M. A., Araujo, A.,
+   Bondan, L., Meneguette, R. I., & Rocha Filho, G. P. (2021, August).
+   Soluções Otimizadas para o Problema de Localização de Máxima
+   Cobertura em Redes Militarizadas 4G/LTE. In *Anais do XXVI Workshop
+   de Gerência e Operação de Redes e Serviços* (pp. 152-165). SBC.
+
+More Links
+==========
+
+https://rodriguezanton.com/identifying-contact-states-for-2d-objects-using-pygad-and/
+
+https://torvaney.github.io/projects/t9-optimised
 
 For More Information
 ====================
