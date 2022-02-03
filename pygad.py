@@ -899,6 +899,7 @@ class GA:
         self.last_generation_parents = None # A list holding the parents of the last generation.
         self.last_generation_offspring_crossover = None # A list holding the offspring after applying crossover in the last generation.
         self.last_generation_offspring_mutation = None # A list holding the offspring after applying mutation in the last generation.
+        self.previous_generation_fitness = None # Holds the fitness values of one generation before the fitness values saved in the last_generation_fitness attribute. Added in PyGAD 2.26.2
 
     def round_genes(self, solutions):
         for gene_idx in range(self.num_genes):
@@ -1146,16 +1147,20 @@ class GA:
         # Calculating the fitness value of each solution in the current population.
         for sol_idx, sol in enumerate(self.population):
 
-            # Check if the parent's fitness value is already calculated. If so, use it instead of calling the fitness function.
-            if not (self.last_generation_parents is None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
+            # Check if this solution is a parent from the previous generation and its fitness value is already calculated. If so, use the fitness value instead of calling the fitness function.
+            if (self.last_generation_parents is not None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
                 # Index of the parent in the parents array (self.last_generation_parents). This is not its index within the population.
                 parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
                 # Index of the parent in the population.
                 parent_idx = self.last_generation_parents_indices[parent_idx]
                 # Use the parent's index to return its pre-calculated fitness value.
-                fitness = self.last_generation_fitness[parent_idx]
+                fitness = self.previous_generation_fitness[parent_idx]
             else:
                 fitness = self.fitness_func(sol, sol_idx)
+                if type(fitness) in GA.supported_int_float_types:
+                    pass
+                else:
+                    raise ValueError("The fitness function should return a number but the value {fit_val} of type {fit_type} found.".format(fit_val=fitness, fit_type=type(fitness)))
             pop_fitness.append(fitness)
 
         pop_fitness = numpy.array(pop_fitness)
@@ -1244,6 +1249,7 @@ class GA:
                 if not (self.on_mutation is None):
                     self.on_mutation(self, self.last_generation_offspring_mutation)
 
+            # Update the population attribute according to the offspring generated.
             if (self.keep_parents == 0):
                 self.population = self.last_generation_offspring_mutation
             elif (self.keep_parents == -1):
@@ -1257,6 +1263,7 @@ class GA:
 
             self.generations_completed = generation + 1 # The generations_completed attribute holds the number of the last completed generation.
 
+            self.previous_generation_fitness = self.last_generation_fitness.copy()
             # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
             self.last_generation_fitness = self.cal_pop_fitness()
 
