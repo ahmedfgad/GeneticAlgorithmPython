@@ -935,6 +935,38 @@ progress bar.
    (``mutation_type="adaptive"``).
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/65
 
+.. _pygad-2162:
+
+PyGAD 2.16.2
+------------
+
+Release Date: 2 February 2022
+
+1. A new instance attribute called ``previous_generation_fitness`` added
+   in the ``pygad.GA`` class. It holds the fitness values of one
+   generation before the fitness values saved in the
+   ``last_generation_fitness``.
+
+2. Issue in the ``cal_pop_fitness()`` method in getting the correct
+   indices of the previous parents. This is solved by using the previous
+   generation's fitness saved in the new attribute
+   ``previous_generation_fitness`` to return the parents' fitness
+   values. Thanks to Tobias Tischhauser (M.Sc. - `Mitarbeiter Institut
+   EMS, Departement Technik, OST – Ostschweizer Fachhochschule,
+   Switzerland <https://www.ost.ch/de/forschung-und-dienstleistungen/technik/systemtechnik/ems/team>`__)
+   for detecting this bug.
+
+.. _pygad-2163:
+
+PyGAD 2.16.3
+------------
+
+Release Date: 2 February 2022
+
+1. Validate the fitness value returned from the fitness function. An
+   exception is raised if something is wrong.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/67
+
 PyGAD Projects at GitHub
 ========================
 
