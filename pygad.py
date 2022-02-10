@@ -1312,7 +1312,7 @@ class GA:
         _, best_solution_fitness, _ = self.best_solution(pop_fitness=self.last_generation_fitness)
         self.best_solutions_fitness.append(best_solution_fitness)
 
-        self.best_solution_generation = numpy.where(numpy.array(self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
+        self.best_solution_generation = numpy.where(numpy.array(self.best_solutions_fitness) == numpy.nanmax(numpy.array(self.best_solutions_fitness)))[0][0]
         # After the run() method completes, the run_completed flag is changed from False to True.
         self.run_completed = True # Set to True only after the run() method completes gracefully.
 
@@ -1411,7 +1411,7 @@ class GA:
         for parent_num in range(num_parents):
             rand_indices = numpy.random.randint(low=0.0, high=len(fitness), size=self.K_tournament)
             K_fitnesses = fitness[rand_indices]
-            selected_parent_idx = numpy.where(K_fitnesses == numpy.max(K_fitnesses))[0][0]
+            selected_parent_idx = numpy.where(K_fitnesses == numpy.nanmax(K_fitnesses))[0][0]
             parents_indices.append(selected_parent_idx)
             parents[parent_num, :] = self.population[rand_indices[selected_parent_idx], :].copy()
 
@@ -3121,7 +3121,7 @@ class GA:
         if pop_fitness is None:
             pop_fitness = self.cal_pop_fitness()
         # Then return the index of that solution corresponding to the best fitness.
-        best_match_idx = numpy.where(pop_fitness == numpy.max(pop_fitness))[0][0]
+        best_match_idx = numpy.where(pop_fitness == numpy.nanmax(pop_fitness))[0][0]
 
         best_solution = self.population[best_match_idx, :].copy()
         best_solution_fitness = pop_fitness[best_match_idx]
