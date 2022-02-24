@@ -840,11 +840,7 @@ PyGAD 2.16.1
 
 Release Date: 28 September 2021
 
-1. Reuse the fitness of previously explored solutions rather than
-   recalculating them. This feature only works if
-   ``save_solutions=True``.
-
-2. The user can use the ``tqdm`` library to show a progress bar.
+1. The user can use the ``tqdm`` library to show a progress bar.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50.
 
 .. code:: python
@@ -924,14 +920,14 @@ progress bar.
    ``solutions_fitness`` array.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/64
 
-2. There was an issue of getting the length of these 4 variables
+1. There was an issue of getting the length of these 4 variables
    (``solutions``, ``solutions_fitness``, ``best_solutions``, and
    ``best_solutions_fitness``) doubled after each call of the ``run()``
    method. This is solved by resetting these variables at the beginning
    of the ``run()`` method.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/62
 
-3. Bug fixes when adaptive mutation is used
+2. Bug fixes when adaptive mutation is used
    (``mutation_type="adaptive"``).
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/65
 
@@ -1470,6 +1466,34 @@ A number of research papers used PyGAD and here are some of them:
    Soluções Otimizadas para o Problema de Localização de Máxima
    Cobertura em Redes Militarizadas 4G/LTE. In *Anais do XXVI Workshop
    de Gerência e Operação de Redes e Serviços* (pp. 152-165). SBC.
+
+-  M. Yani, F. Ardilla, A. A. Saputra and N. Kubota, "Gradient-Free Deep
+   Q-Networks Reinforcement learning: Benchmark and Evaluation," *2021
+   IEEE Symposium Series on Computational Intelligence (SSCI)*, 2021,
+   pp. 1-5, doi: 10.1109/SSCI50451.2021.9659941.
+
+-  Yani, Mohamad, and Naoyuki Kubota. "Deep Convolutional Networks with
+   Genetic Algorithm for Reinforcement Learning Problem."
+
+-  Mahendra, Muhammad Ihza, and Isman Kurniawan. "Optimizing
+   Convolutional Neural Network by Using Genetic Algorithm for COVID-19
+   Detection in Chest X-Ray Image." *2021 International Conference on
+   Data Science and Its Applications (ICoDSA)*. IEEE, 2021.
+
+-  Glibota, Vjeko. *Umjeravanje mikroskopskog prometnog modela primjenom
+   genetskog algoritma*. Diss. University of Zagreb. Faculty of
+   Transport and Traffic Sciences. Division of Intelligent Transport
+   Systems and Logistics. Department of Intelligent Transport Systems,
+   2021.
+
+-  Zhu, Mingda. *Genetic Algorithm-based Parameter Identification for
+   Ship Manoeuvring Model under Wind Disturbance*. MS thesis. NTNU,
+   2021.
+
+-  Abdalrahman, Ahmed, and Weihua Zhuang. "Dynamic pricing for
+   differentiated pev charging services using deep reinforcement
+   learning." *IEEE Transactions on Intelligent Transportation Systems*
+   (2020).
 
 More Links
 ==========
