@@ -1412,7 +1412,7 @@ class GA:
             rand_indices = numpy.random.randint(low=0.0, high=len(fitness), size=self.K_tournament)
             K_fitnesses = fitness[rand_indices]
             selected_parent_idx = numpy.where(K_fitnesses == numpy.max(K_fitnesses))[0][0]
-            parents_indices.append(selected_parent_idx)
+            parents_indices.append(rand_indices[selected_parent_idx])
             parents[parent_num, :] = self.population[rand_indices[selected_parent_idx], :].copy()
 
         return parents, parents_indices
