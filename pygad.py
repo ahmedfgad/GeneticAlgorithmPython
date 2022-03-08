@@ -47,7 +47,11 @@ class GA:
                  save_best_solutions=False,
                  save_solutions=False,
                  suppress_warnings=False,
-                 stop_criteria=None):
+                 stop_criteria=None,
+                 # Initialization for data parameters on fitness function
+                 desired_output=None,
+                 function_inputs=None
+                 ):
 
         """
         The constructor of the GA class accepts all parameters required to create an instance of the GA class. It validates such parameters.
@@ -628,14 +632,26 @@ class GA:
         elif (self.keep_parents > 0): # Keep the specified number of parents in the next population.
             self.num_offspring = self.sol_per_pop - self.keep_parents
 
+        # Initialization for data parameters for fitness function
+        self.fitness_function_extra_data_set = False
+        if not desired_output.empty and not function_inputs.empty:
+            self.fitness_function_extra_data_set = True
+            self.desired_output = desired_output
+            self.function_inputs = function_inputs
+
         # Check if the fitness_func is a function.
         if callable(fitness_func):
             # Check if the fitness function accepts 2 paramaters.
             if (fitness_func.__code__.co_argcount == 2):
                 self.fitness_func = fitness_func
+            elif self.fitness_function_extra_data_set and (fitness_func.__code__.co_argcount == 4):
+                self.fitness_func = fitness_func
             else:
                 self.valid_parameters = False
-                raise ValueError("The fitness function must accept 2 parameters:\n1) A solution to calculate its fitness value.\n2) The solution's index within the population.\n\nThe passed fitness function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
+                if not self.fitness_function_extra_data_set:
+                    raise ValueError("The fitness function must accept 2 parameters:\n1) A solution to calculate its fitness value.\n2) The solution's index within the population.\n\nThe passed fitness function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
+                else:
+                    raise ValueError("The fitness function with extra_data must accept 4 parameters:\n1) A solution to calculate its fitness value.\n2) The solution's index within the population\n3) The desired output.\n4) The function input\n\nThe passed fitness function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
         else:
             self.valid_parameters = False
             raise ValueError("The value assigned to the fitness_func parameter is expected to be of type function but ({fitness_func_type}) found.".format(fitness_func_type=type(fitness_func)))
@@ -1156,7 +1172,10 @@ class GA:
                 # Use the parent's index to return its pre-calculated fitness value.
                 fitness = self.previous_generation_fitness[parent_idx]
             else:
-                fitness = self.fitness_func(sol, sol_idx)
+                if not self.fitness_function_extra_data_set:
+                    fitness = self.fitness_func(sol, sol_idx)
+                else:
+                    fitness = self.fitness_func(sol, sol_idx, self.desired_output, self.function_inputs)
                 if type(fitness) in GA.supported_int_float_types:
                     pass
                 else:
