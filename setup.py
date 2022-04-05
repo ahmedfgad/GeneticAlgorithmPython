@@ -13,4 +13,8 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ahmedfgad/GeneticAlgorithmPython",
+    license="BSD-3-Clause",
+    classifiers=[
+        "License :: OSI Approved :: BSD License"
+    ],
     packages=setuptools.find_packages())
