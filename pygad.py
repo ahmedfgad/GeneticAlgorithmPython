@@ -4,6 +4,7 @@ import matplotlib.pyplot
 import pickle
 import time
 import warnings
+import inspect
 
 class GA:
 
@@ -340,12 +341,13 @@ class GA:
             self.crossover = None
         elif callable(crossover_type):
             # Check if the crossover_type is a function that accepts 2 paramaters.
-            if (crossover_type.__code__.co_argcount == 3):
+            argc = len(inspect.signature(crossover_type).parameters)
+            if (argc == 3):
                 # The crossover function assigned to the crossover_type parameter is validated.
                 self.crossover = crossover_type
             else:
                 self.valid_parameters = False
-                raise ValueError("When 'crossover_type' is assigned to a function, then this crossover function must accept 2 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed crossover function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=crossover_type.__code__.co_name, argcount=crossover_type.__code__.co_argcount))
+                raise ValueError("When 'crossover_type' is assigned to a function, then this crossover function must accept 2 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed crossover function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=crossover_type.__code__.co_name, argcount=argc))
         elif not (type(crossover_type) is str):
             self.valid_parameters = False
             raise TypeError("The expected type of the 'crossover_type' parameter is either callable or str but ({crossover_type}) found.".format(crossover_type=type(crossover_type)))
@@ -385,12 +387,13 @@ class GA:
             self.mutation = None
         elif callable(mutation_type):
             # Check if the mutation_type is a function that accepts 1 paramater.
-            if (mutation_type.__code__.co_argcount == 2):
+            argc = len(inspect.signature(mutation_type).parameters)
+            if (argc == 2):
                 # The mutation function assigned to the mutation_type parameter is validated.
                 self.mutation = mutation_type
             else:
                 self.valid_parameters = False
-                raise ValueError("When 'mutation_type' is assigned to a function, then this mutation function must accept 2 parameters:\n1) The offspring to be mutated.\n2) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed mutation function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=mutation_type.__code__.co_name, argcount=mutation_type.__code__.co_argcount))
+                raise ValueError("When 'mutation_type' is assigned to a function, then this mutation function must accept 2 parameters:\n1) The offspring to be mutated.\n2) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed mutation function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=mutation_type.__code__.co_name, argcount=argc))
         elif not (type(mutation_type) is str):
             self.valid_parameters = False
             raise TypeError("The expected type of the 'mutation_type' parameter is either callable or str but ({mutation_type}) found.".format(mutation_type=type(mutation_type)))
@@ -571,13 +574,14 @@ class GA:
         # Validating the selected type of parent selection: parent_selection_type
         if callable(parent_selection_type):
             # Check if the parent_selection_type is a function that accepts 3 paramaters.
-            if (parent_selection_type.__code__.co_argcount == 3):
+            argc = len(inspect.signature(crossover_type).parameters)
+            if (argc == 3):
                 # population: Added in PyGAD 2.16.0. It should used only to support custom parent selection functions. Otherwise, it should be left to None to retirve the population by self.population.
                 # The parent selection function assigned to the parent_selection_type parameter is validated.
                 self.select_parents = parent_selection_type
             else:
                 self.valid_parameters = False
-                raise ValueError("When 'parent_selection_type' is assigned to a user-defined function, then this parent selection function must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed parent selection function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=parent_selection_type.__code__.co_name, argcount=parent_selection_type.__code__.co_argcount))
+                raise ValueError("When 'parent_selection_type' is assigned to a user-defined function, then this parent selection function must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed parent selection function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=parent_selection_type.__code__.co_name, argcount=argc))
         elif not (type(parent_selection_type) is str):
             self.valid_parameters = False
             raise TypeError("The expected type of the 'parent_selection_type' parameter is either callable or str but ({parent_selection_type}) found.".format(parent_selection_type=type(parent_selection_type)))
@@ -631,11 +635,12 @@ class GA:
         # Check if the fitness_func is a function.
         if callable(fitness_func):
             # Check if the fitness function accepts 2 paramaters.
-            if (fitness_func.__code__.co_argcount == 2):
+            argc = len(inspect.signature(fitness_func).parameters)
+            if (argc == 2):
                 self.fitness_func = fitness_func
             else:
                 self.valid_parameters = False
-                raise ValueError("The fitness function must accept 2 parameters:\n1) A solution to calculate its fitness value.\n2) The solution's index within the population.\n\nThe passed fitness function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
+                raise ValueError("The fitness function must accept 2 parameters:\n1) A solution to calculate its fitness value.\n2) The solution's index within the population.\n\nThe passed fitness function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=argc))
         else:
             self.valid_parameters = False
             raise ValueError("The value assigned to the fitness_func parameter is expected to be of type function but ({fitness_func_type}) found.".format(fitness_func_type=type(fitness_func)))
@@ -645,11 +650,12 @@ class GA:
             # Check if the on_start is a function.
             if callable(on_start):
                 # Check if the on_start function accepts only a single paramater.
-                if (on_start.__code__.co_argcount == 1):
+                argc = len(inspect.signature(on_start).parameters)
+                if (argc == 1):
                     self.on_start = on_start
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_start.__code__.co_name, argcount=argc))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_start parameter is expected to be of type function but ({on_start_type}) found.".format(on_start_type=type(on_start)))
@@ -661,11 +667,12 @@ class GA:
             # Check if the on_fitness is a function.
             if callable(on_fitness):
                 # Check if the on_fitness function accepts 2 paramaters.
-                if (on_fitness.__code__.co_argcount == 2):
+                argc = len(inspect.signature(on_fitness).parameters)
+                if (argc == 2):
                     self.on_fitness = on_fitness
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=argc))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_fitness parameter is expected to be of type function but ({on_fitness_type}) found.".format(on_fitness_type=type(on_fitness)))
@@ -677,11 +684,12 @@ class GA:
             # Check if the on_parents is a function.
             if callable(on_parents):
                 # Check if the on_parents function accepts 2 paramaters.
-                if (on_parents.__code__.co_argcount == 2):
+                argc = len(inspect.signature(on_parents).parameters)
+                if (argc == 2):
                     self.on_parents = on_parents
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_parents.__code__.co_name, argcount=on_parents.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_parents.__code__.co_name, argcount=argc))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_parents parameter is expected to be of type function but ({on_parents_type}) found.".format(on_parents_type=type(on_parents)))
@@ -693,11 +701,12 @@ class GA:
             # Check if the on_crossover is a function.
             if callable(on_crossover):
                 # Check if the on_crossover function accepts 2 paramaters.
-                if (on_crossover.__code__.co_argcount == 2):
+                argc = len(inspect.signature(on_crossover).parameters)
+                if (argc == 2):
                     self.on_crossover = on_crossover
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_crossover.__code__.co_name, argcount=on_crossover.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_crossover.__code__.co_name, argcount=argc))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_crossover parameter is expected to be of type function but ({on_crossover_type}) found.".format(on_crossover_type=type(on_crossover)))
@@ -709,11 +718,12 @@ class GA:
             # Check if the on_mutation is a function.
             if callable(on_mutation):
                 # Check if the on_mutation function accepts 2 paramaters.
-                if (on_mutation.__code__.co_argcount == 2):
+                argc = len(inspect.signature(on_mutation).parameters)
+                if (argc == 2):
                     self.on_mutation = on_mutation
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_mutation.__code__.co_name, argcount=on_mutation.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_mutation.__code__.co_name, argcount=argc))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_mutation parameter is expected to be of type function but ({on_mutation_type}) found.".format(on_mutation_type=type(on_mutation)))
@@ -725,13 +735,14 @@ class GA:
             # Check if the callback_generation is a function.
             if callable(callback_generation):
                 # Check if the callback_generation function accepts only a single paramater.
-                if (callback_generation.__code__.co_argcount == 1):
+                argc = len(inspect.signature(callback_generation).parameters)
+                if (argc == 1):
                     self.callback_generation = callback_generation
                     on_generation = callback_generation
                     if not self.suppress_warnings: warnings.warn("Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and will be removed in a later release of PyGAD. Please use the on_generation parameter instead.")
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the callback_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=callback_generation.__code__.co_name, argcount=callback_generation.__code__.co_argcount))
+                    raise ValueError("The function assigned to the callback_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=callback_generation.__code__.co_name, argcount=argc))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the callback_generation parameter is expected to be of type function but ({callback_generation_type}) found.".format(callback_generation_type=type(callback_generation)))
@@ -743,11 +754,12 @@ class GA:
             # Check if the on_generation is a function.
             if callable(on_generation):
                 # Check if the on_generation function accepts only a single paramater.
-                if (on_generation.__code__.co_argcount == 1):
+                argc = len(inspect.signature(on_generation).parameters)
+                if (argc == 1):
                     self.on_generation = on_generation
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_generation.__code__.co_name, argcount=on_generation.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_generation.__code__.co_name, argcount=argc))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the on_generation parameter is expected to be of type function but ({on_generation_type}) found.".format(on_generation_type=type(on_generation)))
@@ -759,11 +771,12 @@ class GA:
             # Check if the on_stop is a function.
             if callable(on_stop):
                 # Check if the on_stop function accepts 2 paramaters.
-                if (on_stop.__code__.co_argcount == 2):
+                argc = len(inspect.signature(on_stop).parameters)
+                if (argc == 2):
                     self.on_stop = on_stop
                 else:
                     self.valid_parameters = False
-                    raise ValueError("The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_stop.__code__.co_name, argcount=on_stop.__code__.co_argcount))
+                    raise ValueError("The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_stop.__code__.co_name, argcount=argc))
             else:
                 self.valid_parameters = False
                 raise ValueError("The value assigned to the 'on_stop' parameter is expected to be of type function but ({on_stop_type}) found.".format(on_stop_type=type(on_stop)))
