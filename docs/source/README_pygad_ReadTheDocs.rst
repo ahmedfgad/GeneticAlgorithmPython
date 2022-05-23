@@ -1961,7 +1961,7 @@ second parent.
            parent1 = parents[idx % parents.shape[0], :].copy()
            parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
 
-           random_split_point = numpy.random.choice(range(offspring_size[0]))
+           random_split_point = numpy.random.choice(range(offspring_size[1]))
 
            parent1[random_split_point:] = parent2[random_split_point:]
 
@@ -2018,7 +2018,7 @@ gene's value.
    def mutation_func(offspring, ga_instance):
 
        for chromosome_idx in range(offspring.shape[0]):
-           random_gene_idx = numpy.random.choice(range(offspring.shape[0]))
+           random_gene_idx = numpy.random.choice(range(offspring.shape[1]))
 
            offspring[chromosome_idx, random_gene_idx] += numpy.random.random()
 
