@@ -371,6 +371,22 @@ The ``pygad.GA`` class constructor supports the following parameters:
    is ``"saturate_7"`` which means stop the ``run()`` method if the
    fitness does not change for 7 consecutive generations.
 
+-  ``parallel_processing=None``: Added in `PyGAD
+   2.17.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-17-0>`__.
+   If ``None`` (Default), this means no parallel processing is applied.
+   It can accept a list/tuple of 2 elements **[**\ 1) Can be either
+   ``'process'`` or ``'thread'`` to indicate whether processes or
+   threads are used, respectively.\ **,** 2) The number of processes or
+   threads to use.\ **]**. For example,
+   ``parallel_processing=['process', 10]`` applies parallel processing
+   with 10 processes. If a positive integer is assigned, then it is used
+   as the number of threads. For example, ``parallel_processing=5`` uses
+   5 threads which is equivalent to
+   ``parallel_processing=["thread", 5]``. For more information, check
+   the `Parallel Processing in
+   PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#parallel-processing-in-pygad>`__
+   section.
+
 The user doesn't have to specify all of such parameters while creating
 an instance of the GA class. A very important parameter you must care
 about is ``fitness_func`` which defines the fitness function.
@@ -953,6 +969,8 @@ Accepts the following parameter:
    genetic algorithm. No extension is needed.
 
 Returns the genetic algorithm instance.
+
+.. _steps-to-use-pyga:
 
 Steps to Use ``pygad``
 ======================
@@ -2018,7 +2036,7 @@ gene's value.
    def mutation_func(offspring, ga_instance):
 
        for chromosome_idx in range(offspring.shape[0]):
-           random_gene_idx = numpy.random.choice(range(offspring.shape[1]))
+           random_gene_idx = numpy.random.choice(range(offspring.shape[0]))
 
            offspring[chromosome_idx, random_gene_idx] += numpy.random.random()
 
@@ -2171,7 +2189,7 @@ previous 3 user-defined functions instead of the built-in functions.
            parent1 = parents[idx % parents.shape[0], :].copy()
            parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
 
-           random_split_point = numpy.random.choice(range(offspring_size[0]))
+           random_split_point = numpy.random.choice(range(offspring_size[1]))
 
            parent1[random_split_point:] = parent2[random_split_point:]
 
@@ -2908,39 +2926,249 @@ setting ``solutions="best"``.
 Parallel Processing in PyGAD
 ============================
 
-Some time was spent on doing some experiments to use parallel processing
-with PyGAD. From all operations in the genetic algorithm, the 2
-operations that can be parallelized are:
+Starting from `PyGAD
+2.17.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-17-0>`__,
+parallel processing becomes supported. This section explains how to use
+parallel processing in PyGAD.
 
-1. Fitness value calculation
+According to the `PyGAD
+lifecycle <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#life-cycle-of-pygad>`__,
+parallel processing can be parallelized in only 2 operations:
 
-2. Mutation
+1. Population fitness calculation.
 
-The reason is that these 2 operations are independent and can be
-distributed across different processes or threads. Unfortunately, all
-experiments proved that parallel processing does not reduce the time
-compared to regular processing. Most of the time, parallel processing
-increased the time. The best case was that parallel processing gave a
-close time to normal processing.
+2. Mutation.
 
-The interpretation of that is that the genetic algorithm operations like
-mutation does not take much CPU processing time. Thus, using parallel
-processing adds more time to manage the processes/threads which
-increases the overall time.
+The reason is that the calculations in these 2 operations are
+independent (i.e. each solution/chromosome is handled independently from
+the others) and can be distributed across different processes or
+threads.
 
-But there still a chance that parallel processing is efficient with the
-genetic algorithm. This is in case the fitness function makes intensive
-processing and takes much processing time from the CPU. In this case,
-parallelizing the fitness function would help you cut down the overall
-time.
+For the mutation operation, it does not do intensive calculations on the
+CPU. Its calculations are simple like flipping the values of some genes
+from 0 to 1 or adding a random value to some genes. So, it does not take
+much CPU processing time. Experiments proved that parallelizing the
+mutation operation across the solutions increases the time instead of
+reducing it. This is because running multiple processes or threads adds
+overhead to manage them. Thus, parallel processing cannot be applied on
+the mutation operation.
 
-To know about how to parallelize the fitness function with PyGAD, please
-check `this
-tutorial <https://hackernoon.com/how-genetic-algorithms-can-compete-with-gradient-descent-and-backprop-9m9t33bq>`__
-by `László
-Fazekas <https://www.linkedin.com/in/l%C3%A1szl%C3%B3-fazekas-2429a912>`__:
-`How Genetic Algorithms Can Compete with Gradient Descent and
-Backprop <https://hackernoon.com/how-genetic-algorithms-can-compete-with-gradient-descent-and-backprop-9m9t33bq>`__
+For the population fitness calculation, parallel processing can help
+make a difference and reduce the processing time. But this is
+**conditional** on the type of calculations done in the fitness
+function. If the fitness function makes intensive calculations and takes
+much processing time from the CPU, then it is probably that parallel
+processing will help to cut down the overall time.
+
+This section explains how parallel processing works in PyGAD and how to
+use parallel processing in PyGAD
+
+How to Use Parallel Processing in PyGAD
+---------------------------------------
+
+Starting from `PyGAD
+2.17.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-17-0>`__,
+a new parameter called ``parallel_processing`` added to the constructor
+of the ``pygad.GA`` class.
+
+.. code:: python
+
+   import pygad
+   ...
+   ga_instance = pygad.GA(...,
+                          parallel_processing=...)
+   ...
+
+This parameter allows the user to do the following:
+
+1. Enable parallel processing.
+
+2. Select whether processes or threads are used.
+
+3. Specify the number of processes or threads to be used.
+
+These are 3 possible values for the ``parallel_processing`` parameter:
+
+1. **``None``**: (Default) It means no parallel processing is used.
+
+2. A positive integer referring to the number of **threads** to be used
+   (i.e. threads, not processes, are used.
+
+3. ``list``/``tuple``: If a list or a tuple of exactly 2 elements is
+   assigned, then:
+
+   1. The first element can be either ``'process'`` or ``'thread'`` to
+      specify whether processes or threads are used, respectively.
+
+   2. The second element can be:
+
+      1. A positive integer to select the maximum number of processes or
+         threads to be used
+
+      2. **``0``** to indicate that 0 processes or threads are used. It
+         means no parallel processing. This is identical to setting
+         ``parallel_processing=None``.
+
+      3. **``None``** to use the default value as calculated by the
+         ``concurrent.futures module``.
+
+These are examples of the values assigned to the ``parallel_processing``
+parameter:
+
+-  ``parallel_processing=4``: Because the parameter is assigned a
+   positive integer, this means parallel processing is activated where 4
+   threads are used.
+
+-  ``parallel_processing=["thread", 5]``: Use parallel processing with 5
+   threads. This is identical to ``parallel_processing=5``.
+
+-  ``parallel_processing=["process", 8]``: Use parallel processing with
+   8 processes.
+
+-  ``parallel_processing=["process", 0]``: As the second element is
+   given the value 0, this means do not use parallel processing. This is
+   identical to ``parallel_processing=None``.
+
+.. _examples-1:
+
+Examples
+--------
+
+The examples will help you know the difference between using processes
+and threads. Moreover, it will give an idea when parallel processing
+would make a difference and reduce the time. These are dummy examples
+where the fitness function is made to always return 0.
+
+The first example uses 10 genes, 5 solutions in the population where
+only 3 solutions mate, and 9999 generations. The fitness function uses a
+``for`` loop with 100 iterations just to have some calculations. In the
+constructor of the ``pygad.GA`` class, ``parallel_processing=None``
+means no parallel processing is used.
+
+.. code:: python
+
+   import pygad
+   import time
+
+   def fitness_func(solution, solution_idx):
+       for _ in range(99):
+           pass
+       return 0
+
+   ga_instance = pygad.GA(num_generations=9999,
+                          num_parents_mating=3,
+                          sol_per_pop=5,
+                          num_genes=10,
+                          fitness_func=fitness_func,
+                          suppress_warnings=True,
+                          parallel_processing=None)
+
+   if __name__ == '__main__':
+       t1 = time.time()
+
+       ga_instance.run()
+
+       t2 = time.time()
+       print("Time is", t2-t1)
+
+When parallel processing is not used, the time it takes to run the
+genetic algorithm is ``1.5`` seconds.
+
+In the comparison, let's do a second experiment where parallel
+processing is used with 5 threads. In this case, it take ``5`` seconds.
+
+.. code:: python
+
+   ...
+   ga_instance = pygad.GA(...,
+                          parallel_processing=5)
+   ...
+
+For the third experiment, processes instead of threads are used. Also,
+only 99 generations are used instead of 9999. The time it takes is
+``99`` seconds.
+
+.. code:: python
+
+   ...
+   ga_instance = pygad.GA(num_generations=99,
+                          ...,
+                          parallel_processing=["process", 5])
+   ...
+
+This is the summary of the 3 experiments:
+
+1. No parallel processing & 9999 generations: 1.5 seconds.
+
+2. Parallel processing with 5 threads & 9999 generations: 5 seconds
+
+3. Parallel processing with 5 processes & 99 generations: 99 seconds
+
+Because the fitness function does not need much CPU time, the normal
+processing takes the least time. Running processes for this simple
+problem takes 99 compared to only 5 seconds for threads because managing
+processes is much heavier than managing threads. Thus, most of the CPU
+time is for swapping the processes instead of executing the code.
+
+In the second example, the loop makes 99999999 iterations and only 5
+generations are used. With no parallelization, it takes 22 seconds.
+
+.. code:: python
+
+   import pygad
+   import time
+
+   def fitness_func(solution, solution_idx):
+       for _ in range(99999999):
+           pass
+       return 0
+
+   ga_instance = pygad.GA(num_generations=5,
+                          num_parents_mating=3,
+                          sol_per_pop=5,
+                          num_genes=10,
+                          fitness_func=fitness_func,
+                          suppress_warnings=True,
+                          parallel_processing=None)
+
+   if __name__ == '__main__':
+       t1 = time.time()
+       ga_instance.run()
+       t2 = time.time()
+       print("Time is", t2-t1)
+
+It takes 15 seconds when 10 processes are used.
+
+.. code:: python
+
+   ...
+   ga_instance = pygad.GA(...,
+                          parallel_processing=["process", 10])
+   ...
+
+This is compared to 20 seconds when 10 threads are used.
+
+.. code:: python
+
+   ...
+   ga_instance = pygad.GA(...,
+                          parallel_processing=["thread", 10])
+   ...
+
+Based on the second example, using parallel processing with 10 processes
+takes the least time because there is much CPU work done. Generally,
+processes are preferred over threads when most of the work in on the
+CPU. Threads are preferred over processes in some situations like doing
+input/output operations.
+
+*Before releasing*\ `PyGAD
+2.17.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-17-0>`__\ *,*\ `László
+Fazekas <https://www.linkedin.com/in/l%C3%A1szl%C3%B3-fazekas-2429a912>`__\ *wrote
+an article to parallelize the fitness function with PyGAD. Check
+it:*\ `How Genetic Algorithms Can Compete with Gradient Descent and
+Backprop <https://hackernoon.com/how-genetic-algorithms-can-compete-with-gradient-descent-and-backprop-9m9t33bq>`__.
+
+.. _examples-2:
 
 Examples
 ========
@@ -2951,8 +3179,10 @@ This section gives the complete code of some examples that use
 Linear Model Optimization
 -------------------------
 
-This example is discussed in the **Steps to Use ``pygad``** section
-which optimizes a linear model. Its complete code is listed below.
+This example is discussed in the `Steps to Use
+PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#steps-to-use-pygad>`__
+section which optimizes a linear model. Its complete code is listed
+below.
 
 .. code:: python
 

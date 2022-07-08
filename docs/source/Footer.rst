@@ -920,14 +920,14 @@ progress bar.
    ``solutions_fitness`` array.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/64
 
-1. There was an issue of getting the length of these 4 variables
+2. There was an issue of getting the length of these 4 variables
    (``solutions``, ``solutions_fitness``, ``best_solutions``, and
    ``best_solutions_fitness``) doubled after each call of the ``run()``
    method. This is solved by resetting these variables at the beginning
    of the ``run()`` method.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/62
 
-2. Bug fixes when adaptive mutation is used
+3. Bug fixes when adaptive mutation is used
    (``mutation_type="adaptive"``).
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/65
 
@@ -962,6 +962,40 @@ Release Date: 2 February 2022
 1. Validate the fitness value returned from the fitness function. An
    exception is raised if something is wrong.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/67
+
+.. _pygad-2170:
+
+PyGAD 2.17.0
+------------
+
+Release Date: 8 July 2022
+
+1. An issue is solved when the ``gene_space`` parameter is given a fixed
+   value. e.g. gene_space=[range(5), 4]. The second gene's value is
+   static (4) which causes an exception.
+
+2. Fixed the issue where the ``allow_duplicate_genes`` parameter did not
+   work when mutation is disabled (i.e. ``mutation_type=None``). This is
+   by checking for duplicates after crossover directly.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/39
+
+3. Solve an issue in the ``tournament_selection()`` method as the
+   indices of the selected parents were incorrect.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/89
+
+4. Reuse the fitness values of the previously explored solutions rather
+   than recalculating them. This feature only works if
+   ``save_solutions=True``.
+
+5. Parallel processing is supported. This is by the introduction of a
+   new parameter named ``parallel_processing`` in the constructor of the
+   ``pygad.GA`` class. Thanks to
+   `@windowshopr <https://github.com/windowshopr>`__ for opening the
+   issue
+   `#78 <https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/78>`__
+   at GitHub. Check the `Parallel Processing in
+   PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#parallel-processing-in-pygad>`__
+   section for more information and examples.
 
 PyGAD Projects at GitHub
 ========================
@@ -1070,6 +1104,22 @@ Stackoverflow Questions about PyGAD
 
 `Multi-Input Multi-Output in Genetic algorithm (python) <https://stackoverflow.com/questions/64943711/multi-input-multi-output-in-genetic-algorithm-python>`__
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+https://www.linkedin.com/pulse/validation-short-term-parametric-trading-model-genetic-landolfi
+
+https://itchef.ru/articles/397758
+
+https://audhiaprilliant.medium.com/genetic-algorithm-based-clustering-algorithm-in-searching-robust-initial-centroids-for-k-means-e3b4d892a4be
+
+https://python.plainenglish.io/validation-of-a-short-term-parametric-trading-model-with-genetic-optimization-and-walk-forward-89708b789af6
+
+https://ichi.pro/ko/pygadwa-hamkke-yujeon-algolijeum-eul-sayonghayeo-keras-model-eul-hunlyeonsikineun-bangbeob-173299286377169
+
+https://ichi.pro/tr/pygad-ile-genetik-algoritmayi-kullanarak-keras-modelleri-nasil-egitilir-173299286377169
+
+https://ichi.pro/ru/kak-obucit-modeli-keras-s-pomos-u-geneticeskogo-algoritma-s-pygad-173299286377169
+
+https://blog.csdn.net/sinat_38079265/article/details/108449614
 
 Submitting Issues
 =================
