@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(  
     name="pygad",  
-    version="2.17.0",  
+    version="2.18.0",  
     author="Ahmed Fawzy Gad",
     install_requires=["numpy", "matplotlib",],
     author_email="ahmed.f.gad@gmail.com",  
@@ -13,8 +13,4 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ahmedfgad/GeneticAlgorithmPython",
-    license="BSD-3-Clause",
-    classifiers=[
-        "License :: OSI Approved :: BSD License"
-    ],
     packages=setuptools.find_packages())

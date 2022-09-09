@@ -24,6 +24,7 @@ class GA:
                  gene_type=float,
                  parent_selection_type="sss",
                  keep_parents=-1,
+                 keep_elitism=1,
                  K_tournament=3,
                  crossover_type="single_point",
                  crossover_probability=None,
@@ -49,7 +50,8 @@ class GA:
                  save_solutions=False,
                  suppress_warnings=False,
                  stop_criteria=None,
-                 parallel_processing=None):
+                 parallel_processing=None,
+                 random_seed=None):
 
         """
         The constructor of the GA class accepts all parameters required to create an instance of the GA class. It validates such parameters.
@@ -70,8 +72,10 @@ class GA:
         gene_type: The type of the gene. It is assigned to any of these types (int, float, numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, numpy.float, numpy.float16, numpy.float32, numpy.float64) and forces all the genes to be of that type.
 
         parent_selection_type: Type of parent selection.
-        keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. Some parent selection operators such as rank selection, favor population diversity and therefore keeping the parents in the next generation can be beneficial. However, some other parent selection operators, such as roulette wheel selection (RWS), have higher selection pressure and keeping more than one parent in the next generation can seriously harm population diversity. Thanks to Prof. Fernando Jiménez Barrionuevo (http://webs.um.es/fernan) for editing this sentence.
+        keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. Some parent selection operators such as rank selection, favor population diversity and therefore keeping the parents in the next generation can be beneficial. However, some other parent selection operators, such as roulette wheel selection (RWS), have higher selection pressure and keeping more than one parent in the next generation can seriously harm population diversity. This parameter have an effect only when the keep_elitism parameter is 0. Thanks to Prof. Fernando Jiménez Barrionuevo (http://webs.um.es/fernan) for editing this sentence.
         K_tournament: When the value of 'parent_selection_type' is 'tournament', the 'K_tournament' parameter specifies the number of solutions from which a parent is selected randomly.
+
+        keep_elitism: Added in PyGAD 2.18.0. It can take the value 0 or a positive integer that satisfies (0 <= keep_elitism <= sol_per_pop). It defaults to 1 which means only the best solution in the current generation is kept in the next generation. If assigned 0, this means it has no effect. If assigned a positive integer K, then the best K solutions are kept in the next generation. It cannot be assigned a value greater than the value assigned to the sol_per_pop parameter. If this parameter has a value different than 0, then the keep_parents parameter will have no effect.
 
         crossover_type: Type of the crossover opreator. If  crossover_type=None, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
         crossover_probability: The probability of selecting a solution for the crossover operation. If the solution probability is <= crossover_probability, the solution is selected. The value must be between 0 and 1 inclusive.
@@ -109,7 +113,16 @@ class GA:
         stop_criteria: Added in PyGAD 2.15.0. It is assigned to some criteria to stop the evolution if at least one criterion holds.
 
         parallel_processing: Added in PyGAD 2.17.0. Defaults to `None` which means no parallel processing is used. If a positive integer is assigned, it specifies the number of threads to be used. If a list or a tuple of exactly 2 elements is assigned, then: 1) The first element can be either "process" or "thread" to specify whether processes or threads are used, respectively. 2) The second element can be: 1) A positive integer to select the maximum number of processes or threads to be used. 2) 0 to indicate that parallel processing is not used. This is identical to setting 'parallel_processing=None'. 3) None to use the default value as calculated by the concurrent.futures module.
+    
+        random_seed: Added in PyGAD 2.18.0. It defines the random seed to be used by the random function generators (we use random functions in the NumPy and random modules). This helps to reproduce the same results by setting the same random seed.
         """
+
+        self.random_seed = random_seed
+        if random_seed is None:
+            pass
+        else:
+            numpy.random.seed(self.random_seed)
+            random.seed(self.random_seed)
 
         # If suppress_warnings is bool and its valud is False, then print warning messages.
         if type(suppress_warnings) is bool:
@@ -615,22 +628,38 @@ class GA:
         self.K_tournament = K_tournament
 
         # Validating the number of parents to keep in the next population: keep_parents
-        if (keep_parents > self.sol_per_pop or keep_parents > self.num_parents_mating or keep_parents < -1):
+        if not (type(keep_parents) in GA.supported_int_types):
+            self.valid_parameters = False
+            raise TypeError("Incorrect type of the value assigned to the keep_parents parameter. The value {keep_parents} of type {keep_parents_type} found but an integer is expected.".format(keep_parents=keep_parents, keep_parents_type=type(keep_parents)))
+        elif (keep_parents > self.sol_per_pop or keep_parents > self.num_parents_mating or keep_parents < -1):
             self.valid_parameters = False
             raise ValueError("Incorrect value to the keep_parents parameter: {keep_parents}. \nThe assigned value to the keep_parent parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Less than or equal to num_parents_mating\n3) Greater than or equal to -1.".format(keep_parents=keep_parents))
 
         self.keep_parents = keep_parents
-        
+
         if parent_selection_type == "sss" and self.keep_parents == 0:
             if not self.suppress_warnings: warnings.warn("The steady-state parent (sss) selection operator is used despite that no parents are kept in the next generation.")
 
+        # Validating the number of elitism to keep in the next population: keep_elitism
+        if not (type(keep_elitism) in GA.supported_int_types):
+            self.valid_parameters = False
+            raise TypeError("Incorrect type of the value assigned to the keep_elitism parameter. The value {keep_elitism} of type {keep_elitism_type} found but an integer is expected.".format(keep_elitism=keep_elitism, keep_elitism_type=type(keep_elitism)))
+        elif (keep_elitism > self.sol_per_pop or keep_elitism < 0):
+            self.valid_parameters = False
+            raise ValueError("Incorrect value to the keep_elitism parameter: {keep_elitism}. \nThe assigned value to the keep_elitism parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Greater than or equal to 0.".format(keep_elitism=keep_elitism))
+
+        self.keep_elitism = keep_elitism
+
         # Validate keep_parents.
-        if (self.keep_parents == -1): # Keep all parents in the next population.
-            self.num_offspring = self.sol_per_pop - self.num_parents_mating
-        elif (self.keep_parents == 0): # Keep no parents in the next population.
-            self.num_offspring = self.sol_per_pop
-        elif (self.keep_parents > 0): # Keep the specified number of parents in the next population.
-            self.num_offspring = self.sol_per_pop - self.keep_parents
+        if self.keep_elitism == 0:
+            if (self.keep_parents == -1): # Keep all parents in the next population.
+                self.num_offspring = self.sol_per_pop - self.num_parents_mating
+            elif (self.keep_parents == 0): # Keep no parents in the next population.
+                self.num_offspring = self.sol_per_pop
+            elif (self.keep_parents > 0): # Keep the specified number of parents in the next population.
+                self.num_offspring = self.sol_per_pop - self.keep_parents
+        else:
+            self.num_offspring = self.sol_per_pop - self.keep_elitism
 
         # Check if the fitness_func is a function.
         if callable(fitness_func):
@@ -908,6 +937,9 @@ class GA:
             self.valid_parameters = False
             raise ValueError("Unexpected value ({parallel_processing_value}) of type ({parallel_processing_type}) assigned to the 'parallel_processing' parameter. The accepted values for this parameter are:\n1) None: (Default) It means no parallel processing is used.\n2) A positive integer referring to the number of threads to be used (i.e. threads, not processes, are used.\n3) list/tuple: If a list or a tuple of exactly 2 elements is assigned, then:\n\t*1) The first element can be either 'process' or 'thread' to specify whether processes or threads are used, respectively.\n\t*2) The second element can be:\n\t\t**1) A positive integer to select the maximum number of processes or threads to be used.\n\t\t**2) 0 to indicate that parallel processing is not used. This is identical to setting 'parallel_processing=None'.\n\t\t**3) None to use the default value as calculated by the concurrent.futures module.".format(parallel_processing_value=parallel_processing, parallel_processing_type=type(parallel_processing)))
 
+        # Set the `run_completed` property to False. It is set to `True` only after the `run()` method is complete.
+        self.run_completed = False
+
         # The number of completed generations.
         self.generations_completed = 0
 
@@ -939,6 +971,7 @@ class GA:
         self.last_generation_offspring_crossover = None # A list holding the offspring after applying crossover in the last generation.
         self.last_generation_offspring_mutation = None # A list holding the offspring after applying mutation in the last generation.
         self.previous_generation_fitness = None # Holds the fitness values of one generation before the fitness values saved in the last_generation_fitness attribute. Added in PyGAD 2.26.2
+        self.last_generation_elitism = None # Added in PyGAD 2.18.0. A NumPy array holding the elitism in the current generation according to the value passed in the keep_elitism parameter. 
 
     def round_genes(self, solutions):
         for gene_idx in range(self.num_genes):
@@ -1257,12 +1290,21 @@ class GA:
         if self.valid_parameters == False:
             raise Exception("Error calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
 
-        # Reset the variables that store the solutions and their fitness after each generation. If not reset, then for each call to the run() method the new solutions and their fitness values will be appended to the old variables and their length double. Some errors arise if not reset.
-        # If, in the future, new variables are created that get appended after each generation, please consider resetting them here.
-        self.best_solutions = [] # Holds the best solution in each generation.
-        self.best_solutions_fitness = [] # A list holding the fitness value of the best solution for each generation.
-        self.solutions = [] # Holds the solutions in each generation.
-        self.solutions_fitness = [] # Holds the fitness of the solutions in each generation.
+        # Starting from PyGAD 2.18.0, the 4 properties (best_solutions, best_solutions_fitness, solutions, and solutions_fitness) are no longer reset with each call to the run() method. Instead, they are extended. 
+        # For example, if there are 50 generations and the user set save_best_solutions=True, then the length of the 2 properties best_solutions and best_solutions_fitness will be 50 after the first call to the run() method, then 100 after the second call, 150 after the third, and so on.
+
+        # self.best_solutions: Holds the best solution in each generation.
+        if type(self.best_solutions) is numpy.ndarray:
+            self.best_solutions = list(self.best_solutions)
+        # self.best_solutions_fitness: A list holding the fitness value of the best solution for each generation.
+        if type(self.best_solutions_fitness) is numpy.ndarray:
+            self.best_solutions_fitness = list(self.best_solutions_fitness)
+        # self.solutions: Holds the solutions in each generation.
+        if type(self.solutions) is numpy.ndarray:
+            self.solutions = list(self.solutions)
+        # self.solutions_fitness: Holds the fitness of the solutions in each generation.
+        if type(self.solutions_fitness) is numpy.ndarray:
+            self.solutions_fitness = list(self.solutions_fitness)
 
         if not (self.on_start is None):
             self.on_start(self)
@@ -1304,10 +1346,20 @@ class GA:
 
             # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
             if self.crossover_type is None:
-                if self.num_offspring <= self.keep_parents:
-                    self.last_generation_offspring_crossover = self.last_generation_parents[0:self.num_offspring]
+                if self.keep_elitism == 0:
+                    num_parents_to_keep = self.num_parents_mating if self.keep_parents == -1 else self.keep_parents
+                    if self.num_offspring <= num_parents_to_keep:
+                        self.last_generation_offspring_crossover = self.last_generation_parents[0:self.num_offspring]
+                    else:
+                        self.last_generation_offspring_crossover = numpy.concatenate((self.last_generation_parents, self.population[0:(self.num_offspring - self.last_generation_parents.shape[0])]))
                 else:
-                    self.last_generation_offspring_crossover = numpy.concatenate((self.last_generation_parents, self.population[0:(self.num_offspring - self.last_generation_parents.shape[0])]))
+                    # The steady_state_selection() method is called to select the best solutions (i.e. elitism). The keep_elitism parameter defines the number of these solutions.
+                    # The steady_state_selection() method is still called here even if its output may not be used given that the condition of the next if statement is True. The reason is that it will be used later.
+                    self.last_generation_elitism, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_elitism)
+                    if self.num_offspring <= self.keep_elitism:
+                        self.last_generation_offspring_crossover = self.last_generation_parents[0:self.num_offspring]
+                    else:
+                        self.last_generation_offspring_crossover = numpy.concatenate((self.last_generation_elitism, self.population[0:(self.num_offspring - self.last_generation_elitism.shape[0])]))
             else:
                 # Generating offspring using crossover.
                 if callable(self.crossover_type):
@@ -1333,16 +1385,27 @@ class GA:
                     self.on_mutation(self, self.last_generation_offspring_mutation)
 
             # Update the population attribute according to the offspring generated.
-            if (self.keep_parents == 0):
-                self.population = self.last_generation_offspring_mutation
-            elif (self.keep_parents == -1):
-                # Creating the new population based on the parents and offspring.
-                self.population[0:self.last_generation_parents.shape[0], :] = self.last_generation_parents
-                self.population[self.last_generation_parents.shape[0]:, :] = self.last_generation_offspring_mutation
-            elif (self.keep_parents > 0):
-                parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_parents)
-                self.population[0:parents_to_keep.shape[0], :] = parents_to_keep
-                self.population[parents_to_keep.shape[0]:, :] = self.last_generation_offspring_mutation
+            if self.keep_elitism == 0:
+                # If the keep_elitism parameter is 0, then the keep_parents parameter will be used to decide if the parents are kept in the next generation. 
+                if (self.keep_parents == 0):
+                    self.population = self.last_generation_offspring_mutation
+                elif (self.keep_parents == -1):
+                    # Creating the new population based on the parents and offspring.
+                    self.population[0:self.last_generation_parents.shape[0], :] = self.last_generation_parents
+                    self.population[self.last_generation_parents.shape[0]:, :] = self.last_generation_offspring_mutation
+                elif (self.keep_parents > 0):
+                    parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_parents)
+                    self.population[0:parents_to_keep.shape[0], :] = parents_to_keep
+                    self.population[parents_to_keep.shape[0]:, :] = self.last_generation_offspring_mutation
+            else:
+                # If the keep_elitism parameter has a value other than 0, then it will decide the number of elitism to keep in the next generation.
+                if self.last_generation_elitism is None:
+                    self.last_generation_elitism, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_elitism)
+                else:
+                    # The elitism are already returned  into the last_generation_elitism attribute if crossover_type=None. In this case, the steady_state_selection() method was already called.
+                    pass
+                self.population[0:self.last_generation_elitism.shape[0], :] = self.last_generation_elitism
+                self.population[self.last_generation_elitism.shape[0]:, :] = self.last_generation_offspring_mutation
 
             self.generations_completed = generation + 1 # The generations_completed attribute holds the number of the last completed generation.
 
@@ -1512,6 +1575,8 @@ class GA:
         """
 
         fitness_sum = numpy.sum(fitness)
+        if fitness_sum == 0:
+            raise ZeroDivisionError("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
         probs = fitness / fitness_sum
         probs_start = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the start values of the ranges of probabilities.
         probs_end = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the end values of the ranges of probabilities.
@@ -1554,6 +1619,8 @@ class GA:
         """
 
         fitness_sum = numpy.sum(fitness)
+        if fitness_sum == 0:
+            raise ZeroDivisionError("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
         probs = fitness / fitness_sum
         probs_start = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the start values of the ranges of probabilities.
         probs_end = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the end values of the ranges of probabilities.
@@ -2231,13 +2298,17 @@ class GA:
         fitness = self.last_generation_fitness.copy()
         temp_population = numpy.zeros_like(self.population)
 
-        if (self.keep_parents == 0):
-            parents_to_keep = []
-        elif (self.keep_parents == -1):
-            parents_to_keep = self.last_generation_parents.copy()
-            temp_population[0:len(parents_to_keep), :] = parents_to_keep
-        elif (self.keep_parents > 0):
-            parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_parents)
+        if (self.keep_elitism == 0):
+            if (self.keep_parents == 0):
+                parents_to_keep = []
+            elif (self.keep_parents == -1):
+                parents_to_keep = self.last_generation_parents.copy()
+                temp_population[0:len(parents_to_keep), :] = parents_to_keep
+            elif (self.keep_parents > 0):
+                parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_parents)
+                temp_population[0:len(parents_to_keep), :] = parents_to_keep
+        else:
+            parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_elitism)
             temp_population[0:len(parents_to_keep), :] = parents_to_keep
 
         temp_population[len(parents_to_keep):, :] = offspring
