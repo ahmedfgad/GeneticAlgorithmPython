@@ -114,7 +114,22 @@ The ``pygad.GA`` class constructor supports the following parameters:
    value ``greater than 0`` means keeps the specified number of parents
    in the next population. Note that the value assigned to
    ``keep_parents`` cannot be ``< - 1`` or greater than the number of
-   solutions within the population ``sol_per_pop``.
+   solutions within the population ``sol_per_pop``. Starting from `PyGAD
+   2.18.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-18-0>`__,
+   this parameter have an effect only when the ``keep_elitism``
+   parameter is ``0``.
+
+-  ``keep_elitism=1``: Added in `PyGAD
+   2.18.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-18-0>`__.
+   It can take the value ``0`` or a positive integer that satisfies
+   (``0 <= keep_elitism <= sol_per_pop``). It defaults to ``1`` which
+   means only the best solution in the current generation is kept in the
+   next generation. If assigned ``0``, this means it has no effect. If
+   assigned a positive integer ``K``, then the best ``K`` solutions are
+   kept in the next generation. It cannot be assigned a value greater
+   than the value assigned to the ``sol_per_pop`` parameter. If this
+   parameter has a value different than ``0``, then the ``keep_parents``
+   parameter will have no effect.
 
 -  ``K_tournament=3``: In case that the parent selection type is
    ``tournament``, the ``K_tournament`` specifies the number of parents
@@ -387,6 +402,14 @@ The ``pygad.GA`` class constructor supports the following parameters:
    PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#parallel-processing-in-pygad>`__
    section.
 
+-  ``random_seed=None``: Added in `PyGAD
+   2.18.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-18-0>`__.
+   It defines the random seed to be used by the random function
+   generators (we use random functions in the NumPy and random modules).
+   This helps to reproduce the same results by setting the same random
+   seed (e.g. ``random_seed=2``). If given the value ``None``, then it
+   has no effect.
+
 The user doesn't have to specify all of such parameters while creating
 an instance of the GA class. A very important parameter you must care
 about is ``fitness_func`` which defines the fitness function.
@@ -495,6 +518,11 @@ Other Attributes
 -  ``last_generation_parents_indices``: This attribute holds the indices
    of the selected parents in the last generation. Supported in `PyGAD
    2.15.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-15-0>`__.
+
+-  ``last_generation_elitism``: This attribute holds the elitism in the
+   last generation. It is effective only if the ``keep_elitism``
+   parameter has a non-zero value. Supported in `PyGAD
+   2.18.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-18-0>`__.
 
 Note that the attributes with its name start with ``last_generation_``
 are updated after each generation.
@@ -970,8 +998,6 @@ Accepts the following parameter:
 
 Returns the genetic algorithm instance.
 
-.. _steps-to-use-pyga:
-
 Steps to Use ``pygad``
 ======================
 
@@ -998,7 +1024,7 @@ Let's discuss how to do each of these steps.
 .. _preparing-the-fitnessfunc-parameter:
 
 Preparing the ``fitness_func`` Parameter 
-----------------------------------------
+-----------------------------------------
 
 Even there are some steps in the genetic algorithm pipeline that can
 work the same regardless of the problem being solved, one critical step
@@ -1087,9 +1113,9 @@ Here is an example for preparing the other parameters:
 The ``callback_generation`` Parameter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This parameter should be replaced by ``on_generation``. The
+==This parameter should be replaced by ``on_generation``. The
 ``callback_generation`` parameter will be removed in a later release of
-PyGAD.
+PyGAD.==
 
 In `PyGAD
 2.0.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-0-0>`__
@@ -1725,6 +1751,205 @@ reached ``127.4`` or if the fitness saturates for ``15`` generations.
 
    ga_instance.run()
    print("Number of generations passed is {generations_completed}".format(generations_completed=ga_instance.generations_completed))
+
+Elitism Selection
+=================
+
+In `PyGAD
+2.18.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-18-0>`__,
+a new parameter called ``keep_elitism`` is supported. It accepts an
+integer to define the number of elitism (i.e. best solutions) to keep in
+the next generation. This parameter defaults to ``1`` which means only
+the best solution is kept in the next generation.
+
+In the next example, the ``keep_elitism`` parameter in the constructor
+of the ``pygad.GA`` class is set to 2. Thus, the best 2 solutions in
+each generation are kept in the next generation.
+
+.. code:: python
+
+   import numpy
+   import pygad
+
+   function_inputs = [4,-2,3.5,5,-11,-4.7]
+   desired_output = 44
+
+   def fitness_func(solution, solution_idx):
+       output = numpy.sum(solution*function_inputs)
+       fitness = 1.0 / numpy.abs(output - desired_output)
+       return fitness
+
+   ga_instance = pygad.GA(num_generations=2,
+                          num_parents_mating=3,
+                          fitness_func=fitness_func,
+                          num_genes=6,
+                          sol_per_pop=5,
+                          keep_elitism=2)
+
+   ga_instance.run()
+
+The value passed to the ``keep_elitism`` parameter must satisfy 2
+conditions:
+
+1. It must be ``>= 0``.
+
+2. It must be ``<= sol_per_pop``. That is its value cannot exceed the
+   number of solutions in the current population.
+
+In the previous example, if the ``keep_elitism`` parameter is set equal
+to the value passed to the ``sol_per_pop`` parameter, which is 5, then
+there will be no evolution at all as in the next figure. This is because
+all the 5 solutions are used as elitism in the next generation and no
+offspring will be created.
+
+.. code:: python
+
+   ...
+
+   ga_instance = pygad.GA(...,
+                          sol_per_pop=5,
+                          keep_elitism=5)
+
+   ga_instance.run()
+
+.. figure:: https://user-images.githubusercontent.com/16560492/189273225-67ffad41-97ab-45e1-9324-429705e17b20.png
+   :alt: 
+
+Note that if the ``keep_elitism`` parameter is effective (i.e. is
+assigned a positive integer, not zero), then the ``keep_parents``
+parameter will have no effect. Because the default value of the
+``keep_elitism`` parameter is 1, then the ``keep_parents`` parameter has
+no effect by default. The ``keep_parents`` parameter is only effective
+when ``keep_elitism=0``.
+
+Random Seed
+===========
+
+In `PyGAD
+2.18.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-18-0>`__,
+a new parameter called ``random_seed`` is supported. Its value is used
+as a seed for the random function generators.
+
+PyGAD uses random functions in these 2 libraries:
+
+1.  NumPy
+
+2. random
+
+The ``random_seed`` parameter defaults to ``None`` which means no seed
+is used. As a result, different random numbers are generated for each
+run of PyGAD.
+
+If this parameter is assigned a proper seed, then the results will be
+reproducible. In the next example, the integer 2 is used as a random
+seed.
+
+.. code:: python
+
+   import numpy
+   import pygad
+
+   function_inputs = [4,-2,3.5,5,-11,-4.7]
+   desired_output = 44
+
+   def fitness_func(solution, solution_idx):
+       output = numpy.sum(solution*function_inputs)
+       fitness = 1.0 / numpy.abs(output - desired_output)
+       return fitness
+
+   ga_instance = pygad.GA(num_generations=2,
+                          num_parents_mating=3,
+                          fitness_func=fitness_func,
+                          sol_per_pop=5,
+                          num_genes=6,
+                          random_seed=2)
+
+   ga_instance.run()
+   best_solution, best_solution_fitness, best_match_idx = ga_instance.best_solution()
+   print(best_solution)
+   print(best_solution_fitness)
+
+This is the best solution found and its fitness value.
+
+.. code:: 
+
+   [ 2.77249188 -4.06570662  0.04196872 -3.47770796 -0.57502138 -3.22775267]
+   0.04872203136549972
+
+After running the code again, it will find the same result.
+
+.. code:: 
+
+   [ 2.77249188 -4.06570662  0.04196872 -3.47770796 -0.57502138 -3.22775267]
+   0.04872203136549972
+
+Continue without Loosing Progress
+=================================
+
+In `PyGAD
+2.18.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-18-0>`__,
+and thanks for `Felix Bernhard <https://github.com/FeBe95>`__ for
+opening `this GitHub
+issue <https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/123#issuecomment-1203035106>`__,
+the values of these 4 instance attributes are no longer reset after each
+call to the ``run()`` method.
+
+1. ``self.best_solutions``
+
+2. ``self.best_solutions_fitness``
+
+3. ``self.solutions``
+
+4. ``self.solutions_fitness``
+
+This helps the user to continue where the last run stopped without
+loosing the values of these 4 attributes.
+
+Now, the user can save the model by calling the ``save()`` method.
+
+.. code:: python
+
+   import pygad
+
+   def fitness_func(solution, solution_idx):
+       ...
+       return fitness
+
+   ga_instance = pygad.GA(...)
+
+   ga_instance.run()
+
+   ga_instance.plot_fitness()
+
+   ga_instance.save("pygad_GA")
+
+Then the saved model is loaded by calling the ``load()`` function. After
+calling the ``run()`` method over the loaded instance, then the data
+from the previous 4 attributes are not reset but extended with the new
+data.
+
+.. code:: python
+
+   import pygad
+
+   def fitness_func(solution, solution_idx):
+       ...
+       return fitness
+
+   loaded_ga_instance = pygad.load("pygad_GA")
+
+   loaded_ga_instance.run()
+
+   loaded_ga_instance.plot_fitness()
+
+The plot created by the ``plot_fitness()`` method will show the data
+collected from both the runs.
+
+Note that the 2 attributes (``self.best_solutions`` and
+``self.best_solutions_fitness``) only work if the
+``save_best_solutions`` parameter is set to ``True``. Also, the 2
+attributes (``self.solutions`` and ``self.solutions_fitness``) only work
+if the ``save_solutions`` parameter is ``True``.
 
 Prevent Duplicates in Gene Values
 =================================
@@ -3161,11 +3386,12 @@ processes are preferred over threads when most of the work in on the
 CPU. Threads are preferred over processes in some situations like doing
 input/output operations.
 
-*Before releasing*\ `PyGAD
-2.17.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-17-0>`__\ *,*\ `László
-Fazekas <https://www.linkedin.com/in/l%C3%A1szl%C3%B3-fazekas-2429a912>`__\ *wrote
-an article to parallelize the fitness function with PyGAD. Check
-it:*\ `How Genetic Algorithms Can Compete with Gradient Descent and
+*Before releasing* `PyGAD
+2.17.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-17-0>`__\ *,*
+`László
+Fazekas <https://www.linkedin.com/in/l%C3%A1szl%C3%B3-fazekas-2429a912>`__
+*wrote an article to parallelize the fitness function with PyGAD. Check
+it:* `How Genetic Algorithms Can Compete with Gradient Descent and
 Backprop <https://hackernoon.com/how-genetic-algorithms-can-compete-with-gradient-descent-and-backprop-9m9t33bq>`__.
 
 .. _examples-2:

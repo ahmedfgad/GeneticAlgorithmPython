@@ -19,7 +19,7 @@ Release Date: 15 April 2020
 .. _pygad-1020:
 
 PyGAD 1.0.20 
-------------
+-------------
 
 Release Date: 4 May 2020
 
@@ -39,7 +39,7 @@ Release Date: 4 May 2020
 .. _pygad-200:
 
 PyGAD 2.0.0 
------------
+------------
 
 Release Date: 13 May 2020
 
@@ -258,7 +258,7 @@ Release date: 19 July 2020
 .. _pygad-260:
 
 PyGAD 2.6.0 
------------
+------------
 
 Release Date: 6 August 2020
 
@@ -378,7 +378,7 @@ Release Date: 3 October 2020
 .. _pygad-290:
 
 PyGAD 2.9.0 
------------
+------------
 
 Release Date: 06 December 2020
 
@@ -585,7 +585,7 @@ issue.
 .. _pygad-2130:
 
 PyGAD 2.13.0 
-------------
+-------------
 
 Release Date: 12 March 2021
 
@@ -996,6 +996,63 @@ Release Date: 8 July 2022
    at GitHub. Check the `Parallel Processing in
    PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#parallel-processing-in-pygad>`__
    section for more information and examples.
+
+.. _pygad-2180:
+
+PyGAD 2.18.0
+------------
+
+Release Date: 9 September 2022
+
+1. Raise an exception if the sum of fitness values is zero while either
+   roulette wheel or stochastic universal parent selection is used.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/129
+
+2. Initialize the value of the ``run_completed`` property to ``False``.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/122
+
+3. The values of these properties are no longer reset with each call to
+   the ``run()`` method
+   ``self.best_solutions, self.best_solutions_fitness, self.solutions, self.solutions_fitness``:
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/123. Now,
+   the user can have the flexibility of calling the ``run()`` method
+   more than once while extending the data collected after each
+   generation. Another advantage happens when the instance is loaded and
+   the ``run()`` method is called, as the old fitness value are shown on
+   the graph alongside with the new fitness values. Read more in this
+   section: `Continue without Loosing
+   Progress <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#continue-without-loosing-progress>`__
+
+4. Thanks `Prof. Fernando Jiménez
+   Barrionuevo <http://webs.um.es/fernan>`__ (Dept. of Information and
+   Communications Engineering, University of Murcia, Murcia, Spain) for
+   editing this
+   `comment <https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/5315bbec02777df96ce1ec665c94dece81c440f4/pygad.py#L73>`__
+   in the code.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/commit/5315bbec02777df96ce1ec665c94dece81c440f4
+
+5. A bug fixed when ``crossover_type=None``.
+
+6. Support of elitism selection through a new parameter named
+   ``keep_elitism``. It defaults to 1 which means for each generation
+   keep only the best solution in the next generation. If assigned 0,
+   then it has no effect. Read more in this section: `Elitism
+   Selection <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#elitism-selection>`__.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/74
+
+7. A new instance attribute named ``last_generation_elitism`` added to
+   hold the elitism in the last generation.
+
+8. A new parameter called ``random_seed`` added to accept a seed for the
+   random function generators. Credit to this issue
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/70 and
+   `Prof. Fernando Jiménez Barrionuevo <http://webs.um.es/fernan>`__.
+   Read more in this section: `Random
+   Seed <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#random-seed>`__.
+
+9. Editing the ``pygad.TorchGA`` module to make sure the tensor data is
+   moved from GPU to CPU. Thanks to Rasmus Johansson for opening this
+   pull request: https://github.com/ahmedfgad/TorchGA/pull/2
 
 PyGAD Projects at GitHub
 ========================
