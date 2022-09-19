@@ -1054,6 +1054,16 @@ Release Date: 9 September 2022
    moved from GPU to CPU. Thanks to Rasmus Johansson for opening this
    pull request: https://github.com/ahmedfgad/TorchGA/pull/2
 
+.. _pygad-2181:
+
+PyGAD 2.18.1
+------------
+
+Release Date: 19 September 2022
+
+1. A big fix when ``keep_elitism`` is used.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/132
+
 PyGAD Projects at GitHub
 ========================
 
