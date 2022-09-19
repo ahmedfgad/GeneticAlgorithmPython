@@ -1398,12 +1398,7 @@ class GA:
                     self.population[0:parents_to_keep.shape[0], :] = parents_to_keep
                     self.population[parents_to_keep.shape[0]:, :] = self.last_generation_offspring_mutation
             else:
-                # If the keep_elitism parameter has a value other than 0, then it will decide the number of elitism to keep in the next generation.
-                if self.last_generation_elitism is None:
-                    self.last_generation_elitism, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_elitism)
-                else:
-                    # The elitism are already returned  into the last_generation_elitism attribute if crossover_type=None. In this case, the steady_state_selection() method was already called.
-                    pass
+                self.last_generation_elitism, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_elitism)
                 self.population[0:self.last_generation_elitism.shape[0], :] = self.last_generation_elitism
                 self.population[self.last_generation_elitism.shape[0]:, :] = self.last_generation_offspring_mutation
 
