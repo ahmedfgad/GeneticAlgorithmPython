@@ -6,7 +6,7 @@
 This section of the PyGAD's library documentation discusses the
 **pygad.torchga** module.
 
-The ``pygad.torchga`` module has helper a class and 2 functions to train
+The ``pygad.torchga`` module has a helper class and 2 functions to train
 PyTorch models using the genetic algorithm (PyGAD).
 
 The contents of this module are:
