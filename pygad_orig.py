@@ -1,21 +1,3 @@
-'''Module pygad_barloff.py with pull request for pygad.py Version 2.18.1.  
-Changes tagged as "#barloff", 31 Oct 2022; updated 07 Nov 2022.
-
-Objective 1: Allow methods as callbacks while retaining compatibility with functions as callbacks.
-    1. Constructor accepts optional cls_int parameter to pass user's class reference "self".
-    2. Attribute self.cls_int is created to access "self" reference in methods.
-    3. The fitness_function and on_<function_name> are each inspected to be a function or method callback.
-        a. For function and static method callbacks, expected parameter count remain as per original code.
-        b. For class method callbacks, one additional parameter is added to include the user's "self" (i.e., self.cls_inst) 
-           reference as first argumnet.
-Objective 2: Allow for on_crossover and on_mutate callbacks even when crossover and mutate types are None.
-    1. The on_crossover call is moved outside of the if-else check for crossover type is None. 
-    2. The on_mutate call is moved outside of the if-else check for mutate type is None. 
-'''
-
-#barloff: inspect for isfunction vs. ismethod
-import inspect
-
 import numpy
 import random
 import matplotlib.pyplot
@@ -34,8 +16,6 @@ class GA:
                  num_generations, 
                  num_parents_mating, 
                  fitness_func,
-                 #barloff: get user's class instance
-                 cls_inst = None,
                  initial_population=None,
                  sol_per_pop=None, 
                  num_genes=None,
@@ -614,9 +594,7 @@ class GA:
                 self.select_parents = parent_selection_type
             else:
                 self.valid_parameters = False
-                #barloff: fix typo from "fitness values" to "parents"
-                #raise ValueError("When 'parent_selection_type' is assigned to a user-defined function, then this parent selection function must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed parent selection function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=parent_selection_type.__code__.co_name, argcount=parent_selection_type.__code__.co_argcount))
-                raise ValueError("When 'parent_selection_type' is assigned to a user-defined function, then this parent selection function must accept 3 parameters:\n1) The parents of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed parent selection function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=parent_selection_type.__code__.co_name, argcount=parent_selection_type.__code__.co_argcount))
+                raise ValueError("When 'parent_selection_type' is assigned to a user-defined function, then this parent selection function must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed parent selection function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=parent_selection_type.__code__.co_name, argcount=parent_selection_type.__code__.co_argcount))
         elif not (type(parent_selection_type) is str):
             self.valid_parameters = False
             raise TypeError("The expected type of the 'parent_selection_type' parameter is either callable or str but ({parent_selection_type}) found.".format(parent_selection_type=type(parent_selection_type)))
@@ -683,264 +661,145 @@ class GA:
         else:
             self.num_offspring = self.sol_per_pop - self.keep_elitism
 
-        #barloff: Check if the fitness_func is a callable.
+        # Check if the fitness_func is a function.
         if callable(fitness_func):
-			#barloff: Check for is function or method.
-            self.isfitness_func = None
-            #barloff: check is function
-            if inspect.isfunction(fitness_func):
-                #barloff: Check as function accepts 2 paramaters.
-                if (fitness_func.__code__.co_argcount == 2):
-                    self.fitness_func = fitness_func
-                    self.isfitness_func = 'function'
-                else:
-                    self.valid_parameters = False
-                    raise ValueError("The fitness function must accept 2 parameters:\n1) A solution to calculate its fitness value.\n2) The solution's index within the population.\n\nThe passed fitness function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
-            #barloff: check is method
-            elif inspect.ismethod(fitness_func):
-                #barloff: Check as method accepts 3 paramaters to include "self" reference.
-                if (fitness_func.__code__.co_argcount == 3):
-                    self.fitness_func = fitness_func
-                    self.isfitness_func = 'method'
-                else:
-                    self.valid_parameters = False
-                    raise ValueError("The fitness function method must accept 3 parameters:\n1) A reference to your class instance, the solution to calculate its fitness value.\n2) The solution's index within the population.\n\nThe passed fitness method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
+            # Check if the fitness function accepts 2 paramaters.
+            if (fitness_func.__code__.co_argcount == 2):
+                self.fitness_func = fitness_func
+            else:
+                self.valid_parameters = False
+                raise ValueError("The fitness function must accept 2 parameters:\n1) A solution to calculate its fitness value.\n2) The solution's index within the population.\n\nThe passed fitness function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
         else:
             self.valid_parameters = False
-            raise TypeError("The value assigned to the fitness_func parameter is expected to be of type function or method but ({fitness_func_type}) found.".format(fitness_func_type=type(fitness_func)))
+            raise TypeError("The value assigned to the fitness_func parameter is expected to be of type function but ({fitness_func_type}) found.".format(fitness_func_type=type(fitness_func)))
 
         # Check if the on_start exists.
         if not (on_start is None):
-			#barloff: Check for is function or method.
-            self.is_on_start = None
+            # Check if the on_start is a function.
             if callable(on_start):
-                #barloff: check is function
-                if inspect.isfunction(on_start):
-                    #barloff: Check as function accepts 1 paramater.
-                    if (on_start.__code__.co_argcount == 1):
-                        self.on_start = on_start
-                        self.is_on_start = 'function'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
-                #barloff: check is method
-                elif inspect.ismethod(on_start):
-                    #barloff: Check as method accepts 2 paramaters to include caller's "self" reference.
-                    if (on_start.__code__.co_argcount == 2):
-                        self.on_start = on_start
-                        self.is_on_start = 'method'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The method assigned to the on_start parameter must accept 2 parameters:\n1) A reference to your class instance and the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
+                # Check if the on_start function accepts only a single paramater.
+                if (on_start.__code__.co_argcount == 1):
+                    self.on_start = on_start
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise TypeError("The value assigned to the on_start parameter is expected to be of type function or method but ({on_start_type}) found.".format(on_start_type=type(on_start)))
+                raise TypeError("The value assigned to the on_start parameter is expected to be of type function but ({on_start_type}) found.".format(on_start_type=type(on_start)))
         else:
             self.on_start = None
 
         # Check if the on_fitness exists.
         if not (on_fitness is None):
-            #barloff: Check for is function or method.
-            self.is_on_fitness = None
+            # Check if the on_fitness is a function.
             if callable(on_fitness):
-                #barloff: check is function
-                if inspect.isfunction(on_fitness):
-                    # Check if the on_fitness function accepts 2 paramaters.
-                    if (on_fitness.__code__.co_argcount == 2):
-                        self.on_fitness = on_fitness
-                        self.is_on_fitness = 'function'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
-                #barloff: check is method
-                elif inspect.ismethod(on_fitness):
-                    #barloff: Check as method accepts 3 paramaters to include caller's "self" reference.
-                    if (on_fitness.__code__.co_argcount == 3):
-                        self.on_fitness = on_fitness
-                        self.is_on_fitness = 'method'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The method assigned to the on_fitness parameter must accept 3 parameters:\n1) A reference to your class instance the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
+                # Check if the on_fitness function accepts 2 paramaters.
+                if (on_fitness.__code__.co_argcount == 2):
+                    self.on_fitness = on_fitness
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise TypeError("The value assigned to the on_fitness parameter is expected to be of type function or method but ({on_fitness_type}) found.".format(on_fitness_type=type(on_fitness)))
+                raise TypeError("The value assigned to the on_fitness parameter is expected to be of type function but ({on_fitness_type}) found.".format(on_fitness_type=type(on_fitness)))
         else:
             self.on_fitness = None
 
         # Check if the on_parents exists.
         if not (on_parents is None):
-            #barloff: Check for is function or method.
-            self.is_on_parents = None
+            # Check if the on_parents is a function.
             if callable(on_parents):
-                #barloff: check is function
-                if inspect.isfunction(on_parents):
-                    # Check if the on_parents function accepts 2 paramaters.
-                    if (on_parents.__code__.co_argcount == 2):
-                        self.on_parents = on_parents
-                        self.is_on_parents = 'function'
-                    else:
-                        self.valid_parameters = False
-                        #barloff: change typo reference from fitness to parents  
-                        raise ValueError("The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the parents of the solution.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_parents.__code__.co_name, argcount=on_parents.__code__.co_argcount))
-				#barloff: check is method
-                elif inspect.ismethod(on_parents):
-                    #barloff: Check as method accepts 3 paramaters to include caller's "self" reference.
-                    if (on_fitness.__code__.co_argcount == 3):
-                        self.on_parents = on_parents
-                        self.is_on_parents = 'method'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The method assigned to the on_parents parameter must accept 3 parameters:\n1) A reference to your class instance the instance of the genetic algorithm and the parents of the solution.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
+                # Check if the on_parents function accepts 2 paramaters.
+                if (on_parents.__code__.co_argcount == 2):
+                    self.on_parents = on_parents
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_parents.__code__.co_name, argcount=on_parents.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise TypeError("The value assigned to the on_parents parameter is expected to be of type function or method but ({on_parents_type}) found.".format(on_parents_type=type(on_parents)))
+                raise TypeError("The value assigned to the on_parents parameter is expected to be of type function but ({on_parents_type}) found.".format(on_parents_type=type(on_parents)))
         else:
             self.on_parents = None
 
         # Check if the on_crossover exists.
         if not (on_crossover is None):
-            #barloff: Check for is function or method.
-            self.is_on_crossover = None
+            # Check if the on_crossover is a function.
             if callable(on_crossover):
-                #barloff: check is function
-                if inspect.isfunction(on_crossover):
-                    # Check if the on_crossover function accepts 2 paramaters.
-                    if (on_crossover.__code__.co_argcount == 2):
-                        self.on_crossover = on_crossover
-                        self.is_on_crossover = 'function'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated by the crossover operation.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_crossover.__code__.co_name, argcount=on_crossover.__code__.co_argcount))
-                #barloff: check is method
-                elif inspect.ismethod(on_crossover):
-                    #barloff: Check as method accepts 3 paramaters to include caller's "self" reference.
-                    if (on_crossover.__code__.co_argcount == 3):
-                        self.on_crossover = on_crossover
-                        self.is_on_crossover = 'method'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The method assigned to the on_crossover parameter must accept 3 parameters:\n1) A reference to your class instance the instance of the genetic algorithm and the offspring generated by the crossover operation.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
+                # Check if the on_crossover function accepts 2 paramaters.
+                if (on_crossover.__code__.co_argcount == 2):
+                    self.on_crossover = on_crossover
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_crossover.__code__.co_name, argcount=on_crossover.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise TypeError("The value assigned to the on_crossover parameter is expected to be of type function or method but ({on_crossover_type}) found.".format(on_crossover_type=type(on_crossover)))
+                raise TypeError("The value assigned to the on_crossover parameter is expected to be of type function but ({on_crossover_type}) found.".format(on_crossover_type=type(on_crossover)))
         else:
             self.on_crossover = None
 
         # Check if the on_mutation exists.
         if not (on_mutation is None):
-            #barloff: Check for is function or method.
-            self.is_on_mutation = None
+            # Check if the on_mutation is a function.
             if callable(on_mutation):
-                #barloff: check is function
-                if inspect.isfunction(on_mutation):
-                    # Check if the on_mutation function accepts 2 paramaters.
-                    if (on_mutation.__code__.co_argcount == 2):
-                        self.on_mutation = on_mutation
-                        self.is_on_mutation = 'function'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_mutation.__code__.co_name, argcount=on_mutation.__code__.co_argcount))
-                #barloff: check is method
-                elif inspect.ismethod(on_mutation):
-                    #barloff: Check as method accepts 3 paramaters to include caller's "self" reference.
-                    if (on_mutation.__code__.co_argcount == 3):
-                        self.on_mutation = on_mutation
-                        self.is_on_mutation = 'method'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The method assigned to the on_mutation parameter must accept 3 parameters:\n1) A reference to your class instance the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
+                # Check if the on_mutation function accepts 2 paramaters.
+                if (on_mutation.__code__.co_argcount == 2):
+                    self.on_mutation = on_mutation
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_mutation.__code__.co_name, argcount=on_mutation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise TypeError("The value assigned to the on_mutation parameter is expected to be of type function or method but ({on_mutation_type}) found.".format(on_mutation_type=type(on_mutation)))
+                raise TypeError("The value assigned to the on_mutation parameter is expected to be of type function but ({on_mutation_type}) found.".format(on_mutation_type=type(on_mutation)))
         else:
             self.on_mutation = None
 
-        # Check if the callback_generation exists (deprecated).
+        # Check if the callback_generation exists.
         if not (callback_generation is None):
-            #barloff: Check for is function or method.
-            self.is_on_generation = None
+            # Check if the callback_generation is a function.
             if callable(callback_generation):
-                #barloff: check is function
-                if inspect.isfunction(callback_generation):
-                    # Check if the callback_generation function accepts only a single paramater.
-                    if (callback_generation.__code__.co_argcount == 1):
-                        self.callback_generation = callback_generation
-                        on_generation = callback_generation
-                        self.is_on_generation = 'function'
-                        if not self.suppress_warnings: warnings.warn("Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and will be removed in a later release of PyGAD. Please use the on_generation parameter instead.")
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The function assigned to the callback_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=callback_generation.__code__.co_name, argcount=callback_generation.__code__.co_argcount))
-                #barloff: check is method
-                elif inspect.ismethod(callback_generation):
-                    #barloff: Check as method accepts 2 paramaters to include caller's "self" reference.
-                    if (callback_generation.__code__.co_argcount == 2):
-                        self.on_generation = callback_generation
-                        self.is_on_generation = 'method'
-                        if not self.suppress_warnings: warnings.warn("Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and will be removed in a later release of PyGAD. Please use the on_generation parameter instead.")
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The method assigned to the callback_generation parameter must accept 2 parameters:\n1) A reference to your class instance and the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
+                # Check if the callback_generation function accepts only a single paramater.
+                if (callback_generation.__code__.co_argcount == 1):
+                    self.callback_generation = callback_generation
+                    on_generation = callback_generation
+                    if not self.suppress_warnings: warnings.warn("Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and will be removed in a later release of PyGAD. Please use the on_generation parameter instead.")
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the callback_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=callback_generation.__code__.co_name, argcount=callback_generation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise TypeError("The value assigned to the callback_generation parameter is expected to be of type function or method but ({callback_generation_type}) found.".format(callback_generation_type=type(callback_generation)))
+                raise TypeError("The value assigned to the callback_generation parameter is expected to be of type function but ({callback_generation_type}) found.".format(callback_generation_type=type(callback_generation)))
         else:
             self.callback_generation = None
 
         # Check if the on_generation exists.
         if not (on_generation is None):
-            #barloff: Check for is function or method.
-            self.is_on_generation = None
+            # Check if the on_generation is a function.
             if callable(on_generation):
-                #barloff: check is function
-                if inspect.isfunction(on_generation):
-                    # Check if the on_generation function accepts only a single paramater.
-                    if (on_generation.__code__.co_argcount == 1):
-                        self.on_generation = on_generation
-                        self.is_on_generation = 'function'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_generation.__code__.co_name, argcount=on_generation.__code__.co_argcount))
-                #barloff: check is method
-                elif inspect.ismethod(on_generation):
-                    #barloff: Check as method accepts 2 paramaters to include caller's "self" reference.
-                    if (on_generation.__code__.co_argcount == 2):
-                        self.on_generation = on_generation
-                        self.is_on_generation = 'method'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The method assigned to the on_generation parameter must accept 2 parameters:\n1) A reference to your class instance and the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
+                # Check if the on_generation function accepts only a single paramater.
+                if (on_generation.__code__.co_argcount == 1):
+                    self.on_generation = on_generation
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_generation.__code__.co_name, argcount=on_generation.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise TypeError("The value assigned to the on_generation parameter is expected to be of type function or method but ({on_generation_type}) found.".format(on_generation_type=type(on_generation)))
+                raise TypeError("The value assigned to the on_generation parameter is expected to be of type function but ({on_generation_type}) found.".format(on_generation_type=type(on_generation)))
         else:
             self.on_generation = None
+
         # Check if the on_stop exists.
         if not (on_stop is None):
-            #barloff: Check for is function or method.
-            self.is_on_stop = None
+            # Check if the on_stop is a function.
             if callable(on_stop):
-                #barloff: check is function
-                if inspect.isfunction(on_stop):
-                    # Check if the on_stop function accepts 2 paramaters.
-                    if (on_stop.__code__.co_argcount == 2):
-                        self.on_stop = on_stop
-                        self.is_on_stop = 'function'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_stop.__code__.co_name, argcount=on_stop.__code__.co_argcount))
-                #barloff: check is method
-                elif inspect.ismethod(on_stop):
-                    #barloff: Check as method accepts 3 paramaters to include caller's "self" reference.
-                    if (on_stop.__code__.co_argcount == 3):
-                        self.on_stop = on_stop
-                        self.is_on_stop = 'method'
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError("The method assigned to the on_stop parameter must accept 3 parameters:\n1) A reference to your class instance the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
+                # Check if the on_stop function accepts 2 paramaters.
+                if (on_stop.__code__.co_argcount == 2):
+                    self.on_stop = on_stop
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_stop.__code__.co_name, argcount=on_stop.__code__.co_argcount))
             else:
                 self.valid_parameters = False
-                raise TypeError("The value assigned to the 'on_stop' parameter is expected to be of type function or method but ({on_stop_type}) found.".format(on_stop_type=type(on_stop)))
+                raise TypeError("The value assigned to the 'on_stop' parameter is expected to be of type function but ({on_stop_type}) found.".format(on_stop_type=type(on_stop)))
         else:
             self.on_stop = None
 
@@ -1088,9 +947,6 @@ class GA:
         self.valid_parameters = True # Set to True when all the parameters passed in the GA class constructor are valid.
 
         # Parameters of the genetic algorithm.
-        #barloff: Set caller's instance to be returned with fitness_funtion and on_<function> callbacks
-        self.cls_inst = cls_inst
-        
         self.num_generations = abs(num_generations)
         self.parent_selection_type = parent_selection_type
 
@@ -1376,10 +1232,7 @@ class GA:
                     # Use the parent's index to return its pre-calculated fitness value.
                     fitness = self.previous_generation_fitness[parent_idx]
                 else:
-                    #barloff: function or method callback
-                    if self.isfitness_func == 'function': fitness = self.fitness_func(sol, sol_idx)
-                    elif self.isfitness_func == 'method': fitness = getattr(self.cls_inst, self.fitness_func.__name__)(sol, sol_idx)
-                    else: raise ValueError("The fitness function must be a function, class static method, or class instance method not {ff_type}". format(ff_type=str(self.isfitness_func)))
+                    fitness = self.fitness_func(sol, sol_idx)
                     if type(fitness) in GA.supported_int_float_types:
                         pass
                     else:
@@ -1453,11 +1306,9 @@ class GA:
         if type(self.solutions_fitness) is numpy.ndarray:
             self.solutions_fitness = list(self.solutions_fitness)
 
-        #barloff: function or method callback
         if not (self.on_start is None):
-            if self.is_on_start == 'function': self.on_start(self)
-            elif self.is_on_start == 'method': getattr(self.cls_inst, self.on_start.__name__)(self)
-        
+            self.on_start(self)
+
         stop_run = False
 
         # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
@@ -1471,8 +1322,7 @@ class GA:
 
         for generation in range(self.num_generations):
             if not (self.on_fitness is None):
-                if self.is_on_fitness == 'function': self.on_fitness(self, self.last_generation_fitness)
-                elif self.is_on_parents == 'method': getattr(self.cls_inst, self.on_fitness.__name__)(self, self.last_generation_fitness)
+                self.on_fitness(self, self.last_generation_fitness)
 
             # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
             self.best_solutions_fitness.append(best_solution_fitness)
@@ -1492,9 +1342,7 @@ class GA:
             else:
                 self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness, num_parents=self.num_parents_mating)
             if not (self.on_parents is None):
-				#barloff: function or method callback
-                if self.is_on_parents == 'function': self.on_parents(self, self.last_generation_parents)
-                elif self.is_on_parents == 'method': getattr(self.cls_inst, self.on_parents.__name__)(self, self.last_generation_parents)
+                self.on_parents(self, self.last_generation_parents)
 
             # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
             if self.crossover_type is None:
@@ -1521,11 +1369,8 @@ class GA:
                 else:
                     self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
                                                                               offspring_size=(self.num_offspring, self.num_genes))
-            #barloff: calling on_crossover regardless of crossover type set to None
-            if not (self.on_crossover is None):
-            	#barloff: function or method callback
-                if self.is_on_crossover == 'function': self.on_crossover(self, self.last_generation_offspring_crossover)
-                elif self.is_on_crossover == 'method': getattr(self.cls_inst, self.on_crossover.__name__)(self, self.last_generation_offspring_crossover)
+                if not (self.on_crossover is None):
+                    self.on_crossover(self, self.last_generation_offspring_crossover)
 
             # If self.mutation_type=None, then no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
             if self.mutation_type is None:
@@ -1536,11 +1381,8 @@ class GA:
                     self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover, self)
                 else:
                     self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover)
-            #barloff: calling on_mutation regardless of mutation type set to None
-            if not (self.on_mutation is None):
-                #barloff: function or method callback
-                if self.is_on_mutation == 'function': self.on_mutation(self, self.last_generation_offspring_mutation)
-                elif self.is_on_mutation == 'method': getattr(self.cls_inst, self.on_mutation.__name__)(self, self.last_generation_offspring_mutation)
+                if not (self.on_mutation is None):
+                    self.on_mutation(self, self.last_generation_offspring_mutation)
 
             # Update the population attribute according to the offspring generated.
             if self.keep_elitism == 0:
@@ -1574,9 +1416,7 @@ class GA:
 
             # If the callback_generation attribute is not None, then cal the callback function after the generation.
             if not (self.on_generation is None):
-            	#barloff: function or method callback
-                if self.is_on_generation == 'function': r = self.on_generation(self)
-                elif self.is_on_generation == 'method': r = getattr(self.cls_inst, self.on_generation.__name__)(self)
+                r = self.on_generation(self)
                 if type(r) is str and r.lower() == "stop":
                     # Before aborting the loop, save the fitness value of the best solution.
                     _, best_solution_fitness, _ = self.best_solution()
@@ -1619,9 +1459,7 @@ class GA:
         self.run_completed = True # Set to True only after the run() method completes gracefully.
 
         if not (self.on_stop is None):
-            #barloff: function or method callback
-            if self.is_on_stop == 'function': self.on_stop(self, self.last_generation_fitness)
-            elif self.is_on_stop == 'method':  getattr(self.cls_inst, self.on_stop.__name__)(self, self.last_generation_fitness)
+            self.on_stop(self, self.last_generation_fitness)
 
         # Converting the 'best_solutions' list into a NumPy array.
         self.best_solutions = numpy.array(self.best_solutions)
