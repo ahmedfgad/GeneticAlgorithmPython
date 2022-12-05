@@ -11,6 +11,9 @@ Objective 1: Allow methods as callbacks while retaining compatibility with funct
 Objective 2: Allow for on_crossover and on_mutate callbacks even when crossover and mutate types are None.
     1. The on_crossover call is moved outside of the if-else check for crossover type is None. 
     2. The on_mutate call is moved outside of the if-else check for mutate type is None. 
+
+Change log:
+20221205 - Line 788 change on_fitness to on_parents.
 '''
 
 #barloff: inspect for isfunction vs. ismethod
@@ -785,7 +788,7 @@ class GA:
 				#barloff: check is method
                 elif inspect.ismethod(on_parents):
                     #barloff: Check as method accepts 3 paramaters to include caller's "self" reference.
-                    if (on_fitness.__code__.co_argcount == 3):
+                    if (on_parents.__code__.co_argcount == 3):
                         self.on_parents = on_parents
                         self.is_on_parents = 'method'
                     else:
