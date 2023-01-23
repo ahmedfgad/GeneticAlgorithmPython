@@ -94,7 +94,7 @@ set of weights that satisfy the following function:
 
 .. code:: 
 
-   y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
+   y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + w6x6
    where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
 
 The first step is to prepare the inputs and the outputs of this
