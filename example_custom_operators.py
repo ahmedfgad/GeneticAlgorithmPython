@@ -55,7 +55,7 @@ def mutation_func(offspring, ga_instance):
     # This is random mutation that mutates a single gene.
     for chromosome_idx in range(offspring.shape[0]):
         # Make some random changes in 1 or more genes.
-        random_gene_idx = numpy.random.choice(range(offspring.shape[0]))
+        random_gene_idx = numpy.random.choice(range(offspring.shape[1]))
 
         offspring[chromosome_idx, random_gene_idx] += numpy.random.random()
 
