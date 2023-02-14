@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(  
     name="pygad",  
-    version="2.18.1",  
+    version="2.18.2",  
     author="Ahmed Fawzy Gad",
     install_requires=["numpy", "matplotlib",],
     author_email="ahmed.f.gad@gmail.com",  

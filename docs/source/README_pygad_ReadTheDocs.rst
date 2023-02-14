@@ -1832,7 +1832,7 @@ as a seed for the random function generators.
 
 PyGAD uses random functions in these 2 libraries:
 
-1.  NumPy
+1. NumPy
 
 2. random
 
@@ -2261,7 +2261,7 @@ gene's value.
    def mutation_func(offspring, ga_instance):
 
        for chromosome_idx in range(offspring.shape[0]):
-           random_gene_idx = numpy.random.choice(range(offspring.shape[0]))
+           random_gene_idx = numpy.random.choice(range(offspring.shape[1]))
 
            offspring[chromosome_idx, random_gene_idx] += numpy.random.random()
 

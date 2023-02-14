@@ -1064,6 +1064,26 @@ Release Date: 19 September 2022
 1. A big fix when ``keep_elitism`` is used.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/132
 
+.. _pygad-2182:
+
+PyGAD 2.18.2
+------------
+
+Release Date: 14 February 2023
+
+1. Remove ``numpy.int`` and ``numpy.float`` from the list of supported
+   data types.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/151
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/152
+
+2. Call the ``on_crossover()`` callback function even if
+   ``crossover_type`` is ``None``.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/138
+
+3. Call the ``on_mutation()`` callback function even if
+   ``mutation_type`` is ``None``.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/138
+
 PyGAD Projects at GitHub
 ========================
 

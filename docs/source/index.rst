@@ -21,11 +21,10 @@ different types of crossover, mutation, and parent selection operators.
 different types of problems to be optimized using the genetic algorithm
 by customizing the fitness function.
 
-
 .. figure:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :alt: 
 
-*Logo designed by*\ `Asmaa
+*Logo designed by* `Asmaa
 Kabil <https://www.linkedin.com/in/asmaa-kabil-9901b7b6>`__
 
 Besides building the genetic algorithm, it builds and optimizes machine
@@ -74,8 +73,6 @@ PyGAD is developed in Python 3.7.3 and depends on NumPy for creating and
 manipulating arrays and Matplotlib for creating figures. The exact NumPy
 version used in developing PyGAD is 1.16.4. For Matplotlib, the version
 is 3.1.0.
-
-.. _header-n69:
 
 Quick Start
 ===========
@@ -186,8 +183,6 @@ solution found by PyGAD can be accessed.
 There is more to do using PyGAD. Read its documentation to explore the
 features of PyGAD.
 
-.. _header-n88:
-
 PyGAD's Modules
 ===============
 
@@ -215,7 +210,7 @@ PyGAD's Modules
 The documentation discusses each of these modules.
 
 PyGAD Citation - Bibtex Formatted
-==============
+=================================
 
 If you used PyGAD, please consider citing its paper with the following
 details:
@@ -223,19 +218,12 @@ details:
 .. code:: 
 
    @misc{gad2021pygad,
-
          title={PyGAD: An Intuitive Genetic Algorithm Python Library}, 
-
          author={Ahmed Fawzy Gad},
-
          year={2021},
-
          eprint={2106.06158},
-
          archivePrefix={arXiv},
-
          primaryClass={cs.NE}
-
    }
 
 

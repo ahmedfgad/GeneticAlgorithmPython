@@ -1369,8 +1369,10 @@ class GA:
                 else:
                     self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
                                                                               offspring_size=(self.num_offspring, self.num_genes))
-                if not (self.on_crossover is None):
-                    self.on_crossover(self, self.last_generation_offspring_crossover)
+
+            # PyGAD 2.18.2 // The on_crossover() callback function is called even if crossover_type is None.
+            if not (self.on_crossover is None):
+                self.on_crossover(self, self.last_generation_offspring_crossover)
 
             # If self.mutation_type=None, then no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
             if self.mutation_type is None:
@@ -1381,8 +1383,10 @@ class GA:
                     self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover, self)
                 else:
                     self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover)
-                if not (self.on_mutation is None):
-                    self.on_mutation(self, self.last_generation_offspring_mutation)
+
+            # PyGAD 2.18.2 // The on_mutation() callback function is called even if mutation_type is None.
+            if not (self.on_mutation is None):
+                self.on_mutation(self, self.last_generation_offspring_mutation)
 
             # Update the population attribute according to the offspring generated.
             if self.keep_elitism == 0:
