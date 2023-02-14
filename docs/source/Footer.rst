@@ -1084,6 +1084,15 @@ Release Date: 14 February 2023
    ``mutation_type`` is ``None``.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/138
 
+.. _pygad-2183:
+
+PyGAD 2.18.3
+------------
+
+Release Date: 14 February 2023
+
+1. Bug fixes.
+
 PyGAD Projects at GitHub
 ========================
 
