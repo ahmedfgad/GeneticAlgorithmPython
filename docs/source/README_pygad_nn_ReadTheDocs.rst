@@ -896,7 +896,7 @@ This example uses the Fish Market Dataset available at Kaggle
 dataset from `this
 link <https://www.kaggle.com/aungpyaeap/fish-market/download>`__
 (https://www.kaggle.com/aungpyaeap/fish-market/download). The dataset is
-also available at the `GitHub project of the ``pygad.nn``
+also available at the `GitHub project of the pygad.nn
 module <https://github.com/ahmedfgad/NumPyANN>`__:
 https://github.com/ahmedfgad/NumPyANN
 

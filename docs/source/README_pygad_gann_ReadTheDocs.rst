@@ -186,7 +186,7 @@ can be fetched.
 .. _pygadgannpopulationasvectors:
 
 ``pygad.gann.population_as_vectors()`` 
---------------------------------------
+---------------------------------------
 
 Accepts the population as networks and returns a list holding all
 weights of the layers of each solution (i.e. network) in the population
@@ -1103,7 +1103,7 @@ This example uses the Fish Market Dataset available at Kaggle
 dataset from `this
 link <https://www.kaggle.com/aungpyaeap/fish-market/download>`__
 (https://www.kaggle.com/aungpyaeap/fish-market/download). The dataset is
-also available at the `GitHub project of the ``pygad.gann``
+also available at the `GitHub project of the pygad.gann
 module <https://github.com/ahmedfgad/NeuralGenetic>`__:
 https://github.com/ahmedfgad/NeuralGenetic
 

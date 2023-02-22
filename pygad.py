@@ -1,11 +1,11 @@
 import numpy
 import random
 import matplotlib.pyplot
-import pickle
+import cloudpickle
 import time
 import warnings
-import inspect
 import concurrent.futures
+import inspect
 
 class GA:
 
@@ -13,12 +13,13 @@ class GA:
     supported_float_types = [float, numpy.float16, numpy.float32, numpy.float64]
     supported_int_float_types = supported_int_types + supported_float_types
 
-    def __init__(self,
-                 num_generations,
-                 num_parents_mating,
+    def __init__(self, 
+                 num_generations, 
+                 num_parents_mating, 
                  fitness_func,
+                 fitness_batch_size=None,
                  initial_population=None,
-                 sol_per_pop=None,
+                 sol_per_pop=None, 
                  num_genes=None,
                  init_range_low=-4,
                  init_range_high=4,
@@ -61,9 +62,10 @@ class GA:
         num_parents_mating: Number of solutions to be selected as parents in the mating pool.
 
         fitness_func: Accepts a function that must accept 2 parameters (a single solution and its index in the population) and return the fitness value of the solution. Available starting from PyGAD 1.0.17 until 1.0.20 with a single parameter representing the solution. Changed in PyGAD 2.0.0 and higher to include the second parameter representing the solution index.
+        fitness_batch_size: Added in PyGAD 2.19.0. Supports calculating the fitness in batches. If the value is 1 or None, then the fitness function is called for each invidiaul solution. If given another value X where X is neither 1 nor None (e.g. X=3), then the fitness function is called once for each X (3) solutions.
 
         initial_population: A user-defined initial population. It is useful when the user wants to start the generations with a custom initial population. It defaults to None which means no initial population is specified by the user. In this case, PyGAD creates an initial population using the 'sol_per_pop' and 'num_genes' parameters. An exception is raised if the 'initial_population' is None while any of the 2 parameters ('sol_per_pop' or 'num_genes') is also None.
-        sol_per_pop: Number of solutions in the population.
+        sol_per_pop: Number of solutions in the population. 
         num_genes: Number of parameters in the function.
 
         init_range_low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
@@ -100,7 +102,7 @@ class GA:
         on_mutation: Accepts a function to be called each time the mutation operation is applied. This function must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring after applying the mutation. Added in PyGAD 2.6.0.
         callback_generation: Accepts a function to be called after each generation. This function must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and should be replaced by the on_generation parameter.
         on_generation: Accepts a function to be called after each generation. This function must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. Added in PyGAD 2.6.0.
-        on_stop: Accepts a function to be called only once exactly before the genetic algorithm stops or when it completes all the generations. This function must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of fitness values of the last population's solutions. Added in PyGAD 2.6.0.
+        on_stop: Accepts a function to be called only once exactly before the genetic algorithm stops or when it completes all the generations. This function must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of fitness values of the last population's solutions. Added in PyGAD 2.6.0. 
 
         delay_after_gen: Added in PyGAD 2.4.0. It accepts a non-negative number specifying the number of seconds to wait after a generation completes and before going to the next generation. It defaults to 0.0 which means no delay after the generation.
 
@@ -202,7 +204,7 @@ class GA:
         else:
             self.valid_parameters = False
             raise TypeError("The expected type of 'gene_space' is list, tuple, range, or numpy.ndarray but ({gene_space_type}) found.".format(gene_space_type=type(gene_space)))
-
+            
         self.gene_space = gene_space
 
         # Validate init_range_low and init_range_high
@@ -278,7 +280,7 @@ class GA:
         if initial_population is None:
             if (sol_per_pop is None) or (num_genes is None):
                 self.valid_parameters = False
-                raise TypeError("Error creating the initial population\n\nWhen the parameter initial_population is None, then neither of the 2 parameters sol_per_pop and num_genes can be None at the same time.\nThere are 2 options to prepare the initial population:\n1) Create an initial population and assign it to the initial_population parameter. In this case, the values of the 2 parameters sol_per_pop and num_genes will be deduced.\n2) Allow the genetic algorithm to create the initial population automatically by passing valid integer values to the sol_per_pop and num_genes parameters.")
+                raise TypeError("Error creating the initial population:\n\nWhen the parameter 'initial_population' is None, then the 2 parameters 'sol_per_pop' and 'num_genes' cannot be None.\nThere are 2 options to prepare the initial population:\n1) Assinging the initial population to the 'initial_population' parameter. In this case, the values of the 2 parameters sol_per_pop and num_genes will be deduced.\n2) Assign integer values to the 'sol_per_pop' and 'num_genes' parameters so that PyGAD can create the initial population automatically.")
             elif (type(sol_per_pop) is int) and (type(num_genes) is int):
                 # Validating the number of solutions in the population (sol_per_pop)
                 if sol_per_pop <= 0:
@@ -318,11 +320,11 @@ class GA:
                 self.initial_population = numpy.zeros(shape=(initial_population.shape[0], initial_population.shape[1]), dtype=object)
                 for gene_idx in range(initial_population.shape[1]):
                     if self.gene_type[gene_idx][1] is None:
-                        self.initial_population[:, gene_idx] = numpy.asarray(initial_population[:, gene_idx],
+                        self.initial_population[:, gene_idx] = numpy.asarray(initial_population[:, gene_idx], 
                                                                              dtype=self.gene_type[gene_idx][0])
                     else:
-                        self.initial_population[:, gene_idx] = numpy.round(numpy.asarray(initial_population[:, gene_idx],
-                                                                                         dtype=self.gene_type[gene_idx][0]),
+                        self.initial_population[:, gene_idx] = numpy.round(numpy.asarray(initial_population[:, gene_idx], 
+                                                                                         dtype=self.gene_type[gene_idx][0]), 
                                                                            self.gene_type[gene_idx][1])
 
             self.population = self.initial_population.copy() # A NumPy array holding the initial population.
@@ -356,16 +358,22 @@ class GA:
         # Validating the crossover type: crossover_type
         if (crossover_type is None):
             self.crossover = None
+        elif inspect.ismethod(crossover_type):
+            # Check if the crossover_type is a method that accepts 4 paramaters.
+            if (crossover_type.__code__.co_argcount == 4):
+                # The crossover method assigned to the crossover_type parameter is validated.
+                self.crossover = crossover_type
+            else:
+                self.valid_parameters = False
+                raise ValueError("When 'crossover_type' is assigned to a method, then this crossover method must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The selected parents.\n3) The size of the offspring to be produced.\n4) The instance from the pygad.GA class.\n\nThe passed crossover method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=crossover_type.__code__.co_name, argcount=crossover_type.__code__.co_argcount))
         elif callable(crossover_type):
-            # Check if the crossover_type is a function that accepts 3 paramaters.
-            # Allow for the possibility this is a class method (and the extra "self" parameter)
-            parameter_count = 4 if inspect.ismethod(crossover_type) else 3
-            if (crossover_type.__code__.co_argcount == parameter_count):
+            # Check if the crossover_type is a function that accepts 2 paramaters.
+            if (crossover_type.__code__.co_argcount == 3):
                 # The crossover function assigned to the crossover_type parameter is validated.
                 self.crossover = crossover_type
             else:
                 self.valid_parameters = False
-                raise ValueError("When 'crossover_type' is assigned to a function, then this crossover function must accept 2 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed crossover function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=crossover_type.__code__.co_name, argcount=crossover_type.__code__.co_argcount))
+                raise ValueError("When 'crossover_type' is assigned to a function, then this crossover function must accept 3 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed crossover function named '{funcname}' accepts {argcount} parameter(s).".format(funcname=crossover_type.__code__.co_name, argcount=crossover_type.__code__.co_argcount))
         elif not (type(crossover_type) is str):
             self.valid_parameters = False
             raise TypeError("The expected type of the 'crossover_type' parameter is either callable or str but ({crossover_type}) found.".format(crossover_type=type(crossover_type)))
@@ -403,11 +411,17 @@ class GA:
         # "adaptive" mutation is supported starting from PyGAD 2.10.0
         if mutation_type is None:
             self.mutation = None
+        elif inspect.ismethod(mutation_type):
+            # Check if the mutation_type is a method that accepts 3 paramater.
+            if (mutation_type.__code__.co_argcount == 3):
+                # The mutation method assigned to the mutation_type parameter is validated.
+                self.mutation = mutation_type
+            else:
+                self.valid_parameters = False
+                raise ValueError("When 'mutation_type' is assigned to a method, then it must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The offspring to be mutated.\n3) The instance from the pygad.GA class.\n\nThe passed mutation method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=mutation_type.__code__.co_name, argcount=mutation_type.__code__.co_argcount))
         elif callable(mutation_type):
             # Check if the mutation_type is a function that accepts 2 paramater.
-            # Allow for the possibility this is a class method (and the extra "self" parameter)
-            parameter_count = 3 if inspect.ismethod(mutation_type) else 2
-            if (mutation_type.__code__.co_argcount == parameter_count):
+            if (mutation_type.__code__.co_argcount == 2):
                 # The mutation function assigned to the mutation_type parameter is validated.
                 self.mutation = mutation_type
             else:
@@ -580,7 +594,7 @@ class GA:
                     raise TypeError("Unexpected type for the 'mutation_num_genes' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_num_genes_value}) of type {mutation_num_genes_type} found.".format(mutation_num_genes_value=mutation_num_genes, mutation_num_genes_type=type(mutation_num_genes)))
         else:
             pass
-
+        
         # Validating mutation_by_replacement and mutation_type
         if self.mutation_type != "random" and self.mutation_by_replacement:
             if not self.suppress_warnings: warnings.warn("The mutation_by_replacement parameter is set to True while the mutation_type parameter is not set to random but ({mut_type}). Note that the mutation_by_replacement parameter has an effect only when mutation_type='random'.".format(mut_type=mutation_type))
@@ -591,11 +605,18 @@ class GA:
 
         # select_parents: Refers to a method that selects the parents based on the parent selection type specified in the parent_selection_type attribute.
         # Validating the selected type of parent selection: parent_selection_type
-        if callable(parent_selection_type):
+        if inspect.ismethod(parent_selection_type):
+            # Check if the parent_selection_type is a method that accepts 4 paramaters.
+            if (parent_selection_type.__code__.co_argcount == 4):
+                # population: Added in PyGAD 2.16.0. It should used only to support custom parent selection functions. Otherwise, it should be left to None to retirve the population by self.population.
+                # The parent selection method assigned to the parent_selection_type parameter is validated.
+                self.select_parents = parent_selection_type
+            else:
+                self.valid_parameters = False
+                raise ValueError("When 'parent_selection_type' is assigned to a method, then it must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The fitness values of the current population.\n3) The number of parents needed.\n4) The instance from the pygad.GA class.\n\nThe passed parent selection method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=parent_selection_type.__code__.co_name, argcount=parent_selection_type.__code__.co_argcount))
+        elif callable(parent_selection_type):
             # Check if the parent_selection_type is a function that accepts 3 paramaters.
-            # Allow for the possibility this is a class method (and the extra "self" parameter)
-            parameter_count = 4 if inspect.ismethod(parent_selection_type) else 3
-            if (parent_selection_type.__code__.co_argcount == parameter_count):
+            if (parent_selection_type.__code__.co_argcount == 3):
                 # population: Added in PyGAD 2.16.0. It should used only to support custom parent selection functions. Otherwise, it should be left to None to retirve the population by self.population.
                 # The parent selection function assigned to the parent_selection_type parameter is validated.
                 self.select_parents = parent_selection_type
@@ -668,12 +689,18 @@ class GA:
         else:
             self.num_offspring = self.sol_per_pop - self.keep_elitism
 
-        # Check if the fitness_func is a function.
-        if callable(fitness_func):
+        # Check if the fitness_func is a method.
+        if inspect.ismethod(fitness_func):
+            # If the fitness is calculated through a method, not a function, then there is a third 'self` paramaters.
+            # Check if the method has 3 parameters.
+            if (fitness_func.__code__.co_argcount == 3):
+                self.fitness_func = fitness_func
+            else:
+                self.valid_parameters = False
+                raise ValueError("If a method is used to calculate the fitness value, then it must accept 3 parameters\n1) Expected to be the 'self' object.\n2) A solution to calculate its fitness value.\n3) The solution's index within the population.\n\nThe passed fitness method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=fitness_func.__code__.co_name, argcount=fitness_func.__code__.co_argcount))
+        elif callable(fitness_func):
             # Check if the fitness function accepts 2 paramaters.
-            # Allow for the possibility this is a class method (and the extra "self" parameter)
-            parameter_count = 3 if inspect.ismethod(fitness_func) else 2
-            if (fitness_func.__code__.co_argcount == parameter_count):
+            if (fitness_func.__code__.co_argcount == 2):
                 self.fitness_func = fitness_func
             else:
                 self.valid_parameters = False
@@ -681,15 +708,31 @@ class GA:
         else:
             self.valid_parameters = False
             raise TypeError("The value assigned to the fitness_func parameter is expected to be of type function but ({fitness_func_type}) found.".format(fitness_func_type=type(fitness_func)))
+        
+        if fitness_batch_size is None:
+            pass
+        elif not (type(fitness_batch_size) in GA.supported_int_types):
+            self.valid_parameters = False
+            raise TypeError("The value assigned to the fitness_batch_size parameter is expected to be integer but the value ({fitness_batch_size}) of type ({fitness_batch_size_type}) found.".format(fitness_batch_size=fitness_batch_size, fitness_batch_size_type=type(fitness_batch_size)))
+        elif fitness_batch_size <= 0 or fitness_batch_size > self.sol_per_pop:
+            self.valid_parameters = False
+            raise ValueError("The value assigned to the fitness_batch_size parameter must be:\n1) Greater than 0.\n2) Less than or equal to sol_per_pop ({sol_per_pop}).\nBut the value ({fitness_batch_size}) found.".format(fitness_batch_size=fitness_batch_size, sol_per_pop=self.sol_per_pop))
+            
+        self.fitness_batch_size = fitness_batch_size
 
         # Check if the on_start exists.
         if not (on_start is None):
+            if inspect.ismethod(on_start):
+                # Check if the on_start method accepts 2 paramaters.
+                if (on_start.__code__.co_argcount == 2):
+                    self.on_start = on_start
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The method assigned to the on_start parameter must accept only 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_start.__code__.co_name, argcount=on_start.__code__.co_argcount))
             # Check if the on_start is a function.
-            if callable(on_start):
+            elif callable(on_start):
                 # Check if the on_start function accepts only a single paramater.
-                # Allow for the possibility this is a class method (and the extra "self" parameter)
-                parameter_count = 2 if inspect.ismethod(on_start) else 1
-                if (on_start.__code__.co_argcount == parameter_count):
+                if (on_start.__code__.co_argcount == 1):
                     self.on_start = on_start
                 else:
                     self.valid_parameters = False
@@ -702,12 +745,18 @@ class GA:
 
         # Check if the on_fitness exists.
         if not (on_fitness is None):
+            # Check if the on_fitness is a method.
+            if inspect.ismethod(on_fitness):
+                # Check if the on_fitness method accepts 3 paramaters.
+                if (on_fitness.__code__.co_argcount == 3):
+                    self.on_fitness = on_fitness
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The method assigned to the on_fitness parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.3) The fitness values of all solutions.\nThe passed method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_fitness.__code__.co_name, argcount=on_fitness.__code__.co_argcount))
             # Check if the on_fitness is a function.
-            if callable(on_fitness):
+            elif callable(on_fitness):
                 # Check if the on_fitness function accepts 2 paramaters.
-                # Allow for the possibility this is a class method (and the extra "self" parameter)
-                parameter_count = 3 if inspect.ismethod(on_fitness) else 2
-                if (on_fitness.__code__.co_argcount == parameter_count):
+                if (on_fitness.__code__.co_argcount == 2):
                     self.on_fitness = on_fitness
                 else:
                     self.valid_parameters = False
@@ -720,12 +769,18 @@ class GA:
 
         # Check if the on_parents exists.
         if not (on_parents is None):
+            # Check if the on_parents is a method.
+            if inspect.ismethod(on_parents):
+                # Check if the on_parents method accepts 3 paramaters.
+                if (on_parents.__code__.co_argcount == 3):
+                    self.on_parents = on_parents
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The method assigned to the on_parents parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n3) The fitness values of all solutions.\nThe passed method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_parents.__code__.co_name, argcount=on_parents.__code__.co_argcount))
             # Check if the on_parents is a function.
-            if callable(on_parents):
+            elif callable(on_parents):
                 # Check if the on_parents function accepts 2 paramaters.
-                # Allow for the possibility this is a class method (and the extra "self" parameter)
-                parameter_count = 3 if inspect.ismethod(on_parents) else 2
-                if (on_parents.__code__.co_argcount == parameter_count):
+                if (on_parents.__code__.co_argcount == 2):
                     self.on_parents = on_parents
                 else:
                     self.valid_parameters = False
@@ -738,12 +793,18 @@ class GA:
 
         # Check if the on_crossover exists.
         if not (on_crossover is None):
+            # Check if the on_crossover is a method.
+            if inspect.ismethod(on_crossover):
+                # Check if the on_crossover method accepts 3 paramaters.
+                if (on_crossover.__code__.co_argcount == 3):
+                    self.on_crossover = on_crossover
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The method assigned to the on_crossover parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) The offspring generated using crossover.\nThe passed method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_crossover.__code__.co_name, argcount=on_crossover.__code__.co_argcount))
             # Check if the on_crossover is a function.
-            if callable(on_crossover):
+            elif callable(on_crossover):
                 # Check if the on_crossover function accepts 2 paramaters.
-                # Allow for the possibility this is a class method (and the extra "self" parameter)
-                parameter_count = 3 if inspect.ismethod(on_crossover) else 2
-                if (on_crossover.__code__.co_argcount == parameter_count):
+                if (on_crossover.__code__.co_argcount == 2):
                     self.on_crossover = on_crossover
                 else:
                     self.valid_parameters = False
@@ -756,12 +817,18 @@ class GA:
 
         # Check if the on_mutation exists.
         if not (on_mutation is None):
+            # Check if the on_mutation is a method.
+            if inspect.ismethod(on_mutation):
+                # Check if the on_mutation method accepts 3 paramaters.
+                if (on_mutation.__code__.co_argcount == 3):
+                    self.on_mutation = on_mutation
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The method assigned to the on_mutation parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) The offspring after applying the mutation operation.\nThe passed method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_mutation.__code__.co_name, argcount=on_mutation.__code__.co_argcount))
             # Check if the on_mutation is a function.
-            if callable(on_mutation):
+            elif callable(on_mutation):
                 # Check if the on_mutation function accepts 2 paramaters.
-                # Allow for the possibility this is a class method (and the extra "self" parameter)
-                parameter_count = 3 if inspect.ismethod(on_mutation) else 2
-                if (on_mutation.__code__.co_argcount == parameter_count):
+                if (on_mutation.__code__.co_argcount == 2):
                     self.on_mutation = on_mutation
                 else:
                     self.valid_parameters = False
@@ -774,12 +841,20 @@ class GA:
 
         # Check if the callback_generation exists.
         if not (callback_generation is None):
+            # Check if the callback_generation is a method.
+            if inspect.ismethod(callback_generation):
+                # Check if the callback_generation method accepts 2 paramaters.
+                if (callback_generation.__code__.co_argcount == 2):
+                    self.callback_generation = callback_generation
+                    on_generation = callback_generation
+                    if not self.suppress_warnings: warnings.warn("Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and will be removed in a later release of PyGAD. Please use the on_generation parameter instead.")
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The method assigned to the callback_generation parameter must accept 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=callback_generation.__code__.co_name, argcount=callback_generation.__code__.co_argcount))
             # Check if the callback_generation is a function.
-            if callable(callback_generation):
+            elif callable(callback_generation):
                 # Check if the callback_generation function accepts only a single paramater.
-                # Allow for the possibility this is a class method (and the extra "self" parameter)
-                parameter_count = 2 if inspect.ismethod(callback_generation) else 1
-                if (callback_generation.__code__.co_argcount == parameter_count):
+                if (callback_generation.__code__.co_argcount == 1):
                     self.callback_generation = callback_generation
                     on_generation = callback_generation
                     if not self.suppress_warnings: warnings.warn("Starting from PyGAD 2.6.0, the callback_generation parameter is deprecated and will be removed in a later release of PyGAD. Please use the on_generation parameter instead.")
@@ -794,12 +869,18 @@ class GA:
 
         # Check if the on_generation exists.
         if not (on_generation is None):
+            # Check if the on_generation is a method.
+            if inspect.ismethod(on_generation):
+                # Check if the on_generation method accepts 2 paramaters.
+                if (on_generation.__code__.co_argcount == 2):
+                    self.on_generation = on_generation
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The method assigned to the on_generation parameter must accept 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_generation.__code__.co_name, argcount=on_generation.__code__.co_argcount))
             # Check if the on_generation is a function.
-            if callable(on_generation):
+            elif callable(on_generation):
                 # Check if the on_generation function accepts only a single paramater.
-                # Allow for the possibility this is a class method (and the extra "self" parameter)
-                parameter_count = 2 if inspect.ismethod(on_generation) else 1
-                if (on_generation.__code__.co_argcount == parameter_count):
+                if (on_generation.__code__.co_argcount == 1):
                     self.on_generation = on_generation
                 else:
                     self.valid_parameters = False
@@ -812,12 +893,18 @@ class GA:
 
         # Check if the on_stop exists.
         if not (on_stop is None):
+            # Check if the on_stop is a method.
+            if inspect.ismethod(on_stop):
+                # Check if the on_stop method accepts 3 paramaters.
+                if (on_stop.__code__.co_argcount == 3):
+                    self.on_stop = on_stop
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("The method assigned to the on_stop parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) A list of the fitness values of the solutions in the last population.\nThe passed method named '{funcname}' accepts {argcount} parameter(s).".format(funcname=on_stop.__code__.co_name, argcount=on_stop.__code__.co_argcount))
             # Check if the on_stop is a function.
-            if callable(on_stop):
+            elif callable(on_stop):
                 # Check if the on_stop function accepts 2 paramaters.
-                # Allow for the possibility this is a class method (and the extra "self" parameter)
-                parameter_count = 3 if inspect.ismethod(on_stop) else 2
-                if (on_stop.__code__.co_argcount == parameter_count):
+                if (on_stop.__code__.co_argcount == 2):
                     self.on_stop = on_stop
                 else:
                     self.valid_parameters = False
@@ -886,6 +973,7 @@ class GA:
                 else:
                     self.valid_parameters = False
                     raise ValueError("The value following the stop word in the 'stop_criteria' parameter must be a number but the value '{stop_val}' of type {stop_val_type} found.".format(stop_val=number, stop_val_type=type(number)))
+                
                 self.stop_criteria.append([stop_word, number])
 
             else:
@@ -994,8 +1082,9 @@ class GA:
         self.last_generation_parents = None # A list holding the parents of the last generation.
         self.last_generation_offspring_crossover = None # A list holding the offspring after applying crossover in the last generation.
         self.last_generation_offspring_mutation = None # A list holding the offspring after applying mutation in the last generation.
-        self.previous_generation_fitness = None # Holds the fitness values of one generation before the fitness values saved in the last_generation_fitness attribute. Added in PyGAD 2.26.2
-        self.last_generation_elitism = None # Added in PyGAD 2.18.0. A NumPy array holding the elitism in the current generation according to the value passed in the keep_elitism parameter. 
+        self.previous_generation_fitness = None # Holds the fitness values of one generation before the fitness values saved in the last_generation_fitness attribute. Added in PyGAD 2.16.2.
+        self.last_generation_elitism = None # Added in PyGAD 2.18.0. A NumPy array holding the elitism of the current generation according to the value passed in the 'keep_elitism' parameter. It works only if the 'keep_elitism' parameter has a non-zero value. 
+        self.last_generation_elitism_indices = None # Added in PyGAD 2.19.0. A NumPy array holding the indices of the elitism of the current generation. It works only if the 'keep_elitism' parameter has a non-zero value. 
 
     def round_genes(self, solutions):
         for gene_idx in range(self.num_genes):
@@ -1004,8 +1093,8 @@ class GA:
                     solutions[:, gene_idx] = numpy.round(solutions[:, gene_idx], self.gene_type[1])
             else:
                 if not self.gene_type[gene_idx][1] is None:
-                    solutions[:, gene_idx] = numpy.round(numpy.asarray(solutions[:, gene_idx],
-                                                                       dtype=self.gene_type[gene_idx][0]),
+                    solutions[:, gene_idx] = numpy.round(numpy.asarray(solutions[:, gene_idx], 
+                                                                       dtype=self.gene_type[gene_idx][0]), 
                                                          self.gene_type[gene_idx][1])
         return solutions
 
@@ -1029,9 +1118,9 @@ class GA:
         if self.gene_space is None:
             # Creating the initial population randomly.
             if self.gene_type_single == True:
-                self.population = numpy.asarray(numpy.random.uniform(low=low,
-                                                                     high=high,
-                                                                     size=self.pop_size),
+                self.population = numpy.asarray(numpy.random.uniform(low=low, 
+                                                                     high=high, 
+                                                                     size=self.pop_size), 
                                                 dtype=self.gene_type[0]) # A NumPy array holding the initial population.
             else:
                 # Create an empty population of dtype=object to support storing mixed data types within the same array.
@@ -1039,9 +1128,9 @@ class GA:
                 # Loop through the genes, randomly generate the values of a single gene across the entire population, and add the values of each gene to the population.
                 for gene_idx in range(self.num_genes):
                     # A vector of all values of this single gene across all solutions in the population.
-                    gene_values = numpy.asarray(numpy.random.uniform(low=low,
-                                                                     high=high,
-                                                                     size=self.pop_size[0]),
+                    gene_values = numpy.asarray(numpy.random.uniform(low=low, 
+                                                                     high=high, 
+                                                                     size=self.pop_size[0]), 
                                                 dtype=self.gene_type[gene_idx][0])
                     # Adding the current gene values to the population.
                     self.population[:, gene_idx] = gene_values
@@ -1050,7 +1139,7 @@ class GA:
                 for solution_idx in range(self.population.shape[0]):
                     # print("Before", self.population[solution_idx])
                     self.population[solution_idx], _, _ = self.solve_duplicate_genes_randomly(solution=self.population[solution_idx],
-                                                                                              min_val=low,
+                                                                                              min_val=low, 
                                                                                               max_val=high,
                                                                                               mutation_by_replacement=True,
                                                                                               gene_type=gene_type,
@@ -1070,9 +1159,9 @@ class GA:
                                 temp = self.gene_space[gene_idx].copy()
                             for idx, val in enumerate(self.gene_space[gene_idx]):
                                 if val is None:
-                                    self.gene_space[gene_idx][idx] = numpy.asarray(numpy.random.uniform(low=low,
-                                                                                                        high=high,
-                                                                                                        size=1),
+                                    self.gene_space[gene_idx][idx] = numpy.asarray(numpy.random.uniform(low=low, 
+                                                                                                        high=high, 
+                                                                                                        size=1), 
                                                                                    dtype=self.gene_type[0])[0]
                             self.population[sol_idx, gene_idx] = random.choice(self.gene_space[gene_idx])
                             self.population[sol_idx, gene_idx] = self.gene_type[0](self.population[sol_idx, gene_idx])
@@ -1091,17 +1180,17 @@ class GA:
                                                                                    dtype=self.gene_type[0])[0]
                         elif type(self.gene_space[gene_idx]) == type(None):
 
-                            # The following commented code replace the None value with a single number that will not change again.
+                            # The following commented code replace the None value with a single number that will not change again. 
                             # This means the gene value will be the same across all solutions.
                             # self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
-                            #                high=high,
+                            #                high=high, 
                             #                size=1), dtype=self.gene_type[0])[0]
                             # self.population[sol_idx, gene_idx] = self.gene_space[gene_idx].copy()
-
+                            
                             # The above problem is solved by keeping the None value in the gene_space parameter. This forces PyGAD to generate this value for each solution.
                             self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
-                                                                                                    high=high,
-                                                                                                    size=1),
+                                                                                                    high=high, 
+                                                                                                    size=1), 
                                                                                dtype=self.gene_type[0])[0]
                         elif type(self.gene_space[gene_idx]) in GA.supported_int_float_types:
                             self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]
@@ -1114,9 +1203,9 @@ class GA:
                             temp = self.gene_space[gene_idx].copy()
                             for idx, val in enumerate(self.gene_space[gene_idx]):
                                 if val is None:
-                                    self.gene_space[gene_idx][idx] = numpy.asarray(numpy.random.uniform(low=low,
-                                                                                                        high=high,
-                                                                                                        size=1),
+                                    self.gene_space[gene_idx][idx] = numpy.asarray(numpy.random.uniform(low=low, 
+                                                                                                        high=high, 
+                                                                                                        size=1), 
                                                                                    dtype=self.gene_type[gene_idx][0])[0]
                             self.population[sol_idx, gene_idx] = random.choice(self.gene_space[gene_idx])
                             self.population[sol_idx, gene_idx] = self.gene_type[gene_idx][0](self.population[sol_idx, gene_idx])
@@ -1131,19 +1220,19 @@ class GA:
                             else:
                                 self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=self.gene_space[gene_idx]['low'],
                                                                                                         high=self.gene_space[gene_idx]['high'],
-                                                                                                        size=1),
+                                                                                                        size=1), 
                                                                                    dtype=self.gene_type[gene_idx][0])[0]
                         elif type(self.gene_space[gene_idx]) == type(None):
                             # self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
-                            #                                                                high=high,
-                            #                                                                size=1),
+                            #                                                                high=high, 
+                            #                                                                size=1), 
                             #                                           dtype=self.gene_type[gene_idx][0])[0]
 
                             # self.population[sol_idx, gene_idx] = self.gene_space[gene_idx].copy()
 
                             temp = numpy.asarray(numpy.random.uniform(low=low,
-                                                                      high=high,
-                                                                      size=1),
+                                                                      high=high, 
+                                                                      size=1), 
                                                  dtype=self.gene_type[gene_idx][0])[0]
                             self.population[sol_idx, gene_idx] = temp
                         elif type(self.gene_space[gene_idx]) in GA.supported_int_float_types:
@@ -1153,11 +1242,11 @@ class GA:
                 # Replace all the None values with random values using the init_range_low, init_range_high, and gene_type attributes.
                 for idx, curr_gene_space in enumerate(self.gene_space):
                     if curr_gene_space is None:
-                        self.gene_space[idx] = numpy.asarray(numpy.random.uniform(low=low,
-                                                                                  high=high,
-                                                                                  size=1),
+                        self.gene_space[idx] = numpy.asarray(numpy.random.uniform(low=low, 
+                                                                                  high=high, 
+                                                                                  size=1), 
                                                              dtype=self.gene_type[0])[0]
-
+    
                 # Creating the initial population by randomly selecting the genes' values from the values inside the 'gene_space' parameter.
                 if type(self.gene_space) is dict:
                     if 'step' in self.gene_space.keys():
@@ -1179,11 +1268,11 @@ class GA:
                 # Replace all the None values with random values using the init_range_low, init_range_high, and gene_type attributes.
                 for gene_idx, curr_gene_space in enumerate(self.gene_space):
                     if curr_gene_space is None:
-                        self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
-                                                                                  high=high,
-                                                                                  size=1),
+                        self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=low, 
+                                                                                  high=high, 
+                                                                                  size=1), 
                                                              dtype=self.gene_type[gene_idx][0])[0]
-
+    
                 # Creating the initial population by randomly selecting the genes' values from the values inside the 'gene_space' parameter.
                 if type(self.gene_space) is dict:
                     # Create an empty population of dtype=object to support storing mixed data types within the same array.
@@ -1198,21 +1287,21 @@ class GA:
                                                                             size=self.pop_size[0]),
                                                         dtype=self.gene_type[gene_idx][0])
                         else:
-                            gene_values = numpy.asarray(numpy.random.uniform(low=self.gene_space['low'],
-                                                                             high=self.gene_space['high'],
-                                                                             size=self.pop_size[0]),
+                            gene_values = numpy.asarray(numpy.random.uniform(low=self.gene_space['low'], 
+                                                                             high=self.gene_space['high'], 
+                                                                             size=self.pop_size[0]), 
                                                         dtype=self.gene_type[gene_idx][0])
                         # Adding the current gene values to the population.
                         self.population[:, gene_idx] = gene_values
-
+        
                 else:
                     # Create an empty population of dtype=object to support storing mixed data types within the same array.
                     self.population = numpy.zeros(shape=self.pop_size, dtype=object)
                     # Loop through the genes, randomly generate the values of a single gene across the entire population, and add the values of each gene to the population.
                     for gene_idx in range(self.num_genes):
                         # A vector of all values of this single gene across all solutions in the population.
-                        gene_values = numpy.asarray(numpy.random.choice(self.gene_space,
-                                                                        size=self.pop_size[0]),
+                        gene_values = numpy.asarray(numpy.random.choice(self.gene_space, 
+                                                                        size=self.pop_size[0]), 
                                                     dtype=self.gene_type[gene_idx][0])
                         # Adding the current gene values to the population.
                         self.population[:, gene_idx] = gene_values
@@ -1231,7 +1320,7 @@ class GA:
     def cal_pop_fitness(self):
 
         """
-        Calculating the fitness values of all solutions in the current population.
+        Calculating the fitness values of batches of solutions in the current population. 
         It returns:
             -fitness: An array of the calculated fitness values.
         """
@@ -1239,52 +1328,130 @@ class GA:
         if self.valid_parameters == False:
             raise Exception("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
 
+        # 'last_generation_parents_as_list' is the list version of 'self.last_generation_parents'
+        # It is used to return the parent index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
+        if self.last_generation_parents is not None:
+            last_generation_parents_as_list = [list(gen_parent) for gen_parent in self.last_generation_parents]
+
+        # 'last_generation_elitism_as_list' is the list version of 'self.last_generation_elitism'
+        # It is used to return the elitism index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
+        if self.last_generation_elitism is not None:
+            last_generation_elitism_as_list = [list(gen_elitism) for gen_elitism in self.last_generation_elitism]
+
         pop_fitness = ["undefined"] * len(self.population)
         if self.parallel_processing is None:
             # Calculating the fitness value of each solution in the current population.
             for sol_idx, sol in enumerate(self.population):
-    
                 # Check if the `save_solutions` parameter is `True` and whether the solution already exists in the `solutions` list. If so, use its fitness rather than calculating it again.
-                if (self.save_solutions) and (list(sol) in self.solutions):
-                    fitness = self.solutions_fitness[self.solutions.index(list(sol))]
+                # The functions numpy.any()/numpy.all()/numpy.where()/numpy.equal() are very slow.
+                # So, list membership operator 'in' is used to check if the solution exists in the 'self.solutions' list.
+                # Make sure that both the solution and 'self.solutions' are of type 'list' not 'numpy.ndarray'.
+                # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(self.solutions == numpy.array(sol), axis=1))):
+                # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(numpy.equal(self.solutions, numpy.array(sol)), axis=1))):
+                if (self.save_solutions) and (len(self.solutions) > 0) and (list(sol) in self.solutions):
+                    solution_idx = self.solutions.index(list(sol))
+                    fitness = self.solutions_fitness[solution_idx]
+                elif (self.keep_elitism > 0) and (self.last_generation_elitism is not None) and (len(self.last_generation_elitism) > 0) and (list(sol) in last_generation_elitism_as_list):
+                    # Return the index of the elitism from the elitism array 'self.last_generation_elitism'.
+                    # This is not its index within the population. It is just its index in the 'self.last_generation_elitism' array.
+                    elitism_idx = last_generation_elitism_as_list.index(list(sol))
+                    # Use the returned elitism index to return its index in the last population.
+                    elitism_idx = self.last_generation_elitism_indices[elitism_idx]
+                    # Use the elitism's index to return its pre-calculated fitness value.
+                    fitness = self.previous_generation_fitness[elitism_idx]
                 # If the solutions are not saved (i.e. `save_solutions=False`), check if this solution is a parent from the previous generation and its fitness value is already calculated. If so, use the fitness value instead of calling the fitness function.
-                elif (self.last_generation_parents is not None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
-                    # Index of the parent in the parents array (self.last_generation_parents). This is not its index within the population.
-                    parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
-                    # Index of the parent in the population.
+                # We cannot use the `numpy.where()` function directly because it does not support the `axis` parameter. This is why the `numpy.all()` function is used to match the solutions on axis=1.
+                # elif (self.last_generation_parents is not None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
+                elif ((self.keep_parents == -1) or (self.keep_parents > 0)) and (self.last_generation_parents is not None) and (len(self.last_generation_parents) > 0) and (list(sol) in last_generation_parents_as_list):
+                    # Index of the parent in the 'self.last_generation_parents' array. 
+                    # This is not its index within the population. It is just its index in the 'self.last_generation_parents' array.
+                    # parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
+                    parent_idx = last_generation_parents_as_list.index(list(sol))
+                    # Use the returned parent index to return its index in the last population.
                     parent_idx = self.last_generation_parents_indices[parent_idx]
                     # Use the parent's index to return its pre-calculated fitness value.
                     fitness = self.previous_generation_fitness[parent_idx]
                 else:
-                    fitness = self.fitness_func(sol, sol_idx)
-                    if type(fitness) in GA.supported_int_float_types:
-                        pass
+                    # Check if batch processing is used. If not, then calculate this missing fitness value.
+                    if self.fitness_batch_size in [1, None]:
+                        fitness = self.fitness_func(sol, sol_idx)
+                        if type(fitness) in GA.supported_int_float_types:
+                            pass
+                        else:
+                            raise ValueError("The fitness function should return a number but the value {fit_val} of type {fit_type} found.".format(fit_val=fitness, fit_type=type(fitness)))
                     else:
-                        raise ValueError("The fitness function should return a number but the value {fit_val} of type {fit_type} found.".format(fit_val=fitness, fit_type=type(fitness)))
+                        # Reaching this point means that batch processing is in effect to calculate the fitness values.
+                        # Do not continue the loop as no fitness is calculated. The fitness will be calculated later in batch mode.
+                        continue
+
+                # This is only executed if the fitness value was already calculated.
                 pop_fitness[sol_idx] = fitness
-        else:    
+
+            if self.fitness_batch_size not in [1, None]:
+                # Reaching this block means that batch fitness calculation is used.
+
+                # Indices of the solutions to calculate their fitness.
+                solutions_indices = numpy.where(numpy.array(pop_fitness) == "undefined")[0]
+                # Number of batches.
+                num_batches = numpy.int(numpy.ceil(len(solutions_indices) / self.fitness_batch_size))
+                # For each batch, get its indices and call the fitness function.
+                for batch_idx in range(num_batches):
+                    batch_first_index = batch_idx * self.fitness_batch_size
+                    batch_last_index = (batch_idx + 1) * self.fitness_batch_size
+                    batch_indices = solutions_indices[batch_first_index:batch_last_index]
+                    batch_solutions = self.population[batch_indices, :]
+
+                    batch_fitness = self.fitness_func(batch_solutions, batch_indices)
+                    if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
+                        raise TypeError("Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type ({batch_fitness_type}).".format(batch_fitness=batch_fitness, batch_fitness_type=type(batch_fitness)))
+                    elif len(numpy.array(batch_fitness)) != len(batch_indices):
+                        raise ValueError("There is a mismatch between the number of solutions passed to the fitness function ({batch_indices_len}) and the number of fitness values returned ({batch_fitness_len}). They must match.".format(batch_fitness_len=len(batch_fitness), batch_indices_len=len(batch_indices)))
+
+                    for index, fitness in zip(batch_indices, batch_fitness):
+                        if type(fitness) in GA.supported_int_float_types:
+                            pop_fitness[index] = fitness
+                        else:
+                            raise ValueError("The fitness function should return a number but the value {fit_val} of type {fit_type} found.".format(fit_val=fitness, fit_type=type(fitness)))
+        else:
             # Calculating the fitness value of each solution in the current population.
             for sol_idx, sol in enumerate(self.population):
                 # Check if the `save_solutions` parameter is `True` and whether the solution already exists in the `solutions` list. If so, use its fitness rather than calculating it again.
-                if (self.save_solutions) and (list(sol) in self.solutions):
-                    fitness = self.solutions_fitness[self.solutions.index(list(sol))]
+                # The functions numpy.any()/numpy.all()/numpy.where()/numpy.equal() are very slow.
+                # So, list membership operator 'in' is used to check if the solution exists in the 'self.solutions' list.
+                # Make sure that both the solution and 'self.solutions' are of type 'list' not 'numpy.ndarray'.
+                if (self.save_solutions) and (len(self.solutions) > 0) and (list(sol) in self.solutions):
+                    solution_idx = self.solutions.index(list(sol))
+                    fitness = self.solutions_fitness[solution_idx]
+                    pop_fitness[sol_idx] = fitness
+                elif (self.keep_elitism > 0) and (self.last_generation_elitism is not None) and (len(self.last_generation_elitism) > 0) and (list(sol) in last_generation_elitism_as_list):
+                    # Return the index of the elitism from the elitism array 'self.last_generation_elitism'.
+                    # This is not its index within the population. It is just its index in the 'self.last_generation_elitism' array.
+                    elitism_idx = last_generation_elitism_as_list.index(list(sol))
+                    # Use the returned elitism index to return its index in the last population.
+                    elitism_idx = self.last_generation_elitism_indices[elitism_idx]
+                    # Use the elitism's index to return its pre-calculated fitness value.
+                    fitness = self.previous_generation_fitness[elitism_idx]
                 # If the solutions are not saved (i.e. `save_solutions=False`), check if this solution is a parent from the previous generation and its fitness value is already calculated. If so, use the fitness value instead of calling the fitness function.
-                if not (self.last_generation_parents is None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
-                    # Index of the parent in the parents array (self.last_generation_parents). This is not its index within the population.
-                    parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
-                    # Index of the parent in the population.
+                # We cannot use the `numpy.where()` function directly because it does not support the `axis` parameter. This is why the `numpy.all()` function is used to match the solutions on axis=1.
+                # elif (self.last_generation_parents is not None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
+                elif (self.last_generation_parents is not None) and (len(self.last_generation_parents) > 0) and (list(sol) in last_generation_parents_as_list):
+                    # Index of the parent in the 'self.last_generation_parents' array. 
+                    # This is not its index within the population. It is just its index in the 'self.last_generation_parents' array.
+                    # parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
+                    parent_idx = last_generation_parents_as_list.index(list(sol))
+                    # Use the returned parent index to return its index in the last population.
                     parent_idx = self.last_generation_parents_indices[parent_idx]
                     # Use the parent's index to return its pre-calculated fitness value.
-                    fitness = self.last_generation_fitness[parent_idx]
+                    fitness = self.previous_generation_fitness[parent_idx]
 
                     pop_fitness[sol_idx] = fitness
-    
+
             # Decide which class to use based on whether the user selected "process" or "thread"
             if self.parallel_processing[0] == "process":
                 ExecutorClass = concurrent.futures.ProcessPoolExecutor
             else:
                 ExecutorClass = concurrent.futures.ThreadPoolExecutor
-    
+
             # We can use a with statement to ensure threads are cleaned up promptly (https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor-example)
             with ExecutorClass(max_workers=self.parallel_processing[1]) as executor:
                 solutions_to_submit_indices = []
@@ -1294,12 +1461,44 @@ class GA:
                     if pop_fitness[sol_idx] == "undefined":
                         solutions_to_submit.append(sol.copy())
                         solutions_to_submit_indices.append(sol_idx)
-        
-                for index, fitness in zip(solutions_to_submit_indices, executor.map(self.fitness_func, solutions_to_submit, range(len(solutions_to_submit_indices)))):
-                    if type(fitness) in GA.supported_int_float_types:
-                        pop_fitness[index] = fitness
-                    else:
-                        raise ValueError("The fitness function should return a number but the value {fit_val} of type {fit_type} found.".format(fit_val=fitness, fit_type=type(fitness)))
+
+                # Check if batch processing is used. If not, then calculate the fitness value for individual solutions.
+                if self.fitness_batch_size in [1, None]:
+                    for index, fitness in zip(solutions_to_submit_indices, executor.map(self.fitness_func, solutions_to_submit, solutions_to_submit_indices)):
+                        if type(fitness) in GA.supported_int_float_types:
+                            pop_fitness[index] = fitness
+                        else:
+                            raise ValueError("The fitness function should return a number but the value {fit_val} of type {fit_type} found.".format(fit_val=fitness, fit_type=type(fitness)))
+                else:
+                    # Reaching this block means that batch processing is used. The fitness values are calculated in batches.
+
+                    # Number of batches.
+                    num_batches = numpy.int(numpy.ceil(len(solutions_to_submit_indices) / self.fitness_batch_size))
+                    # Each element of the `batches_solutions` list represents the solutions in one batch.
+                    batches_solutions = []
+                    # Each element of the `batches_indices` list represents the solutions' indices in one batch.
+                    batches_indices = []
+                    # For each batch, get its indices and call the fitness function.
+                    for batch_idx in range(num_batches):
+                        batch_first_index = batch_idx * self.fitness_batch_size
+                        batch_last_index = (batch_idx + 1) * self.fitness_batch_size
+                        batch_indices = solutions_to_submit_indices[batch_first_index:batch_last_index]
+                        batch_solutions = self.population[batch_indices, :]
+
+                        batches_solutions.append(batch_solutions)
+                        batches_indices.append(batch_indices)
+
+                    for batch_indices, batch_fitness in zip(batches_indices, executor.map(self.fitness_func, batches_solutions, batches_indices)):
+                        if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
+                            raise TypeError("Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type ({batch_fitness_type}).".format(batch_fitness=batch_fitness, batch_fitness_type=type(batch_fitness)))
+                        elif len(numpy.array(batch_fitness)) != len(batch_indices):
+                            raise ValueError("There is a mismatch between the number of solutions passed to the fitness function ({batch_indices_len}) and the number of fitness values returned ({batch_fitness_len}). They must match.".format(batch_fitness_len=len(batch_fitness), batch_indices_len=len(batch_indices)))
+
+                        for index, fitness in zip(batch_indices, batch_fitness):
+                            if type(fitness) in GA.supported_int_float_types:
+                                pop_fitness[index] = fitness
+                            else:
+                                raise ValueError("The fitness function should return a number but the value {fit_val} of type {fit_type} found.".format(fit_val=fitness, fit_type=type(fitness)))
 
         pop_fitness = numpy.array(pop_fitness)
 
@@ -1335,6 +1534,16 @@ class GA:
 
         stop_run = False
 
+        # To continue from where we stopped, the first generation index should start from the value of the 'self.generations_completed' parameter.
+        if self.generations_completed != 0 and type(self.generations_completed) in GA.supported_int_types:
+            # If the 'self.generations_completed' parameter is not '0', then this means we continue execution.
+            generation_first_idx = self.generations_completed
+            generation_last_idx = self.num_generations + self.generations_completed
+        else:
+            # If the 'self.generations_completed' parameter is '0', then stat from scratch.
+            generation_first_idx = 0
+            generation_last_idx = self.num_generations
+
         # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
         self.last_generation_fitness = self.cal_pop_fitness()
 
@@ -1344,13 +1553,13 @@ class GA:
         if self.save_best_solutions:
             self.best_solutions.append(best_solution)
 
-        for generation in range(self.num_generations):
+        for generation in range(generation_first_idx, generation_last_idx):
             if not (self.on_fitness is None):
                 self.on_fitness(self, self.last_generation_fitness)
 
             # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
             self.best_solutions_fitness.append(best_solution_fitness)
-
+            
             # Appending the solutions in the current generation to the solutions list.
             if self.save_solutions:
                 # self.solutions.extend(self.population.copy())
@@ -1363,8 +1572,25 @@ class GA:
             # Selecting the best parents in the population for mating.
             if callable(self.parent_selection_type):
                 self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness, self.num_parents_mating, self)
+                if not type(self.last_generation_parents) is numpy.ndarray:
+                    raise TypeError("The type of the iterable holding the selected parents is expected to be (numpy.ndarray) but {last_generation_parents_type} found.".format(last_generation_parents_type=type(self.last_generation_parents)))
+                if not type(self.last_generation_parents_indices) is numpy.ndarray:
+                    raise TypeError("The type of the iterable holding the selected parents' indices is expected to be (numpy.ndarray) but {last_generation_parents_indices_type} found.".format(last_generation_parents_indices_type=type(self.last_generation_parents_indices)))
             else:
                 self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness, num_parents=self.num_parents_mating)
+
+            # Validate the output of the parent selection step: self.select_parents()
+            if self.last_generation_parents.shape != (self.num_parents_mating, self.num_genes):
+                if self.last_generation_parents.shape[0] != self.num_parents_mating:
+                    raise ValueError("Size mismatch between the size of the selected parents {parents_size_actual} and the expected size {parents_size_expected}. It is expected to select ({num_parents_mating}) parents but ({num_parents_mating_selected}) selected.".format(parents_size_actual=self.last_generation_parents.shape, parents_size_expected=(self.num_parents_mating, self.num_genes), num_parents_mating=self.num_parents_mating, num_parents_mating_selected=self.last_generation_parents.shape[0]))
+                elif self.last_generation_parents.shape[1] != self.num_genes:
+                    raise ValueError("Size mismatch between the size of the selected parents {parents_size_actual} and the expected size {parents_size_expected}. Parents are expected to have ({num_genes}) genes but ({num_genes_selected}) produced.".format(parents_size_actual=self.last_generation_parents.shape, parents_size_expected=(self.num_parents_mating, self.num_genes), num_genes=self.num_genes, num_genes_selected=self.last_generation_parents.shape[1]))
+
+            if self.last_generation_parents_indices.ndim != 1:
+                raise ValueError("The iterable holding the selected parents indices is expected to have 1 dimension but ({parents_indices_ndim}) found.".format(parents_indices_ndim=len(self.last_generation_parents_indices)))
+            elif len(self.last_generation_parents_indices) != self.num_parents_mating:
+                raise ValueError("The iterable holding the selected parents indices is expected to have ({num_parents_mating}) values but ({num_parents_mating_selected}) found.".format(num_parents_mating=self.num_parents_mating, num_parents_mating_selected=len(self.last_generation_parents_indices)))
+
             if not (self.on_parents is None):
                 self.on_parents(self, self.last_generation_parents)
 
@@ -1390,9 +1616,16 @@ class GA:
                     self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
                                                                               (self.num_offspring, self.num_genes),
                                                                               self)
+                    if not type(self.last_generation_offspring_crossover) is numpy.ndarray:
+                        raise TypeError("The output of the crossover step is expected to be of type (numpy.ndarray) but {last_generation_offspring_crossover_type} found.".format(last_generation_offspring_crossover_type=type(self.last_generation_offspring_crossover)))
                 else:
                     self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
                                                                               offspring_size=(self.num_offspring, self.num_genes))
+                if self.last_generation_offspring_crossover.shape != (self.num_offspring, self.num_genes):
+                    if self.last_generation_offspring_crossover.shape[0] != self.num_offspring:
+                        raise ValueError("Size mismatch between the crossover output {crossover_actual_size} and the expected crossover output {crossover_expected_size}. It is expected to produce ({num_offspring}) offspring but ({num_offspring_produced}) produced.".format(crossover_actual_size=self.last_generation_offspring_crossover.shape, crossover_expected_size=(self.num_offspring, self.num_genes), num_offspring=self.num_offspring, num_offspring_produced=self.last_generation_offspring_crossover.shape[0]))
+                    elif self.last_generation_offspring_crossover.shape[1] != self.num_genes:
+                        raise ValueError("Size mismatch between the crossover output {crossover_actual_size} and the expected crossover output {crossover_expected_size}. It is expected that the offspring has ({num_genes}) genes but ({num_genes_produced}) produced.".format(crossover_actual_size=self.last_generation_offspring_crossover.shape, crossover_expected_size=(self.num_offspring, self.num_genes), num_genes=self.num_genes, num_genes_produced=self.last_generation_offspring_crossover.shape[1]))
 
             # PyGAD 2.18.2 // The on_crossover() callback function is called even if crossover_type is None.
             if not (self.on_crossover is None):
@@ -1405,8 +1638,16 @@ class GA:
                 # Adding some variations to the offspring using mutation.
                 if callable(self.mutation_type):
                     self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover, self)
+                    if not type(self.last_generation_offspring_mutation) is numpy.ndarray:
+                        raise TypeError("The output of the mutation step is expected to be of type (numpy.ndarray) but {last_generation_offspring_mutation_type} found.".format(last_generation_offspring_mutation_type=type(self.last_generation_offspring_mutation)))
                 else:
                     self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover)
+
+                if self.last_generation_offspring_mutation.shape != (self.num_offspring, self.num_genes):
+                    if self.last_generation_offspring_mutation.shape[0] != self.num_offspring:
+                        raise ValueError("Size mismatch between the mutation output {mutation_actual_size} and the expected mutation output {mutation_expected_size}. It is expected to produce ({num_offspring}) offspring but ({num_offspring_produced}) produced.".format(mutation_actual_size=self.last_generation_offspring_mutation.shape, mutation_expected_size=(self.num_offspring, self.num_genes), num_offspring=self.num_offspring, num_offspring_produced=self.last_generation_offspring_mutation.shape[0]))
+                    elif self.last_generation_offspring_mutation.shape[1] != self.num_genes:
+                        raise ValueError("Size mismatch between the mutation output {mutation_actual_size} and the expected mutation output {mutation_expected_size}. It is expected that the offspring has ({num_genes}) genes but ({num_genes_produced}) produced.".format(mutation_actual_size=self.last_generation_offspring_mutation.shape, mutation_expected_size=(self.num_offspring, self.num_genes), num_genes=self.num_genes, num_genes_produced=self.last_generation_offspring_mutation.shape[1]))
 
             # PyGAD 2.18.2 // The on_mutation() callback function is called even if mutation_type is None.
             if not (self.on_mutation is None):
@@ -1414,7 +1655,7 @@ class GA:
 
             # Update the population attribute according to the offspring generated.
             if self.keep_elitism == 0:
-                # If the keep_elitism parameter is 0, then the keep_parents parameter will be used to decide if the parents are kept in the next generation. 
+                # If the keep_elitism parameter is 0, then the keep_parents parameter will be used to decide if the parents are kept in the next generation.
                 if (self.keep_parents == 0):
                     self.population = self.last_generation_offspring_mutation
                 elif (self.keep_parents == -1):
@@ -1426,7 +1667,7 @@ class GA:
                     self.population[0:parents_to_keep.shape[0], :] = parents_to_keep
                     self.population[parents_to_keep.shape[0]:, :] = self.last_generation_offspring_mutation
             else:
-                self.last_generation_elitism, _ = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_elitism)
+                self.last_generation_elitism, self.last_generation_elitism_indices = self.steady_state_selection(self.last_generation_fitness, num_parents=self.keep_elitism)
                 self.population[0:self.last_generation_elitism.shape[0], :] = self.last_generation_elitism
                 self.population[self.last_generation_elitism.shape[0]:, :] = self.last_generation_offspring_mutation
 
@@ -1447,7 +1688,7 @@ class GA:
                 r = self.on_generation(self)
                 if type(r) is str and r.lower() == "stop":
                     # Before aborting the loop, save the fitness value of the best solution.
-                    _, best_solution_fitness, _ = self.best_solution()
+                    # _, best_solution_fitness, _ = self.best_solution()
                     self.best_solutions_fitness.append(best_solution_fitness)
                     break
 
@@ -1515,7 +1756,7 @@ class GA:
         for parent_num in range(num_parents):
             parents[parent_num, :] = self.population[fitness_sorted[parent_num], :].copy()
 
-        return parents, fitness_sorted[:num_parents]
+        return parents, numpy.array(fitness_sorted[:num_parents])
 
     def rank_selection(self, fitness, num_parents):
 
@@ -1537,7 +1778,7 @@ class GA:
         for parent_num in range(num_parents):
             parents[parent_num, :] = self.population[fitness_sorted[parent_num], :].copy()
 
-        return parents, fitness_sorted[:num_parents]
+        return parents, numpy.array(fitness_sorted[:num_parents])
 
     def random_selection(self, fitness, num_parents):
 
@@ -1585,7 +1826,7 @@ class GA:
             parents_indices.append(rand_indices[selected_parent_idx])
             parents[parent_num, :] = self.population[rand_indices[selected_parent_idx], :].copy()
 
-        return parents, parents_indices
+        return parents, numpy.array(parents_indices)
 
     def roulette_wheel_selection(self, fitness, num_parents):
 
@@ -1619,7 +1860,7 @@ class GA:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
         else:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
-
+        
         parents_indices = []
 
         for parent_num in range(num_parents):
@@ -1629,7 +1870,7 @@ class GA:
                     parents[parent_num, :] = self.population[idx, :].copy()
                     parents_indices.append(idx)
                     break
-        return parents, parents_indices
+        return parents, numpy.array(parents_indices)
 
     def stochastic_universal_selection(self, fitness, num_parents):
 
@@ -1666,7 +1907,7 @@ class GA:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
         else:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
-
+        
         parents_indices = []
 
         for parent_num in range(num_parents):
@@ -1676,7 +1917,7 @@ class GA:
                     parents[parent_num, :] = self.population[idx, :].copy()
                     parents_indices.append(idx)
                     break
-        return parents, parents_indices
+        return parents, numpy.array(parents_indices)
 
     def single_point_crossover(self, parents, offspring_size):
 
@@ -1709,7 +1950,7 @@ class GA:
                     parent1_idx = indices[0]
                     parent2_idx = parent1_idx
                 else:
-                    indices = random.sample(set(indices), 2)
+                    indices = random.sample(list(set(indices)), 2)
                     parent1_idx = indices[0]
                     parent2_idx = indices[1]
             else:
@@ -1723,18 +1964,18 @@ class GA:
             # The new offspring has its second half of its genes from the second parent.
             offspring[k, crossover_point:] = parents[parent2_idx, crossover_point:]
 
-            if (self.mutation_type is None) and (self.allow_duplicate_genes == False):
+            if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
                     offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
-                                                                                         min_val=self.random_mutation_min_val,
-                                                                                         max_val=self.random_mutation_max_val,
-                                                                                         mutation_by_replacement=self.mutation_by_replacement,
-                                                                                         gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                             min_val=self.random_mutation_min_val,
+                                                                             max_val=self.random_mutation_max_val,
+                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                             gene_type=self.gene_type,
+                                                                             num_trials=10)
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
-                                                                                         gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                             gene_type=self.gene_type,
+                                                                             num_trials=10)
 
         return offspring
 
@@ -1758,7 +1999,7 @@ class GA:
                 crossover_point1 = 0
             else:
                 crossover_point1 = numpy.random.randint(low=0, high=numpy.ceil(parents.shape[1]/2 + 1), size=1)[0]
-
+    
             crossover_point2 = crossover_point1 + int(parents.shape[1]/2) # The second point must always be greater than the first point.
 
             if not (self.crossover_probability is None):
@@ -1773,7 +2014,7 @@ class GA:
                     parent1_idx = indices[0]
                     parent2_idx = parent1_idx
                 else:
-                    indices = random.sample(set(indices), 2)
+                    indices = random.sample(list(set(indices)), 2)
                     parent1_idx = indices[0]
                     parent2_idx = indices[1]
             else:
@@ -1789,7 +2030,7 @@ class GA:
             # The genes between the 2 points are copied from the second parent.
             offspring[k, crossover_point1:crossover_point2] = parents[parent2_idx, crossover_point1:crossover_point2]
 
-            if (self.mutation_type is None) and (self.allow_duplicate_genes == False):
+            if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
                     offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
                                                                                          min_val=self.random_mutation_min_val,
@@ -1831,7 +2072,7 @@ class GA:
                     parent1_idx = indices[0]
                     parent2_idx = parent1_idx
                 else:
-                    indices = random.sample(set(indices), 2)
+                    indices = random.sample(list(set(indices)), 2)
                     parent1_idx = indices[0]
                     parent2_idx = indices[1]
             else:
@@ -1849,7 +2090,7 @@ class GA:
                     # The gene will be copied from the second parent if the current gene index is 1.
                     offspring[k, gene_idx] = parents[parent2_idx, gene_idx]
 
-            if (self.mutation_type is None) and (self.allow_duplicate_genes == False):
+            if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
                     offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
                                                                                          min_val=self.random_mutation_min_val,
@@ -1867,7 +2108,7 @@ class GA:
     def scattered_crossover(self, parents, offspring_size):
 
         """
-        Applies the scattered crossover. It randomly selects the gene from one of the 2 parents.
+        Applies the scattered crossover. It randomly selects the gene from one of the 2 parents. 
         It accepts 2 parameters:
             -parents: The parents to mate for producing the offspring.
             -offspring_size: The size of the offspring to produce.
@@ -1892,7 +2133,7 @@ class GA:
                     parent1_idx = indices[0]
                     parent2_idx = parent1_idx
                 else:
-                    indices = random.sample(set(indices), 2)
+                    indices = random.sample(list(set(indices)), 2)
                     parent1_idx = indices[0]
                     parent2_idx = indices[1]
             else:
@@ -1905,7 +2146,7 @@ class GA:
             gene_sources = numpy.random.randint(0, 2, size=self.num_genes)
             offspring[k, :] = numpy.where(gene_sources == 0, parents[parent1_idx, :], parents[parent2_idx, :])
 
-            if (self.mutation_type is None) and (self.allow_duplicate_genes == False):
+            if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
                     offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
                                                                                          min_val=self.random_mutation_min_val,
@@ -2001,6 +2242,7 @@ class GA:
                         # If the gene space has more than 1 value, then select a new one that is different from the current value.
                         else:
                             values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
+
                             if len(values_to_select_from) == 0:
                                 value_from_space = offspring[offspring_idx, gene_idx]
                             else:
@@ -2021,6 +2263,7 @@ class GA:
                     else:
                         # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
                         values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
+
                         if len(values_to_select_from) == 0:
                             value_from_space = offspring[offspring_idx, gene_idx]
                         else:
@@ -2028,8 +2271,8 @@ class GA:
                     # value_from_space = random.choice(self.gene_space)
 
                 if value_from_space is None:
-                    value_from_space = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                            high=self.random_mutation_max_val,
+                    value_from_space = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                            high=self.random_mutation_max_val, 
                                                             size=1)
 
                 # Assinging the selected value from the space to the gene.
@@ -2072,7 +2315,7 @@ class GA:
                             curr_gene_space = self.gene_space[gene_idx].copy()
                         else:
                             curr_gene_space = self.gene_space[gene_idx]
-
+        
                         # If the gene space has only a single value, use it as the new gene value.
                         if type(curr_gene_space) in GA.supported_int_float_types:
                             value_from_space = curr_gene_space
@@ -2104,6 +2347,7 @@ class GA:
                             # If the gene space has more than 1 value, then select a new one that is different from the current value.
                             else:
                                 values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
+
                                 if len(values_to_select_from) == 0:
                                     value_from_space = offspring[offspring_idx, gene_idx]
                                 else:
@@ -2122,6 +2366,7 @@ class GA:
                                                                         size=1)
                         else:
                             values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
+
                             if len(values_to_select_from) == 0:
                                 value_from_space = offspring[offspring_idx, gene_idx]
                             else:
@@ -2161,8 +2406,8 @@ class GA:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
             for gene_idx in mutation_indices:
                 # Generating a random value.
-                random_value = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                    high=self.random_mutation_max_val,
+                random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                    high=self.random_mutation_max_val, 
                                                     size=1)
                 # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                 if self.mutation_by_replacement:
@@ -2216,8 +2461,8 @@ class GA:
             for gene_idx in range(offspring.shape[1]):
                 if probs[gene_idx] <= self.mutation_probability:
                     # Generating a random value.
-                    random_value = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                        high=self.random_mutation_max_val,
+                    random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                        high=self.random_mutation_max_val, 
                                                         size=1)
                     # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                     if self.mutation_by_replacement:
@@ -2304,7 +2549,7 @@ class GA:
             mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
             genes_range = numpy.arange(start=mutation_gene1, stop=mutation_gene2)
             numpy.random.shuffle(genes_range)
-
+            
             genes_to_scramble = numpy.flip(offspring[idx, genes_range])
             offspring[idx, genes_range] = genes_to_scramble
         return offspring
@@ -2316,7 +2561,7 @@ class GA:
         It accepts a single parameter:
             -offspring: The offspring to mutate.
         It returns the average fitness to be used in adaptive mutation.
-        """
+        """        
 
         fitness = self.last_generation_fitness.copy()
         temp_population = numpy.zeros_like(self.population)
@@ -2379,14 +2624,14 @@ class GA:
     def adaptive_mutation_by_space(self, offspring):
 
         """
-        Applies the adaptive mutation based on the 2 parameters 'mutation_num_genes' and 'gene_space'.
+        Applies the adaptive mutation based on the 2 parameters 'mutation_num_genes' and 'gene_space'. 
         A number of genes equal are selected randomly for mutation. This number depends on the fitness of the solution.
         The random values are selected from the 'gene_space' parameter.
         It accepts a single parameter:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
-
+        
         # For each offspring, a value from the gene space is selected randomly and assigned to the selected gene for mutation.
 
         average_fitness, offspring_fitness = self.adaptive_mutation_population_fitness(offspring)
@@ -2439,6 +2684,7 @@ class GA:
                         # If the gene space has more than 1 value, then select a new one that is different from the current value.
                         else:
                             values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
+
                             if len(values_to_select_from) == 0:
                                 value_from_space = offspring[offspring_idx, gene_idx]
                             else:
@@ -2457,6 +2703,7 @@ class GA:
                                                                     size=1)
                     else:
                         values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
+
                         if len(values_to_select_from) == 0:
                             value_from_space = offspring[offspring_idx, gene_idx]
                         else:
@@ -2464,8 +2711,8 @@ class GA:
 
 
                 if value_from_space is None:
-                    value_from_space = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                            high=self.random_mutation_max_val,
+                    value_from_space = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                            high=self.random_mutation_max_val, 
                                                             size=1)
 
                 # Assinging the selected value from the space to the gene.
@@ -2487,11 +2734,11 @@ class GA:
                                                                                          gene_type=self.gene_type,
                                                                                          num_trials=10)
         return offspring
-
+        
     def adaptive_mutation_randomly(self, offspring):
 
         """
-        Applies the adaptive mutation based on the 'mutation_num_genes' parameter.
+        Applies the adaptive mutation based on the 'mutation_num_genes' parameter. 
         A number of genes equal are selected randomly for mutation. This number depends on the fitness of the solution.
         The random values are selected based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
         It accepts a single parameter:
@@ -2511,8 +2758,8 @@ class GA:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
             for gene_idx in mutation_indices:
                 # Generating a random value.
-                random_value = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                    high=self.random_mutation_max_val,
+                random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                    high=self.random_mutation_max_val, 
                                                     size=1)
                 # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                 if self.mutation_by_replacement:
@@ -2581,7 +2828,7 @@ class GA:
                             curr_gene_space = self.gene_space[gene_idx].copy()
                         else:
                             curr_gene_space = self.gene_space[gene_idx]
-
+        
                         # If the gene space has only a single value, use it as the new gene value.
                         if type(curr_gene_space) in GA.supported_int_float_types:
                             value_from_space = curr_gene_space
@@ -2613,6 +2860,7 @@ class GA:
                             # If the gene space has more than 1 value, then select a new one that is different from the current value.
                             else:
                                 values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
+
                                 if len(values_to_select_from) == 0:
                                     value_from_space = offspring[offspring_idx, gene_idx]
                                 else:
@@ -2631,14 +2879,15 @@ class GA:
                                                                         size=1)
                         else:
                             values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
+
                             if len(values_to_select_from) == 0:
                                 value_from_space = offspring[offspring_idx, gene_idx]
                             else:
                                 value_from_space = random.choice(values_to_select_from)
 
                     if value_from_space is None:
-                        value_from_space = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                                high=self.random_mutation_max_val,
+                        value_from_space = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                                high=self.random_mutation_max_val, 
                                                                 size=1)
 
                     # Assinging the selected value from the space to the gene.
@@ -2664,7 +2913,7 @@ class GA:
     def adaptive_mutation_probs_randomly(self, offspring):
 
         """
-        Applies the adaptive mutation based on the 'mutation_probability' parameter.
+        Applies the adaptive mutation based on the 'mutation_probability' parameter. 
         Based on whether the solution fitness is above or below a threshold, the mutation is applied diffrently by mutating high or low number of genes.
         The random values are selected based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
         It accepts a single parameter:
@@ -2686,8 +2935,8 @@ class GA:
             for gene_idx in range(offspring.shape[1]):
                 if probs[gene_idx] <= adaptive_mutation_probability:
                     # Generating a random value.
-                    random_value = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                        high=self.random_mutation_max_val,
+                    random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                        high=self.random_mutation_max_val, 
                                                         size=1)
                     # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                     if self.mutation_by_replacement:
@@ -2728,7 +2977,7 @@ class GA:
 
         """
         Solves the duplicates in a solution by randomly selecting new values for the duplicating genes.
-
+        
         solution: A solution with duplicate values.
         min_val: Minimum value of the range to sample a number randomly.
         max_val: Maximum value of the range to sample a number randomly.
@@ -2753,11 +3002,11 @@ class GA:
                 for trial_index in range(num_trials):
                     if self.gene_type_single == True:
                         if gene_type[0] in GA.supported_int_types:
-                            temp_val = self.unique_int_gene_from_range(solution=new_solution,
-                                                                       gene_index=duplicate_index,
-                                                                       min_val=min_val,
-                                                                       max_val=max_val,
-                                                                       mutation_by_replacement=mutation_by_replacement,
+                            temp_val = self.unique_int_gene_from_range(solution=new_solution, 
+                                                                       gene_index=duplicate_index, 
+                                                                       min_val=min_val, 
+                                                                       max_val=max_val, 
+                                                                       mutation_by_replacement=mutation_by_replacement, 
                                                                        gene_type=gene_type)
                         else:
                             temp_val = numpy.random.uniform(low=min_val,
@@ -2769,11 +3018,11 @@ class GA:
                                 temp_val = new_solution[duplicate_index] + temp_val
                     else:
                         if gene_type[duplicate_index] in GA.supported_int_types:
-                            temp_val = self.unique_int_gene_from_range(solution=new_solution,
-                                                                       gene_index=duplicate_index,
-                                                                       min_val=min_val,
-                                                                       max_val=max_val,
-                                                                       mutation_by_replacement=mutation_by_replacement,
+                            temp_val = self.unique_int_gene_from_range(solution=new_solution, 
+                                                                       gene_index=duplicate_index, 
+                                                                       min_val=min_val, 
+                                                                       max_val=max_val, 
+                                                                       mutation_by_replacement=mutation_by_replacement, 
                                                                        gene_type=gene_type)
                         else:
                             temp_val = numpy.random.uniform(low=min_val,
@@ -2783,7 +3032,7 @@ class GA:
                                 pass
                             else:
                                 temp_val = new_solution[duplicate_index] + temp_val
-
+                    
                     if self.gene_type_single == True:
                         if not gene_type[1] is None:
                             temp_val = numpy.round(gene_type[0](temp_val),
@@ -2827,7 +3076,7 @@ class GA:
             not_unique_indices: Indices of the genes with duplicate values.
             num_unsolved_duplicates: Number of unsolved duplicates.
         """
-
+        
         new_solution = solution.copy()
 
         _, unique_gene_indices = numpy.unique(solution, return_index=True)
@@ -2838,9 +3087,9 @@ class GA:
         # For a solution like [3 2 0 0], the indices of the 2 duplicating genes are 2 and 3.
         # The next call to the find_unique_value() method tries to change the value of the gene with index 3 to solve the duplicate.
         if len(not_unique_indices) > 0:
-            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(new_solution=new_solution,
-                                                                                                   gene_type=gene_type,
-                                                                                                   not_unique_indices=not_unique_indices,
+            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(new_solution=new_solution, 
+                                                                                                   gene_type=gene_type, 
+                                                                                                   not_unique_indices=not_unique_indices, 
                                                                                                    num_trials=10,
                                                                                                    build_initial_pop=build_initial_pop)
         else:
@@ -2850,9 +3099,9 @@ class GA:
         # If there are no possible values for the gene 3 with index 3 to solve the duplicate, try to change the value of the other gene with index 2.
         if len(not_unique_indices) > 0:
             not_unique_indices = set(numpy.where(new_solution == new_solution[list(not_unique_indices)[0]])[0]) - set([list(not_unique_indices)[0]])
-            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(new_solution=new_solution,
-                                                                                                   gene_type=gene_type,
-                                                                                                   not_unique_indices=not_unique_indices,
+            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(new_solution=new_solution, 
+                                                                                                   gene_type=gene_type, 
+                                                                                                   not_unique_indices=not_unique_indices, 
                                                                                                    num_trials=10,
                                                                                                    build_initial_pop=build_initial_pop)
         else:
@@ -2862,43 +3111,6 @@ class GA:
             # There are no possible changes in the last 2 genes to solve the problem. But it could be solved by changing the second gene from 2 to 4.
             # As a result, any of the last 2 genes can take the value 2 and solve the duplicates.
             return new_solution, not_unique_indices, len(not_unique_indices)
-
-        return new_solution, not_unique_indices, num_unsolved_duplicates
-
-    def solve_duplicate_genes_by_space_OLD(self, solution, gene_type, num_trials=10):
-        # /////////////////////////
-        # Just for testing purposes.
-        # /////////////////////////
-
-        new_solution = solution.copy()
-
-        _, unique_gene_indices = numpy.unique(solution, return_index=True)
-        not_unique_indices = set(range(len(solution))) - set(unique_gene_indices)
-        # print("not_unique_indices OUTSIDE", not_unique_indices)
-
-        num_unsolved_duplicates = 0
-        if len(not_unique_indices) > 0:
-            for duplicate_index in not_unique_indices:
-                for trial_index in range(num_trials):
-                    temp_val = self.unique_gene_by_space(solution=solution,
-                                                         gene_idx=duplicate_index,
-                                                         gene_type=gene_type)
-
-                    if temp_val in new_solution and trial_index == (num_trials - 1):
-                        # print("temp_val, duplicate_index", temp_val, duplicate_index, new_solution)
-                        num_unsolved_duplicates = num_unsolved_duplicates + 1
-                        if not self.suppress_warnings: warnings.warn("Failed to find a unique value for gene with index {gene_idx}".format(gene_idx=duplicate_index))
-                    elif temp_val in new_solution:
-                        continue
-                    else:
-                        new_solution[duplicate_index] = temp_val
-                        # print("SOLVED", duplicate_index)
-                        break
-
-                # Update the list of duplicate indices after each iteration.
-                _, unique_gene_indices = numpy.unique(new_solution, return_index=True)
-                not_unique_indices = set(range(len(solution))) - set(unique_gene_indices)
-                # print("not_unique_indices INSIDE", not_unique_indices)
 
         return new_solution, not_unique_indices, num_unsolved_duplicates
 
@@ -2987,8 +3199,8 @@ class GA:
         num_unsolved_duplicates = 0
         for duplicate_index in not_unique_indices:
             for trial_index in range(num_trials):
-                temp_val = self.unique_gene_by_space(solution=new_solution,
-                                                     gene_idx=duplicate_index,
+                temp_val = self.unique_gene_by_space(solution=new_solution, 
+                                                     gene_idx=duplicate_index, 
                                                      gene_type=gene_type,
                                                      build_initial_pop=build_initial_pop)
 
@@ -3006,7 +3218,7 @@ class GA:
         # Update the list of duplicate indices after each iteration.
         _, unique_gene_indices = numpy.unique(new_solution, return_index=True)
         not_unique_indices = set(range(len(new_solution))) - set(unique_gene_indices)
-        # print("not_unique_indices INSIDE", not_unique_indices)
+        # print("not_unique_indices INSIDE", not_unique_indices)        
 
         return new_solution, not_unique_indices, num_unsolved_duplicates
 
@@ -3038,18 +3250,18 @@ class GA:
                 if self.gene_type_single == True:
                     if gene_type[0] in GA.supported_int_types:
                         if build_initial_pop == True:
-                            value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                               gene_index=gene_idx,
-                                                                               min_val=self.random_mutation_min_val,
-                                                                               max_val=self.random_mutation_max_val,
-                                                                               mutation_by_replacement=True,
+                            value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                               gene_index=gene_idx, 
+                                                                               min_val=self.random_mutation_min_val, 
+                                                                               max_val=self.random_mutation_max_val, 
+                                                                               mutation_by_replacement=True, 
                                                                                gene_type=gene_type)
                         else:
-                            value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                               gene_index=gene_idx,
-                                                                               min_val=self.random_mutation_min_val,
-                                                                               max_val=self.random_mutation_max_val,
-                                                                               mutation_by_replacement=True, #self.mutation_by_replacement,
+                            value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                               gene_index=gene_idx, 
+                                                                               min_val=self.random_mutation_min_val, 
+                                                                               max_val=self.random_mutation_max_val, 
+                                                                               mutation_by_replacement=True, #self.mutation_by_replacement, 
                                                                                gene_type=gene_type)
                     else:
                         value_from_space = numpy.random.uniform(low=self.random_mutation_min_val,
@@ -3062,18 +3274,18 @@ class GA:
                 else:
                     if gene_type[gene_idx] in GA.supported_int_types:
                         if build_initial_pop == True:
-                            value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                               gene_index=gene_idx,
-                                                                               min_val=self.random_mutation_min_val,
-                                                                               max_val=self.random_mutation_max_val,
-                                                                               mutation_by_replacement=True,
+                            value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                               gene_index=gene_idx, 
+                                                                               min_val=self.random_mutation_min_val, 
+                                                                               max_val=self.random_mutation_max_val, 
+                                                                               mutation_by_replacement=True, 
                                                                                gene_type=gene_type)
                         else:
-                            value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                               gene_index=gene_idx,
-                                                                               min_val=self.random_mutation_min_val,
-                                                                               max_val=self.random_mutation_max_val,
-                                                                               mutation_by_replacement=True, #self.mutation_by_replacement,
+                            value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                               gene_index=gene_idx, 
+                                                                               min_val=self.random_mutation_min_val, 
+                                                                               max_val=self.random_mutation_max_val, 
+                                                                               mutation_by_replacement=True, #self.mutation_by_replacement, 
                                                                                gene_type=gene_type)
                     else:
                         value_from_space = numpy.random.uniform(low=self.random_mutation_min_val,
@@ -3089,37 +3301,37 @@ class GA:
                     if gene_type[0] in GA.supported_int_types:
                         if build_initial_pop == True:
                             if 'step' in curr_gene_space.keys():
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=curr_gene_space['low'],
-                                                                                   max_val=curr_gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=curr_gene_space['low'], 
+                                                                                   max_val=curr_gene_space['high'], 
                                                                                    step=curr_gene_space['step'],
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                             else:
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=curr_gene_space['low'],
-                                                                                   max_val=curr_gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=curr_gene_space['low'], 
+                                                                                   max_val=curr_gene_space['high'], 
                                                                                    step=None,
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                         else:
                             if 'step' in curr_gene_space.keys():
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=curr_gene_space['low'],
-                                                                                   max_val=curr_gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=curr_gene_space['low'], 
+                                                                                   max_val=curr_gene_space['high'], 
                                                                                    step=curr_gene_space['step'],
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                             else:
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=curr_gene_space['low'],
-                                                                                   max_val=curr_gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=curr_gene_space['low'], 
+                                                                                   max_val=curr_gene_space['high'], 
                                                                                    step=None,
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                     else:
                         if 'step' in curr_gene_space.keys():
@@ -3139,37 +3351,37 @@ class GA:
                     if gene_type[gene_idx] in GA.supported_int_types:
                         if build_initial_pop == True:
                             if 'step' in curr_gene_space.keys():
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=curr_gene_space['low'],
-                                                                                   max_val=curr_gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=curr_gene_space['low'], 
+                                                                                   max_val=curr_gene_space['high'], 
                                                                                    step=curr_gene_space['step'],
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                             else:
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=curr_gene_space['low'],
-                                                                                   max_val=curr_gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=curr_gene_space['low'], 
+                                                                                   max_val=curr_gene_space['high'], 
                                                                                    step=None,
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                         else:
                             if 'step' in curr_gene_space.keys():
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=curr_gene_space['low'],
-                                                                                   max_val=curr_gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=curr_gene_space['low'], 
+                                                                                   max_val=curr_gene_space['high'], 
                                                                                    step=curr_gene_space['step'],
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                             else:
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=curr_gene_space['low'],
-                                                                                   max_val=curr_gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=curr_gene_space['low'], 
+                                                                                   max_val=curr_gene_space['high'], 
                                                                                    step=None,
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                     else:
                         if 'step' in curr_gene_space.keys():
@@ -3195,6 +3407,7 @@ class GA:
                 # If the gene space has more than 1 value, then select a new one that is different from the current value.
                 else:
                     values_to_select_from = list(set(curr_gene_space) - set(solution))
+
                     if len(values_to_select_from) == 0:
                         if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the gene space does not have enough values to prevent duplicates.")
                         value_from_space = solution[gene_idx]
@@ -3207,37 +3420,37 @@ class GA:
                     if gene_type[0] in GA.supported_int_types:
                         if build_initial_pop == True:
                             if 'step' in self.gene_space.keys():
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=self.gene_space['low'],
-                                                                                   max_val=self.gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=self.gene_space['low'], 
+                                                                                   max_val=self.gene_space['high'], 
                                                                                    step=self.gene_space['step'],
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                             else:
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=self.gene_space['low'],
-                                                                                   max_val=self.gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=self.gene_space['low'], 
+                                                                                   max_val=self.gene_space['high'], 
                                                                                    step=None,
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                         else:
                             if 'step' in self.gene_space.keys():
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=self.gene_space['low'],
-                                                                                   max_val=self.gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=self.gene_space['low'], 
+                                                                                   max_val=self.gene_space['high'], 
                                                                                    step=self.gene_space['step'],
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                             else:
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=self.gene_space['low'],
-                                                                                   max_val=self.gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=self.gene_space['low'], 
+                                                                                   max_val=self.gene_space['high'], 
                                                                                    step=None,
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                     else:
                         # When the gene_space is assigned a dict object, then it specifies the lower and upper limits of all genes in the space.
@@ -3258,37 +3471,37 @@ class GA:
                     if gene_type[gene_idx] in GA.supported_int_types:
                         if build_initial_pop == True:
                             if 'step' in self.gene_space.keys():
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=self.gene_space['low'],
-                                                                                   max_val=self.gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=self.gene_space['low'], 
+                                                                                   max_val=self.gene_space['high'], 
                                                                                    step=self.gene_space['step'],
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                             else:
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=self.gene_space['low'],
-                                                                                   max_val=self.gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=self.gene_space['low'], 
+                                                                                   max_val=self.gene_space['high'], 
                                                                                    step=None,
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                         else:
                             if 'step' in self.gene_space.keys():
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=self.gene_space['low'],
-                                                                                   max_val=self.gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=self.gene_space['low'], 
+                                                                                   max_val=self.gene_space['high'], 
                                                                                    step=self.gene_space['step'],
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                             else:
-                                value_from_space = self.unique_int_gene_from_range(solution=solution,
-                                                                                   gene_index=gene_idx,
-                                                                                   min_val=self.gene_space['low'],
-                                                                                   max_val=self.gene_space['high'],
+                                value_from_space = self.unique_int_gene_from_range(solution=solution, 
+                                                                                   gene_index=gene_idx, 
+                                                                                   min_val=self.gene_space['low'], 
+                                                                                   max_val=self.gene_space['high'], 
                                                                                    step=None,
-                                                                                   mutation_by_replacement=True,
+                                                                                   mutation_by_replacement=True, 
                                                                                    gene_type=gene_type)
                     else:
                         # When the gene_space is assigned a dict object, then it specifies the lower and upper limits of all genes in the space.
@@ -3308,7 +3521,10 @@ class GA:
 
             else:
                 # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
+                # Remove all the genes in the current solution from the gene_space.
+                # This only leaves the unique values that could be selected for the gene.
                 values_to_select_from = list(set(self.gene_space) - set(solution))
+
                 if len(values_to_select_from) == 0:
                     if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the gene space does not have enough values to prevent duplicates.")
                     value_from_space = solution[gene_idx]
@@ -3316,14 +3532,14 @@ class GA:
                     value_from_space = random.choice(values_to_select_from)
 
         if value_from_space is None:
-            value_from_space = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                    high=self.random_mutation_max_val,
+            value_from_space = numpy.random.uniform(low=self.random_mutation_min_val, 
+                                                    high=self.random_mutation_max_val, 
                                                     size=1)
 
         if self.gene_type_single == True:
             if not gene_type[1] is None:
                 value_from_space = numpy.round(gene_type[0](value_from_space),
-                                              gene_type[1])
+                                               gene_type[1])
             else:
                 value_from_space = gene_type[0](value_from_space)
         else:
@@ -3359,34 +3575,34 @@ class GA:
 
         return best_solution, best_solution_fitness, best_match_idx
 
-    def plot_result(self,
-                    title="PyGAD - Generation vs. Fitness",
-                    xlabel="Generation",
-                    ylabel="Fitness",
-                    linewidth=3,
-                    font_size=14,
+    def plot_result(self, 
+                    title="PyGAD - Generation vs. Fitness", 
+                    xlabel="Generation", 
+                    ylabel="Fitness", 
+                    linewidth=3, 
+                    font_size=14, 
                     plot_type="plot",
                     color="#3870FF",
                     save_dir=None):
 
-        if not self.suppress_warnings:
+        if not self.suppress_warnings: 
             warnings.warn("Please use the plot_fitness() method instead of plot_result(). The plot_result() method will be removed in the future.")
 
-        return self.plot_fitness(title=title,
-                                 xlabel=xlabel,
-                                 ylabel=ylabel,
-                                 linewidth=linewidth,
-                                 font_size=font_size,
+        return self.plot_fitness(title=title, 
+                                 xlabel=xlabel, 
+                                 ylabel=ylabel, 
+                                 linewidth=linewidth, 
+                                 font_size=font_size, 
                                  plot_type=plot_type,
                                  color=color,
                                  save_dir=save_dir)
 
-    def plot_fitness(self,
-                    title="PyGAD - Generation vs. Fitness",
-                    xlabel="Generation",
-                    ylabel="Fitness",
-                    linewidth=3,
-                    font_size=14,
+    def plot_fitness(self, 
+                    title="PyGAD - Generation vs. Fitness", 
+                    xlabel="Generation", 
+                    ylabel="Fitness", 
+                    linewidth=3, 
+                    font_size=14, 
                     plot_type="plot",
                     color="#3870FF",
                     save_dir=None):
@@ -3417,26 +3633,26 @@ class GA:
         if plot_type == "plot":
             matplotlib.pyplot.plot(self.best_solutions_fitness, linewidth=linewidth, color=color)
         elif plot_type == "scatter":
-            matplotlib.pyplot.scatter(range(self.generations_completed + 1), self.best_solutions_fitness, linewidth=linewidth, color=color)
+            matplotlib.pyplot.scatter(range(len(self.best_solutions_fitness)), self.best_solutions_fitness, linewidth=linewidth, color=color)
         elif plot_type == "bar":
-            matplotlib.pyplot.bar(range(self.generations_completed + 1), self.best_solutions_fitness, linewidth=linewidth, color=color)
+            matplotlib.pyplot.bar(range(len(self.best_solutions_fitness)), self.best_solutions_fitness, linewidth=linewidth, color=color)
         matplotlib.pyplot.title(title, fontsize=font_size)
         matplotlib.pyplot.xlabel(xlabel, fontsize=font_size)
         matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
-
+        
         if not save_dir is None:
-            matplotlib.pyplot.savefig(fname=save_dir,
+            matplotlib.pyplot.savefig(fname=save_dir, 
                                       bbox_inches='tight')
         matplotlib.pyplot.show()
 
         return fig
 
     def plot_new_solution_rate(self,
-                               title="PyGAD - Generation vs. New Solution Rate",
-                               xlabel="Generation",
-                               ylabel="New Solution Rate",
-                               linewidth=3,
-                               font_size=14,
+                               title="PyGAD - Generation vs. New Solution Rate", 
+                               xlabel="Generation", 
+                               ylabel="New Solution Rate", 
+                               linewidth=3, 
+                               font_size=14, 
                                plot_type="plot",
                                color="#3870FF",
                                save_dir=None):
@@ -3466,17 +3682,17 @@ class GA:
         unique_solutions = set()
         num_unique_solutions_per_generation = []
         for generation_idx in range(self.generations_completed):
-
+            
             len_before = len(unique_solutions)
 
             start = generation_idx * self.sol_per_pop
             end = start + self.sol_per_pop
-
+        
             for sol in self.solutions[start:end]:
                 unique_solutions.add(tuple(sol))
-
+        
             len_after = len(unique_solutions)
-
+        
             generation_num_unique_solutions = len_after - len_before
             num_unique_solutions_per_generation.append(generation_num_unique_solutions)
 
@@ -3492,17 +3708,17 @@ class GA:
         matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
 
         if not save_dir is None:
-            matplotlib.pyplot.savefig(fname=save_dir,
+            matplotlib.pyplot.savefig(fname=save_dir, 
                                       bbox_inches='tight')
         matplotlib.pyplot.show()
 
         return fig
 
-    def plot_genes(self,
-                   title="PyGAD - Gene",
-                   xlabel="Gene",
-                   ylabel="Value",
-                   linewidth=3,
+    def plot_genes(self, 
+                   title="PyGAD - Gene", 
+                   xlabel="Gene", 
+                   ylabel="Value", 
+                   linewidth=3, 
                    font_size=14,
                    plot_type="plot",
                    graph_type="plot",
@@ -3512,8 +3728,8 @@ class GA:
                    save_dir=None):
 
         """
-        Creates, shows, and returns a figure with number of subplots equal to the number of genes. Each subplot shows the gene value for each generation.
-        This method works only when save_solutions=True in the constructor of the pygad.GA class.
+        Creates, shows, and returns a figure with number of subplots equal to the number of genes. Each subplot shows the gene value for each generation. 
+        This method works only when save_solutions=True in the constructor of the pygad.GA class. 
         It also works only after completing at least 1 generation. If no generation is completed, an exception is raised.
 
         Accepts the following:
@@ -3534,7 +3750,7 @@ class GA:
 
         if self.generations_completed < 1:
             raise RuntimeError("The plot_genes() method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=self.generations_completed))
-
+        
         if type(solutions) is str:
             if solutions == 'all':
                 if self.save_solutions:
@@ -3556,7 +3772,7 @@ class GA:
             # num_cols can only be 0 if num_genes=1
             num_rows = int(numpy.ceil(self.num_genes/5.0))
             num_cols = int(numpy.ceil(self.num_genes/num_rows))
-
+    
             if num_cols == 0:
                 figsize = (10, 8)
                 # There is only a single gene
@@ -3570,7 +3786,7 @@ class GA:
                 ax.set_xlabel(0, fontsize=font_size)
             else:
                 fig, axs = matplotlib.pyplot.subplots(num_rows, num_cols)
-
+    
                 if num_cols == 1 and num_rows == 1:
                     fig.set_figwidth(5 * num_cols)
                     fig.set_figheight(4)
@@ -3604,7 +3820,7 @@ class GA:
                                 axs[row_idx, col_idx].bar(range(solutions_to_plot.shape[0]), solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
                             axs[row_idx, col_idx].set_xlabel("Gene " + str(gene_idx), fontsize=font_size)
                             gene_idx += 1
-
+    
             fig.suptitle(title, fontsize=font_size, y=1.001)
             matplotlib.pyplot.tight_layout()
 
@@ -3613,12 +3829,12 @@ class GA:
 
             # Create an axes instance
             ax = fig.add_subplot(111)
-            boxeplots = ax.boxplot(solutions_to_plot,
+            boxeplots = ax.boxplot(solutions_to_plot, 
                                    labels=range(self.num_genes),
                                    patch_artist=True)
             # adding horizontal grid lines
             ax.yaxis.grid(True)
-
+    
             for box in boxeplots['boxes']:
                 # change outline color
                 box.set(color='black', linewidth=linewidth)
@@ -3631,7 +3847,7 @@ class GA:
                 median.set(color=color, linewidth=linewidth)
             for cap in boxeplots['caps']:
                 cap.set(color=color, linewidth=linewidth)
-
+    
             matplotlib.pyplot.title(title, fontsize=font_size)
             matplotlib.pyplot.xlabel(xlabel, fontsize=font_size)
             matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
@@ -3642,21 +3858,21 @@ class GA:
             # num_cols can only be 0 if num_genes=1
             num_rows = int(numpy.ceil(self.num_genes/5.0))
             num_cols = int(numpy.ceil(self.num_genes/num_rows))
-
+    
             if num_cols == 0:
                 figsize = (10, 8)
                 # There is only a single gene
-                fig, ax = matplotlib.pyplot.subplots(num_rows,
+                fig, ax = matplotlib.pyplot.subplots(num_rows, 
                                                      figsize=figsize)
                 ax.hist(solutions_to_plot[:, 0], color=fill_color)
                 ax.set_xlabel(0, fontsize=font_size)
             else:
                 fig, axs = matplotlib.pyplot.subplots(num_rows, num_cols)
-
+    
                 if num_cols == 1 and num_rows == 1:
                     fig.set_figwidth(4 * num_cols)
                     fig.set_figheight(3)
-                    axs.hist(solutions_to_plot[:, 0],
+                    axs.hist(solutions_to_plot[:, 0], 
                              color=fill_color,
                              rwidth=0.95)
                     axs.set_xlabel("Gene " + str(0), fontsize=font_size)
@@ -3664,7 +3880,7 @@ class GA:
                     fig.set_figwidth(4 * num_cols)
                     fig.set_figheight(3)
                     for gene_idx in range(len(axs)):
-                        axs[gene_idx].hist(solutions_to_plot[:, gene_idx],
+                        axs[gene_idx].hist(solutions_to_plot[:, gene_idx], 
                                            color=fill_color,
                                            rwidth=0.95)
                         axs[gene_idx].set_xlabel("Gene " + str(gene_idx), fontsize=font_size)
@@ -3677,17 +3893,17 @@ class GA:
                             if gene_idx >= self.num_genes:
                                 # axs[row_idx, col_idx].remove()
                                 break
-                            axs[row_idx, col_idx].hist(solutions_to_plot[:, gene_idx],
+                            axs[row_idx, col_idx].hist(solutions_to_plot[:, gene_idx], 
                                                        color=fill_color,
                                                        rwidth=0.95)
                             axs[row_idx, col_idx].set_xlabel("Gene " + str(gene_idx), fontsize=font_size)
                             gene_idx += 1
-
+    
             fig.suptitle(title, fontsize=font_size, y=1.001)
             matplotlib.pyplot.tight_layout()
 
         if not save_dir is None:
-            matplotlib.pyplot.savefig(fname=save_dir,
+            matplotlib.pyplot.savefig(fname=save_dir, 
                                       bbox_inches='tight')
 
         matplotlib.pyplot.show()
@@ -3701,8 +3917,158 @@ class GA:
             -filename: Name of the file to save the instance. No extension is needed.
         """
 
+        cloudpickle_serialized_object = cloudpickle.dumps(self)
         with open(filename + ".pkl", 'wb') as file:
-            pickle.dump(self, file)
+            file.write(cloudpickle_serialized_object)
+            cloudpickle.dump(self, file)
+
+    def summary(self, 
+                line_length=70, 
+                fill_character=" ", 
+                line_character="-", 
+                line_character2="=", 
+                columns_equal_len=False, 
+                print_step_parameters=True,
+                print_parameters_summary=True):
+        """
+        The summary() method prints a summary of the PyGAD lifecycle in a Keras style.
+        The parameters are:
+            line_length: An integer representing the length of the single line in characters.
+            fill_character: A character to fill the lines.
+            line_character: A character for creating a line separator.
+            line_character2: A secondary character to create a line separator.
+            columns_equal_len: The table rows are split into equal-sized columns or split subjective to the width needed.
+            print_step_parameters: Whether to print extra parameters about each step inside the step. If print_step_parameters=False and print_parameters_summary=True, then the parameters of each step are printed at the end of the table.
+            print_parameters_summary: Whether to print parameters summary at the end of the table. If print_step_parameters=False, then the parameters of each step are printed at the end of the table too.
+        """
+    
+        def fill_message(msg, line_length=line_length, fill_character=fill_character):
+            num_spaces = int((line_length - len(msg))/2)
+            num_spaces = int(num_spaces / len(fill_character))
+            msg = "{spaces}{msg}{spaces}".format(msg=msg, spaces=fill_character * num_spaces)
+            return msg
+    
+        def line_separator(line_length=line_length, line_character=line_character):
+            num_characters = int(line_length / len(line_character))
+            return line_character * num_characters
+    
+        def create_row(columns, line_length=line_length, fill_character=fill_character, split_percentages=None):
+            filled_columns = []
+            if split_percentages == None:
+                split_percentages = [int(100/len(columns))] * 3
+            columns_lengths = [int((split_percentages[idx] * line_length) / 100) for idx in range(len(split_percentages))]
+            for column_idx, column in enumerate(columns):
+                current_column_length = len(column)
+                extra_characters = columns_lengths[column_idx] - current_column_length
+                filled_column = column + fill_character * extra_characters
+                filled_column = column + fill_character * extra_characters
+                filled_columns.append(filled_column)
+    
+            return "".join(filled_columns)
+    
+        def print_parent_selection_params():
+            print("Number of Parents: {num_parents_mating}".format(num_parents_mating=self.num_parents_mating))
+            if self.parent_selection_type == "tournament":
+                print("K Tournament: {K_tournament}".format(K_tournament=self.K_tournament))
+    
+        def print_fitness_params():
+            if not self.fitness_batch_size is None:
+                print("Fitness batch size: {fitness_batch_size}".format(fitness_batch_size=self.fitness_batch_size))
+    
+        def print_crossover_params():
+            if not self.crossover_probability is None:
+                print("Crossover probability: {crossover_probability}".format(crossover_probability=self.crossover_probability))
+    
+        def print_mutation_params():
+            if not self.mutation_probability is None:
+                print("Mutation Probability: {mutation_probability}".format(mutation_probability=self.mutation_probability))
+            if self.mutation_percent_genes == "default":
+                print("Mutation Percentage: {mutation_percent_genes}".format(mutation_percent_genes=self.mutation_percent_genes))
+            # Number of mutation genes is already showed above.
+            print("Mutation Genes: {mutation_num_genes}".format(mutation_num_genes=self.mutation_num_genes))
+            print("Random Mutation Range: ({random_mutation_min_val}, {random_mutation_max_val})".format(random_mutation_min_val=self.random_mutation_min_val, random_mutation_max_val=self.random_mutation_max_val))
+            if not self.gene_space is None:
+                print("Gene Space: {gene_space}".format(gene_space=self.gene_space))
+            print("Mutation by Replacement: {mutation_by_replacement}".format(mutation_by_replacement=self.mutation_by_replacement))
+            print("Allow Duplicated Genes: {allow_duplicate_genes}".format(allow_duplicate_genes=self.allow_duplicate_genes))
+    
+        def print_on_generation_params():
+            if not self.stop_criteria is None:
+                print("Stop Criteria: {stop_criteria}".format(stop_criteria=self.stop_criteria))
+    
+        def print_params_summary():
+            print("Population Size: ({sol_per_pop}, {num_genes})".format(sol_per_pop=self.sol_per_pop, num_genes=self.num_genes))
+            print("Number of Generations: {num_generations}".format(num_generations=self.num_generations))
+            print("Initial Population Range: ({init_range_low}, {init_range_high})".format(init_range_low=self.init_range_low, init_range_high=self.init_range_high))
+    
+            if not print_step_parameters:
+                print_fitness_params()
+    
+            if not print_step_parameters:
+                print_parent_selection_params()
+    
+            if self.keep_elitism != 0:
+                print("Keep Elitism: {keep_elitism}".format(keep_elitism=self.keep_elitism))
+            else:
+                print("Keep Parents: {keep_parents}".format(keep_parents=self.keep_parents))
+            print("Gene DType: {gene_type}".format(gene_type=self.gene_type))
+    
+            if not print_step_parameters:
+                print_crossover_params()
+    
+            if not print_step_parameters:
+                print_mutation_params()
+    
+            if self.delay_after_gen != 0:
+                print("Post-Generation Delay: {delay_after_gen}".format(delay_after_gen=self.delay_after_gen))
+    
+            if not print_step_parameters:
+                print_on_generation_params()
+    
+            if not self.parallel_processing is None:
+                print("Parallel Processing: {parallel_processing}".format(parallel_processing=self.parallel_processing))
+            if not self.random_seed is None:
+                print("Random Seed: {random_seed}".format(random_seed=self.random_seed))
+            print("Save Best Solutions: {save_best_solutions}".format(save_best_solutions=self.save_best_solutions))
+            print("Save Solutions: {save_solutions}".format(save_solutions=self.save_solutions))
+    
+        print(line_separator(line_character=line_character))
+        print(fill_message("PyGAD Lifecycle"))
+        print(line_separator(line_character=line_character2))
+    
+        lifecycle_steps = ["on_start()", "Fitness Function", "On Fitness", "Parent Selection", "On Parents", "Crossover", "On Crossover", "Mutation", "On Mutation", "On Generation", "On Stop"]
+        lifecycle_functions = [self.on_start, self.fitness_func, self.on_fitness, self.select_parents, self.on_parents, self.crossover, self.on_crossover, self.mutation, self.on_mutation, self.on_generation, self.on_stop]
+        lifecycle_functions = [getattr(lifecycle_func, '__name__', "None") for lifecycle_func in lifecycle_functions]
+        lifecycle_functions = [lifecycle_func + "()" if lifecycle_func != "None" else "None" for lifecycle_func in lifecycle_functions]
+        lifecycle_output = ["None", "(1)", "None", "({num_parents_mating}, {num_genes})".format(num_parents_mating=self.num_parents_mating, num_genes=self.num_genes), "None", "({num_parents_mating}, {num_genes})".format(num_parents_mating=self.num_parents_mating, num_genes=self.num_genes), "None", "({num_parents_mating}, {num_genes})".format(num_parents_mating=self.num_parents_mating, num_genes=self.num_genes), "None", "None", "None"]
+        lifecycle_step_parameters = [None, print_fitness_params, None, print_parent_selection_params, None, print_crossover_params, None, print_mutation_params, None, print_on_generation_params, None]
+    
+        if not columns_equal_len:
+            max_lengthes = [max(list(map(len, lifecycle_steps))), max(list(map(len, lifecycle_functions))), max(list(map(len, lifecycle_output)))]
+            split_percentages = [int((column_len / sum(max_lengthes)) * 100) for column_len in max_lengthes]
+        else:
+            split_percentages = None
+    
+        header_columns = ["Step", "Handler", "Output Shape"]
+        header_row = create_row(header_columns, split_percentages=split_percentages)
+        print(header_row)
+        print(line_separator(line_character=line_character2))
+    
+        for lifecycle_idx in range(len(lifecycle_steps)):
+            lifecycle_column = [lifecycle_steps[lifecycle_idx], lifecycle_functions[lifecycle_idx], lifecycle_output[lifecycle_idx]]
+            if lifecycle_column[1] == "None":
+                continue
+            lifecycle_row = create_row(lifecycle_column, split_percentages=split_percentages)
+            print(lifecycle_row)
+            if print_step_parameters:
+                if not lifecycle_step_parameters[lifecycle_idx] is None:
+                    lifecycle_step_parameters[lifecycle_idx]()
+            print(line_separator(line_character=line_character))
+    
+        print(line_separator(line_character=line_character2))
+        if print_parameters_summary:
+            print_params_summary()
+            print(line_separator(line_character=line_character2))
 
 def load(filename):
 
@@ -3714,9 +4080,10 @@ def load(filename):
 
     try:
         with open(filename + ".pkl", 'rb') as file:
-            ga_in = pickle.load(file)
+            ga_in = cloudpickle.load(file)
     except FileNotFoundError:
         raise FileNotFoundError("Error reading the file {filename}. Please check your inputs.".format(filename=filename))
     except:
-        raise BaseException("Error loading the file. If the file already exists, please reload all the functions previously used (e.g. fitness function).")
+        # raise BaseException("Error loading the file. If the file already exists, please reload all the functions previously used (e.g. fitness function).")
+        raise BaseException("Error loading the file.")
     return ga_in

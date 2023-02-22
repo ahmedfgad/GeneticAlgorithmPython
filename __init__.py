@@ -1,3 +1,3 @@
 from .pygad import * # Relative import.
 
-__version__ = "2.18.3"
+__version__ = "2.19.0"
