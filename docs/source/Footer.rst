@@ -1171,6 +1171,16 @@ Release Date: 22 February 2023
     ``cal_pop_fitness()`` method.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/79#issuecomment-1439605442
 
+.. _pygad-2191:
+
+PyGAD 2.19.1
+------------
+
+Release Date: 22 February 2023
+
+1. Add the `cloudpickle <https://github.com/cloudpipe/cloudpickle>`__
+   library as a dependency.
+
 PyGAD Projects at GitHub
 ========================
 

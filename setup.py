@@ -5,9 +5,9 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(  
     name="pygad",  
-    version="2.19.0",  
+    version="2.19.1",  
     author="Ahmed Fawzy Gad",
-    install_requires=["numpy", "matplotlib",],
+    install_requires=["numpy", "matplotlib", "cloudpickle",],
     author_email="ahmed.f.gad@gmail.com",  
     description="PyGAD: A Python 3 Library for Building the Genetic Algorithm and Training Machine Learning Algoithms (Keras & PyTorch).",
     long_description=long_description,
