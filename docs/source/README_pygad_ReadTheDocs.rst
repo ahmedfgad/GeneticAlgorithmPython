@@ -3545,30 +3545,30 @@ through the ``on_crossover_callback()`` and ``on_gen()``, respectively.
 
    ----------------------------------------------------------------------
                               PyGAD Lifecycle                           
-   =========================================
-   Step                          Handler                            Output Shape
-   =========================================
-   Fitness Function       genetic_fitness()                      (1)      
+   ======================================================================
+   Step                   Handler                            Output Shape
+   ======================================================================
+   Fitness Function       genetic_fitness()                  (1)      
    Fitness batch size: 4
    ----------------------------------------------------------------------
-   Parent Selection       steady_state_selection()          (10, 6)  
+   Parent Selection       steady_state_selection()           (10, 6)  
    Number of Parents: 10
    ----------------------------------------------------------------------
-   Crossover              single_point_crossover()             (10, 6)  
+   Crossover              single_point_crossover()           (10, 6)  
    Crossover probability: 0.4
    ----------------------------------------------------------------------
-   On Crossover           on_crossover_callback()           None     
+   On Crossover           on_crossover_callback()            None     
    ----------------------------------------------------------------------
-   Mutation               random_mutation()                    (10, 6)  
+   Mutation               random_mutation()                  (10, 6)  
    Mutation Genes: 1
    Random Mutation Range: (-1.0, 1.0)
    Mutation by Replacement: False
    Allow Duplicated Genes: True
    ----------------------------------------------------------------------
-   On Generation          on_gen()                                  None     
+   On Generation          on_gen()                           None     
    Stop Criteria: [['reach', 10.0]]
    ----------------------------------------------------------------------
-   =========================================
+   ======================================================================
    Population Size: (20, 6)
    Number of Generations: 100
    Initial Population Range: (-4, 4)
@@ -3577,7 +3577,7 @@ through the ``on_crossover_callback()`` and ``on_gen()``, respectively.
    Parallel Processing: ['thread', 2]
    Save Best Solutions: False
    Save Solutions: False
-   =========================================
+   ======================================================================
 
 We can set the ``print_step_parameters`` and
 ``print_parameters_summary`` parameters to ``False`` to not print the
@@ -3592,22 +3592,22 @@ parameters.
 
    ----------------------------------------------------------------------
                               PyGAD Lifecycle                           
-   =========================================
-   Step                          Handler                            Output Shape
-   =========================================
-   Fitness Function       genetic_fitness()                      (1)      
+   ======================================================================
+   Step                   Handler                            Output Shape
+   ======================================================================
+   Fitness Function       genetic_fitness()                  (1)      
    ----------------------------------------------------------------------
-   Parent Selection       steady_state_selection()          (10, 6)  
+   Parent Selection       steady_state_selection()           (10, 6)  
    ----------------------------------------------------------------------
-   Crossover              single_point_crossover()             (10, 6)  
+   Crossover              single_point_crossover()           (10, 6)  
    ----------------------------------------------------------------------
-   On Crossover           on_crossover_callback()           None     
+   On Crossover           on_crossover_callback()            None     
    ----------------------------------------------------------------------
-   Mutation               random_mutation()                    (10, 6)  
+   Mutation               random_mutation()                  (10, 6)  
    ----------------------------------------------------------------------
-   On Generation          on_gen()                                  None     
+   On Generation          on_gen()                           None     
    ----------------------------------------------------------------------
-   =========================================
+   ======================================================================
 
 Batch Fitness Calculation
 =========================
