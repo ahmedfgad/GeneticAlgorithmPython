@@ -1431,6 +1431,8 @@ class GA:
                     elitism_idx = self.last_generation_elitism_indices[elitism_idx]
                     # Use the elitism's index to return its pre-calculated fitness value.
                     fitness = self.previous_generation_fitness[elitism_idx]
+
+                    pop_fitness[sol_idx] = fitness
                 # If the solutions are not saved (i.e. `save_solutions=False`), check if this solution is a parent from the previous generation and its fitness value is already calculated. If so, use the fitness value instead of calling the fitness function.
                 # We cannot use the `numpy.where()` function directly because it does not support the `axis` parameter. This is why the `numpy.all()` function is used to match the solutions on axis=1.
                 # elif (self.last_generation_parents is not None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
