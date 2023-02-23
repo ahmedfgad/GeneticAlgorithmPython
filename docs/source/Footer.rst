@@ -1104,16 +1104,15 @@ Release Date: 22 February 2023
     summary of the PyGAD lifecycle.
 
 2.  A new optional parameter called ``fitness_batch_size`` is supported
-    to calculate the fitness function in batches. If it is assigned the
-    value ``1`` or ``None`` (default), then the normal flow is used
-    where the fitness function is called for each individual solution.
-    If the ``fitness_batch_size`` parameter is assigned a value
-    satisfying this condition ``1 < fitness_batch_size <= sol_per_pop``,
-    then the solutions are grouped into batches of size
-    ``fitness_batch_size`` and the fitness function is called once for
-    each batch. In this case, the fitness function must return a
-    list/tuple/numpy.ndarray with a length equal to the number of
-    solutions passed.
+    to calculate the fitness in batches. If it is assigned the value
+    ``1`` or ``None`` (default), then the normal flow is used where the
+    fitness function is called for each individual solution. If the
+    ``fitness_batch_size`` parameter is assigned a value satisfying this
+    condition ``1 < fitness_batch_size <= sol_per_pop``, then the
+    solutions are grouped into batches of size ``fitness_batch_size``
+    and the fitness function is called once for each batch. In this
+    case, the fitness function must return a list/tuple/numpy.ndarray
+    with a length equal to the number of solutions passed.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/136.
 
 3.  The ``cloudpickle`` library
@@ -1180,6 +1179,17 @@ Release Date: 22 February 2023
 
 1. Add the `cloudpickle <https://github.com/cloudpipe/cloudpickle>`__
    library as a dependency.
+
+.. _pygad-2192:
+
+PyGAD 2.19.2
+------------
+
+Release Data 23 February 2023
+
+1. Fix an issue when parallel processing was used where the elitism
+   solutions' fitness values are not re-used.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/160#issuecomment-1441718184
 
 PyGAD Projects at GitHub
 ========================
