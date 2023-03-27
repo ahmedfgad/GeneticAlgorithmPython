@@ -14,9 +14,10 @@ The library is under active development and more features are added regularly. I
 
 # Donation
 
-You can donate via [Open Collective](https://opencollective.com/pygad): [opencollective.com/pygad](https://opencollective.com/pygad). 
-
-To donate using PayPal, use either this link: [paypal.me/ahmedfgad](https://paypal.me/ahmedfgad) or the e-mail address ahmed.f.gad@gmail.com.
+For donattion:
+* By Card (recommended): https://donate.stripe.com/eVa5kO866elKgM0144
+* [Open Collective](https://opencollective.com/pygad): [opencollective.com/pygad](https://opencollective.com/pygad). 
+* PayPal: Either this link: [paypal.me/ahmedfgad](https://paypal.me/ahmedfgad) or the e-mail address ahmed.f.gad@gmail.com.
 
 # Installation
 
