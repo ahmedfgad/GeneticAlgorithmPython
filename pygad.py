@@ -1844,8 +1844,8 @@ class GA:
         if fitness_sum == 0:
             raise ZeroDivisionError("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
         probs = fitness / fitness_sum
-        probs_start = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the start values of the ranges of probabilities.
-        probs_end = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the end values of the ranges of probabilities.
+        probs_start = numpy.zeros(probs.shape, dtype=float) # An array holding the start values of the ranges of probabilities.
+        probs_end = numpy.zeros(probs.shape, dtype=float) # An array holding the end values of the ranges of probabilities.
 
         curr = 0.0
 
@@ -1888,8 +1888,8 @@ class GA:
         if fitness_sum == 0:
             raise ZeroDivisionError("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
         probs = fitness / fitness_sum
-        probs_start = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the start values of the ranges of probabilities.
-        probs_end = numpy.zeros(probs.shape, dtype=numpy.float) # An array holding the end values of the ranges of probabilities.
+        probs_start = numpy.zeros(probs.shape, dtype=float) # An array holding the start values of the ranges of probabilities.
+        probs_end = numpy.zeros(probs.shape, dtype=float) # An array holding the end values of the ranges of probabilities.
 
         curr = 0.0
 
