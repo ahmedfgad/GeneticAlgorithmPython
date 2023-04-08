@@ -11,7 +11,7 @@ What are the best values for the 6 weights (w1 to w6)? We are going to use the g
 function_inputs = [4,-2,3.5,5,-11,-4.7] # Function inputs.
 desired_output = 44 # Function output.
 
-def fitness_func(solution, solution_idx):
+def fitness_func(ga_instance, solution, solution_idx):
     output = numpy.sum(solution*function_inputs)
     fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
     return fitness

@@ -4,7 +4,7 @@ import numpy
 function_inputs = [4,-2,3.5,5,-11,-4.7]
 desired_output = 44
 
-def fitness_func(solution, solution_idx):
+def fitness_func(ga_instanse, solution, solution_idx):
     output = numpy.sum(solution*function_inputs)
     fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
     return fitness

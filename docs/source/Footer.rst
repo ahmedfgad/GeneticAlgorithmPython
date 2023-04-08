@@ -852,7 +852,7 @@ Release Date: 28 September 2021
    equation_inputs = [4,-2,3.5]
    desired_output = 44
 
-   def fitness_func(solution, solution_idx):
+   def fitness_func(ga_instance, solution, solution_idx):
        output = numpy.sum(solution * equation_inputs)
        fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
        return fitness
@@ -891,7 +891,7 @@ progress bar.
    equation_inputs = [4,-2,3.5]
    desired_output = 44
 
-   def fitness_func(solution, solution_idx):
+   def fitness_func(ga_instance, solution, solution_idx):
        output = numpy.sum(solution * equation_inputs)
        fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
        return fitness
@@ -1119,7 +1119,7 @@ Release Date: 22 February 2023
     (https://github.com/cloudpipe/cloudpickle) is used instead of the
     ``pickle`` library to pickle the ``pygad.GA`` objects. This solves
     the issue of having to redefine the functions (e.g. fitness
-    function). The ``cloudpickle`` library is added as a dependancy in
+    function). The ``cloudpickle`` library is added as a dependency in
     the ``requirements.txt`` file.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/159
 
@@ -1185,11 +1185,106 @@ Release Date: 22 February 2023
 PyGAD 2.19.2
 ------------
 
-Release Data 23 February 2023
+Release Date 23 February 2023
 
 1. Fix an issue when parallel processing was used where the elitism
    solutions' fitness values are not re-used.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/160#issuecomment-1441718184
+
+.. _pygad-300:
+
+PyGAD 3.0.0
+-----------
+
+Release Date ... 2023
+
+1. The structure of the library is changed and some methods defined in
+   the ``pygad.py`` module are moved to the ``pygad.utils``,
+   ``pygad.helper``, and ``pygad.visualize`` submodules.
+
+2. The ``pygad.utils.parent_selection`` module has a class named
+   ``ParentSelection`` where all the parent selection operators exist.
+
+3. The ``pygad.utils.crossover`` module has a class named ``Crossover``
+   where all the crossover operators exist.
+
+4. The ``pygad.utils.mutation`` module has a class named ``Mutation``
+   where all the mutation operators exist.
+
+5. The ``pygad.helper.unique`` module has a class named ``Unique`` some
+   helper methods exist to solve duplicate genes and make sure every
+   gene is unique.
+
+6. | The ``pygad.visualize.plot`` module has a class named ``Plot``
+     where all the methods that create plots exist.
+   | The ``pygad.GA`` class extends all of these classes.
+
+.. code:: python
+
+   ...
+   class GA(utils.parent_selection.ParentSelection, 
+            utils.crossover.Crossover, 
+            utils.mutation.Mutation, 
+            helper.unique.Unique,
+            visualize.plot.Plot):
+   ...
+
+1.  Support of using the ``logging`` module to log the outputs to both
+    the console and text file instead of using the ``print()`` function.
+    This is by assigning the ``logging.Logger`` to the new ``logger``
+    parameter. Check the `Logging
+    Outputs <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#logging-outputs>`__
+    for more information.
+
+2.  A new instance attribute called ``logger`` to save the logger.
+
+3.  The function/method passed to the ``fitness_func`` parameter accepts
+    a new parameter that refers to the instance of the ``pygad.GA``
+    class. Check this for an example: `Use Functions and Methods to
+    Build Fitness Function and
+    Callbacks <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#use-functions-and-methods-to-build-fitness-and-callbacks>`__.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/163
+
+4.  Update the documentation to include an example of using functions
+    and methods to calculate the fitness and build callbacks. Check this
+    for more details: `Use Functions and Methods to Build Fitness
+    Function and
+    Callbacks <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#use-functions-and-methods-to-build-fitness-and-callbacks>`__.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/92#issuecomment-1443635003
+
+5.  Validate the value passed to the ``initial_population`` parameter.
+
+6.  Validate the type and length of the ``pop_fitness`` parameter of the
+    ``best_solution()`` method.
+
+7.  Some edits in the documentation.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/106
+
+8.  Fix an issue when building the initial population as (some) genes
+    have their value taken from the mutation range (defined by the
+    parameters ``random_mutation_min_val`` and
+    ``random_mutation_max_val``) instead of using the parameters
+    ``init_range_low`` and ``init_range_high``.
+
+9.  The ``summary()`` method returns the summary as a single-line
+    string. Just log/print the returned string it to see it properly.
+
+10. The ``callback_generation`` parameter is removed. Use the
+    ``on_generation`` parameter instead.
+
+11. There was an issue when using the ``parallel_processing`` parameter
+    with Keras and PyTorch. As Keras/PyTorch are not thread-safe, the
+    ``predict()`` method gives incorrect and weird results when more
+    than 1 thread is used.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/145
+    https://github.com/ahmedfgad/TorchGA/issues/5
+    https://github.com/ahmedfgad/KerasGA/issues/6. Thanks to this
+    `StackOverflow
+    answer <https://stackoverflow.com/a/75606666/5426539>`__.
+
+12. Replace ``numpy.float`` by ``float`` in the 2 parent selection
+    operators roulette wheel and stochastic universal.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/168
 
 PyGAD Projects at GitHub
 ========================

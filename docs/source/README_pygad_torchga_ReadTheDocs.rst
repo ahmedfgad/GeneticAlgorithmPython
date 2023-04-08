@@ -132,7 +132,7 @@ This section discusses the functions in the ``pygad.torchga`` module.
 .. _pygadtorchgamodelweightsasvector:
 
 ``pygad.torchga.model_weights_as_vector()`` 
--------------------------------------------
+--------------------------------------------
 
 The ``model_weights_as_vector()`` function accepts a single parameter
 named ``model`` representing the PyTorch model. It returns a vector
@@ -198,7 +198,7 @@ subsections discuss each part in the code.
    import torchga
    import pygad
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global data_inputs, data_outputs, torch_ga, model, loss_function
 
        predictions = pygad.torchga.predict(model=model, 
@@ -349,7 +349,7 @@ other loss function to calculate the fitness value.
 
    loss_function = torch.nn.L1Loss()
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global data_inputs, data_outputs, torch_ga, model, loss_function
 
        predictions = pygad.torchga.predict(model=model, 
@@ -468,7 +468,7 @@ previous example.
    import torchga
    import pygad
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global data_inputs, data_outputs, torch_ga, model, loss_function
 
        predictions = pygad.torchga.predict(model=model, 
@@ -629,7 +629,7 @@ Here is the code.
    import pygad
    import numpy
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global data_inputs, data_outputs, torch_ga, model, loss_function
 
        predictions = pygad.torchga.predict(model=model, 
@@ -774,7 +774,7 @@ Here is the complete code.
    import pygad
    import numpy
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global data_inputs, data_outputs, torch_ga, model, loss_function
 
        predictions = pygad.torchga.predict(model=model, 

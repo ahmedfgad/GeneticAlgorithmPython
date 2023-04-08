@@ -43,6 +43,9 @@ Donation & Support
 
 You can donate to PyGAD via:
 
+-  `Credit/Debit Card <https://donate.stripe.com/eVa5kO866elKgM0144>`__:
+   https://donate.stripe.com/eVa5kO866elKgM0144
+
 -  `Open Collective <https://opencollective.com/pygad>`__:
    `opencollective.com/pygad <https://opencollective.com/pygad>`__
 
@@ -107,7 +110,7 @@ used for calculating the fitness value for each solution. Here is one.
 
 .. code:: python
 
-   def fitness_func(solution, solution_idx):
+   def fitness_func(ga_instance, solution, solution_idx):
        output = numpy.sum(solution*function_inputs)
        fitness = 1.0 / numpy.abs(output - desired_output)
        return fitness
@@ -188,26 +191,33 @@ PyGAD's Modules
 
 `PyGAD <https://pypi.org/project/pygad>`__ has the following modules:
 
-1. The main module has the same name as the library which is ``pygad``
-   that builds the genetic algorithm.
+1.  The main module has the same name as the library ``pygad`` which is
+    the main interface to build the genetic algorithm.
 
-2. The ``nn`` module builds artificial neural networks.
+2.  The ``nn`` module builds artificial neural networks.
 
-3. The ``gann`` module optimizes neural networks (for classification and
-   regression) using the genetic algorithm.
+3.  The ``gann`` module optimizes neural networks (for classification
+    and regression) using the genetic algorithm.
 
-4. The ``cnn`` module builds convolutional neural networks.
+4.  The ``cnn`` module builds convolutional neural networks.
 
-5. The ``gacnn`` module optimizes convolutional neural networks using
-   the genetic algorithm.
+5.  The ``gacnn`` module optimizes convolutional neural networks using
+    the genetic algorithm.
 
-6. The ``kerasga`` module to train `Keras <https://keras.io>`__ models
-   using the genetic algorithm.
+6.  The ``kerasga`` module to train `Keras <https://keras.io>`__ models
+    using the genetic algorithm.
 
-7. The ``torchga`` module to train `PyTorch <https://pytorch.org>`__
-   models using the genetic algorithm.
+7.  The ``torchga`` module to train `PyTorch <https://pytorch.org>`__
+    models using the genetic algorithm.
 
-The documentation discusses each of these modules.
+8.  The ``visualize`` module to visualize the results.
+
+9.  The ``utils`` module contains the operators (crossover, mutation,
+    and parent selection).
+
+10. The ``helper`` module has some helper functions.
+
+The documentation discusses these modules.
 
 PyGAD Citation - Bibtex Formatted
 =================================

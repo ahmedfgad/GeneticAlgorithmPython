@@ -95,7 +95,7 @@ This section discusses the functions in the ``pygad.gacnn`` module.
 .. _pygadgacnnpopulationasvectors:
 
 ``pygad.gacnn.population_as_vectors()`` 
----------------------------------------
+----------------------------------------
 
 Accepts the population as a list of references to the
 ``pygad.cnn.Model`` class and returns a list holding all weights of the
@@ -356,7 +356,7 @@ fitness value is returned.
 
 .. code:: python
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global GACNN_instance, data_inputs, data_outputs
 
        predictions = GACNN_instance.population_networks[sol_idx].predict(data_inputs=data_inputs)
@@ -558,7 +558,7 @@ complete code is listed below.
    It is also translated into Chinese: http://m.aliyun.com/yunqi/articles/585741
    """
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global GACNN_instance, data_inputs, data_outputs
 
        predictions = GACNN_instance.population_networks[sol_idx].predict(data_inputs=data_inputs)

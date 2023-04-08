@@ -14,10 +14,10 @@ The library is under active development and more features are added regularly. I
 
 # Donation
 
-For donattion:
-* By Card (recommended): https://donate.stripe.com/eVa5kO866elKgM0144
-* [Open Collective](https://opencollective.com/pygad): [opencollective.com/pygad](https://opencollective.com/pygad). 
-* PayPal: Either this link: [paypal.me/ahmedfgad](https://paypal.me/ahmedfgad) or the e-mail address ahmed.f.gad@gmail.com.
+* [Credit/Debit Card](https://donate.stripe.com/eVa5kO866elKgM0144): https://donate.stripe.com/eVa5kO866elKgM0144
+* [Open Collective](https://opencollective.com/pygad): [opencollective.com/pygad](https://opencollective.com/pygad)
+* PayPal: Use either this link: [paypal.me/ahmedfgad](https://paypal.me/ahmedfgad) or the e-mail address ahmed.f.gad@gmail.com
+* Interac e-Transfer: Use e-mail address ahmed.f.gad@gmail.com
 
 # Installation
 
@@ -76,7 +76,7 @@ import numpy
 function_inputs = [4,-2,3.5,5,-11,-4.7]
 desired_output = 44
 
-def fitness_func(solution, solution_idx):
+def fitness_func(ga_instance, solution, solution_idx):
     output = numpy.sum(solution*function_inputs)
     fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
     return fitness
@@ -164,7 +164,7 @@ What are the best values for the 6 weights (w1 to w6)? We are going to use the g
 function_inputs = [4,-2,3.5,5,-11,-4.7] # Function inputs.
 desired_output = 44 # Function output.
 
-def fitness_func(solution, solution_idx):
+def fitness_func(ga_instance, solution, solution_idx):
     # Calculating the fitness value of each solution in the current population.
     # The fitness function calulates the sum of products between each input and its corresponding weight.
     output = numpy.sum(solution*function_inputs)
@@ -280,7 +280,7 @@ To start with coding the genetic algorithm, you can check the tutorial titled [*
 - [KDnuggets](https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html)
 - [Chinese Translation](http://m.aliyun.com/yunqi/articles/585741)
 
-[This tutorial](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad) is prepared based on a previous version of the project but it still a good resource to start with coding CNNs.
+[This tutorial](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)) is prepared based on a previous version of the project but it still a good resource to start with coding CNNs.
 
 [![Building CNN in Python](https://user-images.githubusercontent.com/16560492/82431022-6c3a1200-9a8e-11ea-8f1b-b055196d76e3.png)](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)
 
@@ -331,4 +331,3 @@ If you used PyGAD, please consider adding a citation to the following paper abou
 * [KDnuggets](https://kdnuggets.com/author/ahmed-gad)
 * [TowardsDataScience](https://towardsdatascience.com/@ahmedfgad)
 * [GitHub](https://github.com/ahmedfgad)
-

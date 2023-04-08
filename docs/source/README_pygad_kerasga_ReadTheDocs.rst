@@ -158,7 +158,7 @@ This section discusses the functions in the ``pygad.kerasga`` module.
 .. _pygadkerasgamodelweightsasvector:
 
 ``pygad.kerasga.model_weights_as_vector()`` 
--------------------------------------------
+--------------------------------------------
 
 The ``model_weights_as_vector()`` function accepts a single parameter
 named ``model`` representing the Keras model. It returns a vector
@@ -228,7 +228,7 @@ subsections discuss each part in the code.
    import numpy
    import pygad
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global data_inputs, data_outputs, keras_ga, model
 
        predictions = pygad.kerasga.predict(model=model,
@@ -383,7 +383,7 @@ Feel free to use any other loss function to calculate the fitness value.
 
 .. code:: python
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global data_inputs, data_outputs, keras_ga, model
 
        predictions = pygad.kerasga.predict(model=model,
@@ -504,7 +504,7 @@ previous example.
    import numpy
    import pygad
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global data_inputs, data_outputs, keras_ga, model
 
        predictions = pygad.kerasga.predict(model=model,
@@ -657,7 +657,7 @@ Here is the code.
    import numpy
    import pygad
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global data_inputs, data_outputs, keras_ga, model
 
        predictions = pygad.kerasga.predict(model=model,
@@ -804,7 +804,7 @@ Here is the complete code.
    import numpy
    import pygad
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global data_inputs, data_outputs, keras_ga, model
 
        predictions = pygad.kerasga.predict(model=model,

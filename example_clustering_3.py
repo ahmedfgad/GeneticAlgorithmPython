@@ -94,7 +94,7 @@ def cluster_data(solution, solution_idx):
 
     return cluster_centers, all_clusters_dists, cluster_indices, clusters, clusters_sum_dist
 
-def fitness_func(solution, solution_idx):
+def fitness_func(ga_instance, solution, solution_idx):
     _, _, _, _, clusters_sum_dist = cluster_data(solution, solution_idx)
 
     # The tiny value 0.00000001 is added to the denominator in case the average distance is 0.

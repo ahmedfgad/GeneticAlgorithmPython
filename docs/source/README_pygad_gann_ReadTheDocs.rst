@@ -408,7 +408,7 @@ fitness value is returned.
 
 .. code:: python
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
        predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],
@@ -646,7 +646,7 @@ its complete code is listed below.
    import pygad.nn
    import pygad.gann
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
        predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],
@@ -803,7 +803,7 @@ according to the ``num_neurons_output`` parameter of the
    import pygad.nn
    import pygad.gann
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
        predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],
@@ -960,7 +960,7 @@ To train a neural network for regression, follow these instructions:
 
 .. code:: python
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        ...
 
        predictions = pygad.nn.predict(...,
@@ -980,7 +980,7 @@ for regression.
    import pygad.nn
    import pygad.gann
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
        predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],
@@ -1146,7 +1146,7 @@ Here is the complete code.
    import pygad.gann
    import pandas
 
-   def fitness_func(solution, sol_idx):
+   def fitness_func(ga_instance, solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
        predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],

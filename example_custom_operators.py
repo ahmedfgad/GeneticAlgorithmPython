@@ -13,7 +13,7 @@ For more information, check the User-Defined Crossover, Mutation, and Parent Sel
 equation_inputs = [4,-2,3.5]
 desired_output = 44
 
-def fitness_func(solution, solution_idx):
+def fitness_func(ga_instance, solution, solution_idx):
     output = numpy.sum(solution * equation_inputs)
 
     fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
@@ -31,7 +31,7 @@ def parent_selection_func(fitness, num_parents, ga_instance):
     for parent_num in range(num_parents):
         parents[parent_num, :] = ga_instance.population[fitness_sorted[parent_num], :].copy()
 
-    return parents, fitness_sorted[:num_parents]
+    return parents, numpy.array(fitness_sorted[:num_parents])
 
 def crossover_func(parents, offspring_size, ga_instance):
     # This is single-point crossover.
