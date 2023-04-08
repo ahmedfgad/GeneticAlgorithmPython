@@ -1196,7 +1196,7 @@ Release Date 23 February 2023
 PyGAD 3.0.0
 -----------
 
-Release Date ... 2023
+Release Date 8 April 2023
 
 1. The structure of the library is changed and some methods defined in
    the ``pygad.py`` module are moved to the ``pygad.utils``,
@@ -1204,20 +1204,23 @@ Release Date ... 2023
 
 2. The ``pygad.utils.parent_selection`` module has a class named
    ``ParentSelection`` where all the parent selection operators exist.
+   The ``pygad.GA`` class extends this class.
 
 3. The ``pygad.utils.crossover`` module has a class named ``Crossover``
-   where all the crossover operators exist.
+   where all the crossover operators exist. The ``pygad.GA`` class
+   extends this class.
 
 4. The ``pygad.utils.mutation`` module has a class named ``Mutation``
-   where all the mutation operators exist.
+   where all the mutation operators exist. The ``pygad.GA`` class
+   extends this class.
 
 5. The ``pygad.helper.unique`` module has a class named ``Unique`` some
    helper methods exist to solve duplicate genes and make sure every
-   gene is unique.
+   gene is unique. The ``pygad.GA`` class extends this class.
 
-6. | The ``pygad.visualize.plot`` module has a class named ``Plot``
-     where all the methods that create plots exist.
-   | The ``pygad.GA`` class extends all of these classes.
+6. The ``pygad.visualize.plot`` module has a class named ``Plot`` where
+   all the methods that create plots exist. The ``pygad.GA`` class
+   extends this class.
 
 .. code:: python
 
