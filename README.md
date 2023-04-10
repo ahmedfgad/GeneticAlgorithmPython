@@ -29,9 +29,7 @@ Install PyGAD with the following command:
 pip install pygad
 ```
 
-PyGAD is developed in Python 3.7.3 and depends on NumPy for creating and manipulating arrays and Matplotlib for creating figures. The exact NumPy version used in developing PyGAD is 1.16.4. For Matplotlib, the version is 3.1.0.
-
-To get started with PyGAD, please read the documentation at [Read The Docs](https://pygad.readthedocs.io/) https://pygad.readthedocs.io.
+To get started with PyGAD, please read the documentation at [Read The Docs](https://pygad.readthedocs.io) https://pygad.readthedocs.io.
 
 # PyGAD Source Code
 
