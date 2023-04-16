@@ -36,14 +36,14 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
-documentation = "https://pygad.readthedocs.io"
-github_repository = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
-pypi_project = "https://pypi.org/project/pygad"
-conda_forge_project = "https://anaconda.org/conda-forge/pygad"
-donation_stripe = "https://donate.stripe.com/eVa5kO866elKgM0144"
-donation_open_collective = "https://opencollective.com/pygad"
-donation_paypal = "http://paypal.me/ahmedfgad"
+"Homepage" = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
+"Documentation" = "https://pygad.readthedocs.io"
+"GitHub Repository" = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
+"PyPI Project" = "https://pypi.org/project/pygad"
+"Conda Forge Project" = "https://anaconda.org/conda-forge/pygad"
+"Donation Stripe" = "https://donate.stripe.com/eVa5kO866elKgM0144"
+"Donation Open Collective" = "https://opencollective.com/pygad"
+"Donation Paypal" = "http://paypal.me/ahmedfgad"
 
 [project.optional-dependencies]
 deep_learning = ["keras", "torch"]
