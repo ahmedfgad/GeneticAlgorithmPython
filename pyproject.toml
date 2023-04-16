@@ -12,9 +12,23 @@ maintainers = [
 {name = "Ahmed Gad", email = "ahmed.f.gad@gmail.com"}
 ]
 classifiers = [
-  "Programming Language :: Python"
+  "License :: OSI Approved :: BSD License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development",
+  "Topic :: Utilities",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Intended Audience :: Other Audience"
 ]
-keywords = ["genetic algorithm", "optimization", "natural evolution", "pygad", "machine learning", "deep learning", "neural networks", "tensorflow", "keras", "pytorch"]
+keywords = ["genetic algorithm", "GA", "optimization", "evolutionary algorithm", "natural evolution", "pygad", "machine learning", "deep learning", "neural networks", "tensorflow", "keras", "pytorch"]
 dependencies = [
   "numpy",
   "matplotlib",
