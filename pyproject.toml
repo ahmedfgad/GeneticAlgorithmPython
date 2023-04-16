@@ -1,0 +1,35 @@
+[project]
+name = "pygad"
+version = "3.0.0"
+description = "PyGAD: A Python Library for Building the Genetic Algorithm and Training Machine Learning Algoithms (Keras & PyTorch)."
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Ahmed Gad", email = "ahmed.f.gad@gmail.com"},
+]
+maintainers = [
+{name = "Ahmed Gad", email = "ahmed.f.gad@gmail.com"}
+]
+classifiers = [
+  "Programming Language :: Python"
+]
+keywords = ["genetic algorithm", "optimization", "natural evolution", "pygad", "machine learning", "deep learning", "neural networks", "tensorflow", "keras", "pytorch"]
+dependencies = [
+  "numpy",
+  "matplotlib",
+  "cloudpickle",
+]
+
+[project.urls]
+homepage = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
+documentation = "https://pygad.readthedocs.io"
+github_repository = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
+pypi_project = "https://pypi.org/project/pygad"
+conda_forge_project = "https://anaconda.org/conda-forge/pygad"
+donation_stripe = "https://donate.stripe.com/eVa5kO866elKgM0144"
+donation_open_collective = "https://opencollective.com/pygad"
+donation_paypal = "http://paypal.me/ahmedfgad"
+
+[project.optional-dependencies]
+deep_learning = ["keras", "torch"]
