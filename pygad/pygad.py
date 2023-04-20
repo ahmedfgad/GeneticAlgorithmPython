@@ -1747,9 +1747,9 @@ class GA(utils.parent_selection.ParentSelection,
 
             # Selecting the best parents in the population for mating.
             if callable(self.parent_selection_type):
-                self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self, 
-                                                                                                         self.last_generation_fitness, 
-                                                                                                         self.num_parents_mating, self)
+                self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness, 
+                                                                                                         self.num_parents_mating, 
+                                                                                                         self)
                 if not type(self.last_generation_parents) is numpy.ndarray:
                     self.logger.error("The type of the iterable holding the selected parents is expected to be (numpy.ndarray) but {last_generation_parents_type} found.".format(last_generation_parents_type=type(self.last_generation_parents)))
                     raise TypeError("The type of the iterable holding the selected parents is expected to be (numpy.ndarray) but {last_generation_parents_type} found.".format(last_generation_parents_type=type(self.last_generation_parents)))

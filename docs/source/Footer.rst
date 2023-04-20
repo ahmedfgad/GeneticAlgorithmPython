@@ -1279,6 +1279,17 @@ Release Date 8 April 2023
     operators roulette wheel and stochastic universal.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/168
 
+.. _pygad-301:
+
+PyGAD 3.0.1
+-----------
+
+Release Date 20 April 2023
+
+1. Fix an issue with passing user-defined function/method for parent
+   selection.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/179
+
 PyGAD Projects at GitHub
 ========================
 
