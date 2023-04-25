@@ -1,1 +1,28 @@
+name: Testing PyGAD using PyTest
 
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  job_id_1:
+    runs-on: ubuntu-latest
+    name: PyTest Workflow Job
+
+    steps:
+      - name: Checkout Pre-Built Action
+        uses: actions/checkout@v3
+
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10' 
+      
+      - name: Install PyTest
+        run: pip install pytest
+
+      - name: Call PyTest
+        run: |
+          pytest
