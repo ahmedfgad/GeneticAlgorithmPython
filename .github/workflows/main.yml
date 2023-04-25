@@ -3,8 +3,8 @@ name: Testing PyGAD using PyTest
 on:
   push:
     branches:
-      - main
-      - master
+      - github-actions
+      # - master
 
 jobs:
   job_id_1:
