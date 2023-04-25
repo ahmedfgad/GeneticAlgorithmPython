@@ -54,9 +54,4 @@ deep_learning = ["keras", "torch"]
 
 # PyTest Configuration. Later, PyTest will support the [tool.pytest] table.
 [tool.pytest.ini_options]
-minversion = "6.0"
-addopts = "-ra -q"
-testpaths = [
-    "tests",
-    "integration",
-]
+testpaths = ["tests"]
