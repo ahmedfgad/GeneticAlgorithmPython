@@ -8,9 +8,7 @@ import random
 import pygad
 
 class Unique:
-    # DEEP-DUPLICATE-REMOVAL-NEEDED
-    NUM_DUPLICATE1 = 0
-    NUM_DUPLICATE2 = 0
+
     def solve_duplicate_genes_randomly(self, 
                                        solution, 
                                        min_val, 
@@ -155,15 +153,13 @@ class Unique:
                                                                                                        build_initial_pop=build_initial_pop)
             else:
                 # DEEP-DUPLICATE-REMOVAL-NEEDED
+                # Search by this phrase to find where deep duplicates removal should be applied.
+
                 # If there exist duplicate genes, then changing either of the 2 duplicating genes (with indices 2 and 3) will not solve the problem.
                 # This problem can be solved by randomly changing one of the non-duplicating genes that may make a room for a unique value in one the 2 duplicating genes.
                 # For example, if gene_space=[[3, 0, 1], [4, 1, 2], [0, 2], [3, 2, 0]] and the solution is [3 2 0 0], then the values of the last 2 genes duplicate.
                 # There are no possible changes in the last 2 genes to solve the problem. But it could be solved by changing the second gene from 2 to 4.
                 # As a result, any of the last 2 genes can take the value 2 and solve the duplicates.
-                # print("DEEP-DUPLICATE-REMOVAL-NEEDED1")
-                # print("DEEP-DUPLICATE-REMOVAL-NEEDED1\n", new_solution, not_unique_indices, len(not_unique_indices))
-                # DEEP-DUPLICATE-REMOVAL-NEEDED
-                Unique.NUM_DUPLICATE1 += 1
                 return new_solution, not_unique_indices, len(not_unique_indices)
 
             return new_solution, not_unique_indices, num_unsolved_duplicates
@@ -288,7 +284,7 @@ class Unique:
             _, unique_gene_indices = numpy.unique(new_solution, return_index=True)
             not_unique_indices = set(range(len(new_solution))) - set(unique_gene_indices)
             # self.logger.info("not_unique_indices INSIDE", not_unique_indices)        
-    
+
             return new_solution, not_unique_indices, num_unsolved_duplicates
 
     def unique_gene_by_space(self, 
@@ -455,15 +451,18 @@ class Unique:
     
                         if len(values_to_select_from) == 0:
                             # DEEP-DUPLICATE-REMOVAL-NEEDED
+                            # Search by this phrase to find where deep duplicates removal should be applied.
+
                             # Reaching this block means there is no value in the gene space of this gene to solve the duplicates.
                             # To solve the duplicate between the 2 genes, the solution is to change the value of a third gene that makes a room to solve the duplicate.
 
                             if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the gene space does not have enough values to prevent duplicates.")
+
                             solution2 = self.solve_duplicates_deeply(solution)
                             if solution2 is None:
-                                # print("DEEP-DUPLICATE-REMOVAL-NEEDED2")
-                                # print("DEEP-DUPLICATE-REMOVAL-NEEDED2", solution, gene_idx, solution[gene_idx])
-                                Unique.NUM_DUPLICATE2 += 1
+                                # Cannot solve duplicates. At the moment, we are changing the value of a third gene to solve the duplicates between 2 genes.
+                                # Maybe a 4th, 5th, 6th, or even more genes need to be changed to solve the duplicates.
+                                pass
                             else:
                                 solution = solution2
                             value_from_space = solution[gene_idx]
