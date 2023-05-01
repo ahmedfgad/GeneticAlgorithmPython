@@ -191,7 +191,12 @@ class GA(utils.parent_selection.ParentSelection,
         self.gene_space_nested = False
         if type(gene_space) is type(None):
             pass
-        elif type(gene_space) in [list, tuple, range, numpy.ndarray]:
+        elif type(gene_space) is range:
+            if len(gene_space) == 0:
+                self.valid_parameters = False
+                self.logger.error("'gene_space' cannot be empty (i.e. its length must be >= 0).")
+                raise ValueError("'gene_space' cannot be empty (i.e. its length must be >= 0).")
+        elif type(gene_space) in [list, numpy.ndarray]:
             if len(gene_space) == 0:
                 self.valid_parameters = False
                 self.logger.error("'gene_space' cannot be empty (i.e. its length must be >= 0).")
@@ -259,8 +264,8 @@ class GA(utils.parent_selection.ParentSelection,
 
         else:
             self.valid_parameters = False
-            self.logger.error("The expected type of 'gene_space' is list, tuple, range, or numpy.ndarray but {gene_space_type} found.".format(gene_space_type=type(gene_space)))
-            raise TypeError("The expected type of 'gene_space' is list, tuple, range, or numpy.ndarray but {gene_space_type} found.".format(gene_space_type=type(gene_space)))
+            self.logger.error("The expected type of 'gene_space' is list, range, or numpy.ndarray but {gene_space_type} found.".format(gene_space_type=type(gene_space)))
+            raise TypeError("The expected type of 'gene_space' is list, range, or numpy.ndarray but {gene_space_type} found.".format(gene_space_type=type(gene_space)))
 
         self.gene_space = gene_space
 
@@ -302,6 +307,11 @@ class GA(utils.parent_selection.ParentSelection,
         elif len(gene_type) == 2 and gene_type[0] in GA.supported_float_types and (type(gene_type[1]) in GA.supported_int_types or gene_type[1] is None):
             self.gene_type = gene_type
             self.gene_type_single = True
+        # A single data type of int with precision.
+        elif len(gene_type) == 2 and gene_type[0] in GA.supported_int_types and (type(gene_type[1]) in GA.supported_int_types or gene_type[1] is None):
+            self.gene_type_single = False
+            self.logger.error("Integers cannot have precision. Please use the integer data type directly instead of {gene_type_val}.".format(gene_type_val=gene_type))
+            raise ValueError("Integers cannot have precision. Please use the integer data type directly instead of {gene_type_val}.".format(gene_type_val=gene_type))
         elif type(gene_type) in [list, tuple, numpy.ndarray]:
             if num_genes is None:
                 if initial_population is None:
@@ -334,8 +344,8 @@ class GA(utils.parent_selection.ParentSelection,
                                 raise TypeError("In the 'gene_type' parameter, the precision for float gene data types must be an integer but the element {gene_type_val} at index {gene_type_idx} has a precision of {gene_type_precision_val} with type {gene_type_type}.".format(gene_type_val=gene_type_val, gene_type_precision_val=gene_type_val[1], gene_type_type=gene_type_val[0], gene_type_idx=gene_type_idx))
                         else:
                             self.valid_parameters = False
-                            self.logger.error("In the 'gene_type' parameter, a precision is expected only for float gene data types but the element {gene_type} found at index {gene_type_idx}.\nNote that the data type must be at index 0 followed by precision at index 1.".format(gene_type=gene_type_val, gene_type_idx=gene_type_idx))
-                            raise TypeError("In the 'gene_type' parameter, a precision is expected only for float gene data types but the element {gene_type} found at index {gene_type_idx}.\nNote that the data type must be at index 0 followed by precision at index 1.".format(gene_type=gene_type_val, gene_type_idx=gene_type_idx))
+                            self.logger.error("In the 'gene_type' parameter, a precision is expected only for float gene data types but the element {gene_type} found at index {gene_type_idx}.\nNote that the data type must be at index 0 of the item followed by precision at index 1.".format(gene_type=gene_type_val, gene_type_idx=gene_type_idx))
+                            raise TypeError("In the 'gene_type' parameter, a precision is expected only for float gene data types but the element {gene_type} found at index {gene_type_idx}.\nNote that the data type must be at index 0 of the item followed by precision at index 1.".format(gene_type=gene_type_val, gene_type_idx=gene_type_idx))
                     else:
                         self.valid_parameters = False
                         self.logger.error("In the 'gene_type' parameter, a precision is specified in a list/tuple/numpy.ndarray of length 2 but value ({gene_type_val}) of type {gene_type_type} with length {gene_type_length} found at index {gene_type_idx}.".format(gene_type_val=gene_type_val, gene_type_type=type(gene_type_val), gene_type_idx=gene_type_idx, gene_type_length=len(gene_type_val)))
@@ -1315,21 +1325,42 @@ class GA(utils.parent_selection.ParentSelection,
                 self.population = numpy.zeros(shape=self.pop_size, dtype=self.gene_type[0])
                 for sol_idx in range(self.sol_per_pop):
                     for gene_idx in range(self.num_genes):
-                        if type(self.gene_space[gene_idx]) in [list, tuple, range]:
+                        if type(self.gene_space[gene_idx]) == type(None):
+
+                            # The following commented code replace the None value with a single number that will not change again. 
+                            # This means the gene value will be the same across all solutions.
+                            # self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
+                            #                high=high, 
+                            #                size=1), dtype=self.gene_type[0])[0]
+                            # self.population[sol_idx, gene_idx] = list(self.gene_space[gene_idx]).copy()
+
+                            # The above problem is solved by keeping the None value in the gene_space parameter. This forces PyGAD to generate this value for each solution.
+                            self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
+                                                                                                    high=high, 
+                                                                                                    size=1), 
+                                                                               dtype=self.gene_type[0])[0]
+                        elif type(self.gene_space[gene_idx]) in [list, tuple, range]:
                             # Check if the gene space has None values. If any, then replace it with randomly generated values according to the 3 attributes init_range_low, init_range_high, and gene_type.
                             if type(self.gene_space[gene_idx]) is range:
                                 temp = self.gene_space[gene_idx]
                             else:
-                                temp = self.gene_space[gene_idx].copy()
+                                temp = list(self.gene_space[gene_idx]).copy()
+
                             for idx, val in enumerate(self.gene_space[gene_idx]):
                                 if val is None:
                                     self.gene_space[gene_idx][idx] = numpy.asarray(numpy.random.uniform(low=low, 
                                                                                                         high=high, 
                                                                                                         size=1), 
                                                                                    dtype=self.gene_type[0])[0]
-                            self.population[sol_idx, gene_idx] = random.choice(self.gene_space[gene_idx])
+                            # Find the difference between the current gene space and the current values in the solution.
+                            unique_gene_values = list(set(self.gene_space[gene_idx]).difference(set(self.population[sol_idx, :gene_idx])))
+                            if len(unique_gene_values) > 0:
+                                self.population[sol_idx, gene_idx] = random.choice(unique_gene_values)
+                            else:
+                                # If there is no unique values, then we have to select a duplicate value.
+                                self.population[sol_idx, gene_idx] = random.choice(self.gene_space[gene_idx])
                             self.population[sol_idx, gene_idx] = self.gene_type[0](self.population[sol_idx, gene_idx])
-                            self.gene_space[gene_idx] = temp
+                            self.gene_space[gene_idx] = list(temp).copy()
                         elif type(self.gene_space[gene_idx]) is dict:
                             if 'step' in self.gene_space[gene_idx].keys():
                                 self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.choice(numpy.arange(start=self.gene_space[gene_idx]['low'],
@@ -1342,20 +1373,6 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                         high=self.gene_space[gene_idx]['high'],
                                                                                                         size=1),
                                                                                    dtype=self.gene_type[0])[0]
-                        elif type(self.gene_space[gene_idx]) == type(None):
-
-                            # The following commented code replace the None value with a single number that will not change again. 
-                            # This means the gene value will be the same across all solutions.
-                            # self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
-                            #                high=high, 
-                            #                size=1), dtype=self.gene_type[0])[0]
-                            # self.population[sol_idx, gene_idx] = self.gene_space[gene_idx].copy()
-                            
-                            # The above problem is solved by keeping the None value in the gene_space parameter. This forces PyGAD to generate this value for each solution.
-                            self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
-                                                                                                    high=high, 
-                                                                                                    size=1), 
-                                                                               dtype=self.gene_type[0])[0]
                         elif type(self.gene_space[gene_idx]) in GA.supported_int_float_types:
                             self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]
             else:
@@ -1364,7 +1381,7 @@ class GA(utils.parent_selection.ParentSelection,
                     for gene_idx in range(self.num_genes):
                         if type(self.gene_space[gene_idx]) in [list, tuple, range]:
                             # Check if the gene space has None values. If any, then replace it with randomly generated values according to the 3 attributes init_range_low, init_range_high, and gene_type.
-                            temp = self.gene_space[gene_idx].copy()
+                            temp = list(self.gene_space[gene_idx]).copy()
                             for idx, val in enumerate(self.gene_space[gene_idx]):
                                 if val is None:
                                     self.gene_space[gene_idx][idx] = numpy.asarray(numpy.random.uniform(low=low, 
@@ -1392,7 +1409,7 @@ class GA(utils.parent_selection.ParentSelection,
                             #                                                                size=1), 
                             #                                           dtype=self.gene_type[gene_idx][0])[0]
 
-                            # self.population[sol_idx, gene_idx] = self.gene_space[gene_idx].copy()
+                            # self.population[sol_idx, gene_idx] = list(self.gene_space[gene_idx]).copy()
 
                             temp = numpy.asarray(numpy.random.uniform(low=low,
                                                                       high=high, 

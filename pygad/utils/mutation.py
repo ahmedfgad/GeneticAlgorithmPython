@@ -8,6 +8,7 @@ import random
 import pygad
 
 class Mutation:
+
     def random_mutation(self, offspring):
 
         """
