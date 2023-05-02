@@ -64,6 +64,7 @@ class Crossover:
                                                                              gene_type=self.gene_type,
                                                                              num_trials=10)
 
+        
         return offspring
 
     def two_points_crossover(self, parents, offspring_size):
@@ -120,15 +121,15 @@ class Crossover:
             if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
                     offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
-                                                                                         min_val=self.random_mutation_min_val,
-                                                                                         max_val=self.random_mutation_max_val,
-                                                                                         mutation_by_replacement=self.mutation_by_replacement,
-                                                                                         gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                             min_val=self.random_mutation_min_val,
+                                                                             max_val=self.random_mutation_max_val,
+                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                             gene_type=self.gene_type,
+                                                                             num_trials=10)
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
-                                                                                         gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                             gene_type=self.gene_type,
+                                                                             num_trials=10)
         return offspring
 
     def uniform_crossover(self, parents, offspring_size):
@@ -180,15 +181,15 @@ class Crossover:
             if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
                     offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
-                                                                                         min_val=self.random_mutation_min_val,
-                                                                                         max_val=self.random_mutation_max_val,
-                                                                                         mutation_by_replacement=self.mutation_by_replacement,
-                                                                                         gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                             min_val=self.random_mutation_min_val,
+                                                                             max_val=self.random_mutation_max_val,
+                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                             gene_type=self.gene_type,
+                                                                             num_trials=10)
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
-                                                                                         gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                             gene_type=self.gene_type,
+                                                                             num_trials=10)
 
         return offspring
 
@@ -236,13 +237,13 @@ class Crossover:
             if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
                     offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
-                                                                                         min_val=self.random_mutation_min_val,
-                                                                                         max_val=self.random_mutation_max_val,
-                                                                                         mutation_by_replacement=self.mutation_by_replacement,
-                                                                                         gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                             min_val=self.random_mutation_min_val,
+                                                                             max_val=self.random_mutation_max_val,
+                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                             gene_type=self.gene_type,
+                                                                             num_trials=10)
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
-                                                                                         gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                             gene_type=self.gene_type,
+                                                                             num_trials=10)
         return offspring
