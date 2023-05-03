@@ -67,7 +67,7 @@ class Mutation:
                     elif curr_gene_space is None:
                         rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
                                                         high=self.random_mutation_max_val,
-                                                        size=1)
+                                                        size=1)[0]
                         if self.mutation_by_replacement:
                             value_from_space = rand_val
                         else:
@@ -82,7 +82,7 @@ class Mutation:
                         else:
                             value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                     high=curr_gene_space['high'],
-                                                                    size=1)
+                                                                    size=1)[0]
                     else:
                         # Selecting a value randomly based on the current gene's space in the 'gene_space' attribute.
                         # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
@@ -108,7 +108,7 @@ class Mutation:
                         else:
                             value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                     high=self.gene_space['high'],
-                                                                    size=1)
+                                                                    size=1)[0]
                     else:
                         # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
                         values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
@@ -120,9 +120,11 @@ class Mutation:
                     # value_from_space = random.choice(self.gene_space)
 
                 if value_from_space is None:
+                    # TODO: Return index 0.
+                    # TODO: Check if this if statement is necessary.
                     value_from_space = numpy.random.uniform(low=self.random_mutation_min_val, 
                                                             high=self.random_mutation_max_val, 
-                                                            size=1)
+                                                            size=1)[0]
 
                 # Assinging the selected value from the space to the gene.
                 if self.gene_type_single == True:
@@ -135,6 +137,7 @@ class Mutation:
                     if not self.gene_type[gene_idx][1] is None:
                         offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
                                                                          self.gene_type[gene_idx][1])
+
                     else:
                         offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
 
@@ -172,7 +175,7 @@ class Mutation:
                         elif curr_gene_space is None:
                             rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
                                                             high=self.random_mutation_max_val,
-                                                            size=1)
+                                                            size=1)[0]
                             if self.mutation_by_replacement:
                                 value_from_space = rand_val
                             else:
@@ -187,7 +190,7 @@ class Mutation:
                             else:
                                 value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                         high=curr_gene_space['high'],
-                                                                        size=1)
+                                                                        size=1)[0]
                         else:
                             # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
                             # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
@@ -212,7 +215,7 @@ class Mutation:
                             else:
                                 value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                         high=self.gene_space['high'],
-                                                                        size=1)
+                                                                        size=1)[0]
                         else:
                             values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
 
@@ -257,7 +260,7 @@ class Mutation:
                 # Generating a random value.
                 random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
                                                     high=self.random_mutation_max_val, 
-                                                    size=1)
+                                                    size=1)[0]
                 # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                 if self.mutation_by_replacement:
                     if self.gene_type_single == True:
@@ -312,7 +315,7 @@ class Mutation:
                     # Generating a random value.
                     random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
                                                         high=self.random_mutation_max_val, 
-                                                        size=1)
+                                                        size=1)[0]
                     # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                     if self.mutation_by_replacement:
                         if self.gene_type_single == True:
@@ -509,7 +512,7 @@ class Mutation:
                     elif curr_gene_space is None:
                         rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
                                                         high=self.random_mutation_max_val,
-                                                        size=1)
+                                                        size=1)[0]
                         if self.mutation_by_replacement:
                             value_from_space = rand_val
                         else:
@@ -524,7 +527,7 @@ class Mutation:
                             else:
                                 value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                         high=curr_gene_space['high'],
-                                                                        size=1)
+                                                                        size=1)[0]
                     else:
                         # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
                         # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
@@ -549,7 +552,7 @@ class Mutation:
                         else:
                             value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                     high=self.gene_space['high'],
-                                                                    size=1)
+                                                                    size=1)[0]
                     else:
                         values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
 
@@ -562,7 +565,7 @@ class Mutation:
                 if value_from_space is None:
                     value_from_space = numpy.random.uniform(low=self.random_mutation_min_val, 
                                                             high=self.random_mutation_max_val, 
-                                                            size=1)
+                                                            size=1)[0]
 
                 # Assinging the selected value from the space to the gene.
                 if self.gene_type_single == True:
@@ -609,7 +612,7 @@ class Mutation:
                 # Generating a random value.
                 random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
                                                     high=self.random_mutation_max_val, 
-                                                    size=1)
+                                                    size=1)[0]
                 # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                 if self.mutation_by_replacement:
                     if self.gene_type_single == True:
@@ -685,7 +688,7 @@ class Mutation:
                         elif curr_gene_space is None:
                             rand_val = numpy.random.uniform(low=self.random_mutation_min_val,
                                                             high=self.random_mutation_max_val,
-                                                            size=1)
+                                                            size=1)[0]
                             if self.mutation_by_replacement:
                                 value_from_space = rand_val
                             else:
@@ -700,7 +703,7 @@ class Mutation:
                             else:
                                 value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                         high=curr_gene_space['high'],
-                                                                        size=1)
+                                                                        size=1)[0]
                         else:
                             # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
                             # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
@@ -725,7 +728,7 @@ class Mutation:
                             else:
                                 value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                         high=self.gene_space['high'],
-                                                                        size=1)
+                                                                        size=1)[0]
                         else:
                             values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
 
@@ -737,7 +740,7 @@ class Mutation:
                     if value_from_space is None:
                         value_from_space = numpy.random.uniform(low=self.random_mutation_min_val, 
                                                                 high=self.random_mutation_max_val, 
-                                                                size=1)
+                                                                size=1)[0]
 
                     # Assinging the selected value from the space to the gene.
                     if self.gene_type_single == True:
@@ -786,7 +789,7 @@ class Mutation:
                     # Generating a random value.
                     random_value = numpy.random.uniform(low=self.random_mutation_min_val, 
                                                         high=self.random_mutation_max_val, 
-                                                        size=1)
+                                                        size=1)[0]
                     # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
                     if self.mutation_by_replacement:
                         if self.gene_type_single == True:

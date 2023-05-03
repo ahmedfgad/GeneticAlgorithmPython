@@ -53,7 +53,7 @@ class Unique:
                             else:
                                 temp_val = numpy.random.uniform(low=min_val,
                                                                 high=max_val,
-                                                                size=1)
+                                                                size=1)[0]
                                 if mutation_by_replacement:
                                     pass
                                 else:
@@ -69,7 +69,7 @@ class Unique:
                             else:
                                 temp_val = numpy.random.uniform(low=min_val,
                                                                 high=max_val,
-                                                                size=1)
+                                                                size=1)[0]
                                 if mutation_by_replacement:
                                     pass
                                 else:
@@ -229,7 +229,7 @@ class Unique:
                 # Note that we already know that the data type is integer.
                 all_gene_values = numpy.asarray(all_gene_values, 
                                                 gene_type[gene_index][0])
-    
+
             values_to_select_from = list(set(all_gene_values) - set(solution))
     
             if len(values_to_select_from) == 0:
@@ -347,12 +347,12 @@ class Unique:
 
                             value_from_space = numpy.random.uniform(low=low,
                                                                     high=high,
-                                                                    size=1)
+                                                                    size=1)[0]
                             # TODO: Remove check for mutation_by_replacement when solving duplicates. Just replace the gene by the selected value from space.
-                            if self.mutation_by_replacement:
-                                pass
-                            else:
-                                value_from_space = solution[gene_idx] + value_from_space
+                            # if self.mutation_by_replacement:
+                            #     pass
+                            # else:
+                            #     value_from_space = solution[gene_idx] + value_from_space
                     else:
                         if gene_type[gene_idx][0] in pygad.GA.supported_int_types:
                             if build_initial_pop == True:
@@ -378,12 +378,12 @@ class Unique:
 
                             value_from_space = numpy.random.uniform(low=low,
                                                                     high=high,
-                                                                    size=1)
+                                                                    size=1)[0]
                             # TODO: Remove check for mutation_by_replacement when solving duplicates. Just replace the gene by the selected value from space.
-                            if self.mutation_by_replacement:
-                                pass
-                            else:
-                                value_from_space = solution[gene_idx] + value_from_space
+                            # if self.mutation_by_replacement:
+                            #     pass
+                            # else:
+                            #     value_from_space = solution[gene_idx] + value_from_space
     
                 elif type(curr_gene_space) is dict:
                     if self.gene_type_single == True:
@@ -409,12 +409,12 @@ class Unique:
                             else:
                                 value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                         high=curr_gene_space['high'],
-                                                                        size=1)
+                                                                        size=1)[0]
                             # TODO: Remove check for mutation_by_replacement when solving duplicates. Just replace the gene by the selected value from space.
-                            if self.mutation_by_replacement:
-                                pass
-                            else:
-                                value_from_space = solution[gene_idx] + value_from_space
+                            # if self.mutation_by_replacement:
+                            #     pass
+                            # else:
+                            #     value_from_space = solution[gene_idx] + value_from_space
                     else:
                         # Use index 0 to return the type from the list (e.g. [int, None] or [float, 2]).
                         if gene_type[gene_idx][0] in pygad.GA.supported_int_types:
@@ -439,12 +439,12 @@ class Unique:
                             else:
                                 value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                         high=curr_gene_space['high'],
-                                                                        size=1)
+                                                                        size=1)[0]
                             # TODO: Remove check for mutation_by_replacement when solving duplicates. Just replace the gene by the selected value from space.
-                            if self.mutation_by_replacement:
-                                pass
-                            else:
-                                value_from_space = solution[gene_idx] + value_from_space
+                            # if self.mutation_by_replacement:
+                            #     pass
+                            # else:
+                            #     value_from_space = solution[gene_idx] + value_from_space
 
                 else:
                     # Selecting a value randomly based on the current gene's space in the 'gene_space' attribute.
@@ -503,12 +503,12 @@ class Unique:
                             else:
                                 value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                         high=self.gene_space['high'],
-                                                                        size=1)
+                                                                        size=1)[0]
                             # TODO: Remove check for mutation_by_replacement when solving duplicates. Just replace the gene by the selected value from space.
-                            if self.mutation_by_replacement:
-                                pass
-                            else:
-                                value_from_space = solution[gene_idx] + value_from_space
+                            # if self.mutation_by_replacement:
+                            #     pass
+                            # else:
+                            #     value_from_space = solution[gene_idx] + value_from_space
                     else:
                         if gene_type[gene_idx][0] in pygad.GA.supported_int_types:
                             if 'step' in self.gene_space.keys():
@@ -533,12 +533,12 @@ class Unique:
                             else:
                                 value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                         high=self.gene_space['high'],
-                                                                        size=1)
+                                                                        size=1)[0]
                             # TODO: Remove check for mutation_by_replacement when solving duplicates. Just replace the gene by the selected value from space.
-                            if self.mutation_by_replacement:
-                                pass
-                            else:
-                                value_from_space = solution[gene_idx] + value_from_space
+                            # if self.mutation_by_replacement:
+                            #     pass
+                            # else:
+                            #     value_from_space = solution[gene_idx] + value_from_space
     
                 else:
                     # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
@@ -562,7 +562,7 @@ class Unique:
 
                 value_from_space = numpy.random.uniform(low=low,
                                                         high=high,
-                                                        size=1)
+                                                        size=1)[0]
 
             # Similar to the round_genes() method in the pygad module,
             # Create a round_gene() method to round a single gene.
@@ -722,7 +722,7 @@ class Unique:
                         for idx in none_indices:
                             random_value = numpy.random.uniform(low=self.random_mutation_min_val,
                                                                 high=self.random_mutation_max_val,
-                                                                size=1)
+                                                                size=1)[0]
                             gene_space_unpacked[space_idx][idx] = random_value
     
                 if self.gene_type_single == True: # self.gene_type_single

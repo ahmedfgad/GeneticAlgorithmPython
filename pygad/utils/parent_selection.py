@@ -171,7 +171,9 @@ class ParentSelection:
                 probs[min_probs_idx] = 99999999999
     
             pointers_distance = 1.0 / self.num_parents_mating # Distance between different pointers.
-            first_pointer = numpy.random.uniform(low=0.0, high=pointers_distance, size=1) # Location of the first pointer.
+            first_pointer = numpy.random.uniform(low=0.0, 
+                                                 high=pointers_distance, 
+                                                 size=1)[0] # Location of the first pointer.
     
             # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
             if self.gene_type_single == True:

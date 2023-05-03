@@ -1,5 +1,5 @@
 """
-This script is identical to the test_gene_space_allow_duplicate_genes.py script except for:
+This script is identical to the test_gene_space.py script except for:
     Setting allow_duplicate_genes=False instead of True.
 """
 
@@ -47,11 +47,11 @@ def number_respect_gene_space(gene_space=None,
                            init_range_high=init_range_high,
                            random_mutation_min_val=random_mutation_min_val,
                            random_mutation_max_val=random_mutation_max_val,
-                           allow_duplicate_genes=True,
+                           allow_duplicate_genes=False,
                            mutation_by_replacement=mutation_by_replacement,
                            save_solutions=True,
                            suppress_warnings=True,
-                           random_seed=1)
+                           random_seed=2)
 
     ga_instance.run()
     ga_instance.solutions = numpy.array(ga_instance.solutions, 
@@ -77,6 +77,7 @@ def number_respect_gene_space(gene_space=None,
                         if val >= ga_instance.gene_space[gene_idx]["low"] and val < ga_instance.gene_space[gene_idx]["high"]:
                             pass
                         else:
+                            print(gene_idx, val, current_gene_space, all_gene_values)
                             num_outside += 1
                 else:
                     gene_space_values = numpy.arange(ga_instance.gene_space[gene_idx]["low"],
