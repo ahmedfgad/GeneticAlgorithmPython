@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pygad"
+version = "3.0.1"
+description = "PyGAD: A Python Library for Building the Genetic Algorithm and Training Machine Learning Algoithms (Keras & PyTorch)."
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Ahmed Gad", email = "ahmed.f.gad@gmail.com"},
+]
+maintainers = [
+{name = "Ahmed Gad", email = "ahmed.f.gad@gmail.com"}
+]
+classifiers = [
+  "License :: OSI Approved :: BSD License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development",
+  "Topic :: Utilities",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Intended Audience :: Other Audience"
+]
+keywords = ["genetic algorithm", "GA", "optimization", "evolutionary algorithm", "natural evolution", "pygad", "machine learning", "deep learning", "neural networks", "tensorflow", "keras", "pytorch"]
+dependencies = [
+  "numpy",
+  "matplotlib",
+  "cloudpickle",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
+"Documentation" = "https://pygad.readthedocs.io"
+"GitHub Repository" = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
+"PyPI Project" = "https://pypi.org/project/pygad"
+"Conda Forge Project" = "https://anaconda.org/conda-forge/pygad"
+"Donation Stripe" = "https://donate.stripe.com/eVa5kO866elKgM0144"
+"Donation Open Collective" = "https://opencollective.com/pygad"
+"Donation Paypal" = "http://paypal.me/ahmedfgad"
+
+[project.optional-dependencies]
+deep_learning = ["keras", "torch"]
+
+# PyTest Configuration. Later, PyTest will support the [tool.pytest] table.
+[tool.pytest.ini_options]
+testpaths = ["tests"]
