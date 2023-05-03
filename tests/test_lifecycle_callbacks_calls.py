@@ -3,7 +3,9 @@ import pygad
 num_generations = 100
 
 def number_lifecycle_callback_functions_calls(stop_criteria=None,
-                                              on_generation_stop=None):
+                                              on_generation_stop=None,
+                                              crossover_type="single_point",
+                                              mutation_type="random"):
     actual_num_callbacks_calls = 0
 
     def fitness_func(ga_instanse, solution, solution_idx):
@@ -46,6 +48,8 @@ def number_lifecycle_callback_functions_calls(stop_criteria=None,
                            fitness_func=fitness_func,
                            sol_per_pop=10,
                            num_genes=5,
+                           crossover_type=crossover_type,
+                           mutation_type=mutation_type,
                            on_start=on_start,
                            on_fitness=on_fitness,
                            on_parents=on_parents,
@@ -71,12 +75,14 @@ def number_lifecycle_callback_functions_calls(stop_criteria=None,
     # Use 'generations_completed' instead of 'num_generations' because the evolution may stops in the on_generation() callback.
     expected_num_callbacks_calls = 1 + ga_instance.generations_completed * 5 + 1
 
-    print("Expected number of callbacks calls is {expected_num_callbacks_calls}.".format(expected_num_callbacks_calls=expected_num_callbacks_calls))
-    print("Actual number of callbacks calls is {actual_num_callbacks_calls}.".format(actual_num_callbacks_calls=actual_num_callbacks_calls))
+    print("Expected {expected_num_callbacks_calls}.".format(expected_num_callbacks_calls=expected_num_callbacks_calls))
+    print("Actual {actual_num_callbacks_calls}.".format(actual_num_callbacks_calls=actual_num_callbacks_calls))
     return actual_num_callbacks_calls, expected_num_callbacks_calls
 
 def number_lifecycle_callback_methods_calls(stop_criteria=None,
-                                            on_generation_stop=None):
+                                            on_generation_stop=None,
+                                            crossover_type="single_point",
+                                            mutation_type="random"):
     actual_num_callbacks_calls = 0
 
     class Callbacks:
@@ -121,6 +127,8 @@ def number_lifecycle_callback_methods_calls(stop_criteria=None,
                            fitness_func=Callbacks_obj.fitness_func,
                            sol_per_pop=10,
                            num_genes=5,
+                           crossover_type=crossover_type,
+                           mutation_type=mutation_type,
                            on_start=Callbacks_obj.on_start,
                            on_fitness=Callbacks_obj.on_fitness,
                            on_parents=Callbacks_obj.on_parents,
@@ -146,8 +154,8 @@ def number_lifecycle_callback_methods_calls(stop_criteria=None,
     # Use 'generations_completed' instead of 'num_generations' because the evolution may stops in the on_generation() callback.
     expected_num_callbacks_calls = 1 + ga_instance.generations_completed * 5 + 1
 
-    print("Expected number of callbacks calls is {expected_num_callbacks_calls}.".format(expected_num_callbacks_calls=expected_num_callbacks_calls))
-    print("Actual number of callbacks calls is {actual_num_callbacks_calls}.".format(actual_num_callbacks_calls=actual_num_callbacks_calls))
+    print("Expected {expected_num_callbacks_calls}.".format(expected_num_callbacks_calls=expected_num_callbacks_calls))
+    print("Actual {actual_num_callbacks_calls}.".format(actual_num_callbacks_calls=actual_num_callbacks_calls))
     return actual_num_callbacks_calls, expected_num_callbacks_calls
 
 def test_number_lifecycle_callback_functions_calls():
@@ -170,13 +178,69 @@ def test_number_lifecycle_callback_methods_calls_stop_criteria():
 
     assert actual == expected
 
+def test_number_lifecycle_callback_functions_calls_no_crossover():
+    actual, expected = number_lifecycle_callback_functions_calls(crossover_type=None)
+
+    assert actual == expected
+
+def test_number_lifecycle_callback_functions_calls_no_mutation():
+    actual, expected = number_lifecycle_callback_functions_calls(mutation_type=None)
+
+    assert actual == expected
+
+def test_number_lifecycle_callback_functions_calls_no_crossover_no_mutation():
+    actual, expected = number_lifecycle_callback_functions_calls(crossover_type=None,
+                                                                 mutation_type=None)
+
+    assert actual == expected
+
+def test_number_lifecycle_callback_methods_calls_no_crossover():
+    actual, expected = number_lifecycle_callback_methods_calls(crossover_type=None)
+
+    assert actual == expected
+
+def test_number_lifecycle_callback_methods_calls_no_mutation():
+    actual, expected = number_lifecycle_callback_methods_calls(mutation_type=None)
+
+    assert actual == expected
+
+def test_number_lifecycle_callback_methods_calls_no_crossover_no_mutation():
+    actual, expected = number_lifecycle_callback_methods_calls(crossover_type=None,
+                                                               mutation_type=None)
+
+    assert actual == expected
+
 if __name__ == "__main__":
     print()
     test_number_lifecycle_callback_functions_calls()
     print()
+
     test_number_lifecycle_callback_functions_calls_stop_criteria()
     print()
+
     test_number_lifecycle_callback_methods_calls()
     print()
+
     test_number_lifecycle_callback_methods_calls_stop_criteria()
+    print()
+
+    test_number_lifecycle_callback_functions_calls_no_crossover()
+    print()
+
+    test_number_lifecycle_callback_functions_calls_no_crossover()
+    print()
+
+    test_number_lifecycle_callback_functions_calls_no_mutation()
+    print()
+
+    test_number_lifecycle_callback_functions_calls_no_crossover_no_mutation()
+    print()
+
+    test_number_lifecycle_callback_methods_calls_no_crossover()
+    print()
+
+    test_number_lifecycle_callback_methods_calls_no_mutation()
+    print()
+
+    test_number_lifecycle_callback_methods_calls_no_crossover_no_mutation()
     print()
