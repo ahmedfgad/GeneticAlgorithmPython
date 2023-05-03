@@ -1,6 +1,6 @@
 """
 This script is identical to the test_gene_space_allow_duplicate_genes.py script except for:
-    Setting allow_duplicate_genes=False instead of True.
+    Setting allow_duplicate_genes=True instead of False.
 """
 
 import pygad
@@ -51,7 +51,7 @@ def number_respect_gene_space(gene_space=None,
                            mutation_by_replacement=mutation_by_replacement,
                            save_solutions=True,
                            suppress_warnings=True,
-                           random_seed=1)
+                           random_seed=2)
 
     ga_instance.run()
     ga_instance.solutions = numpy.array(ga_instance.solutions, 
@@ -157,6 +157,51 @@ def test_gene_space_dict_with_step():
 
 def test_gene_space_list_single_value():
     num_outside, ga_instance = number_respect_gene_space(gene_space=[5])
+
+    # print(ga_instance.population)
+
+    assert num_outside == 0
+
+def test_gene_space_range_nested_gene_type():
+    num_outside, _ = number_respect_gene_space(gene_space=range(10),
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+    
+    assert num_outside == 0
+
+def test_gene_space_numpy_arange_nested_gene_type():
+    num_outside, _ = number_respect_gene_space(gene_space=numpy.arange(10),
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+    
+    assert num_outside == 0
+
+def test_gene_space_list_nested_gene_type():
+    num_outside, _ = number_respect_gene_space(gene_space=list(range(10)),
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+    
+    assert num_outside == 0
+
+def test_gene_space_numpy_nested_gene_type():
+    num_outside, _ = number_respect_gene_space(gene_space=numpy.array(list(range(10))),
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+    
+    assert num_outside == 0
+
+def test_gene_space_dict_without_step_nested_gene_type():
+    num_outside, ga_instance = number_respect_gene_space(gene_space={"low": 0, "high": 10},
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+    # print(ga_instance.population)
+
+    assert num_outside == 0
+
+def test_gene_space_dict_with_step_nested_gene_type():
+    num_outside, ga_instance = number_respect_gene_space(gene_space={"low": 0, "high": 10, "step": 2},
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+
+    assert num_outside == 0
+
+def test_gene_space_list_single_value_nested_gene_type():
+    num_outside, ga_instance = number_respect_gene_space(gene_space=[5],
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
 
     # print(ga_instance.population)
 
@@ -337,23 +382,37 @@ if __name__ == "__main__":
     print()
     test_gene_space_range()
     print()
+    test_gene_space_range_nested_gene_type()
+    print()
 
     test_gene_space_numpy_arange()
+    print()
+    test_gene_space_numpy_arange_nested_gene_type()
     print()
 
     test_gene_space_list()
     print()
+    test_gene_space_list_nested_gene_type()
+    print()
 
     test_gene_space_list_single_value()
+    print()
+    test_gene_space_list_single_value_nested_gene_type()
     print()
 
     test_gene_space_numpy()
     print()
+    test_gene_space_numpy_nested_gene_type()
+    print()
 
     test_gene_space_dict_without_step()
     print()
+    test_gene_space_dict_without_step_nested_gene_type()
+    print()
 
     test_gene_space_dict_with_step()
+    print()
+    test_gene_space_dict_with_step_nested_gene_type()
     print()
 
     test_nested_gene_space_range()

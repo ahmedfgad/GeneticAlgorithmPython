@@ -75,10 +75,13 @@ class Mutation:
                     elif type(curr_gene_space) is dict:
                         # The gene's space of type dict specifies the lower and upper limits of a gene.
                         if 'step' in curr_gene_space.keys():
+                            # The numpy.random.choice() and numpy.random.uniform() functions return a NumPy array as the output even if the array has a single value.
+                            # We have to return the output at index 0 to force a numeric value to be returned not an object of type numpy.ndarray. 
+                            # If numpy.ndarray is returned, then it will cause an issue later while using the set() function.
                             value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
                                                                                 stop=curr_gene_space['high'],
                                                                                 step=curr_gene_space['step']),
-                                                                   size=1)
+                                                                   size=1)[0]
                         else:
                             value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                     high=curr_gene_space['high'],
@@ -104,7 +107,7 @@ class Mutation:
                             value_from_space = numpy.random.choice(numpy.arange(start=self.gene_space['low'],
                                                                                 stop=self.gene_space['high'],
                                                                                 step=self.gene_space['step']),
-                                                                   size=1)
+                                                                   size=1)[0]
                         else:
                             value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                     high=self.gene_space['high'],
@@ -186,7 +189,7 @@ class Mutation:
                                 value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
                                                                                     stop=curr_gene_space['high'],
                                                                                     step=curr_gene_space['step']),
-                                                                       size=1)
+                                                                       size=1)[0]
                             else:
                                 value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                         high=curr_gene_space['high'],
@@ -211,7 +214,7 @@ class Mutation:
                                 value_from_space = numpy.random.choice(numpy.arange(start=self.gene_space['low'],
                                                                                     stop=self.gene_space['high'],
                                                                                     step=self.gene_space['step']),
-                                                                       size=1)
+                                                                       size=1)[0]
                             else:
                                 value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                         high=self.gene_space['high'],
@@ -520,10 +523,13 @@ class Mutation:
                     elif type(curr_gene_space) is dict:
                             # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
                             if 'step' in curr_gene_space.keys():
+                                # The numpy.random.choice() and numpy.random.uniform() functions return a NumPy array as the output even if the array has a single value.
+                                # We have to return the output at index 0 to force a numeric value to be returned not an object of type numpy.ndarray. 
+                                # If numpy.ndarray is returned, then it will cause an issue later while using the set() function.
                                 value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
                                                                                     stop=curr_gene_space['high'],
                                                                                     step=curr_gene_space['step']),
-                                                                       size=1)
+                                                                       size=1)[0]
                             else:
                                 value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                         high=curr_gene_space['high'],
@@ -548,7 +554,7 @@ class Mutation:
                             value_from_space = numpy.random.choice(numpy.arange(start=self.gene_space['low'],
                                                                                 stop=self.gene_space['high'],
                                                                                 step=self.gene_space['step']),
-                                                                   size=1)
+                                                                   size=1)[0]
                         else:
                             value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                     high=self.gene_space['high'],
@@ -699,7 +705,7 @@ class Mutation:
                                 value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
                                                                                     stop=curr_gene_space['high'],
                                                                                     step=curr_gene_space['step']),
-                                                                       size=1)
+                                                                       size=1)[0]
                             else:
                                 value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                         high=curr_gene_space['high'],
@@ -721,10 +727,13 @@ class Mutation:
                         # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
                         if type(self.gene_space) is dict:
                             if 'step' in self.gene_space.keys():
+                                # The numpy.random.choice() and numpy.random.uniform() functions return a NumPy array as the output even if the array has a single value.
+                                # We have to return the output at index 0 to force a numeric value to be returned not an object of type numpy.ndarray. 
+                                # If numpy.ndarray is returned, then it will cause an issue later while using the set() function.
                                 value_from_space = numpy.random.choice(numpy.arange(start=self.gene_space['low'],
                                                                                     stop=self.gene_space['high'],
                                                                                     step=self.gene_space['step']),
-                                                                       size=1)
+                                                                       size=1)[0]
                             else:
                                 value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                         high=self.gene_space['high'],
