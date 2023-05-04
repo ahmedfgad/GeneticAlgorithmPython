@@ -9,6 +9,7 @@ import logging
 from pygad import utils
 from pygad import helper
 from pygad import visualize
+from typing import Callable
 
 
 class GA(utils.parent_selection.ParentSelection,
@@ -19,7 +20,8 @@ class GA(utils.parent_selection.ParentSelection,
 
     supported_int_types = [int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,
                            numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64]
-    supported_float_types = [float, numpy.float16, numpy.float32, numpy.float64]
+    supported_float_types = [
+        float, numpy.float16, numpy.float32, numpy.float64]
     supported_int_float_types = supported_int_types + supported_float_types
 
     def __init__(self,
@@ -33,13 +35,15 @@ class GA(utils.parent_selection.ParentSelection,
                  init_range_low=-4,
                  init_range_high=4,
                  gene_type=float,
-                 parent_selection_type="sss",
+                 parent_selection_type: str | Callable = "sss",
                  keep_parents=-1,
                  keep_elitism=1,
                  K_tournament=3,
-                 crossover_type="single_point",
+                 crossover_type: str | Callable[[
+                     numpy.ndarray, int], numpy.ndarray] = "single_point",
                  crossover_probability=None,
-                 mutation_type="random",
+                 mutation_type: str | Callable[[
+                     numpy.ndarray], numpy.ndarray] = "random",
                  mutation_probability=None,
                  mutation_by_replacement=False,
                  mutation_percent_genes='default',
@@ -210,13 +214,17 @@ class GA(utils.parent_selection.ParentSelection,
         elif type(gene_space) is range:
             if len(gene_space) == 0:
                 self.valid_parameters = False
-                self.logger.error("'gene_space' cannot be empty (i.e. its length must be >= 0).")
-                raise ValueError("'gene_space' cannot be empty (i.e. its length must be >= 0).")
+                self.logger.error(
+                    "'gene_space' cannot be empty (i.e. its length must be >= 0).")
+                raise ValueError(
+                    "'gene_space' cannot be empty (i.e. its length must be >= 0).")
         elif type(gene_space) in [list, numpy.ndarray]:
             if len(gene_space) == 0:
                 self.valid_parameters = False
-                self.logger.error("'gene_space' cannot be empty (i.e. its length must be >= 0).")
-                raise ValueError("'gene_space' cannot be empty (i.e. its length must be >= 0).")
+                self.logger.error(
+                    "'gene_space' cannot be empty (i.e. its length must be >= 0).")
+                raise ValueError(
+                    "'gene_space' cannot be empty (i.e. its length must be >= 0).")
             else:
                 for index, el in enumerate(gene_space):
                     if type(el) in [numpy.ndarray, list, tuple, range]:
@@ -445,8 +453,10 @@ class GA(utils.parent_selection.ParentSelection,
                 # Validating the number of gene.
                 if (num_genes <= 0):
                     self.valid_parameters = False
-                    self.logger.error(f"The number of genes cannot be <= 0 but ({num_genes}) found.\n")
-                    raise ValueError(f"The number of genes cannot be <= 0 but ({num_genes}) found.\n")
+                    self.logger.error(
+                        f"The number of genes cannot be <= 0 but ({num_genes}) found.\n")
+                    raise ValueError(
+                        f"The number of genes cannot be <= 0 but ({num_genes}) found.\n")
                 # When initial_population=None and the 2 parameters sol_per_pop and num_genes have valid integer values, then the initial population is created.
                 # Inside the initialize_population() method, the initial_population attribute is assigned to keep the initial population accessible.
                 self.num_genes = num_genes  # Number of genes in the solution.
@@ -460,7 +470,8 @@ class GA(utils.parent_selection.ParentSelection,
                         raise ValueError(
                             f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
 
-                self.sol_per_pop = sol_per_pop  # Number of solutions in the population.
+                # Number of solutions in the population.
+                self.sol_per_pop = sol_per_pop
                 self.initialize_population(self.init_range_low,
                                            self.init_range_high,
                                            allow_duplicate_genes,
@@ -537,10 +548,14 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                                   gene_type=self.gene_type,
                                                                                                                   num_trials=10)
 
-            self.population = self.initial_population.copy()  # A NumPy array holding the initial population.
-            self.num_genes = self.initial_population.shape[1]  # Number of genes in the solution.
-            self.sol_per_pop = self.initial_population.shape[0]  # Number of solutions in the population.
-            self.pop_size = (self.sol_per_pop, self.num_genes)  # The population size.
+            # A NumPy array holding the initial population.
+            self.population = self.initial_population.copy()
+            # Number of genes in the solution.
+            self.num_genes = self.initial_population.shape[1]
+            # Number of solutions in the population.
+            self.sol_per_pop = self.initial_population.shape[0]
+            # The population size.
+            self.pop_size = (self.sol_per_pop, self.num_genes)
 
         # Round initial_population and population
         self.initial_population = self.round_genes(self.initial_population)
@@ -767,7 +782,8 @@ class GA(utils.parent_selection.ParentSelection,
                     if mutation_percent_genes == 'default'.lower():
                         mutation_percent_genes = 10
                         # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
-                        mutation_num_genes = numpy.uint32((mutation_percent_genes*self.num_genes)/100)
+                        mutation_num_genes = numpy.uint32(
+                            (mutation_percent_genes*self.num_genes)/100)
                         # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
                         if mutation_num_genes == 0:
                             if self.mutation_probability is None:
@@ -789,7 +805,8 @@ class GA(utils.parent_selection.ParentSelection,
                                 mutation_percent_genes = 10
 
                             # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
-                            mutation_num_genes = numpy.uint32((mutation_percent_genes*self.num_genes)/100)
+                            mutation_num_genes = numpy.uint32(
+                                (mutation_percent_genes*self.num_genes)/100)
                             # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
                             if mutation_num_genes == 0:
                                 if self.mutation_probability is None:
@@ -807,7 +824,8 @@ class GA(utils.parent_selection.ParentSelection,
                     # The percent of genes to mutate is adaptive not fixed.
                     if type(mutation_percent_genes) in [list, tuple, numpy.ndarray]:
                         if len(mutation_percent_genes) == 2:
-                            mutation_num_genes = numpy.zeros_like(mutation_percent_genes, dtype=numpy.uint32)
+                            mutation_num_genes = numpy.zeros_like(
+                                mutation_percent_genes, dtype=numpy.uint32)
                             for idx, el in enumerate(mutation_percent_genes):
                                 if type(el) in GA.supported_int_float_types:
                                     if (el <= 0 or el > 100):
@@ -824,7 +842,8 @@ class GA(utils.parent_selection.ParentSelection,
                                         f"Unexpected type for a value assigned to the 'mutation_percent_genes' parameter. An integer value is expected but ({el}) of type {type(el)} found.")
                                 # At this point of the loop, the current value assigned to the parameter 'mutation_percent_genes' is validated.
                                 # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
-                                mutation_num_genes[idx] = numpy.uint32((mutation_percent_genes[idx]*self.num_genes)/100)
+                                mutation_num_genes[idx] = numpy.uint32(
+                                    (mutation_percent_genes[idx]*self.num_genes)/100)
                                 # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
                                 if mutation_num_genes[idx] == 0:
                                     if not self.suppress_warnings:
@@ -987,8 +1006,10 @@ class GA(utils.parent_selection.ParentSelection,
                         f"K of the tournament selection ({K_tournament}) should not be greater than the number of solutions within the population ({self.sol_per_pop}).\nK will be clipped to be equal to the number of solutions in the population (sol_per_pop).\n")
             elif (K_tournament <= 0):
                 self.valid_parameters = False
-                self.logger.error(f"K of the tournament selection cannot be <=0 but ({K_tournament}) found.\n")
-                raise ValueError(f"K of the tournament selection cannot be <=0 but ({K_tournament}) found.\n")
+                self.logger.error(
+                    f"K of the tournament selection cannot be <=0 but ({K_tournament}) found.\n")
+                raise ValueError(
+                    f"K of the tournament selection cannot be <=0 but ({K_tournament}) found.\n")
 
         self.K_tournament = K_tournament
 
@@ -1031,11 +1052,14 @@ class GA(utils.parent_selection.ParentSelection,
 
         # Validate keep_parents.
         if self.keep_elitism == 0:
-            if (self.keep_parents == -1):  # Keep all parents in the next population.
+            # Keep all parents in the next population.
+            if (self.keep_parents == -1):
                 self.num_offspring = self.sol_per_pop - self.num_parents_mating
-            elif (self.keep_parents == 0):  # Keep no parents in the next population.
+            # Keep no parents in the next population.
+            elif (self.keep_parents == 0):
                 self.num_offspring = self.sol_per_pop
-            elif (self.keep_parents > 0):  # Keep the specified number of parents in the next population.
+            # Keep the specified number of parents in the next population.
+            elif (self.keep_parents > 0):
                 self.num_offspring = self.sol_per_pop - self.keep_parents
         else:
             self.num_offspring = self.sol_per_pop - self.keep_elitism
@@ -1519,7 +1543,8 @@ class GA(utils.parent_selection.ParentSelection,
         self.mutation_num_genes = mutation_num_genes
 
         # Even such this parameter is declared in the class header, it is assigned to the object here to access it after saving the object.
-        self.best_solutions_fitness = []  # A list holding the fitness value of the best solution for each generation.
+        # A list holding the fitness value of the best solution for each generation.
+        self.best_solutions_fitness = []
 
         # The generation number at which the best fitness value is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
         self.best_solution_generation = -1
@@ -1529,11 +1554,13 @@ class GA(utils.parent_selection.ParentSelection,
 
         self.save_solutions = save_solutions
         self.solutions = []  # Holds the solutions in each generation.
-        self.solutions_fitness = []  # Holds the fitness of the solutions in each generation.
+        # Holds the fitness of the solutions in each generation.
+        self.solutions_fitness = []
 
         # A list holding the fitness values of all solutions in the last generation.
         self.last_generation_fitness = None
-        self.last_generation_parents = None  # A list holding the parents of the last generation.
+        # A list holding the parents of the last generation.
+        self.last_generation_parents = None
         # A list holding the offspring after applying crossover in the last generation.
         self.last_generation_offspring_crossover = None
         # A list holding the offspring after applying mutation in the last generation.
@@ -1589,7 +1616,8 @@ class GA(utils.parent_selection.ParentSelection,
                                                 dtype=self.gene_type[0])  # A NumPy array holding the initial population.
             else:
                 # Create an empty population of dtype=object to support storing mixed data types within the same array.
-                self.population = numpy.zeros(shape=self.pop_size, dtype=object)
+                self.population = numpy.zeros(
+                    shape=self.pop_size, dtype=object)
                 # Loop through the genes, randomly generate the values of a single gene across the entire population, and add the values of each gene to the population.
                 for gene_idx in range(self.num_genes):
                     # A vector of all values of this single gene across all solutions in the population.
@@ -1643,7 +1671,8 @@ class GA(utils.parent_selection.ParentSelection,
                                 # We copy the gene_space to a temp variable to keep its original value.
                                 # In the next for loop, the gene_space is changed.
                                 # Later, the gene_space is restored to its original value using the temp variable.
-                                temp_gene_space = list(self.gene_space[gene_idx]).copy()
+                                temp_gene_space = list(
+                                    self.gene_space[gene_idx]).copy()
 
                             for idx, val in enumerate(self.gene_space[gene_idx]):
                                 if val is None:
@@ -1655,28 +1684,35 @@ class GA(utils.parent_selection.ParentSelection,
                             unique_gene_values = list(set(self.gene_space[gene_idx]).difference(
                                 set(self.population[sol_idx, :gene_idx])))
                             if len(unique_gene_values) > 0:
-                                self.population[sol_idx, gene_idx] = random.choice(unique_gene_values)
+                                self.population[sol_idx, gene_idx] = random.choice(
+                                    unique_gene_values)
                             else:
                                 # If there is no unique values, then we have to select a duplicate value.
-                                self.population[sol_idx, gene_idx] = random.choice(self.gene_space[gene_idx])
+                                self.population[sol_idx, gene_idx] = random.choice(
+                                    self.gene_space[gene_idx])
 
-                            self.population[sol_idx, gene_idx] = self.gene_type[0](self.population[sol_idx, gene_idx])
+                            self.population[sol_idx, gene_idx] = self.gene_type[0](
+                                self.population[sol_idx, gene_idx])
                             # Restore the gene_space from the temp_gene_space variable.
-                            self.gene_space[gene_idx] = list(temp_gene_space).copy()
+                            self.gene_space[gene_idx] = list(
+                                temp_gene_space).copy()
                         elif type(self.gene_space[gene_idx]) is dict:
                             if 'step' in self.gene_space[gene_idx].keys():
                                 self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.choice(numpy.arange(start=self.gene_space[gene_idx]['low'],
-                                                                                                                    stop=self.gene_space[gene_idx]['high'],
+                                                                                                                    stop=self.gene_space[
+                                                                                                                        gene_idx]['high'],
                                                                                                                     step=self.gene_space[gene_idx]['step']),
                                                                                                        size=1),
                                                                                    dtype=self.gene_type[0])[0]
                             else:
                                 self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=self.gene_space[gene_idx]['low'],
-                                                                                                        high=self.gene_space[gene_idx]['high'],
+                                                                                                        high=self.gene_space[
+                                                                                                            gene_idx]['high'],
                                                                                                         size=1),
                                                                                    dtype=self.gene_type[0])[0]
                         elif type(self.gene_space[gene_idx]) in GA.supported_int_float_types:
-                            self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]
+                            self.population[sol_idx,
+                                            gene_idx] = self.gene_space[gene_idx]
                         else:
                             # There is no more options.
                             pass
@@ -1693,7 +1729,8 @@ class GA(utils.parent_selection.ParentSelection,
                             # We copy the gene_space to a temp variable to keep its original value.
                             # In the next for loop, the gene_space is changed.
                             # Later, the gene_space is restored to its original value using the temp variable.
-                            temp_gene_space = list(self.gene_space[gene_idx]).copy()
+                            temp_gene_space = list(
+                                self.gene_space[gene_idx]).copy()
 
                             # Check if the gene space has None values. If any, then replace it with randomly generated values according to the 3 attributes init_range_low, init_range_high, and gene_type.
                             for idx, val in enumerate(self.gene_space[gene_idx]):
@@ -1703,7 +1740,8 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                         size=1),
                                                                                    dtype=self.gene_type[gene_idx][0])[0]
 
-                            self.population[sol_idx, gene_idx] = random.choice(self.gene_space[gene_idx])
+                            self.population[sol_idx, gene_idx] = random.choice(
+                                self.gene_space[gene_idx])
                             self.population[sol_idx, gene_idx] = self.gene_type[gene_idx][0](
                                 self.population[sol_idx, gene_idx])
                             # Restore the gene_space from the temp_gene_space variable.
@@ -1711,13 +1749,15 @@ class GA(utils.parent_selection.ParentSelection,
                         elif type(self.gene_space[gene_idx]) is dict:
                             if 'step' in self.gene_space[gene_idx].keys():
                                 self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.choice(numpy.arange(start=self.gene_space[gene_idx]['low'],
-                                                                                                                    stop=self.gene_space[gene_idx]['high'],
+                                                                                                                    stop=self.gene_space[
+                                                                                                                        gene_idx]['high'],
                                                                                                                     step=self.gene_space[gene_idx]['step']),
                                                                                                        size=1),
                                                                                    dtype=self.gene_type[gene_idx][0])[0]
                             else:
                                 self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=self.gene_space[gene_idx]['low'],
-                                                                                                        high=self.gene_space[gene_idx]['high'],
+                                                                                                        high=self.gene_space[
+                                                                                                            gene_idx]['high'],
                                                                                                         size=1),
                                                                                    dtype=self.gene_type[gene_idx][0])[0]
                         elif type(self.gene_space[gene_idx]) == type(None):
@@ -1726,9 +1766,11 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                  size=1),
                                                             dtype=self.gene_type[gene_idx][0])[0]
 
-                            self.population[sol_idx, gene_idx] = temp_gene_value.copy()
+                            self.population[sol_idx,
+                                            gene_idx] = temp_gene_value.copy()
                         elif type(self.gene_space[gene_idx]) in GA.supported_int_float_types:
-                            self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]
+                            self.population[sol_idx,
+                                            gene_idx] = self.gene_space[gene_idx]
                         else:
                             # There is no more options.
                             pass
@@ -1797,7 +1839,8 @@ class GA(utils.parent_selection.ParentSelection,
                     # It can be either range, numpy.ndarray, or list.
 
                     # Create an empty population of dtype=object to support storing mixed data types within the same array.
-                    self.population = numpy.zeros(shape=self.pop_size, dtype=object)
+                    self.population = numpy.zeros(
+                        shape=self.pop_size, dtype=object)
                     # Loop through the genes, randomly generate the values of a single gene across the entire population, and add the values of each gene to the population.
                     for gene_idx in range(self.num_genes):
                         # A vector of all values of this single gene across all solutions in the population.
@@ -1834,12 +1877,14 @@ class GA(utils.parent_selection.ParentSelection,
         # 'last_generation_parents_as_list' is the list version of 'self.last_generation_parents'
         # It is used to return the parent index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
         if self.last_generation_parents is not None:
-            last_generation_parents_as_list = [list(gen_parent) for gen_parent in self.last_generation_parents]
+            last_generation_parents_as_list = [
+                list(gen_parent) for gen_parent in self.last_generation_parents]
 
         # 'last_generation_elitism_as_list' is the list version of 'self.last_generation_elitism'
         # It is used to return the elitism index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
         if self.last_generation_elitism is not None:
-            last_generation_elitism_as_list = [list(gen_elitism) for gen_elitism in self.last_generation_elitism]
+            last_generation_elitism_as_list = [
+                list(gen_elitism) for gen_elitism in self.last_generation_elitism]
 
         pop_fitness = ["undefined"] * len(self.population)
         if self.parallel_processing is None:
@@ -1857,7 +1902,8 @@ class GA(utils.parent_selection.ParentSelection,
                 elif (self.keep_elitism > 0) and (self.last_generation_elitism is not None) and (len(self.last_generation_elitism) > 0) and (list(sol) in last_generation_elitism_as_list):
                     # Return the index of the elitism from the elitism array 'self.last_generation_elitism'.
                     # This is not its index within the population. It is just its index in the 'self.last_generation_elitism' array.
-                    elitism_idx = last_generation_elitism_as_list.index(list(sol))
+                    elitism_idx = last_generation_elitism_as_list.index(
+                        list(sol))
                     # Use the returned elitism index to return its index in the last population.
                     elitism_idx = self.last_generation_elitism_indices[elitism_idx]
                     # Use the elitism's index to return its pre-calculated fitness value.
@@ -1869,7 +1915,8 @@ class GA(utils.parent_selection.ParentSelection,
                     # Index of the parent in the 'self.last_generation_parents' array.
                     # This is not its index within the population. It is just its index in the 'self.last_generation_parents' array.
                     # parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
-                    parent_idx = last_generation_parents_as_list.index(list(sol))
+                    parent_idx = last_generation_parents_as_list.index(
+                        list(sol))
                     # Use the returned parent index to return its index in the last population.
                     parent_idx = self.last_generation_parents_indices[parent_idx]
                     # Use the parent's index to return its pre-calculated fitness value.
@@ -1897,17 +1944,21 @@ class GA(utils.parent_selection.ParentSelection,
                 # Reaching this block means that batch fitness calculation is used.
 
                 # Indices of the solutions to calculate their fitness.
-                solutions_indices = numpy.where(numpy.array(pop_fitness) == "undefined")[0]
+                solutions_indices = numpy.where(
+                    numpy.array(pop_fitness) == "undefined")[0]
                 # Number of batches.
-                num_batches = int(numpy.ceil(len(solutions_indices) / self.fitness_batch_size))
+                num_batches = int(numpy.ceil(
+                    len(solutions_indices) / self.fitness_batch_size))
                 # For each batch, get its indices and call the fitness function.
                 for batch_idx in range(num_batches):
                     batch_first_index = batch_idx * self.fitness_batch_size
-                    batch_last_index = (batch_idx + 1) * self.fitness_batch_size
+                    batch_last_index = (batch_idx + 1) * \
+                        self.fitness_batch_size
                     batch_indices = solutions_indices[batch_first_index:batch_last_index]
                     batch_solutions = self.population[batch_indices, :]
 
-                    batch_fitness = self.fitness_func(self, batch_solutions, batch_indices)
+                    batch_fitness = self.fitness_func(
+                        self, batch_solutions, batch_indices)
                     if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
                         self.logger.error(
                             f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
@@ -1941,7 +1992,8 @@ class GA(utils.parent_selection.ParentSelection,
                 elif (self.keep_elitism > 0) and (self.last_generation_elitism is not None) and (len(self.last_generation_elitism) > 0) and (list(sol) in last_generation_elitism_as_list):
                     # Return the index of the elitism from the elitism array 'self.last_generation_elitism'.
                     # This is not its index within the population. It is just its index in the 'self.last_generation_elitism' array.
-                    elitism_idx = last_generation_elitism_as_list.index(list(sol))
+                    elitism_idx = last_generation_elitism_as_list.index(
+                        list(sol))
                     # Use the returned elitism index to return its index in the last population.
                     elitism_idx = self.last_generation_elitism_indices[elitism_idx]
                     # Use the elitism's index to return its pre-calculated fitness value.
@@ -1955,7 +2007,8 @@ class GA(utils.parent_selection.ParentSelection,
                     # Index of the parent in the 'self.last_generation_parents' array.
                     # This is not its index within the population. It is just its index in the 'self.last_generation_parents' array.
                     # parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
-                    parent_idx = last_generation_parents_as_list.index(list(sol))
+                    parent_idx = last_generation_parents_as_list.index(
+                        list(sol))
                     # Use the returned parent index to return its index in the last population.
                     parent_idx = self.last_generation_parents_indices[parent_idx]
                     # Use the parent's index to return its pre-calculated fitness value.
@@ -1993,7 +2046,8 @@ class GA(utils.parent_selection.ParentSelection,
                     # Reaching this block means that batch processing is used. The fitness values are calculated in batches.
 
                     # Number of batches.
-                    num_batches = int(numpy.ceil(len(solutions_to_submit_indices) / self.fitness_batch_size))
+                    num_batches = int(numpy.ceil(
+                        len(solutions_to_submit_indices) / self.fitness_batch_size))
                     # Each element of the `batches_solutions` list represents the solutions in one batch.
                     batches_solutions = []
                     # Each element of the `batches_indices` list represents the solutions' indices in one batch.
@@ -2001,7 +2055,8 @@ class GA(utils.parent_selection.ParentSelection,
                     # For each batch, get its indices and call the fitness function.
                     for batch_idx in range(num_batches):
                         batch_first_index = batch_idx * self.fitness_batch_size
-                        batch_last_index = (batch_idx + 1) * self.fitness_batch_size
+                        batch_last_index = (batch_idx + 1) * \
+                            self.fitness_batch_size
                         batch_indices = solutions_to_submit_indices[batch_first_index:batch_last_index]
                         batch_solutions = self.population[batch_indices, :]
 
@@ -2096,7 +2151,8 @@ class GA(utils.parent_selection.ParentSelection,
             if self.save_solutions:
                 # self.solutions.extend(self.population.copy())
                 population_as_list = self.population.copy()
-                population_as_list = [list(item) for item in population_as_list]
+                population_as_list = [list(item)
+                                      for item in population_as_list]
                 self.solutions.extend(population_as_list)
 
                 self.solutions_fitness.extend(self.last_generation_fitness)
@@ -2150,9 +2206,11 @@ class GA(utils.parent_selection.ParentSelection,
             # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
             if self.crossover_type is None:
                 if self.keep_elitism == 0:
-                    num_parents_to_keep = self.num_parents_mating if self.keep_parents == -1 else self.keep_parents
+                    num_parents_to_keep = self.num_parents_mating if self.keep_parents == - \
+                        1 else self.keep_parents
                     if self.num_offspring <= num_parents_to_keep:
-                        self.last_generation_offspring_crossover = self.last_generation_parents[0:self.num_offspring]
+                        self.last_generation_offspring_crossover = self.last_generation_parents[
+                            0:self.num_offspring]
                     else:
                         self.last_generation_offspring_crossover = numpy.concatenate(
                             (self.last_generation_parents, self.population[0:(self.num_offspring - self.last_generation_parents.shape[0])]))
@@ -2162,7 +2220,8 @@ class GA(utils.parent_selection.ParentSelection,
                     self.last_generation_elitism, _ = self.steady_state_selection(self.last_generation_fitness,
                                                                                   num_parents=self.keep_elitism)
                     if self.num_offspring <= self.keep_elitism:
-                        self.last_generation_offspring_crossover = self.last_generation_parents[0:self.num_offspring]
+                        self.last_generation_offspring_crossover = self.last_generation_parents[
+                            0:self.num_offspring]
                     else:
                         self.last_generation_offspring_crossover = numpy.concatenate(
                             (self.last_generation_elitism, self.population[0:(self.num_offspring - self.last_generation_elitism.shape[0])]))
@@ -2170,7 +2229,8 @@ class GA(utils.parent_selection.ParentSelection,
                 # Generating offspring using crossover.
                 if callable(self.crossover_type):
                     self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
-                                                                              (self.num_offspring, self.num_genes),
+                                                                              (self.num_offspring,
+                                                                               self.num_genes),
                                                                               self)
                     if not type(self.last_generation_offspring_crossover) is numpy.ndarray:
                         self.logger.error(
@@ -2194,7 +2254,8 @@ class GA(utils.parent_selection.ParentSelection,
 
             # PyGAD 2.18.2 // The on_crossover() callback function is called even if crossover_type is None.
             if not (self.on_crossover is None):
-                self.on_crossover(self, self.last_generation_offspring_crossover)
+                self.on_crossover(
+                    self, self.last_generation_offspring_crossover)
 
             # If self.mutation_type=None, then no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
             if self.mutation_type is None:
@@ -2210,7 +2271,8 @@ class GA(utils.parent_selection.ParentSelection,
                         raise TypeError(
                             f"The output of the mutation step is expected to be of type (numpy.ndarray) but {type(self.last_generation_offspring_mutation)} found.")
                 else:
-                    self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover)
+                    self.last_generation_offspring_mutation = self.mutation(
+                        self.last_generation_offspring_crossover)
 
                 if self.last_generation_offspring_mutation.shape != (self.num_offspring, self.num_genes):
                     if self.last_generation_offspring_mutation.shape[0] != self.num_offspring:
@@ -2235,18 +2297,22 @@ class GA(utils.parent_selection.ParentSelection,
                     self.population = self.last_generation_offspring_mutation
                 elif (self.keep_parents == -1):
                     # Creating the new population based on the parents and offspring.
-                    self.population[0:self.last_generation_parents.shape[0], :] = self.last_generation_parents
-                    self.population[self.last_generation_parents.shape[0]:, :] = self.last_generation_offspring_mutation
+                    self.population[0:self.last_generation_parents.shape[0],
+                                    :] = self.last_generation_parents
+                    self.population[self.last_generation_parents.shape[0]                                    :, :] = self.last_generation_offspring_mutation
                 elif (self.keep_parents > 0):
                     parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness,
                                                                      num_parents=self.keep_parents)
-                    self.population[0:parents_to_keep.shape[0], :] = parents_to_keep
-                    self.population[parents_to_keep.shape[0]:, :] = self.last_generation_offspring_mutation
+                    self.population[0:parents_to_keep.shape[0],
+                                    :] = parents_to_keep
+                    self.population[parents_to_keep.shape[0]:,
+                                    :] = self.last_generation_offspring_mutation
             else:
                 self.last_generation_elitism, self.last_generation_elitism_indices = self.steady_state_selection(self.last_generation_fitness,
                                                                                                                  num_parents=self.keep_elitism)
-                self.population[0:self.last_generation_elitism.shape[0], :] = self.last_generation_elitism
-                self.population[self.last_generation_elitism.shape[0]:, :] = self.last_generation_offspring_mutation
+                self.population[0:self.last_generation_elitism.shape[0],
+                                :] = self.last_generation_elitism
+                self.population[self.last_generation_elitism.shape[0]                                :, :] = self.last_generation_offspring_mutation
 
             # The generations_completed attribute holds the number of the last completed generation.
             self.generations_completed = generation + 1
@@ -2299,13 +2365,15 @@ class GA(utils.parent_selection.ParentSelection,
             self.solutions_fitness.extend(self.last_generation_fitness)
 
         # Save the fitness value of the best solution.
-        _, best_solution_fitness, _ = self.best_solution(pop_fitness=self.last_generation_fitness)
+        _, best_solution_fitness, _ = self.best_solution(
+            pop_fitness=self.last_generation_fitness)
         self.best_solutions_fitness.append(best_solution_fitness)
 
         self.best_solution_generation = numpy.where(numpy.array(
             self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
         # After the run() method completes, the run_completed flag is changed from False to True.
-        self.run_completed = True  # Set to True only after the run() method completes gracefully.
+        # Set to True only after the run() method completes gracefully.
+        self.run_completed = True
 
         if not (self.on_stop is None):
             self.on_stop(self, self.last_generation_fitness)
@@ -2348,7 +2416,8 @@ class GA(utils.parent_selection.ParentSelection,
                 f"The type of the 'pop_fitness' parameter is expected to be list, tuple, or numpy.ndarray but ({type(pop_fitness)}) found.")
 
         # Return the index of the best solution that has the best fitness value.
-        best_match_idx = numpy.where(pop_fitness == numpy.max(pop_fitness))[0][0]
+        best_match_idx = numpy.where(
+            pop_fitness == numpy.max(pop_fitness))[0][0]
 
         best_solution = self.population[best_match_idx, :].copy()
         best_solution_fitness = pop_fitness[best_match_idx]
@@ -2391,7 +2460,8 @@ class GA(utils.parent_selection.ParentSelection,
         def fill_message(msg, line_length=line_length, fill_character=fill_character):
             num_spaces = int((line_length - len(msg))/2)
             num_spaces = int(num_spaces / len(fill_character))
-            msg = "{spaces}{msg}{spaces}".format(msg=msg, spaces=fill_character * num_spaces)
+            msg = "{spaces}{msg}{spaces}".format(
+                msg=msg, spaces=fill_character * num_spaces)
             return msg
 
         def line_separator(line_length=line_length, line_character=line_character):
@@ -2406,7 +2476,8 @@ class GA(utils.parent_selection.ParentSelection,
                                for idx in range(len(split_percentages))]
             for column_idx, column in enumerate(columns):
                 current_column_length = len(column)
-                extra_characters = columns_lengths[column_idx] - current_column_length
+                extra_characters = columns_lengths[column_idx] - \
+                    current_column_length
                 filled_column = column + fill_character * extra_characters
                 filled_column = column + fill_character * extra_characters
                 filled_columns.append(filled_column)
@@ -2545,7 +2616,8 @@ class GA(utils.parent_selection.ParentSelection,
                            "Crossover", "On Crossover", "Mutation", "On Mutation", "On Generation", "On Stop"]
         lifecycle_functions = [self.on_start, self.fitness_func, self.on_fitness, self.select_parents, self.on_parents,
                                self.crossover, self.on_crossover, self.mutation, self.on_mutation, self.on_generation, self.on_stop]
-        lifecycle_functions = [getattr(lifecycle_func, '__name__', "None") for lifecycle_func in lifecycle_functions]
+        lifecycle_functions = [getattr(
+            lifecycle_func, '__name__', "None") for lifecycle_func in lifecycle_functions]
         lifecycle_functions = [lifecycle_func + "()" if lifecycle_func !=
                                "None" else "None" for lifecycle_func in lifecycle_functions]
         lifecycle_output = ["None", "(1)", "None", f"({self.num_parents_mating}, {self.num_genes})", "None",
@@ -2556,12 +2628,14 @@ class GA(utils.parent_selection.ParentSelection,
         if not columns_equal_len:
             max_lengthes = [max(list(map(len, lifecycle_steps))), max(
                 list(map(len, lifecycle_functions))), max(list(map(len, lifecycle_output)))]
-            split_percentages = [int((column_len / sum(max_lengthes)) * 100) for column_len in max_lengthes]
+            split_percentages = [
+                int((column_len / sum(max_lengthes)) * 100) for column_len in max_lengthes]
         else:
             split_percentages = None
 
         header_columns = ["Step", "Handler", "Output Shape"]
-        header_row = create_row(header_columns, split_percentages=split_percentages)
+        header_row = create_row(
+            header_columns, split_percentages=split_percentages)
         m = header_row
         self.logger.info(m)
         summary_output = summary_output + m + "\n"
@@ -2574,7 +2648,8 @@ class GA(utils.parent_selection.ParentSelection,
                                 lifecycle_functions[lifecycle_idx], lifecycle_output[lifecycle_idx]]
             if lifecycle_column[1] == "None":
                 continue
-            lifecycle_row = create_row(lifecycle_column, split_percentages=split_percentages)
+            lifecycle_row = create_row(
+                lifecycle_column, split_percentages=split_percentages)
             m = lifecycle_row
             self.logger.info(m)
             summary_output = summary_output + m + "\n"
@@ -2607,7 +2682,8 @@ def load(filename):
         with open(filename + ".pkl", 'rb') as file:
             ga_in = cloudpickle.load(file)
     except FileNotFoundError:
-        raise FileNotFoundError(f"Error reading the file {filename}. Please check your inputs.")
+        raise FileNotFoundError(
+            f"Error reading the file {filename}. Please check your inputs.")
     except:
         # raise BaseException("Error loading the file. If the file already exists, please reload all the functions previously used (e.g. fitness function).")
         raise BaseException("Error loading the file.")
