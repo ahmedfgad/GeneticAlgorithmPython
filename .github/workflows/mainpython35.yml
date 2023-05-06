@@ -15,10 +15,10 @@ jobs:
       - name: Checkout Pre-Built Action
         uses: actions/checkout@v3
 
-      - name: Setup Python 3.5
+      - name: Setup Python 3.6
         uses: actions/setup-python@v4
         with:
-          python-version: '3.5' 
+          python-version: '3.6'
 
       - name: Build PyGAD from the Repository
         run: |
