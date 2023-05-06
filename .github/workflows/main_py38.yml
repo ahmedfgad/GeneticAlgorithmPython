@@ -1,0 +1,37 @@
+name: Testing PyGAD using PyTest
+
+on:
+  push:
+    branches:
+      - github-actions
+      # - master
+
+jobs:
+  job_id_1:
+    runs-on: ubuntu-latest
+    name: PyTest Workflow Job
+
+    steps:
+      - name: Checkout Pre-Built Action
+        uses: actions/checkout@v3
+
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Build PyGAD from the Repository
+        run: |
+          python3 -m pip install --upgrade build
+          python3 -m build
+
+      - name: Install PyGAD after Building the .whl File
+        run: |
+          find ./dist/*.whl | xargs pip install
+
+      - name: Install PyTest
+        run: pip install pytest
+
+      - name: Run the Tests by Calling PyTest
+        run: |
+          pytest
