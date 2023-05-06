@@ -8,17 +8,17 @@ on:
 
 jobs:
   job_id_1:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: PyTest Workflow Job
 
     steps:
       - name: Checkout Pre-Built Action
         uses: actions/checkout@v3
 
-      - name: Setup Python 3.5.9
+      - name: Setup Python 3.5
         uses: actions/setup-python@v4
         with:
-          python-version: '3.5.9' 
+          python-version: '3.5' 
 
       - name: Build PyGAD from the Repository
         run: |
