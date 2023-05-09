@@ -9,6 +9,7 @@ import logging
 from pygad import utils
 from pygad import helper
 from pygad import visualize
+import sys
 
 class GA(utils.parent_selection.ParentSelection,
          utils.crossover.Crossover,
@@ -1201,7 +1202,7 @@ class GA(utils.parent_selection.ParentSelection,
             self.last_generation_elitism_indices = None
         except Exception as e:
             self.logger.exception(e)
-            exit(-1)
+            sys.exit(-1)
 
     def round_genes(self, solutions):
         for gene_idx in range(self.num_genes):
