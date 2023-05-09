@@ -1,4 +1,4 @@
-name: Testing PyGAD using PyTest
+name: Python 3.7 Testing PyGAD using PyTest
 
 on:
   push:
