@@ -159,8 +159,12 @@ class GA(utils.parent_selection.ParentSelection,
                 if isinstance(logger, logging.Logger):
                     pass
                 else:
+<<<<<<< HEAD
+                    raise TypeError(f"The expected type of the 'logger' parameter is 'logging.Logger' but {type(logger)} found.")
+=======
                     raise TypeError(
                         f"The expected type of the 'logger' parameter is 'logging.Logger' but {type(logger)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Create the 'self.logger' attribute to hold the logger.
             # Instead of using 'print()', use 'self.logger.info()'
@@ -178,25 +182,37 @@ class GA(utils.parent_selection.ParentSelection,
                 self.suppress_warnings = suppress_warnings
             else:
                 self.valid_parameters = False
+<<<<<<< HEAD
+                raise TypeError(f"The expected type of the 'suppress_warnings' parameter is bool but {type(suppress_warnings)} found.")
+=======
                 
                 raise TypeError(
                     f"The expected type of the 'suppress_warnings' parameter is bool but {type(suppress_warnings)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Validating mutation_by_replacement
             if not (type(mutation_by_replacement) is bool):
                 self.valid_parameters = False
+<<<<<<< HEAD
+                raise TypeError(f"The expected type of the 'mutation_by_replacement' parameter is bool but {type(mutation_by_replacement)} found.")
+=======
                 
                 raise TypeError(
                     f"The expected type of the 'mutation_by_replacement' parameter is bool but {type(mutation_by_replacement)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.mutation_by_replacement = mutation_by_replacement
 
             # Validate allow_duplicate_genes
             if not (type(allow_duplicate_genes) is bool):
                 self.valid_parameters = False
+<<<<<<< HEAD
+                raise TypeError(f"The expected type of the 'allow_duplicate_genes' parameter is bool but {type(allow_duplicate_genes)} found.")
+=======
                 
                 raise TypeError(
                     f"The expected type of the 'allow_duplicate_genes' parameter is bool but {type(allow_duplicate_genes)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.allow_duplicate_genes = allow_duplicate_genes
 
@@ -207,6 +223,13 @@ class GA(utils.parent_selection.ParentSelection,
             elif type(gene_space) is range:
                 if len(gene_space) == 0:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError("'gene_space' cannot be empty (i.e. its length must be >= 0).")
+            elif type(gene_space) in [list, numpy.ndarray]:
+                if len(gene_space) == 0:
+                    self.valid_parameters = False
+                    raise ValueError("'gene_space' cannot be empty (i.e. its length must be >= 0).")
+=======
                     
                     raise ValueError(
                         "'gene_space' cannot be empty (i.e. its length must be >= 0).")
@@ -216,11 +239,19 @@ class GA(utils.parent_selection.ParentSelection,
                     
                     raise ValueError(
                         "'gene_space' cannot be empty (i.e. its length must be >= 0).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 else:
                     for index, el in enumerate(gene_space):
                         if type(el) in [numpy.ndarray, list, tuple, range]:
                             if len(el) == 0:
                                 self.valid_parameters = False
+<<<<<<< HEAD
+                                raise ValueError(f"The element indexed {index} of 'gene_space' with type {type(el)} cannot be empty (i.e. its length must be >= 0).")
+                            else:
+                                for val in el:
+                                    if not (type(val) in [type(None)] + GA.supported_int_float_types):
+                                        raise TypeError(f"All values in the sublists inside the 'gene_space' attribute must be numeric of type int/float/None but ({val}) of type {type(val)} found.")
+=======
                                 raise ValueError(
                                     f"The element indexed {index} of 'gene_space' with type {type(el)} cannot be empty (i.e. its length must be >= 0).")
                             else:
@@ -228,6 +259,7 @@ class GA(utils.parent_selection.ParentSelection,
                                     if not (type(val) in [type(None)] + GA.supported_int_float_types):
                                         raise TypeError(
                                             f"All values in the sublists inside the 'gene_space' attribute must be numeric of type int/float/None but ({val}) of type {type(val)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                             self.gene_space_nested = True
                         elif type(el) == type(None):
                             pass
@@ -238,13 +270,27 @@ class GA(utils.parent_selection.ParentSelection,
                                     pass
                                 else:
                                     self.valid_parameters = False
+<<<<<<< HEAD
+                                    raise ValueError(f"When an element in the 'gene_space' parameter is of type dict, then it can have the keys 'low', 'high', and 'step' (optional) but the following keys found: {el.keys()}")
+=======
                                     raise ValueError(
                                         f"When an element in the 'gene_space' parameter is of type dict, then it can have the keys 'low', 'high', and 'step' (optional) but the following keys found: {el.keys()}")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                             elif len(el.items()) == 3:
                                 if ('low' in el.keys()) and ('high' in el.keys()) and ('step' in el.keys()):
                                     pass
                                 else:
                                     self.valid_parameters = False
+<<<<<<< HEAD
+                                    raise ValueError(f"When an element in the 'gene_space' parameter is of type dict, then it can have the keys 'low', 'high', and 'step' (optional) but the following keys found: {el.keys()}")
+                            else:
+                                self.valid_parameters = False
+                                raise ValueError(f"When an element in the 'gene_space' parameter is of type dict, then it must have only 2 items but ({len(el.items())}) items found.")
+                            self.gene_space_nested = True
+                        elif not (type(el) in GA.supported_int_float_types):
+                            self.valid_parameters = False
+                            raise TypeError(f"Unexpected type {type(el)} for the element indexed {index} of 'gene_space'. The accepted types are list/tuple/range/numpy.ndarray of numbers, a single number (int/float), or None.")
+=======
                                     raise ValueError(
                                         f"When an element in the 'gene_space' parameter is of type dict, then it can have the keys 'low', 'high', and 'step' (optional) but the following keys found: {el.keys()}")
                             else:
@@ -257,6 +303,7 @@ class GA(utils.parent_selection.ParentSelection,
                             self.valid_parameters = False
                             raise TypeError(
                                 f"Unexpected type {type(el)} for the element indexed {index} of 'gene_space'. The accepted types are list/tuple/range/numpy.ndarray of numbers, a single number (int/float), or None.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             elif type(gene_space) is dict:
                 if len(gene_space.items()) == 2:
@@ -264,13 +311,27 @@ class GA(utils.parent_selection.ParentSelection,
                         pass
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"When the 'gene_space' parameter is of type dict, then it can have only the keys 'low', 'high', and 'step' (optional) but the following keys found: {gene_space.keys()}")
+=======
                         raise ValueError(
                             f"When the 'gene_space' parameter is of type dict, then it can have only the keys 'low', 'high', and 'step' (optional) but the following keys found: {gene_space.keys()}")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 elif len(gene_space.items()) == 3:
                     if ('low' in gene_space.keys()) and ('high' in gene_space.keys()) and ('step' in gene_space.keys()):
                         pass
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"When the 'gene_space' parameter is of type dict, then it can have only the keys 'low', 'high', and 'step' (optional) but the following keys found: {gene_space.keys()}")
+                else:
+                    self.valid_parameters = False
+                    raise ValueError(f"When the 'gene_space' parameter is of type dict, then it must have only 2 items but ({len(gene_space.items())}) items found.")
+
+            else:
+                self.valid_parameters = False
+                raise TypeError(f"The expected type of 'gene_space' is list, range, or numpy.ndarray but {type(gene_space)} found.")
+=======
                         raise ValueError(
                             f"When the 'gene_space' parameter is of type dict, then it can have only the keys 'low', 'high', and 'step' (optional) but the following keys found: {gene_space.keys()}")
                 else:
@@ -282,6 +343,7 @@ class GA(utils.parent_selection.ParentSelection,
                 self.valid_parameters = False
                 raise TypeError(
                     f"The expected type of 'gene_space' is list, range, or numpy.ndarray but {type(gene_space)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.gene_space = gene_space
 
@@ -292,18 +354,34 @@ class GA(utils.parent_selection.ParentSelection,
                     self.init_range_high = init_range_high
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"The value passed to the 'init_range_high' parameter must be either integer or floating-point number but the value ({init_range_high}) of type {type(init_range_high)} found.")
+            else:
+                self.valid_parameters = False
+                raise ValueError(f"The value passed to the 'init_range_low' parameter must be either integer or floating-point number but the value ({init_range_low}) of type {type(init_range_low)} found.")
+=======
                     raise ValueError(
                         f"The value passed to the 'init_range_high' parameter must be either integer or floating-point number but the value ({init_range_high}) of type {type(init_range_high)} found.")
             else:
                 self.valid_parameters = False
                 raise ValueError(
                     f"The value passed to the 'init_range_low' parameter must be either integer or floating-point number but the value ({init_range_low}) of type {type(init_range_low)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Validate random_mutation_min_val and random_mutation_max_val
             if type(random_mutation_min_val) in GA.supported_int_float_types:
                 if type(random_mutation_max_val) in GA.supported_int_float_types:
                     if random_mutation_min_val == random_mutation_max_val:
                         if not self.suppress_warnings:
+<<<<<<< HEAD
+                            warnings.warn("The values of the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val' are equal and this causes a fixed change to all genes.")
+                else:
+                    self.valid_parameters = False
+                    raise TypeError(f"The expected type of the 'random_mutation_max_val' parameter is numeric but {type(random_mutation_max_val)} found.")
+            else:
+                self.valid_parameters = False
+                raise TypeError(f"The expected type of the 'random_mutation_min_val' parameter is numeric but {type(random_mutation_min_val)} found.")
+=======
                             warnings.warn(
                                 "The values of the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val' are equal and this causes a fixed change to all genes.")
                 else:
@@ -314,6 +392,7 @@ class GA(utils.parent_selection.ParentSelection,
                 self.valid_parameters = False
                 raise TypeError(
                     f"The expected type of the 'random_mutation_min_val' parameter is numeric but {type(random_mutation_min_val)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             self.random_mutation_min_val = random_mutation_min_val
             self.random_mutation_max_val = random_mutation_max_val
 
@@ -328,12 +407,25 @@ class GA(utils.parent_selection.ParentSelection,
             # A single data type of int with precision.
             elif len(gene_type) == 2 and gene_type[0] in GA.supported_int_types and (type(gene_type[1]) in GA.supported_int_types or gene_type[1] is None):
                 self.gene_type_single = False
+<<<<<<< HEAD
+                raise ValueError(f"Integers cannot have precision. Please use the integer data type directly instead of {gene_type}.")
+=======
                 raise ValueError(
                     f"Integers cannot have precision. Please use the integer data type directly instead of {gene_type}.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             elif type(gene_type) in [list, tuple, numpy.ndarray]:
                 if num_genes is None:
                     if initial_population is None:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise TypeError("When the parameter 'initial_population' is None, then the 2 parameters 'sol_per_pop' and 'num_genes' cannot be None too.")
+                    elif not len(gene_type) == len(initial_population[0]):
+                        self.valid_parameters = False
+                        raise ValueError(f"When the parameter 'gene_type' is nested, then it can be either [float, int<precision>] or with length equal to the number of genes parameter. Instead, value {gene_type} with len(gene_type) ({len(gene_type)}) != number of genes ({len(initial_population[0])}) found.")
+                elif not len(gene_type) == num_genes:
+                    self.valid_parameters = False
+                    raise ValueError(f"When the parameter 'gene_type' is nested, then it can be either [float, int<precision>] or with length equal to the value passed to the 'num_genes' parameter. Instead, value {gene_type} with len(gene_type) ({len(gene_type)}) != len(num_genes) ({num_genes}) found.")
+=======
                         raise TypeError(
                             "When the parameter 'initial_population' is None, then the 2 parameters 'sol_per_pop' and 'num_genes' cannot be None too.")
                     elif not len(gene_type) == len(initial_population[0]):
@@ -344,6 +436,7 @@ class GA(utils.parent_selection.ParentSelection,
                     self.valid_parameters = False
                     raise ValueError(
                         f"When the parameter 'gene_type' is nested, then it can be either [float, int<precision>] or with length equal to the value passed to the 'num_genes' parameter. Instead, value {gene_type} with len(gene_type) ({len(gene_type)}) != len(num_genes) ({num_genes}) found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 for gene_type_idx, gene_type_val in enumerate(gene_type):
                     if gene_type_val in GA.supported_float_types:
                         # If the gene type is float and no precision is passed, set it to None.
@@ -358,26 +451,41 @@ class GA(utils.parent_selection.ParentSelection,
                                     pass
                                 else:
                                     self.valid_parameters = False
+<<<<<<< HEAD
+                                    raise TypeError(f"In the 'gene_type' parameter, the precision for float gene data types must be an integer but the element {gene_type_val} at index {gene_type_idx} has a precision of {gene_type_val[1]} with type {gene_type_val[0]}.")
+=======
                                     raise TypeError(
                                         f"In the 'gene_type' parameter, the precision for float gene data types must be an integer but the element {gene_type_val} at index {gene_type_idx} has a precision of {gene_type_val[1]} with type {gene_type_val[0]}.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                             else:
                                 self.valid_parameters = False
                                 raise TypeError(
                                     f"In the 'gene_type' parameter, a precision is expected only for float gene data types but the element {gene_type_val} found at index {gene_type_idx}.\nNote that the data type must be at index 0 of the item followed by precision at index 1.")
                         else:
                             self.valid_parameters = False
+<<<<<<< HEAD
+                            raise ValueError(f"In the 'gene_type' parameter, a precision is specified in a list/tuple/numpy.ndarray of length 2 but value ({gene_type_val}) of type {type(gene_type_val)} with length {len(gene_type_val)} found at index {gene_type_idx}.")
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError(f"When a list/tuple/numpy.ndarray is assigned to the 'gene_type' parameter, then its elements must be of integer, floating-point, list, tuple, or numpy.ndarray data types but the value ({gene_type_val}) of type {type(gene_type_val)} found at index {gene_type_idx}.")
+=======
                             raise ValueError(
                                 f"In the 'gene_type' parameter, a precision is specified in a list/tuple/numpy.ndarray of length 2 but value ({gene_type_val}) of type {type(gene_type_val)} with length {len(gene_type_val)} found at index {gene_type_idx}.")
                     else:
                         self.valid_parameters = False
                         raise ValueError(
                             f"When a list/tuple/numpy.ndarray is assigned to the 'gene_type' parameter, then its elements must be of integer, floating-point, list, tuple, or numpy.ndarray data types but the value ({gene_type_val}) of type {type(gene_type_val)} found at index {gene_type_idx}.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 self.gene_type = gene_type
                 self.gene_type_single = False
             else:
                 self.valid_parameters = False
+<<<<<<< HEAD
+                raise ValueError(f"The value passed to the 'gene_type' parameter must be either a single integer, floating-point, list, tuple, or numpy.ndarray but ({gene_type}) of type {type(gene_type)} found.")
+=======
                 raise ValueError(
                     f"The value passed to the 'gene_type' parameter must be either a single integer, floating-point, list, tuple, or numpy.ndarray but ({gene_type}) of type {type(gene_type)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Call the unpack_gene_space() method in the pygad.helper.unique.Unique class.
             self.gene_space_unpacked = self.unpack_gene_space()
@@ -391,6 +499,13 @@ class GA(utils.parent_selection.ParentSelection,
                     # Validating the number of solutions in the population (sol_per_pop)
                     if sol_per_pop <= 0:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The number of solutions in the population (sol_per_pop) must be > 0 but ({sol_per_pop}) found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n")
+                    # Validating the number of gene.
+                    if (num_genes <= 0):
+                        self.valid_parameters = False
+                        raise ValueError(f"The number of genes cannot be <= 0 but ({num_genes}) found.\n")
+=======
                         raise ValueError(
                             f"The number of solutions in the population (sol_per_pop) must be > 0 but ({sol_per_pop}) found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n")
                     # Validating the number of gene.
@@ -398,6 +513,7 @@ class GA(utils.parent_selection.ParentSelection,
                         self.valid_parameters = False
                         raise ValueError(
                             f"The number of genes cannot be <= 0 but ({num_genes}) found.\n")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                     # When initial_population=None and the 2 parameters sol_per_pop and num_genes have valid integer values, then the initial population is created.
                     # Inside the initialize_population() method, the initial_population attribute is assigned to keep the initial population accessible.
                     self.num_genes = num_genes  # Number of genes in the solution.
@@ -406,8 +522,12 @@ class GA(utils.parent_selection.ParentSelection,
                     if self.gene_space_nested:
                         if len(gene_space) != self.num_genes:
                             self.valid_parameters = False
+<<<<<<< HEAD
+                            raise ValueError(f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
+=======
                             raise ValueError(
                                 f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                     # Number of solutions in the population.
                     self.sol_per_pop = sol_per_pop
@@ -418,6 +538,15 @@ class GA(utils.parent_selection.ParentSelection,
                                             self.gene_type)
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise TypeError(f"The expected type of both the sol_per_pop and num_genes parameters is int but {type(sol_per_pop)} and {type(num_genes)} found.")
+            elif not type(initial_population) in [list, tuple, numpy.ndarray]:
+                self.valid_parameters = False
+                raise TypeError(f"The value assigned to the 'initial_population' parameter is expected to by of type list, tuple, or ndarray but {type(initial_population)} found.")
+            elif numpy.array(initial_population).ndim != 2:
+                self.valid_parameters = False
+                raise ValueError(f"A 2D list is expected to the initail_population parameter but a ({numpy.array(initial_population).ndim}-D) list found.")
+=======
                     raise TypeError(
                         f"The expected type of both the sol_per_pop and num_genes parameters is int but {type(sol_per_pop)} and {type(num_genes)} found.")
             elif not type(initial_population) in [list, tuple, numpy.ndarray]:
@@ -428,6 +557,7 @@ class GA(utils.parent_selection.ParentSelection,
                 self.valid_parameters = False
                 raise ValueError(
                     f"A 2D list is expected to the initail_population parameter but a ({numpy.array(initial_population).ndim}-D) list found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 # Validate the type of each value in the 'initial_population' parameter.
                 for row_idx in range(len(initial_population)):
@@ -436,8 +566,12 @@ class GA(utils.parent_selection.ParentSelection,
                             pass
                         else:
                             self.valid_parameters = False
+<<<<<<< HEAD
+                            raise TypeError(f"The values in the initial population can be integers or floats but the value ({initial_population[row_idx][col_idx]}) of type {type(initial_population[row_idx][col_idx])} found.")
+=======
                             raise TypeError(
                                 f"The values in the initial population can be integers or floats but the value ({initial_population[row_idx][col_idx]}) of type {type(initial_population[row_idx][col_idx])} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                 # Forcing the initial_population array to have the data type assigned to the gene_type parameter.
                 if self.gene_type_single == True:
@@ -496,20 +630,32 @@ class GA(utils.parent_selection.ParentSelection,
             if self.gene_space_nested:
                 if len(gene_space) != self.num_genes:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
+=======
                     raise ValueError(
                         f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Validating the number of parents to be selected for mating (num_parents_mating)
             if num_parents_mating <= 0:
                 self.valid_parameters = False
+<<<<<<< HEAD
+                raise ValueError(f"The number of parents mating (num_parents_mating) parameter must be > 0 but ({num_parents_mating}) found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n")
+=======
                 raise ValueError(
                     f"The number of parents mating (num_parents_mating) parameter must be > 0 but ({num_parents_mating}) found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Validating the number of parents to be selected for mating: num_parents_mating
             if (num_parents_mating > self.sol_per_pop):
                 self.valid_parameters = False
+<<<<<<< HEAD
+                raise ValueError(f"The number of parents to select for mating ({num_parents_mating}) cannot be greater than the number of solutions in the population ({self.sol_per_pop}) (i.e., num_parents_mating must always be <= sol_per_pop).\n")
+=======
                 raise ValueError(
                     f"The number of parents to select for mating ({num_parents_mating}) cannot be greater than the number of solutions in the population ({self.sol_per_pop}) (i.e., num_parents_mating must always be <= sol_per_pop).\n")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.num_parents_mating = num_parents_mating
 
@@ -524,8 +670,12 @@ class GA(utils.parent_selection.ParentSelection,
                     self.crossover = crossover_type
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"When 'crossover_type' is assigned to a method, then this crossover method must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The selected parents.\n3) The size of the offspring to be produced.\n4) The instance from the pygad.GA class.\n\nThe passed crossover method named '{crossover_type.__code__.co_name}' accepts {crossover_type.__code__.co_argcount} parameter(s).")
+=======
                     raise ValueError(
                         f"When 'crossover_type' is assigned to a method, then this crossover method must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The selected parents.\n3) The size of the offspring to be produced.\n4) The instance from the pygad.GA class.\n\nThe passed crossover method named '{crossover_type.__code__.co_name}' accepts {crossover_type.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             elif callable(crossover_type):
                 # Check if the crossover_type is a function that accepts 2 paramaters.
                 if (crossover_type.__code__.co_argcount == 3):
@@ -533,12 +683,19 @@ class GA(utils.parent_selection.ParentSelection,
                     self.crossover = crossover_type
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"When 'crossover_type' is assigned to a function, then this crossover function must accept 3 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed crossover function named '{crossover_type.__code__.co_name}' accepts {crossover_type.__code__.co_argcount} parameter(s).")
+            elif not (type(crossover_type) is str):
+                self.valid_parameters = False
+                raise TypeError(f"The expected type of the 'crossover_type' parameter is either callable or str but {type(crossover_type)} found.")
+=======
                     raise ValueError(
                         f"When 'crossover_type' is assigned to a function, then this crossover function must accept 3 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed crossover function named '{crossover_type.__code__.co_name}' accepts {crossover_type.__code__.co_argcount} parameter(s).")
             elif not (type(crossover_type) is str):
                 self.valid_parameters = False
                 raise TypeError(
                     f"The expected type of the 'crossover_type' parameter is either callable or str but {type(crossover_type)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:  # type crossover_type is str
                 crossover_type = crossover_type.lower()
                 if (crossover_type == "single_point"):
@@ -551,8 +708,12 @@ class GA(utils.parent_selection.ParentSelection,
                     self.crossover = self.scattered_crossover
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise TypeError(f"Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) parameter does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover)\n-scattered (for scattered crossover).\n")
+=======
                     raise TypeError(
                         f"Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) parameter does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover)\n-scattered (for scattered crossover).\n")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.crossover_type = crossover_type
 
@@ -564,12 +725,19 @@ class GA(utils.parent_selection.ParentSelection,
                     self.crossover_probability = crossover_probability
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"The value assigned to the 'crossover_probability' parameter must be between 0 and 1 inclusive but ({crossover_probability}) found.")
+            else:
+                self.valid_parameters = False
+                raise TypeError(f"Unexpected type for the 'crossover_probability' parameter. Float is expected but ({crossover_probability}) of type {type(crossover_probability)} found.")
+=======
                     raise ValueError(
                         f"The value assigned to the 'crossover_probability' parameter must be between 0 and 1 inclusive but ({crossover_probability}) found.")
             else:
                 self.valid_parameters = False
                 raise TypeError(
                     f"Unexpected type for the 'crossover_probability' parameter. Float is expected but ({crossover_probability}) of type {type(crossover_probability)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # mutation: Refers to the method that applies the mutation operator based on the selected type of mutation in the mutation_type property.
             # Validating the mutation type: mutation_type
@@ -583,8 +751,12 @@ class GA(utils.parent_selection.ParentSelection,
                     self.mutation = mutation_type
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"When 'mutation_type' is assigned to a method, then it must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The offspring to be mutated.\n3) The instance from the pygad.GA class.\n\nThe passed mutation method named '{mutation_type.__code__.co_name}' accepts {mutation_type.__code__.co_argcount} parameter(s).")
+=======
                     raise ValueError(
                         f"When 'mutation_type' is assigned to a method, then it must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The offspring to be mutated.\n3) The instance from the pygad.GA class.\n\nThe passed mutation method named '{mutation_type.__code__.co_name}' accepts {mutation_type.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             elif callable(mutation_type):
                 # Check if the mutation_type is a function that accepts 2 paramater.
                 if (mutation_type.__code__.co_argcount == 2):
@@ -592,12 +764,19 @@ class GA(utils.parent_selection.ParentSelection,
                     self.mutation = mutation_type
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"When 'mutation_type' is assigned to a function, then this mutation function must accept 2 parameters:\n1) The offspring to be mutated.\n2) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed mutation function named '{mutation_type.__code__.co_name}' accepts {mutation_type.__code__.co_argcount} parameter(s).")
+            elif not (type(mutation_type) is str):
+                self.valid_parameters = False
+                raise TypeError(f"The expected type of the 'mutation_type' parameter is either callable or str but {type(mutation_type)} found.")
+=======
                     raise ValueError(
                         f"When 'mutation_type' is assigned to a function, then this mutation function must accept 2 parameters:\n1) The offspring to be mutated.\n2) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed mutation function named '{mutation_type.__code__.co_name}' accepts {mutation_type.__code__.co_argcount} parameter(s).")
             elif not (type(mutation_type) is str):
                 self.valid_parameters = False
                 raise TypeError(
                     f"The expected type of the 'mutation_type' parameter is either callable or str but {type(mutation_type)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:  # type mutation_type is str
                 mutation_type = mutation_type.lower()
                 if (mutation_type == "random"):
@@ -612,8 +791,12 @@ class GA(utils.parent_selection.ParentSelection,
                     self.mutation = self.adaptive_mutation
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise TypeError(f"Undefined mutation type. \nThe assigned string value to the 'mutation_type' parameter ({mutation_type}) does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation)\n-adaptive (for adaptive mutation).\n")
+=======
                     raise TypeError(
                         f"Undefined mutation type. \nThe assigned string value to the 'mutation_type' parameter ({mutation_type}) does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation)\n-adaptive (for adaptive mutation).\n")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.mutation_type = mutation_type
 
@@ -628,12 +811,19 @@ class GA(utils.parent_selection.ParentSelection,
                             self.mutation_probability = mutation_probability
                         else:
                             self.valid_parameters = False
+<<<<<<< HEAD
+                            raise ValueError(f"The value assigned to the 'mutation_probability' parameter must be between 0 and 1 inclusive but ({mutation_probability}) found.")
+                    else:
+                        self.valid_parameters = False
+                        raise TypeError(f"Unexpected type for the 'mutation_probability' parameter. A numeric value is expected but ({mutation_probability}) of type {type(mutation_probability)} found.")
+=======
                             raise ValueError(
                                 f"The value assigned to the 'mutation_probability' parameter must be between 0 and 1 inclusive but ({mutation_probability}) found.")
                     else:
                         self.valid_parameters = False
                         raise TypeError(
                             f"Unexpected type for the 'mutation_probability' parameter. A numeric value is expected but ({mutation_probability}) of type {type(mutation_probability)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 else:
                     # Mutation probability is adaptive not fixed.
                     if type(mutation_probability) in [list, tuple, numpy.ndarray]:
@@ -644,6 +834,22 @@ class GA(utils.parent_selection.ParentSelection,
                                         pass
                                     else:
                                         self.valid_parameters = False
+<<<<<<< HEAD
+                                        raise ValueError(f"The values assigned to the 'mutation_probability' parameter must be between 0 and 1 inclusive but ({el}) found.")
+                                else:
+                                    self.valid_parameters = False
+                                    raise TypeError(f"Unexpected type for a value assigned to the 'mutation_probability' parameter. A numeric value is expected but ({el}) of type {type(el)} found.")
+                            if mutation_probability[0] < mutation_probability[1]:
+                                if not self.suppress_warnings:
+                                    warnings.warn(f"The first element in the 'mutation_probability' parameter is {mutation_probability[0]} which is smaller than the second element {mutation_probability[1]}. This means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high qualitiy solutions while making little changes in the low quality solutions. Please make the first element higher than the second element.")
+                            self.mutation_probability = mutation_probability
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"When mutation_type='adaptive', then the 'mutation_probability' parameter must have only 2 elements but ({len(mutation_probability)}) element(s) found.")
+                    else:
+                        self.valid_parameters = False
+                        raise TypeError(f"Unexpected type for the 'mutation_probability' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_probability}) of type {type(mutation_probability)} found.")
+=======
                                         raise ValueError(
                                             f"The values assigned to the 'mutation_probability' parameter must be between 0 and 1 inclusive but ({el}) found.")
                                 else:
@@ -663,6 +869,7 @@ class GA(utils.parent_selection.ParentSelection,
                         self.valid_parameters = False
                         raise TypeError(
                             f"Unexpected type for the 'mutation_probability' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_probability}) of type {type(mutation_probability)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 pass
 
@@ -688,8 +895,12 @@ class GA(utils.parent_selection.ParentSelection,
                         elif type(mutation_percent_genes) in GA.supported_int_float_types:
                             if (mutation_percent_genes <= 0 or mutation_percent_genes > 100):
                                 self.valid_parameters = False
+<<<<<<< HEAD
+                                raise ValueError(f"The percentage of selected genes for mutation (mutation_percent_genes) must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n")
+=======
                                 raise ValueError(
                                     f"The percentage of selected genes for mutation (mutation_percent_genes) must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                             else:
                                 # If mutation_percent_genes equals the string "default", then it is replaced by the numeric value 10.
                                 if mutation_percent_genes == 'default'.lower():
@@ -702,6 +913,13 @@ class GA(utils.parent_selection.ParentSelection,
                                 if mutation_num_genes == 0:
                                     if self.mutation_probability is None:
                                         if not self.suppress_warnings:
+<<<<<<< HEAD
+                                            warnings.warn(f"The percentage of genes to mutate (mutation_percent_genes={mutation_percent_genes}) resutled in selecting ({mutation_num_genes}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.")
+                                    mutation_num_genes = 1
+                        else:
+                            self.valid_parameters = False
+                            raise TypeError(f"Unexpected value or type of the 'mutation_percent_genes' parameter. It only accepts the string 'default' or a numeric value but ({mutation_percent_genes}) of type {type(mutation_percent_genes)} found.")
+=======
                                             warnings.warn(
                                                 f"The percentage of genes to mutate (mutation_percent_genes={mutation_percent_genes}) resutled in selecting ({mutation_num_genes}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.")
                                     mutation_num_genes = 1
@@ -709,6 +927,7 @@ class GA(utils.parent_selection.ParentSelection,
                             self.valid_parameters = False
                             raise TypeError(
                                 f"Unexpected value or type of the 'mutation_percent_genes' parameter. It only accepts the string 'default' or a numeric value but ({mutation_percent_genes}) of type {type(mutation_percent_genes)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                     else:
                         # The percent of genes to mutate is adaptive not fixed.
                         if type(mutation_percent_genes) in [list, tuple, numpy.ndarray]:
@@ -719,12 +938,19 @@ class GA(utils.parent_selection.ParentSelection,
                                     if type(el) in GA.supported_int_float_types:
                                         if (el <= 0 or el > 100):
                                             self.valid_parameters = False
+<<<<<<< HEAD
+                                            raise ValueError(f"The values assigned to the 'mutation_percent_genes' must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n")
+                                    else:
+                                        self.valid_parameters = False
+                                        raise TypeError(f"Unexpected type for a value assigned to the 'mutation_percent_genes' parameter. An integer value is expected but ({el}) of type {type(el)} found.")
+=======
                                             raise ValueError(
                                                 f"The values assigned to the 'mutation_percent_genes' must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n")
                                     else:
                                         self.valid_parameters = False
                                         raise TypeError(
                                             f"Unexpected type for a value assigned to the 'mutation_percent_genes' parameter. An integer value is expected but ({el}) of type {type(el)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                                     # At this point of the loop, the current value assigned to the parameter 'mutation_percent_genes' is validated.
                                     # Based on the mutation percentage in the 'mutation_percent_genes' parameter, the number of genes to mutate is calculated.
                                     mutation_num_genes[idx] = numpy.uint32(
@@ -732,6 +958,21 @@ class GA(utils.parent_selection.ParentSelection,
                                     # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
                                     if mutation_num_genes[idx] == 0:
                                         if not self.suppress_warnings:
+<<<<<<< HEAD
+                                            warnings.warn(f"The percentage of genes to mutate ({mutation_percent_genes[idx]}) resutled in selecting ({mutation_num_genes[idx]}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.")
+                                        mutation_num_genes[idx] = 1
+                                if mutation_percent_genes[0] < mutation_percent_genes[1]:
+                                    if not self.suppress_warnings:
+                                        warnings.warn(f"The first element in the 'mutation_percent_genes' parameter is ({mutation_percent_genes[0]}) which is smaller than the second element ({mutation_percent_genes[1]}).\nThis means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high qualitiy solutions while making little changes in the low quality solutions.\nPlease make the first element higher than the second element.")
+                                # At this point outside the loop, all values of the parameter 'mutation_percent_genes' are validated. Eveyrthing is OK.
+                            else:
+                                self.valid_parameters = False
+                                raise ValueError(f"When mutation_type='adaptive', then the 'mutation_percent_genes' parameter must have only 2 elements but ({len(mutation_percent_genes)}) element(s) found.")
+                        else:
+                            if self.mutation_probability is None:
+                                self.valid_parameters = False
+                                raise TypeError(f"Unexpected type of the 'mutation_percent_genes' parameter. When mutation_type='adaptive', then the 'mutation_percent_genes' parameter should exist and assigned a list/tuple/numpy.ndarray with 2 values but ({mutation_percent_genes}) found.")
+=======
                                             warnings.warn(
                                                 f"The percentage of genes to mutate ({mutation_percent_genes[idx]}) resutled in selecting ({mutation_num_genes[idx]}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.")
                                         mutation_num_genes[idx] = 1
@@ -749,12 +990,22 @@ class GA(utils.parent_selection.ParentSelection,
                                 self.valid_parameters = False
                                 raise TypeError(
                                     f"Unexpected type of the 'mutation_percent_genes' parameter. When mutation_type='adaptive', then the 'mutation_percent_genes' parameter should exist and assigned a list/tuple/numpy.ndarray with 2 values but ({mutation_percent_genes}) found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 # The mutation_num_genes parameter exists. Checking whether adaptive mutation is used.
                 elif (mutation_type != "adaptive"):
                     # Number of genes to mutate is fixed not adaptive.
                     if type(mutation_num_genes) in GA.supported_int_types:
                         if (mutation_num_genes <= 0):
                             self.valid_parameters = False
+<<<<<<< HEAD
+                            raise ValueError(f"The number of selected genes for mutation (mutation_num_genes) cannot be <= 0 but ({mutation_num_genes}) found. If you do not want to use mutation, please set mutation_type=None\n")
+                        elif (mutation_num_genes > self.num_genes):
+                            self.valid_parameters = False
+                            raise ValueError(f"The number of selected genes for mutation (mutation_num_genes), which is ({mutation_num_genes}), cannot be greater than the number of genes ({self.num_genes}).\n")
+                    else:
+                        self.valid_parameters = False
+                        raise TypeError(f"The 'mutation_num_genes' parameter is expected to be a positive integer but the value ({mutation_num_genes}) of type {type(mutation_num_genes)} found.\n")
+=======
                             raise ValueError(
                                 f"The number of selected genes for mutation (mutation_num_genes) cannot be <= 0 but ({mutation_num_genes}) found. If you do not want to use mutation, please set mutation_type=None\n")
                         elif (mutation_num_genes > self.num_genes):
@@ -765,6 +1016,7 @@ class GA(utils.parent_selection.ParentSelection,
                         self.valid_parameters = False
                         raise TypeError(
                             f"The 'mutation_num_genes' parameter is expected to be a positive integer but the value ({mutation_num_genes}) of type {type(mutation_num_genes)} found.\n")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 else:
                     # Number of genes to mutate is adaptive not fixed.
                     if type(mutation_num_genes) in [list, tuple, numpy.ndarray]:
@@ -773,6 +1025,26 @@ class GA(utils.parent_selection.ParentSelection,
                                 if type(el) in GA.supported_int_types:
                                     if (el <= 0):
                                         self.valid_parameters = False
+<<<<<<< HEAD
+                                        raise ValueError(f"The values assigned to the 'mutation_num_genes' cannot be <= 0 but ({el}) found. If you do not want to use mutation, please set mutation_type=None\n")
+                                    elif (el > self.num_genes):
+                                        self.valid_parameters = False
+                                        raise ValueError(f"The values assigned to the 'mutation_num_genes' cannot be greater than the number of genes ({self.num_genes}) but ({el}) found.\n")
+                                else:
+                                    self.valid_parameters = False
+                                    raise TypeError(f"Unexpected type for a value assigned to the 'mutation_num_genes' parameter. An integer value is expected but ({el}) of type {type(el)} found.")
+                                # At this point of the loop, the current value assigned to the parameter 'mutation_num_genes' is validated.
+                            if mutation_num_genes[0] < mutation_num_genes[1]:
+                                if not self.suppress_warnings:
+                                    warnings.warn(f"The first element in the 'mutation_num_genes' parameter is {mutation_num_genes[0]} which is smaller than the second element {mutation_num_genes[1]}. This means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high qualitiy solutions while making little changes in the low quality solutions. Please make the first element higher than the second element.")
+                            # At this point outside the loop, all values of the parameter 'mutation_num_genes' are validated. Eveyrthing is OK.
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"When mutation_type='adaptive', then the 'mutation_num_genes' parameter must have only 2 elements but ({len(mutation_num_genes)}) element(s) found.")
+                    else:
+                        self.valid_parameters = False
+                        raise TypeError(f"Unexpected type for the 'mutation_num_genes' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_num_genes}) of type {type(mutation_num_genes)} found.")
+=======
                                         raise ValueError(
                                             f"The values assigned to the 'mutation_num_genes' cannot be <= 0 but ({el}) found. If you do not want to use mutation, please set mutation_type=None\n")
                                     elif (el > self.num_genes):
@@ -797,14 +1069,19 @@ class GA(utils.parent_selection.ParentSelection,
                         self.valid_parameters = False
                         raise TypeError(
                             f"Unexpected type for the 'mutation_num_genes' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_num_genes}) of type {type(mutation_num_genes)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 pass
 
             # Validating mutation_by_replacement and mutation_type
             if self.mutation_type != "random" and self.mutation_by_replacement:
                 if not self.suppress_warnings:
+<<<<<<< HEAD
+                    warnings.warn(f"The mutation_by_replacement parameter is set to True while the mutation_type parameter is not set to random but ({mutation_type}). Note that the mutation_by_replacement parameter has an effect only when mutation_type='random'.")
+=======
                     warnings.warn(
                         f"The mutation_by_replacement parameter is set to True while the mutation_type parameter is not set to random but ({mutation_type}). Note that the mutation_by_replacement parameter has an effect only when mutation_type='random'.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Check if crossover and mutation are both disabled.
             if (self.mutation_type is None) and (self.crossover_type is None):
@@ -821,8 +1098,12 @@ class GA(utils.parent_selection.ParentSelection,
                     self.select_parents = parent_selection_type
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"When 'parent_selection_type' is assigned to a method, then it must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The fitness values of the current population.\n3) The number of parents needed.\n4) The instance from the pygad.GA class.\n\nThe passed parent selection method named '{parent_selection_type.__code__.co_name}' accepts {parent_selection_type.__code__.co_argcount} parameter(s).")
+=======
                     raise ValueError(
                         f"When 'parent_selection_type' is assigned to a method, then it must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The fitness values of the current population.\n3) The number of parents needed.\n4) The instance from the pygad.GA class.\n\nThe passed parent selection method named '{parent_selection_type.__code__.co_name}' accepts {parent_selection_type.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             elif callable(parent_selection_type):
                 # Check if the parent_selection_type is a function that accepts 3 paramaters.
                 if (parent_selection_type.__code__.co_argcount == 3):
@@ -831,6 +1112,13 @@ class GA(utils.parent_selection.ParentSelection,
                     self.select_parents = parent_selection_type
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"When 'parent_selection_type' is assigned to a user-defined function, then this parent selection function must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed parent selection function named '{parent_selection_type.__code__.co_name}' accepts {parent_selection_type.__code__.co_argcount} parameter(s).")
+            elif not (type(parent_selection_type) is str):
+                self.valid_parameters = False
+                
+                raise TypeError(f"The expected type of the 'parent_selection_type' parameter is either callable or str but {type(parent_selection_type)} found.")
+=======
                     raise ValueError(
                         f"When 'parent_selection_type' is assigned to a user-defined function, then this parent selection function must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed parent selection function named '{parent_selection_type.__code__.co_name}' accepts {parent_selection_type.__code__.co_argcount} parameter(s).")
             elif not (type(parent_selection_type) is str):
@@ -838,6 +1126,7 @@ class GA(utils.parent_selection.ParentSelection,
                 
                 raise TypeError(
                     f"The expected type of the 'parent_selection_type' parameter is either callable or str but {type(parent_selection_type)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 parent_selection_type = parent_selection_type.lower()
                 if (parent_selection_type == "sss"):
@@ -861,41 +1150,66 @@ class GA(utils.parent_selection.ParentSelection,
                 if (K_tournament > self.sol_per_pop):
                     K_tournament = self.sol_per_pop
                     if not self.suppress_warnings:
+<<<<<<< HEAD
+                        warnings.warn(f"K of the tournament selection ({K_tournament}) should not be greater than the number of solutions within the population ({self.sol_per_pop}).\nK will be clipped to be equal to the number of solutions in the population (sol_per_pop).\n")
+                elif (K_tournament <= 0):
+                    self.valid_parameters = False
+                    raise ValueError(f"K of the tournament selection cannot be <=0 but ({K_tournament}) found.\n")
+=======
                         warnings.warn(
                             f"K of the tournament selection ({K_tournament}) should not be greater than the number of solutions within the population ({self.sol_per_pop}).\nK will be clipped to be equal to the number of solutions in the population (sol_per_pop).\n")
                 elif (K_tournament <= 0):
                     self.valid_parameters = False
                     raise ValueError(
                         f"K of the tournament selection cannot be <=0 but ({K_tournament}) found.\n")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.K_tournament = K_tournament
 
             # Validating the number of parents to keep in the next population: keep_parents
             if not (type(keep_parents) in GA.supported_int_types):
                 self.valid_parameters = False
+<<<<<<< HEAD
+                raise TypeError(f"Incorrect type of the value assigned to the keep_parents parameter. The value ({keep_parents}) of type {type(keep_parents)} found but an integer is expected.")
+            elif (keep_parents > self.sol_per_pop or keep_parents > self.num_parents_mating or keep_parents < -1):
+                self.valid_parameters = False
+                raise ValueError(f"Incorrect value to the keep_parents parameter: {keep_parents}. \nThe assigned value to the keep_parent parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Less than or equal to num_parents_mating\n3) Greater than or equal to -1.")
+=======
                 raise TypeError(
                     f"Incorrect type of the value assigned to the keep_parents parameter. The value ({keep_parents}) of type {type(keep_parents)} found but an integer is expected.")
             elif (keep_parents > self.sol_per_pop or keep_parents > self.num_parents_mating or keep_parents < -1):
                 self.valid_parameters = False
                 raise ValueError(
                     f"Incorrect value to the keep_parents parameter: {keep_parents}. \nThe assigned value to the keep_parent parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Less than or equal to num_parents_mating\n3) Greater than or equal to -1.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.keep_parents = keep_parents
 
             if parent_selection_type == "sss" and self.keep_parents == 0:
                 if not self.suppress_warnings:
+<<<<<<< HEAD
+                    warnings.warn("The steady-state parent (sss) selection operator is used despite that no parents are kept in the next generation.")
+=======
                     warnings.warn(
                         "The steady-state parent (sss) selection operator is used despite that no parents are kept in the next generation.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Validating the number of elitism to keep in the next population: keep_elitism
             if not (type(keep_elitism) in GA.supported_int_types):
                 self.valid_parameters = False
+<<<<<<< HEAD
+                raise TypeError(f"Incorrect type of the value assigned to the keep_elitism parameter. The value ({keep_elitism}) of type {type(keep_elitism)} found but an integer is expected.")
+            elif (keep_elitism > self.sol_per_pop or keep_elitism < 0):
+                self.valid_parameters = False
+                raise ValueError(f"Incorrect value to the keep_elitism parameter: {keep_elitism}. \nThe assigned value to the keep_elitism parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Greater than or equal to 0.")
+=======
                 raise TypeError(
                     f"Incorrect type of the value assigned to the keep_elitism parameter. The value ({keep_elitism}) of type {type(keep_elitism)} found but an integer is expected.")
             elif (keep_elitism > self.sol_per_pop or keep_elitism < 0):
                 self.valid_parameters = False
                 raise ValueError(
                     f"Incorrect value to the keep_elitism parameter: {keep_elitism}. \nThe assigned value to the keep_elitism parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Greater than or equal to 0.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.keep_elitism = keep_elitism
 
@@ -922,14 +1236,25 @@ class GA(utils.parent_selection.ParentSelection,
                     self.fitness_func = fitness_func
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"In PyGAD 2.20.0, if a method is used to calculate the fitness value, then it must accept 4 parameters\n1) Expected to be the 'self' object.\n2) The instance of the 'pygad.GA' class.\n3) A solution to calculate its fitness value.\n4) The solution's index within the population.\n\nThe passed fitness method named '{fitness_func.__code__.co_name}' accepts {fitness_func.__code__.co_argcount} parameter(s).")
+=======
                     raise ValueError(
                         f"In PyGAD 2.20.0, if a method is used to calculate the fitness value, then it must accept 4 parameters\n1) Expected to be the 'self' object.\n2) The instance of the 'pygad.GA' class.\n3) A solution to calculate its fitness value.\n4) The solution's index within the population.\n\nThe passed fitness method named '{fitness_func.__code__.co_name}' accepts {fitness_func.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             elif callable(fitness_func):
                 # Check if the fitness function accepts 2 paramaters.
                 if (fitness_func.__code__.co_argcount == 3):
                     self.fitness_func = fitness_func
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"In PyGAD 2.20.0, the fitness function must accept 3 parameters:\n1) The instance of the 'pygad.GA' class.\n2) A solution to calculate its fitness value.\n3) The solution's index within the population.\n\nThe passed fitness function named '{fitness_func.__code__.co_name}' accepts {fitness_func.__code__.co_argcount} parameter(s).")
+            else:
+                self.valid_parameters = False
+                
+                raise TypeError(f"The value assigned to the fitness_func parameter is expected to be of type function but {type(fitness_func)} found.")
+=======
                     raise ValueError(
                         f"In PyGAD 2.20.0, the fitness function must accept 3 parameters:\n1) The instance of the 'pygad.GA' class.\n2) A solution to calculate its fitness value.\n3) The solution's index within the population.\n\nThe passed fitness function named '{fitness_func.__code__.co_name}' accepts {fitness_func.__code__.co_argcount} parameter(s).")
             else:
@@ -937,17 +1262,25 @@ class GA(utils.parent_selection.ParentSelection,
                 
                 raise TypeError(
                     f"The value assigned to the fitness_func parameter is expected to be of type function but {type(fitness_func)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             if fitness_batch_size is None:
                 pass
             elif not (type(fitness_batch_size) in GA.supported_int_types):
                 self.valid_parameters = False
+<<<<<<< HEAD
+                raise TypeError(f"The value assigned to the fitness_batch_size parameter is expected to be integer but the value ({fitness_batch_size}) of type {type(fitness_batch_size)} found.")
+            elif fitness_batch_size <= 0 or fitness_batch_size > self.sol_per_pop:
+                self.valid_parameters = False
+                raise ValueError(f"The value assigned to the fitness_batch_size parameter must be:\n1) Greater than 0.\n2) Less than or equal to sol_per_pop ({self.sol_per_pop}).\nBut the value ({fitness_batch_size}) found.")
+=======
                 raise TypeError(
                     f"The value assigned to the fitness_batch_size parameter is expected to be integer but the value ({fitness_batch_size}) of type {type(fitness_batch_size)} found.")
             elif fitness_batch_size <= 0 or fitness_batch_size > self.sol_per_pop:
                 self.valid_parameters = False
                 raise ValueError(
                     f"The value assigned to the fitness_batch_size parameter must be:\n1) Greater than 0.\n2) Less than or equal to sol_per_pop ({self.sol_per_pop}).\nBut the value ({fitness_batch_size}) found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.fitness_batch_size = fitness_batch_size
 
@@ -959,8 +1292,12 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_start = on_start
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The method assigned to the on_start parameter must accept only 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{on_start.__code__.co_name}' accepts {on_start.__code__.co_argcount} parameter(s).")
+=======
                         raise ValueError(
                             f"The method assigned to the on_start parameter must accept only 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{on_start.__code__.co_name}' accepts {on_start.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 # Check if the on_start is a function.
                 elif callable(on_start):
                     # Check if the on_start function accepts only a single paramater.
@@ -968,6 +1305,13 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_start = on_start
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{on_start.__code__.co_name}' accepts {on_start.__code__.co_argcount} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    
+                    raise TypeError(f"The value assigned to the on_start parameter is expected to be of type function but {type(on_start)} found.")
+=======
                         raise ValueError(
                             f"The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{on_start.__code__.co_name}' accepts {on_start.__code__.co_argcount} parameter(s).")
                 else:
@@ -975,6 +1319,7 @@ class GA(utils.parent_selection.ParentSelection,
                     
                     raise TypeError(
                         f"The value assigned to the on_start parameter is expected to be of type function but {type(on_start)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 self.on_start = None
 
@@ -987,8 +1332,12 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_fitness = on_fitness
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The method assigned to the on_fitness parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.3) The fitness values of all solutions.\nThe passed method named '{on_fitness.__code__.co_name}' accepts {on_fitness.__code__.co_argcount} parameter(s).")
+=======
                         raise ValueError(
                             f"The method assigned to the on_fitness parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.3) The fitness values of all solutions.\nThe passed method named '{on_fitness.__code__.co_name}' accepts {on_fitness.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 # Check if the on_fitness is a function.
                 elif callable(on_fitness):
                     # Check if the on_fitness function accepts 2 paramaters.
@@ -996,12 +1345,19 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_fitness = on_fitness
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{on_fitness.__code__.co_name}' accepts {on_fitness.__code__.co_argcount} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    raise TypeError(f"The value assigned to the on_fitness parameter is expected to be of type function but {type(on_fitness)} found.")
+=======
                         raise ValueError(
                             f"The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{on_fitness.__code__.co_name}' accepts {on_fitness.__code__.co_argcount} parameter(s).")
                 else:
                     self.valid_parameters = False
                     raise TypeError(
                         f"The value assigned to the on_fitness parameter is expected to be of type function but {type(on_fitness)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 self.on_fitness = None
 
@@ -1014,8 +1370,12 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_parents = on_parents
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The method assigned to the on_parents parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n3) The fitness values of all solutions.\nThe passed method named '{on_parents.__code__.co_name}' accepts {on_parents.__code__.co_argcount} parameter(s).")
+=======
                         raise ValueError(
                             f"The method assigned to the on_parents parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n3) The fitness values of all solutions.\nThe passed method named '{on_parents.__code__.co_name}' accepts {on_parents.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 # Check if the on_parents is a function.
                 elif callable(on_parents):
                     # Check if the on_parents function accepts 2 paramaters.
@@ -1023,12 +1383,19 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_parents = on_parents
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{on_parents.__code__.co_name}' accepts {on_parents.__code__.co_argcount} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    raise TypeError(f"The value assigned to the on_parents parameter is expected to be of type function but {type(on_parents)} found.")
+=======
                         raise ValueError(
                             f"The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{on_parents.__code__.co_name}' accepts {on_parents.__code__.co_argcount} parameter(s).")
                 else:
                     self.valid_parameters = False
                     raise TypeError(
                         f"The value assigned to the on_parents parameter is expected to be of type function but {type(on_parents)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 self.on_parents = None
 
@@ -1041,8 +1408,12 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_crossover = on_crossover
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The method assigned to the on_crossover parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) The offspring generated using crossover.\nThe passed method named '{on_crossover.__code__.co_name}' accepts {on_crossover.__code__.co_argcount} parameter(s).")
+=======
                         raise ValueError(
                             f"The method assigned to the on_crossover parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) The offspring generated using crossover.\nThe passed method named '{on_crossover.__code__.co_name}' accepts {on_crossover.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 # Check if the on_crossover is a function.
                 elif callable(on_crossover):
                     # Check if the on_crossover function accepts 2 paramaters.
@@ -1050,6 +1421,12 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_crossover = on_crossover
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{on_crossover.__code__.co_name}' accepts {on_crossover.__code__.co_argcount} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    raise TypeError(f"The value assigned to the on_crossover parameter is expected to be of type function but {type(on_crossover)} found.")
+=======
                         raise ValueError(
                             f"The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{on_crossover.__code__.co_name}' accepts {on_crossover.__code__.co_argcount} parameter(s).")
                 else:
@@ -1057,6 +1434,7 @@ class GA(utils.parent_selection.ParentSelection,
                     
                     raise TypeError(
                         f"The value assigned to the on_crossover parameter is expected to be of type function but {type(on_crossover)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 self.on_crossover = None
 
@@ -1069,8 +1447,12 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_mutation = on_mutation
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The method assigned to the on_mutation parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) The offspring after applying the mutation operation.\nThe passed method named '{on_mutation.__code__.co_name}' accepts {on_mutation.__code__.co_argcount} parameter(s).")
+=======
                         raise ValueError(
                             f"The method assigned to the on_mutation parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) The offspring after applying the mutation operation.\nThe passed method named '{on_mutation.__code__.co_name}' accepts {on_mutation.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 # Check if the on_mutation is a function.
                 elif callable(on_mutation):
                     # Check if the on_mutation function accepts 2 paramaters.
@@ -1078,12 +1460,19 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_mutation = on_mutation
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{on_mutation.__code__.co_name}' accepts {on_mutation.__code__.co_argcount} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    raise TypeError(f"The value assigned to the on_mutation parameter is expected to be of type function but {type(on_mutation)} found.")
+=======
                         raise ValueError(
                             f"The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{on_mutation.__code__.co_name}' accepts {on_mutation.__code__.co_argcount} parameter(s).")
                 else:
                     self.valid_parameters = False
                     raise TypeError(
                         f"The value assigned to the on_mutation parameter is expected to be of type function but {type(on_mutation)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 self.on_mutation = None
 
@@ -1096,8 +1485,12 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_generation = on_generation
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The method assigned to the on_generation parameter must accept 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{on_generation.__code__.co_name}' accepts {on_generation.__code__.co_argcount} parameter(s).")
+=======
                         raise ValueError(
                             f"The method assigned to the on_generation parameter must accept 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{on_generation.__code__.co_name}' accepts {on_generation.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 # Check if the on_generation is a function.
                 elif callable(on_generation):
                     # Check if the on_generation function accepts only a single paramater.
@@ -1105,12 +1498,19 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_generation = on_generation
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{on_generation.__code__.co_name}' accepts {on_generation.__code__.co_argcount} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    raise TypeError(f"The value assigned to the on_generation parameter is expected to be of type function but {type(on_generation)} found.")
+=======
                         raise ValueError(
                             f"The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{on_generation.__code__.co_name}' accepts {on_generation.__code__.co_argcount} parameter(s).")
                 else:
                     self.valid_parameters = False
                     raise TypeError(
                         f"The value assigned to the on_generation parameter is expected to be of type function but {type(on_generation)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 self.on_generation = None
 
@@ -1123,8 +1523,12 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_stop = on_stop
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The method assigned to the on_stop parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) A list of the fitness values of the solutions in the last population.\nThe passed method named '{on_stop.__code__.co_name}' accepts {on_stop.__code__.co_argcount} parameter(s).")
+=======
                         raise ValueError(
                             f"The method assigned to the on_stop parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) A list of the fitness values of the solutions in the last population.\nThe passed method named '{on_stop.__code__.co_name}' accepts {on_stop.__code__.co_argcount} parameter(s).")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 # Check if the on_stop is a function.
                 elif callable(on_stop):
                     # Check if the on_stop function accepts 2 paramaters.
@@ -1132,12 +1536,19 @@ class GA(utils.parent_selection.ParentSelection,
                         self.on_stop = on_stop
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{on_stop.__code__.co_name}' accepts {on_stop.__code__.co_argcount} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    raise TypeError(f"The value assigned to the 'on_stop' parameter is expected to be of type function but {type(on_stop)} found.")
+=======
                         raise ValueError(
                             f"The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{on_stop.__code__.co_name}' accepts {on_stop.__code__.co_argcount} parameter(s).")
                 else:
                     self.valid_parameters = False
                     raise TypeError(
                         f"The value assigned to the 'on_stop' parameter is expected to be of type function but {type(on_stop)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 self.on_stop = None
 
@@ -1147,34 +1558,55 @@ class GA(utils.parent_selection.ParentSelection,
                     self.delay_after_gen = delay_after_gen
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"The value passed to the 'delay_after_gen' parameter must be a non-negative number. The value passed is ({delay_after_gen}) of type {type(delay_after_gen)}.")
+            else:
+                self.valid_parameters = False
+                raise TypeError(f"The value passed to the 'delay_after_gen' parameter must be of type int or float but {type(delay_after_gen)} found.")
+=======
                     raise ValueError(
                         f"The value passed to the 'delay_after_gen' parameter must be a non-negative number. The value passed is ({delay_after_gen}) of type {type(delay_after_gen)}.")
             else:
                 self.valid_parameters = False
                 raise TypeError(
                     f"The value passed to the 'delay_after_gen' parameter must be of type int or float but {type(delay_after_gen)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Validate save_best_solutions
             if type(save_best_solutions) is bool:
                 if save_best_solutions == True:
                     if not self.suppress_warnings:
+<<<<<<< HEAD
+                        warnings.warn("Use the 'save_best_solutions' parameter with caution as it may cause memory overflow when either the number of generations or number of genes is large.")
+            else:
+                self.valid_parameters = False
+                raise TypeError(f"The value passed to the 'save_best_solutions' parameter must be of type bool but {type(save_best_solutions)} found.")
+=======
                         warnings.warn(
                             "Use the 'save_best_solutions' parameter with caution as it may cause memory overflow when either the number of generations or number of genes is large.")
             else:
                 self.valid_parameters = False
                 raise TypeError(
                     f"The value passed to the 'save_best_solutions' parameter must be of type bool but {type(save_best_solutions)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Validate save_solutions
             if type(save_solutions) is bool:
                 if save_solutions == True:
                     if not self.suppress_warnings:
+<<<<<<< HEAD
+                        warnings.warn("Use the 'save_solutions' parameter with caution as it may cause memory overflow when either the number of generations, number of genes, or number of solutions in population is large.")
+            else:
+                self.valid_parameters = False
+                raise TypeError(f"The value passed to the 'save_solutions' parameter must be of type bool but {type(save_solutions)} found.")
+=======
                         warnings.warn(
                             "Use the 'save_solutions' parameter with caution as it may cause memory overflow when either the number of generations, number of genes, or number of solutions in population is large.")
             else:
                 self.valid_parameters = False
                 raise TypeError(
                     f"The value passed to the 'save_solutions' parameter must be of type bool but {type(save_solutions)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             self.stop_criteria = []
             self.supported_stop_words = ["reach", "saturate"]
@@ -1193,22 +1625,34 @@ class GA(utils.parent_selection.ParentSelection,
                         pass
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"In the 'stop_criteria' parameter, the supported stop words are '{self.supported_stop_words}' but '{stop_word}' found.")
+=======
                         raise ValueError(
                             f"In the 'stop_criteria' parameter, the supported stop words are '{self.supported_stop_words}' but '{stop_word}' found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                     if number.replace(".", "").isnumeric():
                         number = float(number)
                     else:
                         self.valid_parameters = False
+<<<<<<< HEAD
+                        raise ValueError(f"The value following the stop word in the 'stop_criteria' parameter must be a number but the value ({number}) of type {type(number)} found.")
+=======
                         raise ValueError(
                             f"The value following the stop word in the 'stop_criteria' parameter must be a number but the value ({number}) of type {type(number)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                     self.stop_criteria.append([stop_word, number])
 
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"For format of a single criterion in the 'stop_criteria' parameter is 'word_number' but '{stop_criteria}' found.")
+=======
                     raise ValueError(
                         f"For format of a single criterion in the 'stop_criteria' parameter is 'word_number' but '{stop_criteria}' found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             elif type(stop_criteria) in [list, tuple, numpy.ndarray]:
                 # Remove duplicate criterira by converting the list to a set then back to a list.
@@ -1224,20 +1668,37 @@ class GA(utils.parent_selection.ParentSelection,
                                 pass
                             else:
                                 self.valid_parameters = False
+<<<<<<< HEAD
+                                raise ValueError(f"In the 'stop_criteria' parameter, the supported stop words are {self.supported_stop_words} but '{stop_word}' found.")
+=======
                                 raise ValueError(
                                     f"In the 'stop_criteria' parameter, the supported stop words are {self.supported_stop_words} but '{stop_word}' found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                             if number.replace(".", "").isnumeric():
                                 number = float(number)
                             else:
                                 self.valid_parameters = False
+<<<<<<< HEAD
+                                raise ValueError(f"The value following the stop word in the 'stop_criteria' parameter must be a number but the value ({number}) of type {type(number)} found.")
+=======
                                 raise ValueError(
                                     f"The value following the stop word in the 'stop_criteria' parameter must be a number but the value ({number}) of type {type(number)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                             self.stop_criteria.append([stop_word, number])
 
                         else:
                             self.valid_parameters = False
+<<<<<<< HEAD
+                            raise ValueError(f"The format of a single criterion in the 'stop_criteria' parameter is 'word_number' but {criterion} found.")
+                    else:
+                        self.valid_parameters = False
+                        raise TypeError(f"When the 'stop_criteria' parameter is assigned a tuple/list/numpy.ndarray, then its elements must be strings but the value ({val}) of type {type(val)} found at index {idx}.")
+            else:
+                self.valid_parameters = False
+                raise TypeError(f"The expected value of the 'stop_criteria' is a single string or a list/tuple/numpy.ndarray of strings but the value ({stop_criteria}) of type {type(stop_criteria)} found.")
+=======
                             raise ValueError(
                                 f"The format of a single criterion in the 'stop_criteria' parameter is 'word_number' but {criterion} found.")
                     else:
@@ -1248,6 +1709,7 @@ class GA(utils.parent_selection.ParentSelection,
                 self.valid_parameters = False
                 raise TypeError(
                     f"The expected value of the 'stop_criteria' is a single string or a list/tuple/numpy.ndarray of strings but the value ({stop_criteria}) of type {type(stop_criteria)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             if parallel_processing is None:
                 self.parallel_processing = None
@@ -1256,8 +1718,12 @@ class GA(utils.parent_selection.ParentSelection,
                     self.parallel_processing = ["thread", parallel_processing]
                 else:
                     self.valid_parameters = False
+<<<<<<< HEAD
+                    raise ValueError(f"When the 'parallel_processing' parameter is assigned an integer, then the integer must be positive but the value ({parallel_processing}) found.")
+=======
                     raise ValueError(
                         f"When the 'parallel_processing' parameter is assigned an integer, then the integer must be positive but the value ({parallel_processing}) found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             elif type(parallel_processing) in [list, tuple]:
                 if len(parallel_processing) == 2:
                     if type(parallel_processing[0]) is str:
@@ -1271,6 +1737,18 @@ class GA(utils.parent_selection.ParentSelection,
                                     self.parallel_processing = parallel_processing
                             else:
                                 self.valid_parameters = False
+<<<<<<< HEAD
+                                raise TypeError(f"When a list or tuple is assigned to the 'parallel_processing' parameter, then the second element must be an integer but the value ({parallel_processing[1]}) of type {type(parallel_processing[1])} found.")
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"When a list or tuple is assigned to the 'parallel_processing' parameter, then the value of the first element must be either 'process' or 'thread' but the value ({parallel_processing[0]}) found.")
+                    else:
+                        self.valid_parameters = False
+                        raise TypeError(f"When a list or tuple is assigned to the 'parallel_processing' parameter, then the first element must be of type 'str' but the value ({parallel_processing[0]}) of type {type(parallel_processing[0])} found.")
+                else:
+                    self.valid_parameters = False
+                    raise ValueError(f"When a list or tuple is assigned to the 'parallel_processing' parameter, then it must have 2 elements but ({len(parallel_processing)}) found.")
+=======
                                 raise TypeError(
                                     f"When a list or tuple is assigned to the 'parallel_processing' parameter, then the second element must be an integer but the value ({parallel_processing[1]}) of type {type(parallel_processing[1])} found.")
                         else:
@@ -1285,6 +1763,7 @@ class GA(utils.parent_selection.ParentSelection,
                     self.valid_parameters = False
                     raise ValueError(
                         f"When a list or tuple is assigned to the 'parallel_processing' parameter, then it must have 2 elements but ({len(parallel_processing)}) found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 self.valid_parameters = False
                 raise ValueError(f"Unexpected value ({parallel_processing}) of type ({type(parallel_processing)}) assigned to the 'parallel_processing' parameter. The accepted values for this parameter are:\n1) None: (Default) It means no parallel processing is used.\n2) A positive integer referring to the number of threads to be used (i.e. threads, not processes, are used.\n3) list/tuple: If a list or a tuple of exactly 2 elements is assigned, then:\n\t*1) The first element can be either 'process' or 'thread' to specify whether processes or threads are used, respectively.\n\t*2) The second element can be:\n\t\t**1) A positive integer to select the maximum number of processes or threads to be used.\n\t\t**2) 0 to indicate that parallel processing is not used. This is identical to setting 'parallel_processing=None'.\n\t\t**3) None to use the default value as calculated by the concurrent.futures module.")
@@ -1637,8 +2116,12 @@ class GA(utils.parent_selection.ParentSelection,
         """
         try:
             if self.valid_parameters == False:
+<<<<<<< HEAD
+                raise Exception("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
+=======
                 raise Exception(
                     "ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # 'last_generation_parents_as_list' is the list version of 'self.last_generation_parents'
             # It is used to return the parent index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
@@ -1695,8 +2178,12 @@ class GA(utils.parent_selection.ParentSelection,
                                 pass
                             else:
                                 
+<<<<<<< HEAD
+                                raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+=======
                                 raise ValueError(
                                     f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                         else:
                             # Reaching this point means that batch processing is in effect to calculate the fitness values.
                             # Do not continue the loop as no fitness is calculated. The fitness will be calculated later in batch mode.
@@ -1726,20 +2213,31 @@ class GA(utils.parent_selection.ParentSelection,
                             self, batch_solutions, batch_indices)
                         if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
                             
+<<<<<<< HEAD
+                            raise TypeError(f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
+                        elif len(numpy.array(batch_fitness)) != len(batch_indices):
+                            
+                            raise ValueError(f"There is a mismatch between the number of solutions passed to the fitness function ({len(batch_indices)}) and the number of fitness values returned ({len(batch_fitness)}). They must match.")
+=======
                             raise TypeError(
                                 f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
                         elif len(numpy.array(batch_fitness)) != len(batch_indices):
                             
                             raise ValueError(
                                 f"There is a mismatch between the number of solutions passed to the fitness function ({len(batch_indices)}) and the number of fitness values returned ({len(batch_fitness)}). They must match.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                         for index, fitness in zip(batch_indices, batch_fitness):
                             if type(fitness) in GA.supported_int_float_types:
                                 pop_fitness[index] = fitness
                             else:
                                 
+<<<<<<< HEAD
+                                raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+=======
                                 raise ValueError(
                                     f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
             else:
                 # Calculating the fitness value of each solution in the current population.
                 for sol_idx, sol in enumerate(self.population):
@@ -1800,9 +2298,13 @@ class GA(utils.parent_selection.ParentSelection,
                             if type(fitness) in GA.supported_int_float_types:
                                 pop_fitness[index] = fitness
                             else:
+<<<<<<< HEAD
+                                raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+=======
                                 
                                 raise ValueError(
                                     f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                     else:
                         # Reaching this block means that batch processing is used. The fitness values are calculated in batches.
 
@@ -1826,6 +2328,12 @@ class GA(utils.parent_selection.ParentSelection,
 
                         for batch_indices, batch_fitness in zip(batches_indices, executor.map(self.fitness_func, [self]*len(solutions_to_submit_indices), batches_solutions, batches_indices)):
                             if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
+<<<<<<< HEAD
+                                raise TypeError(f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
+                            elif len(numpy.array(batch_fitness)) != len(batch_indices):
+                                
+                                raise ValueError(f"There is a mismatch between the number of solutions passed to the fitness function ({len(batch_indices)}) and the number of fitness values returned ({len(batch_fitness)}). They must match.")
+=======
                                 
                                 raise TypeError(
                                     f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
@@ -1833,14 +2341,19 @@ class GA(utils.parent_selection.ParentSelection,
                                 
                                 raise ValueError(
                                     f"There is a mismatch between the number of solutions passed to the fitness function ({len(batch_indices)}) and the number of fitness values returned ({len(batch_fitness)}). They must match.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                             for index, fitness in zip(batch_indices, batch_fitness):
                                 if type(fitness) in GA.supported_int_float_types:
                                     pop_fitness[index] = fitness
                                 else:
+<<<<<<< HEAD
+                                    raise ValueError(f"The fitness function should return a number but the value ({fitness}) of type {type(fitness)} found.")
+=======
                                     
                                     raise ValueError(
                                         f"The fitness function should return a number but the value ({fitness}) of type {type(fitness)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             pop_fitness = numpy.array(pop_fitness)
         except Exception as ex:
@@ -1854,9 +2367,13 @@ class GA(utils.parent_selection.ParentSelection,
         """
         try:
             if self.valid_parameters == False:
+<<<<<<< HEAD
+                raise Exception("Error calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
+=======
                 
                 raise Exception(
                     "Error calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Starting from PyGAD 2.18.0, the 4 properties (best_solutions, best_solutions_fitness, solutions, and solutions_fitness) are no longer reset with each call to the run() method. Instead, they are extended.
             # For example, if there are 50 generations and the user set save_best_solutions=True, then the length of the 2 properties best_solutions and best_solutions_fitness will be 50 after the first call to the run() method, then 100 after the second call, 150 after the third, and so on.
@@ -1922,6 +2439,11 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                             self.num_parents_mating,
                                                                                                             self)
                     if not type(self.last_generation_parents) is numpy.ndarray:
+<<<<<<< HEAD
+                        raise TypeError(f"The type of the iterable holding the selected parents is expected to be (numpy.ndarray) but {type(self.last_generation_parents)} found.")
+                    if not type(self.last_generation_parents_indices) is numpy.ndarray:
+                        raise TypeError(f"The type of the iterable holding the selected parents' indices is expected to be (numpy.ndarray) but {type(self.last_generation_parents_indices)} found.")
+=======
                         
                         raise TypeError(
                             f"The type of the iterable holding the selected parents is expected to be (numpy.ndarray) but {type(self.last_generation_parents)} found.")
@@ -1929,6 +2451,7 @@ class GA(utils.parent_selection.ParentSelection,
                         
                         raise TypeError(
                             f"The type of the iterable holding the selected parents' indices is expected to be (numpy.ndarray) but {type(self.last_generation_parents_indices)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                 else:
                     self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness,
                                                                                                             num_parents=self.num_parents_mating)
@@ -1936,6 +2459,16 @@ class GA(utils.parent_selection.ParentSelection,
                 # Validate the output of the parent selection step: self.select_parents()
                 if self.last_generation_parents.shape != (self.num_parents_mating, self.num_genes):
                     if self.last_generation_parents.shape[0] != self.num_parents_mating:
+<<<<<<< HEAD
+                        raise ValueError(f"Size mismatch between the size of the selected parents {self.last_generation_parents.shape} and the expected size {(self.num_parents_mating, self.num_genes)}. It is expected to select ({self.num_parents_mating}) parents but ({self.last_generation_parents.shape[0]}) selected.")
+                    elif self.last_generation_parents.shape[1] != self.num_genes:
+                        raise ValueError(f"Size mismatch between the size of the selected parents {self.last_generation_parents.shape} and the expected size {(self.num_parents_mating, self.num_genes)}. Parents are expected to have ({self.num_genes}) genes but ({self.last_generation_parents.shape[1]}) produced.")
+
+                if self.last_generation_parents_indices.ndim != 1:
+                    raise ValueError(f"The iterable holding the selected parents indices is expected to have 1 dimension but ({len(self.last_generation_parents_indices)}) found.")
+                elif len(self.last_generation_parents_indices) != self.num_parents_mating:
+                    raise ValueError(f"The iterable holding the selected parents indices is expected to have ({self.num_parents_mating}) values but ({len(self.last_generation_parents_indices)}) found.")
+=======
                         
                         raise ValueError(
                             f"Size mismatch between the size of the selected parents {self.last_generation_parents.shape} and the expected size {(self.num_parents_mating, self.num_genes)}. It is expected to select ({self.num_parents_mating}) parents but ({self.last_generation_parents.shape[0]}) selected.")
@@ -1952,6 +2485,7 @@ class GA(utils.parent_selection.ParentSelection,
                     
                     raise ValueError(
                         f"The iterable holding the selected parents indices is expected to have ({self.num_parents_mating}) values but ({len(self.last_generation_parents_indices)}) found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                 if not (self.on_parents is None):
                     self.on_parents(self, self.last_generation_parents)
@@ -1986,14 +2520,23 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                 self.num_genes),
                                                                                 self)
                         if not type(self.last_generation_offspring_crossover) is numpy.ndarray:
+<<<<<<< HEAD
+                            raise TypeError(f"The output of the crossover step is expected to be of type (numpy.ndarray) but {type(self.last_generation_offspring_crossover)} found.")
+=======
                             
                             raise TypeError(
                                 f"The output of the crossover step is expected to be of type (numpy.ndarray) but {type(self.last_generation_offspring_crossover)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                     else:
                         self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
                                                                                 offspring_size=(self.num_offspring, self.num_genes))
                     if self.last_generation_offspring_crossover.shape != (self.num_offspring, self.num_genes):
                         if self.last_generation_offspring_crossover.shape[0] != self.num_offspring:
+<<<<<<< HEAD
+                            raise ValueError(f"Size mismatch between the crossover output {self.last_generation_offspring_crossover.shape} and the expected crossover output {(self.num_offspring, self.num_genes)}. It is expected to produce ({self.num_offspring}) offspring but ({self.last_generation_offspring_crossover.shape[0]}) produced.")
+                        elif self.last_generation_offspring_crossover.shape[1] != self.num_genes:
+                            raise ValueError(f"Size mismatch between the crossover output {self.last_generation_offspring_crossover.shape} and the expected crossover output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_crossover.shape[1]}) produced.")
+=======
                             
                             raise ValueError(
                                 f"Size mismatch between the crossover output {self.last_generation_offspring_crossover.shape} and the expected crossover output {(self.num_offspring, self.num_genes)}. It is expected to produce ({self.num_offspring}) offspring but ({self.last_generation_offspring_crossover.shape[0]}) produced.")
@@ -2001,6 +2544,7 @@ class GA(utils.parent_selection.ParentSelection,
                             
                             raise ValueError(
                                 f"Size mismatch between the crossover output {self.last_generation_offspring_crossover.shape} and the expected crossover output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_crossover.shape[1]}) produced.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                 # PyGAD 2.18.2 // The on_crossover() callback function is called even if crossover_type is None.
                 if not (self.on_crossover is None):
@@ -2016,15 +2560,24 @@ class GA(utils.parent_selection.ParentSelection,
                         self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover,
                                                                                 self)
                         if not type(self.last_generation_offspring_mutation) is numpy.ndarray:
+<<<<<<< HEAD
+                            raise TypeError(f"The output of the mutation step is expected to be of type (numpy.ndarray) but {type(self.last_generation_offspring_mutation)} found.")
+=======
                             
                             raise TypeError(
                                 f"The output of the mutation step is expected to be of type (numpy.ndarray) but {type(self.last_generation_offspring_mutation)} found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
                     else:
                         self.last_generation_offspring_mutation = self.mutation(
                             self.last_generation_offspring_crossover)
 
                     if self.last_generation_offspring_mutation.shape != (self.num_offspring, self.num_genes):
                         if self.last_generation_offspring_mutation.shape[0] != self.num_offspring:
+<<<<<<< HEAD
+                            raise ValueError(f"Size mismatch between the mutation output {self.last_generation_offspring_mutation.shape} and the expected mutation output {(self.num_offspring, self.num_genes)}. It is expected to produce ({self.num_offspring}) offspring but ({self.last_generation_offspring_mutation.shape[0]}) produced.")
+                        elif self.last_generation_offspring_mutation.shape[1] != self.num_genes:
+                            raise ValueError(f"Size mismatch between the mutation output {self.last_generation_offspring_mutation.shape} and the expected mutation output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_mutation.shape[1]}) produced.")
+=======
                             
                             raise ValueError(
                                 f"Size mismatch between the mutation output {self.last_generation_offspring_mutation.shape} and the expected mutation output {(self.num_offspring, self.num_genes)}. It is expected to produce ({self.num_offspring}) offspring but ({self.last_generation_offspring_mutation.shape[0]}) produced.")
@@ -2032,6 +2585,7 @@ class GA(utils.parent_selection.ParentSelection,
                             
                             raise ValueError(
                                 f"Size mismatch between the mutation output {self.last_generation_offspring_mutation.shape} and the expected mutation output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_mutation.shape[1]}) produced.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
                 # PyGAD 2.18.2 // The on_mutation() callback function is called even if mutation_type is None.
                 if not (self.on_mutation is None):
@@ -2155,6 +2709,11 @@ class GA(utils.parent_selection.ParentSelection,
                     # This successfully verifies the 'pop_fitness' parameter.
                     pass
                 else:
+<<<<<<< HEAD
+                    raise ValueError(f"The length of the list/tuple/numpy.ndarray passed to the 'pop_fitness' parameter ({len(pop_fitness)}) must match the length of the 'self.population' attribute ({len(self.population)}).")
+            else:
+                raise ValueError(f"The type of the 'pop_fitness' parameter is expected to be list, tuple, or numpy.ndarray but ({type(pop_fitness)}) found.")
+=======
                     
                     raise ValueError(
                         f"The length of the list/tuple/numpy.ndarray passed to the 'pop_fitness' parameter ({len(pop_fitness)}) must match the length of the 'self.population' attribute ({len(self.population)}).")
@@ -2162,6 +2721,7 @@ class GA(utils.parent_selection.ParentSelection,
                 
                 raise ValueError(
                     f"The type of the 'pop_fitness' parameter is expected to be list, tuple, or numpy.ndarray but ({type(pop_fitness)}) found.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
 
             # Return the index of the best solution that has the best fitness value.
             best_match_idx = numpy.where(
@@ -2433,8 +2993,12 @@ def load(filename):
         with open(filename + ".pkl", 'rb') as file:
             ga_in = cloudpickle.load(file)
     except FileNotFoundError:
+<<<<<<< HEAD
+        raise FileNotFoundError(f"Error reading the file {filename}. Please check your inputs.")
+=======
         raise FileNotFoundError(
             f"Error reading the file {filename}. Please check your inputs.")
+>>>>>>> 977acdaf553eed3f8c0f01e720a1756c2b6d79a9
     except:
         # raise BaseException("Error loading the file. If the file already exists, please reload all the functions previously used (e.g. fitness function).")
         raise BaseException("Error loading the file.")

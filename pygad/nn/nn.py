@@ -27,7 +27,7 @@ def layers_weights(last_layer, initial=True):
         elif initial == False:
             network_weights.append(layer.trained_weights)
         else:
-            raise ValueError("Unexpected value to the 'initial' parameter: {initial}.".format(initial=initial))
+            raise ValueError(f"Unexpected value to the 'initial' parameter: {initial}.")
 
         # Go to the previous layer.
         layer = layer.previous_layer
@@ -64,7 +64,7 @@ def layers_weights_as_vector(last_layer, initial=True):
 #            vector = DenseLayer.to_vector(array=layer.trained_weights)
             network_weights.extend(vector)
         else:
-            raise ValueError("Unexpected value to the 'initial' parameter: {initial}.".format(initial=initial))
+            raise ValueError(f"Unexpected value to the 'initial' parameter: {initial}.")
 
         # Go to the previous layer.
         layer = layer.previous_layer
@@ -207,8 +207,8 @@ def train(num_epochs,
     """
     
     if not (problem_type in ["classification", "regression"]):
-        raise ValueError("The value of the problem_type parameter can be either classification or regression but {problem_type_val} found.".format(problem_type_val=problem_type))
-    
+        raise ValueError(f"The value of the problem_type parameter can be either classification or regression but {problem_type} found.")
+
     # To fetch the initial weights of the layer, the 'initial' argument is set to True.
     weights = layers_weights(last_layer, initial=True)
     activations = layers_activations(last_layer)
@@ -294,14 +294,14 @@ def predict(last_layer, data_inputs, problem_type="classification"):
     Returns the predictions of all samples.
     """
     if not (problem_type in ["classification", "regression"]):
-        raise ValueError("The value of the problem_type parameter can be either classification or regression but {problem_type_val} found.".format(problem_type_val=problem_type))
-    
+        raise ValueError(f"The value of the problem_type parameter can be either classification or regression but {problem_type} found.")
+
     # To fetch the trained weights of the layer, the 'initial' argument is set to False.
     weights = layers_weights(last_layer, initial=False)
     activations = layers_activations(last_layer)
 
     if len(weights) != len(activations):
-        raise TypeError("The length of layers {num_layers} is not equal to the number of activations functions {num_activations} and they must be equal.".format(num_layers=len(weights), num_activations=len(activations)))
+        raise TypeError(f"The length of layers {len(weights)} is not equal to the number of activations functions {len(activations)} and they must be equal.")
 
     predictions = []
     for sample_idx in range(data_inputs.shape[0]):
@@ -337,7 +337,7 @@ def to_vector(array):
     Example: weights_vector = nn.DenseLayer.to_vector(array=array)
     """
     if not (type(array) is numpy.ndarray):
-        raise TypeError("An input of type numpy.ndarray is expected but an input of type {in_type} found.".format(in_type=type(array)))
+        raise TypeError(f"An input of type numpy.ndarray is expected but an input of type {type(array)} found.")
     return numpy.reshape(array, newshape=(array.size))
 
 def to_array(vector, shape):
@@ -352,11 +352,11 @@ def to_array(vector, shape):
     Example: weights_matrix = nn.DenseLayer.to_array(vector=vector, shape=shape)
     """
     if not (type(vector) is numpy.ndarray):
-        raise TypeError("An input of type numpy.ndarray is expected but an input of type {in_type} found.".format(in_type=type(vector)))
+        raise TypeError(f"An input of type numpy.ndarray is expected but an input of type {type(vector)} found.")
     if vector.ndim > 1:
-        raise ValueError("A 1D NumPy array is expected but an array of {ndim} dimensions found.".format(ndim=vector.ndim))
+        raise ValueError(f"A 1D NumPy array is expected but an array of {vector.ndim} dimensions found.")
     if vector.size != functools.reduce(lambda x,y:x*y, shape, 1): # (operator.mul == lambda x,y:x*y
-        raise ValueError("Mismatch between the vector length and the array shape. A vector of length {vector_length} cannot be converted into a array of shape ({array_shape}).".format(vector_length=vector.size, array_shape=shape))
+        raise ValueError(f"Mismatch between the vector length and the array shape. A vector of length {vector.size} cannot be converted into a array of shape ({shape}).")
     return numpy.reshape(vector, newshape=shape)
 
 class InputLayer:
@@ -381,7 +381,7 @@ class DenseLayer:
 
         supported_activation_functions = ("sigmoid", "relu", "softmax", "None")
         if not (activation_function in supported_activation_functions):
-            raise ValueError("The specified activation function '{activation_function}' is not among the supported activation functions {supported_activation_functions}. Please use one of the supported functions.".format(activation_function=activation_function, supported_activation_functions=supported_activation_functions))
+            raise ValueError(f"The specified activation function '{activation_function}' is not among the supported activation functions {supported_activation_functions}. Please use one of the supported functions.")
         self.activation_function = activation_function
 
         if previous_layer is None:

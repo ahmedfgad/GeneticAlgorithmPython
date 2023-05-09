@@ -56,8 +56,8 @@ class Plot:
         """
 
         if self.generations_completed < 1:
-            self.logger.error("The plot_fitness() (i.e. plot_result()) method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=self.generations_completed))
-            raise RuntimeError("The plot_fitness() (i.e. plot_result()) method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=self.generations_completed))
+            self.logger.error("The plot_fitness() (i.e. plot_result()) method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
+            raise RuntimeError("The plot_fitness() (i.e. plot_result()) method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
 
         fig = matplotlib.pyplot.figure()
         if plot_type == "plot":
@@ -104,8 +104,8 @@ class Plot:
         """
 
         if self.generations_completed < 1:
-            self.logger.error("The plot_new_solution_rate() method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=self.generations_completed))
-            raise RuntimeError("The plot_new_solution_rate() method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=self.generations_completed))
+            self.logger.error("The plot_new_solution_rate() method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
+            raise RuntimeError("The plot_new_solution_rate() method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
 
         if self.save_solutions == False:
             self.logger.error("The plot_new_solution_rate() method works only when save_solutions=True in the constructor of the pygad.GA class.")
@@ -181,8 +181,8 @@ class Plot:
         """
 
         if self.generations_completed < 1:
-            self.logger.error("The plot_genes() method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=self.generations_completed))
-            raise RuntimeError("The plot_genes() method can only be called after completing at least 1 generation but ({generations_completed}) is completed.".format(generations_completed=self.generations_completed))
+            self.logger.error("The plot_genes() method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
+            raise RuntimeError("The plot_genes() method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
 
         if type(solutions) is str:
             if solutions == 'all':
@@ -198,8 +198,8 @@ class Plot:
                     self.logger.error("The plot_genes() method with solutions='best' can only be called if 'save_best_solutions=True' in the pygad.GA class constructor.")
                     raise RuntimeError("The plot_genes() method with solutions='best' can only be called if 'save_best_solutions=True' in the pygad.GA class constructor.")
             else:
-                self.logger.error("The solutions parameter can be either 'all' or 'best' but {solutions} found.".format(solutions=solutions))
-                raise RuntimeError("The solutions parameter can be either 'all' or 'best' but {solutions} found.".format(solutions=solutions))
+                self.logger.error("The solutions parameter can be either 'all' or 'best' but {solutions} found.")
+                raise RuntimeError("The solutions parameter can be either 'all' or 'best' but {solutions} found.")
         else:
             self.logger.error("The solutions parameter must be a string but {solutions_type} found.".format(solutions_type=type(solutions)))
             raise RuntimeError("The solutions parameter must be a string but {solutions_type} found.".format(solutions_type=type(solutions)))

@@ -26,8 +26,8 @@ def validate_network_parameters(num_neurons_input,
     # Validating the number of solutions within the population.
     if not (num_solutions is None):
         if num_solutions < 2:
-            raise ValueError("num_solutions: The number of solutions within the population must be at least 2. The current value is {num_solutions}.".format(num_solutions=num_solutions))
-        
+            raise ValueError(f"num_solutions: The number of solutions within the population must be at least 2. The current value is {num_solutions}.")
+
     # Validating the number of neurons in the input layer.
     if num_neurons_input is int and num_neurons_input <= 0:
         raise ValueError("num_neurons_input: The number of neurons in the input layer must be > 0.")
@@ -35,13 +35,13 @@ def validate_network_parameters(num_neurons_input,
     # Validating the number of neurons in the output layer.
     if num_neurons_output is int and num_neurons_output <= 0:
         raise ValueError("num_neurons_output: The number of neurons in the output layer must be > 0.")
-    
+
     # Validating the type of the 'num_neurons_hidden_layers' parameter which is expected to be list or tuple.
     if not (type(num_neurons_hidden_layers) in [list, tuple]):
-        raise TypeError("num_neurons_hidden_layers: A list or a tuple is expected but {hidden_layers_neurons_type} found.".format(hidden_layers_neurons_type=type(num_neurons_hidden_layers)))
-    
+        raise TypeError(f"num_neurons_hidden_layers: A list or a tuple is expected but {type(num_neurons_hidden_layers)} found.")
+
     # Frequently used error messages.
-    unexpected_output_activation_value = "Output activation function: The activation function of the output layer is passed as a string not {activation_type}."
+    unexpected_output_activation_value = f"Output activation function: The activation function of the output layer is passed as a string not {type(output_activation)}."
     unexpected_activation_value = "Activation function: The supported values for the activation function are {supported_activations} but an unexpected value is found:\n{activations}"
     unexpected_activation_type = "Activation Function: A list, tuple, or a string is expected but {activations_type} found."
     length_mismatch = "Hidden activation functions: When passing the activation function(s) as a list or a tuple, its length must match the length of the 'num_neurons_hidden_layers' parameter but a mismatch is found:\n{mismatched_lengths}"
@@ -51,7 +51,7 @@ def validate_network_parameters(num_neurons_input,
 
     # Validating the output layer activation function.
     if not (type(output_activation) is str):
-        raise ValueError(unexpected_output_activation_value.format(activation_type=type(output_activation)))
+        raise ValueError(unexpected_output_activation_value)
     if not (output_activation in supported_activations): #activation_type
         raise ValueError(unexpected_activation_value.format(activations=output_activation, supported_activations=supported_activations))
     
@@ -81,9 +81,9 @@ def validate_network_parameters(num_neurons_input,
         else:
             raise TypeError(unexpected_activation_type.format(activations_type=type(hidden_activations)))
     else: # In case there are no hidden layers (num_hidden_layers == 0)
-        print("WARNING: There are no hidden layers however a value is assigned to the parameter 'hidden_activations'. It will be reset to [].".format(hidden_activations=hidden_activations))
+        print("WARNING: There are no hidden layers however a value is assigned to the parameter 'hidden_activations'. It will be reset to [].")
         hidden_activations = []
-    
+
     # If the value passed to the 'hidden_activations' parameter is actually a list, then its elements are checked to make sure the listed name(s) of the activation function(s) are supported.
     for act in hidden_activations:
         if not (act in supported_activations):
