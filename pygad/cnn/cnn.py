@@ -84,7 +84,7 @@ def layers_weights(model, initial=True):
             elif initial == False:
                 network_weights.append(layer.trained_weights)
             else:
-                raise ValueError("Unexpected value to the 'initial' parameter: {initial}.".format(initial=initial))
+                raise ValueError(f"Unexpected value to the 'initial' parameter: {initial}.")
 
         # Go to the previous layer.
         layer = layer.previous_layer
@@ -164,7 +164,7 @@ def layers_weights_as_vector(model, initial=True):
     #            vector = pygad.nn.DenseLayer.to_vector(array=layer.trained_weights)
                 network_weights.extend(vector)
             else:
-                raise ValueError("Unexpected value to the 'initial' parameter: {initial}.".format(initial=initial))
+                raise ValueError(f"Unexpected value to the 'initial' parameter: {initial}.")
 
         # Go to the previous layer.
         layer = layer.previous_layer
@@ -214,7 +214,7 @@ class Input2D:
 
         # If the input sample has less than 2 dimensions, then an exception is raised.
         if len(input_shape) < 2:
-            raise ValueError("The Input2D class creates an input layer for data inputs with at least 2 dimensions but ({num_dim}) dimensions found.".format(num_dim=len(input_shape)))
+            raise ValueError(f"The Input2D class creates an input layer for data inputs with at least 2 dimensions but ({len(input_shape)}) dimensions found.")
         # If the input sample has exactly 2 dimensions, the third dimension is set to 1.
         elif len(input_shape) == 2:
             input_shape = (input_shape[0], input_shape[1], 1)
@@ -261,7 +261,7 @@ class Conv2D:
         elif (activation_function == "softmax"):
             raise ValueError("The softmax activation function cannot be used in a conv layer.")
         else:
-            raise ValueError("The specified activation function '{activation_function}' is not among the supported activation functions {supported_activation_functions}. Please use one of the supported functions.".format(activation_function=activation_function, supported_activation_functions=supported_activation_functions))
+            raise ValueError(f"The specified activation function '{activation_function}' is not among the supported activation functions {supported_activation_functions}. Please use one of the supported functions.")
 
         # The activation function used in the current layer.
         self.activation_function = activation_function
@@ -445,7 +445,7 @@ class MaxPooling2D:
         """
         
         if not (type(pool_size) is int):
-            raise ValueError("The expected type of the pool_size is int but {pool_size_type} found.".format(pool_size_type=type(pool_size)))
+            raise ValueError(f"The expected type of the pool_size is int but {type(pool_size)} found.")
 
         if pool_size <= 0:
             raise ValueError("The passed value to the pool_size parameter cannot be <= 0.")
@@ -642,7 +642,7 @@ class Dense:
         elif (activation_function == "softmax"):
             self.activation = softmax
         else:
-            raise ValueError("The specified activation function '{activation_function}' is not among the supported activation functions {supported_activation_functions}. Please use one of the supported functions.".format(activation_function=activation_function, supported_activation_functions=supported_activation_functions))
+            raise ValueError(f"The specified activation function '{activation_function}' is not among the supported activation functions {supported_activation_functions}. Please use one of the supported functions.")
 
         self.activation_function = activation_function
 
@@ -652,7 +652,7 @@ class Dense:
         self.previous_layer = previous_layer
         
         if type(self.previous_layer.layer_output_size) in [list, tuple, numpy.ndarray] and len(self.previous_layer.layer_output_size) > 1:
-            raise ValueError("The input to the dense layer must be of type int but {sh} found.".format(sh=type(self.previous_layer.layer_output_size)))
+            raise ValueError(f"The input to the dense layer must be of type int but {type(self.previous_layer.layer_output_size)} found.")
         # Initializing the weights of the layer.
         self.initial_weights = numpy.random.uniform(low=-0.1,
                                                     high=0.1,
@@ -741,13 +741,13 @@ class Model:
             raise ValueError("The training data input has {num_dims} but it must have 4 dimensions. The first dimension is the number of training samples, the second & third dimensions represent the width and height of the sample, and the fourth dimension represents the number of channels in the sample.".format(num_dims=train_inputs.ndim))    
 
         if (train_inputs.shape[0] != len(train_outputs)):
-            raise ValueError("Mismatch between the number of input samples and number of labels: {num_samples_inputs} != {num_samples_outputs}.".format(num_samples_inputs=train_inputs.shape[0], num_samples_outputs=len(train_outputs)))
+            raise ValueError(f"Mismatch between the number of input samples and number of labels: {train_inputs.shape[0]} != {len(train_outputs)}.")
 
         network_predictions = []
         network_error = 0
     
         for epoch in range(self.epochs):
-            print("Epoch {epoch}".format(epoch=epoch))
+            print(f"Epoch {epoch}")
             for sample_idx in range(train_inputs.shape[0]):
                 # print("Sample {sample_idx}".format(sample_idx=sample_idx))
                 self.feed_sample(train_inputs[sample_idx, :])
@@ -797,7 +797,7 @@ class Model:
                 pass
             else:
                 print("Other")
-                raise TypeError("The layer of type {layer_type} is not supported yet.".format(layer_type=type(layer)))
+                raise TypeError("The layer of type {type(layer)} is not supported yet.")
 
             last_layer_outputs = layer.layer_output
         return self.network_layers[-1].layer_output
@@ -828,7 +828,7 @@ class Model:
         """
 
         if (data_inputs.ndim != 4):
-            raise ValueError("The data input has {num_dims} but it must have 4 dimensions. The first dimension is the number of training samples, the second & third dimensions represent the width and height of the sample, and the fourth dimension represents the number of channels in the sample.".format(num_dims=data_inputs.ndim))
+            raise ValueError("The data input has {data_inputs.ndim} but it must have 4 dimensions. The first dimension is the number of training samples, the second & third dimensions represent the width and height of the sample, and the fourth dimension represents the number of channels in the sample.")
 
         predictions = []
         for sample in data_inputs:

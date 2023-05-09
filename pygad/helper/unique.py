@@ -92,7 +92,7 @@ class Unique:
     
                         if temp_val in new_solution and trial_index == (num_trials - 1):
                             num_unsolved_duplicates = num_unsolved_duplicates + 1
-                            if not self.suppress_warnings: warnings.warn("Failed to find a unique value for gene with index {gene_idx} whose value is {gene_value}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.".format(gene_idx=duplicate_index, gene_value=solution[duplicate_index]))
+                            if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {solution[duplicate_index]}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
                         elif temp_val in new_solution:
                             continue
                         else:
@@ -105,7 +105,7 @@ class Unique:
                     # self.logger.info("not_unique_indices INSIDE", not_unique_indices)
     
             return new_solution, not_unique_indices, num_unsolved_duplicates
-    
+
     def solve_duplicate_genes_by_space(self, 
                                        solution, 
                                        gene_type, 
@@ -230,7 +230,7 @@ class Unique:
                 all_gene_values = numpy.asarray(all_gene_values, 
                                                 gene_type[gene_index][0])
 
-            values_to_select_from = list(set(all_gene_values) - set(solution))
+            values_to_select_from = list(set(list(all_gene_values)) - set(solution))
     
             if len(values_to_select_from) == 0:
                 # If there is no values, then keep the current gene value.
@@ -274,7 +274,7 @@ class Unique:
                 if temp_val in new_solution and trial_index == (num_trials - 1):
                     # self.logger.info("temp_val, duplicate_index", temp_val, duplicate_index, new_solution)
                     num_unsolved_duplicates = num_unsolved_duplicates + 1
-                    if not self.suppress_warnings: warnings.warn("Failed to find a unique value for gene with index {gene_idx} whose value is {gene_value}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.".format(gene_idx=duplicate_index, gene_value=new_solution[duplicate_index]))
+                    if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {new_solution[duplicate_index]}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
                 elif temp_val in new_solution:
                     continue
                 else:
@@ -451,7 +451,7 @@ class Unique:
                     # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
                     if len(curr_gene_space) == 1:
                         value_from_space = curr_gene_space[0]
-                        if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the space of the gene with index {gene_idx} has only a single value. Thus, duplicates are possible.".format(gene_idx=gene_idx))
+                        if not self.suppress_warnings: warnings.warn(f"You set 'allow_duplicate_genes=False' but the space of the gene with index {gene_idx} has only a single value. Thus, duplicates are possible.")
                     # If the gene space has more than 1 value, then select a new one that is different from the current value.
                     else:
                         values_to_select_from = list(set(curr_gene_space) - set(solution))
