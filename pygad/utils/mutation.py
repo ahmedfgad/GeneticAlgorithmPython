@@ -438,8 +438,39 @@ class Mutation:
 
         fitness[:self.last_generation_parents.shape[0]] = self.last_generation_fitness[self.last_generation_parents_indices]
 
-        for idx in range(len(parents_to_keep), fitness.shape[0]):
-            fitness[idx] = self.fitness_func(self, temp_population[idx], None)
+        first_idx = len(parents_to_keep)
+        last_idx = fitness.shape[0]
+        fitness[first_idx:last_idx] = [0]*(last_idx - first_idx)
+
+        if self.fitness_batch_size in [1, None]:
+            # Calculate the fitness for each individual solution.
+            for idx in range(first_idx, last_idx):
+                fitness[idx] = self.fitness_func(self, 
+                                                 temp_population[idx], 
+                                                 None)
+        else:
+            # Calculate the fitness for batch of solutions.
+
+            # Number of batches.
+            num_batches = int(numpy.ceil((last_idx - first_idx) / self.fitness_batch_size))
+
+            for batch_idx in range(num_batches):
+                # The index of the first solution in the current batch.
+                batch_first_index = first_idx + batch_idx * self.fitness_batch_size
+                # The index of the last solution in the current batch.
+                if batch_idx == (num_batches - 1):
+                    batch_last_index = last_idx
+                else:
+                    batch_last_index = first_idx + (batch_idx + 1) * self.fitness_batch_size
+
+                # Calculate the fitness values for the batch.
+                fitness_temp = self.fitness_func(self, 
+                                                 temp_population[batch_first_index:batch_last_index], 
+                                                 None) 
+                # Insert the fitness of each solution at the proper index.
+                for idx in range(batch_first_index, batch_last_index):
+                    fitness[idx] = fitness_temp[idx - batch_first_index]
+
         average_fitness = numpy.mean(fitness)
 
         return average_fitness, fitness[len(parents_to_keep):]

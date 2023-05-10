@@ -1,4 +1,5 @@
 from ..nn import nn
+import warnings
 
 def validate_network_parameters(num_neurons_input, 
                                 num_neurons_output, 
@@ -81,7 +82,7 @@ def validate_network_parameters(num_neurons_input,
         else:
             raise TypeError(unexpected_activation_type.format(activations_type=type(hidden_activations)))
     else: # In case there are no hidden layers (num_hidden_layers == 0)
-        print("WARNING: There are no hidden layers however a value is assigned to the parameter 'hidden_activations'. It will be reset to [].")
+        warnings.warn("WARNING: There are no hidden layers however a value is assigned to the parameter 'hidden_activations'. It will be reset to [].")
         hidden_activations = []
 
     # If the value passed to the 'hidden_activations' parameter is actually a list, then its elements are checked to make sure the listed name(s) of the activation function(s) are supported.

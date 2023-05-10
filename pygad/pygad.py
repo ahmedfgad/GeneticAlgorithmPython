@@ -1531,8 +1531,7 @@ class GA(utils.parent_selection.ParentSelection,
                     elif (self.keep_elitism > 0) and (self.last_generation_elitism is not None) and (len(self.last_generation_elitism) > 0) and (list(sol) in last_generation_elitism_as_list):
                         # Return the index of the elitism from the elitism array 'self.last_generation_elitism'.
                         # This is not its index within the population. It is just its index in the 'self.last_generation_elitism' array.
-                        elitism_idx = last_generation_elitism_as_list.index(
-                            list(sol))
+                        elitism_idx = last_generation_elitism_as_list.index(list(sol))
                         # Use the returned elitism index to return its index in the last population.
                         elitism_idx = self.last_generation_elitism_indices[elitism_idx]
                         # Use the elitism's index to return its pre-calculated fitness value.
@@ -1544,8 +1543,7 @@ class GA(utils.parent_selection.ParentSelection,
                         # Index of the parent in the 'self.last_generation_parents' array.
                         # This is not its index within the population. It is just its index in the 'self.last_generation_parents' array.
                         # parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
-                        parent_idx = last_generation_parents_as_list.index(
-                            list(sol))
+                        parent_idx = last_generation_parents_as_list.index(list(sol))
                         # Use the returned parent index to return its index in the last population.
                         parent_idx = self.last_generation_parents_indices[parent_idx]
                         # Use the parent's index to return its pre-calculated fitness value.
@@ -1573,13 +1571,11 @@ class GA(utils.parent_selection.ParentSelection,
                     solutions_indices = numpy.where(
                         numpy.array(pop_fitness) == "undefined")[0]
                     # Number of batches.
-                    num_batches = int(numpy.ceil(
-                        len(solutions_indices) / self.fitness_batch_size))
+                    num_batches = int(numpy.ceil(len(solutions_indices) / self.fitness_batch_size))
                     # For each batch, get its indices and call the fitness function.
                     for batch_idx in range(num_batches):
                         batch_first_index = batch_idx * self.fitness_batch_size
-                        batch_last_index = (batch_idx + 1) * \
-                            self.fitness_batch_size
+                        batch_last_index = (batch_idx + 1) * self.fitness_batch_size
                         batch_indices = solutions_indices[batch_first_index:batch_last_index]
                         batch_solutions = self.population[batch_indices, :]
 
@@ -1660,8 +1656,7 @@ class GA(utils.parent_selection.ParentSelection,
                         # Reaching this block means that batch processing is used. The fitness values are calculated in batches.
 
                         # Number of batches.
-                        num_batches = int(numpy.ceil(
-                            len(solutions_to_submit_indices) / self.fitness_batch_size))
+                        num_batches = int(numpy.ceil(len(solutions_to_submit_indices) / self.fitness_batch_size))
                         # Each element of the `batches_solutions` list represents the solutions in one batch.
                         batches_solutions = []
                         # Each element of the `batches_indices` list represents the solutions' indices in one batch.
@@ -1669,8 +1664,7 @@ class GA(utils.parent_selection.ParentSelection,
                         # For each batch, get its indices and call the fitness function.
                         for batch_idx in range(num_batches):
                             batch_first_index = batch_idx * self.fitness_batch_size
-                            batch_last_index = (batch_idx + 1) * \
-                                self.fitness_batch_size
+                            batch_last_index = (batch_idx + 1) * self.fitness_batch_size
                             batch_indices = solutions_to_submit_indices[batch_first_index:batch_last_index]
                             batch_solutions = self.population[batch_indices, :]
 
@@ -1693,7 +1687,7 @@ class GA(utils.parent_selection.ParentSelection,
             pop_fitness = numpy.array(pop_fitness)
         except Exception as ex:
             self.logger.exception(ex)
-            exit(-1)
+            sys.exit(-1)
         return pop_fitness
 
     def run(self):
@@ -1738,8 +1732,7 @@ class GA(utils.parent_selection.ParentSelection,
             # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
             self.last_generation_fitness = self.cal_pop_fitness()
 
-            best_solution, best_solution_fitness, best_match_idx = self.best_solution(
-                pop_fitness=self.last_generation_fitness)
+            best_solution, best_solution_fitness, best_match_idx = self.best_solution(pop_fitness=self.last_generation_fitness)
 
             # Appending the best solution in the initial population to the best_solutions list.
             if self.save_best_solutions:
@@ -1747,7 +1740,20 @@ class GA(utils.parent_selection.ParentSelection,
 
             for generation in range(generation_first_idx, generation_last_idx):
                 if not (self.on_fitness is None):
-                    self.on_fitness(self, self.last_generation_fitness)
+                    on_fitness_output = self.on_fitness(self, 
+                                                        self.last_generation_fitness)
+
+                    if on_fitness_output is None:
+                        pass
+                    else:
+                        if type(on_fitness_output) in [tuple, list, numpy.ndarray, range]:
+                            on_fitness_output = numpy.array(on_fitness_output)
+                            if on_fitness_output.shape == self.last_generation_fitness.shape:
+                                self.last_generation_fitness = on_fitness_output
+                            else:
+                                raise ValueError(f"Size mismatch between the output of on_fitness() {on_fitness_output.shape} and the expected fitness output {self.last_generation_fitness.shape}.")
+                        else:
+                            raise ValueError(f"The output of on_fitness() is expected to be tuple/list/range/numpy.ndarray but {type(on_fitness_output)} found.")
 
                 # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
                 self.best_solutions_fitness.append(best_solution_fitness)
@@ -1788,7 +1794,45 @@ class GA(utils.parent_selection.ParentSelection,
                     raise ValueError(f"The iterable holding the selected parents indices is expected to have ({self.num_parents_mating}) values but ({len(self.last_generation_parents_indices)}) found.")
 
                 if not (self.on_parents is None):
-                    self.on_parents(self, self.last_generation_parents)
+                    on_parents_output = self.on_parents(self, 
+                                                        self.last_generation_parents)
+                    
+                    if on_parents_output is None:
+                        pass
+                    elif type(on_parents_output) in [list, tuple, numpy.ndarray]:
+                        if len(on_parents_output) == 2:
+                            on_parents_selected_parents, on_parents_selected_parents_indices = on_parents_output
+                        else:
+                            raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray of length 2 but {type(on_parents_output)} of length {len(on_parents_output)} found.")
+
+                        # Validate the parents.
+                        if on_parents_selected_parents is None:
+                            raise ValueError("The returned outputs of on_parents() cannot be None but the first output is None.")
+                        else:
+                            if type(on_parents_selected_parents) in [tuple, list, numpy.ndarray]:
+                                on_parents_selected_parents = numpy.array(on_parents_selected_parents)
+                                if on_parents_selected_parents.shape == self.last_generation_parents.shape:
+                                    self.last_generation_parents = on_parents_selected_parents
+                                else:
+                                    raise ValueError(f"Size mismatch between the parents retrned by on_parents() {on_parents_selected_parents.shape} and the expected parents shape {self.last_generation_parents.shape}.")
+                            else:
+                                raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but the first output type is {type(on_parents_selected_parents)}.")
+
+                        # Validate the parents indices.
+                        if on_parents_selected_parents_indices is None:
+                            raise ValueError("The returned outputs of on_parents() cannot be None but the second output is None.")
+                        else:
+                            if type(on_parents_selected_parents_indices) in [tuple, list, numpy.ndarray, range]:
+                                on_parents_selected_parents_indices = numpy.array(on_parents_selected_parents_indices)
+                                if on_parents_selected_parents_indices.shape == self.last_generation_parents_indices.shape:
+                                    self.last_generation_parents_indices = on_parents_selected_parents_indices
+                                else:
+                                    raise ValueError(f"Size mismatch between the parents indices returned by on_parents() {on_parents_selected_parents_indices.shape} and the expected crossover output {self.last_generation_parents_indices.shape}.")
+                            else:
+                                raise ValueError(f"The output of on_parents() is expected to be tuple/list/range/numpy.ndarray but the second output type is {type(on_parents_selected_parents_indices)}.")
+
+                    else:
+                        raise TypeError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but {type(on_parents_output)} found.")
 
                 # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
                 if self.crossover_type is None:
@@ -1832,8 +1876,19 @@ class GA(utils.parent_selection.ParentSelection,
 
                 # PyGAD 2.18.2 // The on_crossover() callback function is called even if crossover_type is None.
                 if not (self.on_crossover is None):
-                    self.on_crossover(
-                        self, self.last_generation_offspring_crossover)
+                    on_crossover_output = self.on_crossover(self, 
+                                                            self.last_generation_offspring_crossover)
+                    if on_crossover_output is None:
+                        pass
+                    else:
+                        if type(on_crossover_output) in [tuple, list, numpy.ndarray]:
+                            on_crossover_output = numpy.array(on_crossover_output)
+                            if on_crossover_output.shape == self.last_generation_offspring_crossover.shape:
+                                self.last_generation_offspring_crossover = on_crossover_output
+                            else:
+                                raise ValueError(f"Size mismatch between the output of on_crossover() {on_crossover_output.shape} and the expected crossover output {self.last_generation_offspring_crossover.shape}.")
+                        else:
+                            raise ValueError(f"The output of on_crossover() is expected to be tuple/list/numpy.ndarray but {type(on_crossover_output)} found.")
 
                 # If self.mutation_type=None, then no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
                 if self.mutation_type is None:
@@ -1857,7 +1912,20 @@ class GA(utils.parent_selection.ParentSelection,
 
                 # PyGAD 2.18.2 // The on_mutation() callback function is called even if mutation_type is None.
                 if not (self.on_mutation is None):
-                    self.on_mutation(self, self.last_generation_offspring_mutation)
+                    on_mutation_output = self.on_mutation(self, 
+                                                          self.last_generation_offspring_mutation)
+
+                    if on_mutation_output is None:
+                        pass
+                    else:
+                        if type(on_mutation_output) in [tuple, list, numpy.ndarray]:
+                            on_mutation_output = numpy.array(on_mutation_output)
+                            if on_mutation_output.shape == self.last_generation_offspring_mutation.shape:
+                                self.last_generation_offspring_mutation = on_mutation_output
+                            else:
+                                raise ValueError(f"Size mismatch between the output of on_mutation() {on_mutation_output.shape} and the expected mutation output {self.last_generation_offspring_mutation.shape}.")
+                        else:
+                            raise ValueError(f"The output of on_mutation() is expected to be tuple/list/numpy.ndarray but {type(on_mutation_output)} found.")
 
                 # Update the population attribute according to the offspring generated.
                 if self.keep_elitism == 0:
@@ -1954,7 +2022,7 @@ class GA(utils.parent_selection.ParentSelection,
             # self.solutions = numpy.array(self.solutions)
         except Exception as ex:
             self.logger.exception(ex)
-            exit(-1)
+            sys.exit(-1)
 
     def best_solution(self, pop_fitness=None):
         """
@@ -1989,7 +2057,7 @@ class GA(utils.parent_selection.ParentSelection,
             best_solution_fitness = pop_fitness[best_match_idx]
         except Exception as ex:
             self.logger.exception(ex)
-            exit(-1)
+            sys.exit(-1)
 
         return best_solution, best_solution_fitness, best_match_idx
 

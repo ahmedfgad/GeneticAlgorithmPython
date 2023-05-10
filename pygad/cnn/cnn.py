@@ -1,5 +1,6 @@
 import numpy
 import functools
+import logging
 
 """
 Convolutional neural network implementation using NumPy
@@ -84,14 +85,18 @@ def layers_weights(model, initial=True):
             elif initial == False:
                 network_weights.append(layer.trained_weights)
             else:
-                raise ValueError(f"Unexpected value to the 'initial' parameter: {initial}.")
+                msg = f"Unexpected value to the 'initial' parameter: {initial}."
+                model.logger.error(msg)
+                raise ValueError(msg)
 
         # Go to the previous layer.
         layer = layer.previous_layer
 
     # If the first layer in the network is not an input layer (i.e. an instance of the Input2D class), raise an error.
     if not (type(layer) is Input2D):
-        raise TypeError("The first layer in the network architecture must be an input layer.")
+        msg = "The first layer in the network architecture must be an input layer."
+        model.logger.error(msg)
+        raise TypeError(msg)
 
     # Currently, the weights of the layers are in the reverse order. In other words, the weights of the first layer are at the last index of the 'network_weights' list while the weights of the last layer are at the first index.
     # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appears at index 0 of the list).
@@ -131,7 +136,9 @@ def layers_weights_as_matrix(model, vector_weights):
 
     # If the first layer in the network is not an input layer (i.e. an instance of the Input2D class), raise an error.
     if not (type(layer) is Input2D):
-        raise TypeError("The first layer in the network architecture must be an input layer.")
+        msg = "The first layer in the network architecture must be an input layer."
+        model.logger.error(msg)
+        raise TypeError(msg)
 
     # Currently, the weights of the layers are in the reverse order. In other words, the weights of the first layer are at the last index of the 'network_weights' list while the weights of the last layer are at the first index.
     # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appears at index 0 of the list).
@@ -164,14 +171,18 @@ def layers_weights_as_vector(model, initial=True):
     #            vector = pygad.nn.DenseLayer.to_vector(array=layer.trained_weights)
                 network_weights.extend(vector)
             else:
-                raise ValueError(f"Unexpected value to the 'initial' parameter: {initial}.")
+                msg = f"Unexpected value to the 'initial' parameter: {initial}."
+                model.logger.error(msg)
+                raise ValueError(msg)
 
         # Go to the previous layer.
         layer = layer.previous_layer
 
     # If the first layer in the network is not an input layer (i.e. an instance of the Input2D class), raise an error.
     if not (type(layer) is Input2D):
-        raise TypeError("The first layer in the network architecture must be an input layer.")
+        msg = "The first layer in the network architecture must be an input layer."
+        model.logger.error(msg)
+        raise TypeError(msg)
 
     # Currently, the weights of the layers are in the reverse order. In other words, the weights of the first layer are at the last index of the 'network_weights' list while the weights of the last layer are at the first index.
     # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appears at index 0 of the list).
@@ -199,40 +210,91 @@ def update_layers_trained_weights(model, final_weights):
         # Go to the previous layer.
         layer = layer.previous_layer
 
-class Input2D:
+
+class CustomLogger:
+
+    def __init__(self):
+        # Create a logger named with the module name.
+        logger = logging.getLogger(__name__)
+        # Set the logger log level to 'DEBUG' to log all kinds of messages.
+        logger.setLevel(logging.DEBUG)
+
+        # Clear any attached handlers to the logger from the previous runs.
+        # If the handlers are not cleared, then the new handler will be appended to the list of handlers.
+        # This makes the single log message be repeated according to the length of the list of handlers.
+        logger.handlers.clear()
+
+        # Create the handlers.
+        stream_handler = logging.StreamHandler()
+        # Set the handler log level to 'DEBUG' to log all kinds of messages received from the logger.
+        stream_handler.setLevel(logging.DEBUG)
+
+        # Create the formatter that just includes the log message.
+        formatter = logging.Formatter('%(message)s')
+
+        # Add the formatter to the handler.
+        stream_handler.setFormatter(formatter)
+
+        # Add the handler to the logger.
+        logger.addHandler(stream_handler)
+
+        # Create the 'self.logger' attribute to hold the logger.
+        # Instead of using 'print()', use 'self.logger.info()'
+        self.logger = logger
+
+class Input2D(CustomLogger):
 
     """
     Implementing the input layer of a CNN.
     The CNN architecture must start with an input layer.
     """
 
-    def __init__(self, input_shape):
+    def __init__(self, 
+                 input_shape,
+                 logger=None):
 
         """
         input_shape: Shape of the input sample to the CNN.
         """
 
+        super().__init__()
+
+        # If logger is None, then the CustomLogger.logger is created.
+        if logger is None:
+            pass
+        else:
+            self.logger = logger
+
         # If the input sample has less than 2 dimensions, then an exception is raised.
         if len(input_shape) < 2:
-            raise ValueError(f"The Input2D class creates an input layer for data inputs with at least 2 dimensions but ({len(input_shape)}) dimensions found.")
+            msg = f"The Input2D class creates an input layer for data inputs with at least 2 dimensions but ({len(input_shape)}) dimensions found."
+            self.logger.error(msg)
+            raise ValueError(msg)
         # If the input sample has exactly 2 dimensions, the third dimension is set to 1.
         elif len(input_shape) == 2:
             input_shape = (input_shape[0], input_shape[1], 1)
 
         for dim_idx, dim in enumerate(input_shape):
             if dim <= 0:
-                raise ValueError("The dimension size of the inputs cannot be <= 0. Please pass a valid value to the 'input_size' parameter.")
+                msg = "The dimension size of the inputs cannot be <= 0. Please pass a valid value to the 'input_size' parameter."
+                self.logger.error(msg)
+                raise ValueError(msg)
 
         self.input_shape = input_shape # Shape of the input sample.
         self.layer_output_size = input_shape # Shape of the output from the current layer. For an input layer, it is the same as the shape of the input sample.
 
-class Conv2D:
+class Conv2D(CustomLogger):
 
     """
     Implementing the convolution layer.
     """
 
-    def __init__(self, num_filters, kernel_size, previous_layer, activation_function=None):
+    def __init__(self, 
+                 num_filters, 
+                 kernel_size, 
+                 previous_layer, 
+                 activation_function=None,
+                 logger=None):
 
         """
         num_filters: Number of filters in the convolution layer.
@@ -241,13 +303,25 @@ class Conv2D:
         activation_function=None: The name of the activation function to be used in the conv layer. If None, then no activation function is applied besides the convolution operation. The activation function can be applied by a separate layer.
         """
 
+        super().__init__()
+
+        # If logger is None, then the CustomLogger.logger is created.
+        if logger is None:
+            pass
+        else:
+            self.logger = logger
+
         if num_filters <= 0:
-            raise ValueError("Number of filters cannot be <= 0. Please pass a valid value to the 'num_filters' parameter.")
+            msg = "Number of filters cannot be <= 0. Please pass a valid value to the 'num_filters' parameter."
+            self.logger.error(msg)
+            raise ValueError(msg)
         # Number of filters in the conv layer.
         self.num_filters = num_filters
 
         if kernel_size <= 0:
-            raise ValueError("The kernel size cannot be <= 0. Please pass a valid value to the 'kernel_size' parameter.")
+            msg = "The kernel size cannot be <= 0. Please pass a valid value to the 'kernel_size' parameter."
+            self.logger.error(msg)
+            raise ValueError(msg)
         # Kernel size of each filter.
         self.kernel_size = kernel_size
 
@@ -259,15 +333,21 @@ class Conv2D:
         elif (activation_function == "sigmoid"):
             self.activation = sigmoid
         elif (activation_function == "softmax"):
-            raise ValueError("The softmax activation function cannot be used in a conv layer.")
+            msg = "The softmax activation function cannot be used in a conv layer."
+            self.logger.error(msg)
+            raise ValueError(msg)
         else:
-            raise ValueError(f"The specified activation function '{activation_function}' is not among the supported activation functions {supported_activation_functions}. Please use one of the supported functions.")
+            msg = f"The specified activation function '{activation_function}' is not among the supported activation functions {supported_activation_functions}. Please use one of the supported functions."
+            self.logger.error(msg)
+            raise ValueError(msg)
 
         # The activation function used in the current layer.
         self.activation_function = activation_function
 
         if previous_layer is None:
-            raise TypeError("The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter.")
+            msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
+            self.logger.error(msg)
+            raise TypeError(msg)
         # A reference to the layer that preceeds the current layer in the network architecture.
         self.previous_layer = previous_layer
         
@@ -353,24 +433,36 @@ class Conv2D:
         """
 
         if len(input2D.shape) != len(self.initial_weights.shape) - 1: # Check if there is a match in the number of dimensions between the image and the filters.
-            raise ValueError("Number of dimensions in the conv filter and the input do not match.")  
+            msg = "Number of dimensions in the conv filter and the input do not match."
+            self.logger.error(msg)
+            raise ValueError(msg)
         if len(input2D.shape) > 2 or len(self.initial_weights.shape) > 3: # Check if number of image channels matches the filter depth.
             if input2D.shape[-1] != self.initial_weights.shape[-1]:
-                raise ValueError("Number of channels in both the input and the filter must match.")
+                msg = "Number of channels in both the input and the filter must match."
+                self.logger.error(msg)
+                raise ValueError(msg)
         if self.initial_weights.shape[1] != self.initial_weights.shape[2]: # Check if filter dimensions are equal.
-            raise ValueError('A filter must be a square matrix. I.e. number of rows and columns must match.')
+            msg = 'A filter must be a square matrix. I.e. number of rows and columns must match.'
+            self.logger.error(msg)
+            raise ValueError(msg)
         if self.initial_weights.shape[1]%2==0: # Check if filter diemnsions are odd.
-            raise ValueError('A filter must have an odd size. I.e. number of rows and columns must be odd.')
+            msg = 'A filter must have an odd size. I.e. number of rows and columns must be odd.'
+            self.logger.error(msg)
+            raise ValueError(msg)
 
         self.layer_output = self.conv_(input2D, self.trained_weights)
 
-class AveragePooling2D:
+class AveragePooling2D(CustomLogger):
 
     """
     Implementing the average pooling layer.
     """
 
-    def __init__(self, pool_size, previous_layer, stride=2):
+    def __init__(self, 
+                 pool_size, 
+                 previous_layer, 
+                 stride=2,
+                 logger=None):
 
         """
         pool_size: Pool size.
@@ -378,19 +470,35 @@ class AveragePooling2D:
         stride=2: Stride
         """
 
+        super().__init__()
+
+        # If logger is None, then the CustomLogger.logger is created.
+        if logger is None:
+            pass
+        else:
+            self.logger = logger
+
         if not (type(pool_size) is int):
-            raise ValueError("The expected type of the pool_size is int but {pool_size_type} found.".format(pool_size_type=type(pool_size)))
+            msg = "The expected type of the pool_size is int but {pool_size_type} found.".format(pool_size_type=type(pool_size))
+            self.logger.error(msg)
+            raise ValueError(msg)
 
         if pool_size <= 0:
-            raise ValueError("The passed value to the pool_size parameter cannot be <= 0.")
+            msg = "The passed value to the pool_size parameter cannot be <= 0."
+            self.logger.error(msg)
+            raise ValueError(msg)
         self.pool_size = pool_size
 
         if stride <= 0:
-            raise ValueError("The passed value to the stride parameter cannot be <= 0.")
+            msg = "The passed value to the stride parameter cannot be <= 0."
+            self.logger.error(msg)
+            raise ValueError(msg)
         self.stride = stride
 
         if previous_layer is None:
-            raise TypeError("The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter.")
+            msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
+            self.logger.error(msg)
+            raise TypeError(msg)
         # A reference to the layer that preceeds the current layer in the network architecture.
         self.previous_layer = previous_layer
 
@@ -430,33 +538,53 @@ class AveragePooling2D:
 
         self.layer_output = pool_out
 
-class MaxPooling2D:
+class MaxPooling2D(CustomLogger):
 
     """
     Similar to the AveragePooling2D class except that it implements max pooling.
     """
 
-    def __init__(self, pool_size, previous_layer, stride=2):
+    def __init__(self, 
+                 pool_size, 
+                 previous_layer, 
+                 stride=2,
+                 logger=None):
         
         """
         pool_size: Pool size.
         previous_layer: Reference to the previous layer in the CNN architecture.
         stride=2: Stride
         """
-        
+
+        super().__init__()
+
+        # If logger is None, then the CustomLogger.logger is created.
+        if logger is None:
+            pass
+        else:
+            self.logger = logger
+
         if not (type(pool_size) is int):
-            raise ValueError(f"The expected type of the pool_size is int but {type(pool_size)} found.")
+            msg = f"The expected type of the pool_size is int but {type(pool_size)} found."
+            self.logger.error(msg)
+            raise ValueError(msg)
 
         if pool_size <= 0:
-            raise ValueError("The passed value to the pool_size parameter cannot be <= 0.")
+            msg = "The passed value to the pool_size parameter cannot be <= 0."
+            self.logger.error(msg)
+            raise ValueError(msg)
         self.pool_size = pool_size
 
         if stride <= 0:
-            raise ValueError("The passed value to the stride parameter cannot be <= 0.")
+            msg = "The passed value to the stride parameter cannot be <= 0."
+            self.logger.error(msg)
+            raise ValueError(msg)
         self.stride = stride
 
         if previous_layer is None:
-            raise TypeError("The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter.")
+            msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
+            self.logger.error(msg)
+            raise TypeError(msg)
         # A reference to the layer that preceeds the current layer in the network architecture.
         self.previous_layer = previous_layer
 
@@ -496,20 +624,32 @@ class MaxPooling2D:
 
         self.layer_output = pool_out
 
-class ReLU:
+class ReLU(CustomLogger):
 
     """
     Implementing the ReLU layer.
     """
 
-    def __init__(self, previous_layer):
+    def __init__(self, 
+                 previous_layer,
+                 logger=None):
 
         """
         previous_layer: Reference to the previous layer.
         """
 
+        super().__init__()
+
+        # If logger is None, then the CustomLogger.logger is created.
+        if logger is None:
+            pass
+        else:
+            self.logger = logger
+
         if previous_layer is None:
-            raise TypeError("The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter.")
+            msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
+            self.logger.error(msg)
+            raise TypeError(msg)
 
         # A reference to the layer that preceeds the current layer in the network architecture.
         self.previous_layer = previous_layer
@@ -536,20 +676,32 @@ class ReLU:
         self.layer_output_size = layer_input.size
         self.layer_output = relu(layer_input)
 
-class Sigmoid:
+class Sigmoid(CustomLogger):
 
     """
     Implementing the sigmoid layer.
     """
 
-    def __init__(self, previous_layer):
+    def __init__(self, 
+                 previous_layer,
+                 logger=None):
 
         """
         previous_layer: Reference to the previous layer.
         """
 
+        super().__init__()
+
+        # If logger is None, then the CustomLogger.logger is created.
+        if logger is None:
+            pass
+        else:
+            self.logger = logger
+
         if previous_layer is None:
-            raise TypeError("The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter.")
+            msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
+            self.logger.error(msg)
+            raise TypeError(msg)
         # A reference to the layer that preceeds the current layer in the network architecture.
         self.previous_layer = previous_layer
 
@@ -575,20 +727,32 @@ class Sigmoid:
         self.layer_output_size = layer_input.size
         self.layer_output = sigmoid(layer_input)
 
-class Flatten:
+class Flatten(CustomLogger):
 
     """
     Implementing the flatten layer.
     """
 
-    def __init__(self, previous_layer):
+    def __init__(self, 
+                 previous_layer,
+                 logger=None):
         
         """
         previous_layer: Reference to the previous layer.
         """
 
+        super().__init__()
+
+        # If logger is None, then the CustomLogger.logger is created.
+        if logger is None:
+            pass
+        else:
+            self.logger = logger
+
         if previous_layer is None:
-            raise TypeError("The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter.")
+            msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
+            self.logger.error(msg)
+            raise TypeError(msg)
         # A reference to the layer that preceeds the current layer in the network architecture.
         self.previous_layer = previous_layer
 
@@ -614,22 +778,37 @@ class Flatten:
         self.layer_output_size = input2D.size
         self.layer_output = numpy.ravel(input2D)
 
-class Dense:
+class Dense(CustomLogger):
 
     """
     Implementing the input dense (fully connected) layer of a CNN.
     """
 
-    def __init__(self, num_neurons, previous_layer, activation_function="relu"):
+    def __init__(self, 
+                 num_neurons, 
+                 previous_layer, 
+                 activation_function="relu",
+                 logger=None):
 
         """
         num_neurons: Number of neurons in the dense layer.
         previous_layer: Reference to the previous layer.
         activation_function: Name of the activation function to be used in the current layer.
+        logger=None: Reference to the instance of the logging.Logger class.
         """
 
+        super().__init__()
+
+        # If logger is None, then the CustomLogger.logger is created.
+        if logger is None:
+            pass
+        else:
+            self.logger = logger
+
         if num_neurons <= 0:
-            raise ValueError("Number of neurons cannot be <= 0. Please pass a valid value to the 'num_neurons' parameter.")
+            msg = "Number of neurons cannot be <= 0. Please pass a valid value to the 'num_neurons' parameter."
+            self.logger.error(msg)
+            raise ValueError(msg)
 
         # Number of neurons in the dense layer.
         self.num_neurons = num_neurons
@@ -642,17 +821,23 @@ class Dense:
         elif (activation_function == "softmax"):
             self.activation = softmax
         else:
-            raise ValueError(f"The specified activation function '{activation_function}' is not among the supported activation functions {supported_activation_functions}. Please use one of the supported functions.")
+            msg = f"The specified activation function '{activation_function}' is not among the supported activation functions {supported_activation_functions}. Please use one of the supported functions."
+            self.logger.error(msg)
+            raise ValueError(msg)
 
         self.activation_function = activation_function
 
         if previous_layer is None:
-            raise TypeError("The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter.")
+            msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
+            self.logger.error(msg)
+            raise TypeError(msg)
         # A reference to the layer that preceeds the current layer in the network architecture.
         self.previous_layer = previous_layer
-        
+
         if type(self.previous_layer.layer_output_size) in [list, tuple, numpy.ndarray] and len(self.previous_layer.layer_output_size) > 1:
-            raise ValueError(f"The input to the dense layer must be of type int but {type(self.previous_layer.layer_output_size)} found.")
+            msg = f"The input to the dense layer must be of type int but {type(self.previous_layer.layer_output_size)} found."
+            self.logger.error(msg)
+            raise ValueError(msg)
         # Initializing the weights of the layer.
         self.initial_weights = numpy.random.uniform(low=-0.1,
                                                     high=0.1,
@@ -682,25 +867,40 @@ class Dense:
         """
 
         if self.trained_weights is None:
-            raise TypeError("The weights of the dense layer cannot be of Type 'None'.")
+            msg = "The weights of the dense layer cannot be of Type 'None'."
+            self.logger.error(msg)
+            raise TypeError(msg)
 
         sop = numpy.matmul(layer_input, self.trained_weights)
 
         self.layer_output = self.activation(sop)
 
-class Model:
+class Model(CustomLogger):
 
     """
     Creating a CNN model.
     """
 
-    def __init__(self, last_layer, epochs=10, learning_rate=0.01):
+    def __init__(self, 
+                 last_layer, 
+                 epochs=10, 
+                 learning_rate=0.01,
+                 logger=None):
         
         """
         last_layer: A reference to the last layer in the CNN architecture.
         epochs=10: Number of epochs.
         learning_rate=0.01: Learning rate.
+        logger=None: Reference to the instance of the logging.Logger class.
         """
+
+        super().__init__()
+
+        # If logger is None, then the CustomLogger.logger is created.
+        if logger is None:
+            pass
+        else:
+            self.logger = logger
 
         self.last_layer = last_layer
         self.epochs = epochs
@@ -728,7 +928,7 @@ class Model:
         return network_layers
 
     def train(self, train_inputs, train_outputs):
-        
+
         """
         Trains the CNN model.
         It is important to note that no learning algorithm is used for training the CNN. Just the learning rate is used for making some changes which is better than leaving the weights unchanged.
@@ -738,16 +938,20 @@ class Model:
         """
         
         if (train_inputs.ndim != 4):
-            raise ValueError("The training data input has {num_dims} but it must have 4 dimensions. The first dimension is the number of training samples, the second & third dimensions represent the width and height of the sample, and the fourth dimension represents the number of channels in the sample.".format(num_dims=train_inputs.ndim))    
+            msg = f"The training data input has {train_inputs.ndim} but it must have 4 dimensions. The first dimension is the number of training samples, the second & third dimensions represent the width and height of the sample, and the fourth dimension represents the number of channels in the sample."
+            self.logger.error(msg)
+            raise ValueError(msg)
 
         if (train_inputs.shape[0] != len(train_outputs)):
-            raise ValueError(f"Mismatch between the number of input samples and number of labels: {train_inputs.shape[0]} != {len(train_outputs)}.")
+            msg = f"Mismatch between the number of input samples and number of labels: {train_inputs.shape[0]} != {len(train_outputs)}."
+            self.logger.error(msg)
+            raise ValueError(msg)
 
         network_predictions = []
         network_error = 0
     
         for epoch in range(self.epochs):
-            print(f"Epoch {epoch}")
+            self.logger.info(f"Epoch {epoch}")
             for sample_idx in range(train_inputs.shape[0]):
                 # print("Sample {sample_idx}".format(sample_idx=sample_idx))
                 self.feed_sample(train_inputs[sample_idx, :])
@@ -755,8 +959,10 @@ class Model:
                 try:
                     predicted_label = numpy.where(numpy.max(self.last_layer.layer_output) == self.last_layer.layer_output)[0][0]
                 except IndexError:
-                    print(self.last_layer.layer_output)
-                    raise IndexError("Index out of range")
+                    self.logger.info(self.last_layer.layer_output)
+                    msg = "Index out of range"
+                    self.logger.error(msg)
+                    raise IndexError(msg)
                 network_predictions.append(predicted_label)
     
                 network_error = network_error + abs(predicted_label - train_outputs[sample_idx])
@@ -796,8 +1002,10 @@ class Model:
             elif type(layer) is Input2D:
                 pass
             else:
-                print("Other")
-                raise TypeError("The layer of type {type(layer)} is not supported yet.")
+                # self.logger.info("Other")
+                msg = "The layer of type {type(layer)} is not supported."
+                self.logger.error(msg)
+                raise TypeError(msg)
 
             last_layer_outputs = layer.layer_output
         return self.network_layers[-1].layer_output
@@ -828,7 +1036,9 @@ class Model:
         """
 
         if (data_inputs.ndim != 4):
-            raise ValueError("The data input has {data_inputs.ndim} but it must have 4 dimensions. The first dimension is the number of training samples, the second & third dimensions represent the width and height of the sample, and the fourth dimension represents the number of channels in the sample.")
+            msg = "The data input has {data_inputs.ndim} but it must have 4 dimensions. The first dimension is the number of training samples, the second & third dimensions represent the width and height of the sample, and the fourth dimension represents the number of channels in the sample."
+            self.logger.error(msg)
+            raise ValueError(msg)
 
         predictions = []
         for sample in data_inputs:
@@ -843,7 +1053,7 @@ class Model:
         Prints a summary of the CNN architecture.
         """
 
-        print("\n----------Network Architecture----------")
+        self.logger.info("\n----------Network Architecture----------")
         for layer in self.network_layers:
-            print(type(layer))
-        print("----------------------------------------\n")
+            self.logger.info(type(layer))
+        self.logger.info("----------------------------------------\n")
