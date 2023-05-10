@@ -1531,8 +1531,7 @@ class GA(utils.parent_selection.ParentSelection,
                     elif (self.keep_elitism > 0) and (self.last_generation_elitism is not None) and (len(self.last_generation_elitism) > 0) and (list(sol) in last_generation_elitism_as_list):
                         # Return the index of the elitism from the elitism array 'self.last_generation_elitism'.
                         # This is not its index within the population. It is just its index in the 'self.last_generation_elitism' array.
-                        elitism_idx = last_generation_elitism_as_list.index(
-                            list(sol))
+                        elitism_idx = last_generation_elitism_as_list.index(list(sol))
                         # Use the returned elitism index to return its index in the last population.
                         elitism_idx = self.last_generation_elitism_indices[elitism_idx]
                         # Use the elitism's index to return its pre-calculated fitness value.
@@ -1544,8 +1543,7 @@ class GA(utils.parent_selection.ParentSelection,
                         # Index of the parent in the 'self.last_generation_parents' array.
                         # This is not its index within the population. It is just its index in the 'self.last_generation_parents' array.
                         # parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
-                        parent_idx = last_generation_parents_as_list.index(
-                            list(sol))
+                        parent_idx = last_generation_parents_as_list.index(list(sol))
                         # Use the returned parent index to return its index in the last population.
                         parent_idx = self.last_generation_parents_indices[parent_idx]
                         # Use the parent's index to return its pre-calculated fitness value.
@@ -1573,13 +1571,11 @@ class GA(utils.parent_selection.ParentSelection,
                     solutions_indices = numpy.where(
                         numpy.array(pop_fitness) == "undefined")[0]
                     # Number of batches.
-                    num_batches = int(numpy.ceil(
-                        len(solutions_indices) / self.fitness_batch_size))
+                    num_batches = int(numpy.ceil(len(solutions_indices) / self.fitness_batch_size))
                     # For each batch, get its indices and call the fitness function.
                     for batch_idx in range(num_batches):
                         batch_first_index = batch_idx * self.fitness_batch_size
-                        batch_last_index = (batch_idx + 1) * \
-                            self.fitness_batch_size
+                        batch_last_index = (batch_idx + 1) * self.fitness_batch_size
                         batch_indices = solutions_indices[batch_first_index:batch_last_index]
                         batch_solutions = self.population[batch_indices, :]
 
@@ -1660,8 +1656,7 @@ class GA(utils.parent_selection.ParentSelection,
                         # Reaching this block means that batch processing is used. The fitness values are calculated in batches.
 
                         # Number of batches.
-                        num_batches = int(numpy.ceil(
-                            len(solutions_to_submit_indices) / self.fitness_batch_size))
+                        num_batches = int(numpy.ceil(len(solutions_to_submit_indices) / self.fitness_batch_size))
                         # Each element of the `batches_solutions` list represents the solutions in one batch.
                         batches_solutions = []
                         # Each element of the `batches_indices` list represents the solutions' indices in one batch.
@@ -1669,8 +1664,7 @@ class GA(utils.parent_selection.ParentSelection,
                         # For each batch, get its indices and call the fitness function.
                         for batch_idx in range(num_batches):
                             batch_first_index = batch_idx * self.fitness_batch_size
-                            batch_last_index = (batch_idx + 1) * \
-                                self.fitness_batch_size
+                            batch_last_index = (batch_idx + 1) * self.fitness_batch_size
                             batch_indices = solutions_to_submit_indices[batch_first_index:batch_last_index]
                             batch_solutions = self.population[batch_indices, :]
 
