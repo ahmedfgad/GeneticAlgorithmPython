@@ -913,7 +913,7 @@ It returns the following:
 -  ``best_match_idx``: Index of the best solution in the current
    population.
 
-.. _plotfitness-1:
+.. _plotfitness:
 
 ``plot_fitness()``
 ------------------
@@ -946,7 +946,7 @@ and higher, this method accepts the following parameters:
 
 8. ``save_dir``: Directory to save the figure.
 
-.. _plotnewsolutionrate-1:
+.. _plotnewsolutionrate:
 
 ``plot_new_solution_rate()``
 ----------------------------
@@ -979,7 +979,7 @@ This method accepts the following parameters:
 
 8. ``save_dir``: Directory to save the figure.
 
-.. _plotgenes-1:
+.. _plotgenes:
 
 ``plot_genes()``
 ----------------
@@ -1229,7 +1229,7 @@ The next step is to import PyGAD as follows:
 The ``pygad.GA`` class holds the implementation of all methods for
 running the genetic algorithm.
 
-.. _create-an-instance-of-the-pygadga-class-1:
+.. _create-an-instance-of-the-pygadga-class:
 
 Create an Instance of the ``pygad.GA`` Class
 --------------------------------------------
@@ -2403,6 +2403,8 @@ The function should return 2 outputs:
 2. The indices of the selected parents inside the population. It is a 1D
    list with length equal to the number of selected parents.
 
+The outputs must be of type ``numpy.ndarray``.
+
 Here is a template for building a custom parent selection function.
 
 .. code:: python
@@ -2427,7 +2429,7 @@ parents are selected. The number of parents is equal to the value in the
        for parent_num in range(num_parents):
            parents[parent_num, :] = ga_instance.population[fitness_sorted[parent_num], :].copy()
 
-       return parents, fitness_sorted[:num_parents]
+       return parents, numpy.array(fitness_sorted[:num_parents])
 
 Finally, the defined function is assigned to the
 ``parent_selection_type`` parameter as in the next code.
@@ -2474,7 +2476,7 @@ previous 3 user-defined functions instead of the built-in functions.
        for parent_num in range(num_parents):
            parents[parent_num, :] = ga_instance.population[fitness_sorted[parent_num], :].copy()
 
-       return parents, fitness_sorted[:num_parents]
+       return parents, numpy.array(fitness_sorted[:num_parents])
 
    def crossover_func(parents, offspring_size, ga_instance):
 
@@ -3004,7 +3006,7 @@ methods.
 The ``plot_fitness()`` method shows the fitness value for each
 generation.
 
-.. _plottypeplot-1:
+.. _plottypeplot:
 
 ``plot_type="plot"``
 ~~~~~~~~~~~~~~~~~~~~
@@ -3021,7 +3023,7 @@ line connecting the fitness values across all generations:
 .. figure:: https://user-images.githubusercontent.com/16560492/122472609-d02f5280-cf8e-11eb-88a7-f9366ff6e7c6.png
    :alt: 
 
-.. _plottypescatter-1:
+.. _plottypescatter:
 
 ``plot_type="scatter"``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -3037,7 +3039,7 @@ these dots can be changed using the ``linewidth`` parameter.
 .. figure:: https://user-images.githubusercontent.com/16560492/122473159-75e2c180-cf8f-11eb-942d-31279b286dbd.png
    :alt: 
 
-.. _plottypebar-1:
+.. _plottypebar:
 
 ``plot_type="bar"``
 ~~~~~~~~~~~~~~~~~~~
@@ -3392,8 +3394,6 @@ parameter:
 -  ``parallel_processing=["process", 0]``: As the second element is
    given the value 0, this means do not use parallel processing. This is
    identical to ``parallel_processing=None``.
-
-.. _examples-1:
 
 Examples
 --------
