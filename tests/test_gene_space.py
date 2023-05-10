@@ -30,6 +30,8 @@ def number_respect_gene_space(gene_space=None,
                               random_mutation_max_val=1,
                               init_range_low=-4,
                               init_range_high=4,
+                              mutation_type="random",
+                              mutation_percent_genes="default",
                               initial_population=None):
 
     def fitness_func(ga, solution, idx):
@@ -50,6 +52,8 @@ def number_respect_gene_space(gene_space=None,
                            allow_duplicate_genes=True,
                            mutation_by_replacement=mutation_by_replacement,
                            save_solutions=True,
+                           mutation_type=mutation_type,
+                           mutation_percent_genes=mutation_percent_genes,
                            suppress_warnings=True,
                            random_seed=2)
 
@@ -77,6 +81,7 @@ def number_respect_gene_space(gene_space=None,
                         if val >= ga_instance.gene_space[gene_idx]["low"] and val < ga_instance.gene_space[gene_idx]["high"]:
                             pass
                         else:
+                            print(gene_idx, val, current_gene_space)
                             num_outside += 1
                 else:
                     gene_space_values = numpy.arange(ga_instance.gene_space[gene_idx]["low"],
@@ -378,6 +383,43 @@ def test_nested_gene_space_mix_initial_population_single_gene_type():
 
     assert num_outside == 0
 
+def test_nested_gene_space_single_gene_type_adaptive_mutation():
+    num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 
+                                                                     numpy.arange(0, 10), 
+                                                                     range(0, 10),
+                                                                     {"low": 0, "high": 10},
+                                                                     {"low": 0, "high": 10},
+                                                                     range(0, 10),
+                                                                     numpy.arange(0, 10),
+                                                                     numpy.arange(0, 10),
+                                                                     {"low": 0, "high": 10},
+                                                                     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]],
+                                                         # Due to rounding the genes, a gene at index 4 will have a value of 10 (outside the dict range) if [float, 2] is used.
+                                                         gene_type=[float, 4],
+                                                         mutation_percent_genes=[70, 50],
+                                                         mutation_type="adaptive")
+    # print(ga_instance.population)
+
+    assert num_outside == 0
+
+def test_nested_gene_space_nested_gene_type_adaptive_mutation():
+    num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 
+                                                                     numpy.arange(0, 10), 
+                                                                     range(0, 10),
+                                                                     {"low": 0, "high": 10},
+                                                                     {"low": 0, "high": 10},
+                                                                     range(0, 10),
+                                                                     numpy.arange(0, 10),
+                                                                     numpy.arange(0, 10),
+                                                                     {"low": 0, "high": 10},
+                                                                     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]],
+                                                         gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
+                                                         mutation_percent_genes=[70, 50],
+                                                         mutation_type="adaptive")
+    # print(ga_instance.population)
+
+    assert num_outside == 0
+
 if __name__ == "__main__":
     print()
     test_gene_space_range()
@@ -446,4 +488,10 @@ if __name__ == "__main__":
     print()
 
     test_nested_gene_space_mix_initial_population_single_gene_type()
+    print()
+
+    test_nested_gene_space_single_gene_type_adaptive_mutation()
+    print()
+
+    test_nested_gene_space_nested_gene_type_adaptive_mutation()
     print()
