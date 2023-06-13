@@ -9,6 +9,8 @@ num_generations = 100
 sol_per_pop = 10
 num_parents_mating = 5
 
+# TODO: Calculate the number when fitness_batch_size is used.
+
 def number_calls_fitness_function(keep_elitism=1, 
                                   keep_parents=-1,
                                   mutation_type="random",
