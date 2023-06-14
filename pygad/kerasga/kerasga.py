@@ -44,6 +44,7 @@ def predict(model, solution, data, verbose=1):
     _model = tensorflow.keras.models.clone_model(model)
     _model.set_weights(solution_weights)
     predictions = _model(data)
+    predictions = predictions.numpy()
 
     return predictions
 
