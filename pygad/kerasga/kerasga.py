@@ -37,13 +37,13 @@ def model_weights_as_matrix(model, weights_vector):
 
     return weights_matrix
 
-def predict(model, solution, data):
+def predict(model, solution, data, verbose=1):
     # Fetch the parameters of the best solution.
     solution_weights = model_weights_as_matrix(model=model,
                                                weights_vector=solution)
     _model = tensorflow.keras.models.clone_model(model)
     _model.set_weights(solution_weights)
-    predictions = _model.predict(data)
+    predictions = _model(data)
 
     return predictions
 
