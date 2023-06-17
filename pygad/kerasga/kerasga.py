@@ -3,6 +3,20 @@ import numpy
 import tensorflow.keras
 
 def model_weights_as_vector(model):
+    """
+    Reshapes the Keras model weight as a vector.
+
+    Parameters
+    ----------
+    model : TYPE
+        The Keras model.
+
+    Returns
+    -------
+    TYPE
+        The weights as a 1D vector.
+
+    """
     weights_vector = []
 
     for layer in model.layers: # model.get_weights():
@@ -15,6 +29,22 @@ def model_weights_as_vector(model):
     return numpy.array(weights_vector)
 
 def model_weights_as_matrix(model, weights_vector):
+    """
+    Reshapes the PyGAD 1D solution as a Keras weight matrix.
+
+    Parameters
+    ----------
+    model : TYPE
+        The Keras model.
+    weights_vector : TYPE
+        The PyGAD solution as a 1D vector.
+
+    Returns
+    -------
+    weights_matrix : TYPE
+        The Keras weights as a matrix.
+
+    """
     weights_matrix = []
 
     start = 0
@@ -37,14 +67,45 @@ def model_weights_as_matrix(model, weights_vector):
 
     return weights_matrix
 
-def predict(model, solution, data, verbose=1):
+def predict(model, 
+            solution, 
+            data, 
+            batch_size=None,
+            verbose=0,
+            steps=None):
+    """
+    Use the PyGAD's solution to make predictions using the Keras model.
+
+    Parameters
+    ----------
+    model : TYPE
+        The Keras model.
+    solution : TYPE
+        A single PyGAD solution as 1D vector.
+    data : TYPE
+        The data or a generator.
+    batch_size : TYPE, optional
+        The batch size (i.e. number of samples per step or batch). The default is None. Check documentation of the Keras Model.predict() method for more information.
+    verbose : TYPE, optional
+        Verbosity mode. The default is 0. Check documentation of the Keras Model.predict() method for more information.
+    steps : TYPE, optional
+        The total number of steps (batches of samples). The default is None. Check documentation of the Keras Model.predict() method for more information.
+
+    Returns
+    -------
+    predictions : TYPE
+        The Keras model predictions.
+
+    """
     # Fetch the parameters of the best solution.
     solution_weights = model_weights_as_matrix(model=model,
                                                weights_vector=solution)
     _model = tensorflow.keras.models.clone_model(model)
     _model.set_weights(solution_weights)
-    predictions = _model(data)
-    predictions = predictions.numpy()
+    predictions = _model.predict(x=data,
+                                 batch_size=batch_size,
+                                 verbose=verbose,
+                                 steps=steps)
 
     return predictions
 
