@@ -65,12 +65,37 @@ def number_respect_gene_space(gene_space=None,
     num_outside = 0
     if ga_instance.gene_space_nested == True:
         for gene_idx in range(ga_instance.num_genes):
+
+            if type(ga_instance.init_range_low) in ga_instance.supported_int_float_types:
+                range_min_init = ga_instance.init_range_low
+                range_max_init = ga_instance.init_range_high
+            else:
+                range_min_init = ga_instance.init_range_low[gene_idx]
+                range_max_init = ga_instance.init_range_high[gene_idx]
+            if type(ga_instance.random_mutation_min_val) in ga_instance.supported_int_float_types:
+                range_min_mutation = ga_instance.random_mutation_min_val
+                range_max_mutation = ga_instance.random_mutation_max_val
+            else:
+                range_min_mutation = ga_instance.random_mutation_min_val[gene_idx]
+                range_max_mutation = ga_instance.random_mutation_max_val[gene_idx]
+
             all_gene_values = ga_instance.solutions[:, gene_idx]
             if type(ga_instance.gene_space[gene_idx]) in [list, tuple, range, numpy.ndarray]:
                 current_gene_space = list(ga_instance.gene_space[gene_idx])
-                for val in all_gene_values:
-                    if val in current_gene_space:
-                        # print(val, current_gene_space)
+                # print("current_gene_space", current_gene_space)
+                for val_idx, val in enumerate(all_gene_values):
+                    if None in current_gene_space:
+                        if (val in current_gene_space) or (val >= range_min_init and val < range_max_init) or (val >= range_min_mutation and val < range_max_mutation):
+                            pass
+                        else:
+                            # print("###########")
+                            # print(gene_idx, val)
+                            # print(current_gene_space)
+                            # print(range_min_mutation, range_max_mutation)
+                            # print("\n\n")
+                            num_outside += 1
+                    elif val in current_gene_space:
+                        # print("val, current_gene_space", val, current_gene_space)
                         pass
                     else:
                         # print(gene_idx, val, current_gene_space)
@@ -98,14 +123,51 @@ def number_respect_gene_space(gene_space=None,
                         pass
                     else:
                         num_outside += 1
+            elif ga_instance.gene_space[gene_idx] is None:
+                for val in all_gene_values:
+                    # print(val)
+                    if (val >= range_min_init and val < range_max_init) or (val >= range_min_mutation and val < range_max_mutation):
+                        pass
+                    else:
+                        # print("###########")
+                        # print(gene_idx, val)
+                        # print(ga_instance.gene_space[gene_idx])
+                        # print(range_min_init, range_max_init)
+                        # print(range_min_mutation, range_max_mutation)
+                        # print("\n\n")
+                        num_outside += 1
     else:
         for gene_idx in range(ga_instance.num_genes):
+
+            if type(ga_instance.init_range_low) in ga_instance.supported_int_float_types:
+                range_min_init = ga_instance.init_range_low
+                range_max_init = ga_instance.init_range_high
+            else:
+                range_min_init = ga_instance.init_range_low[gene_idx]
+                range_max_init = ga_instance.init_range_high[gene_idx]
+            if type(ga_instance.random_mutation_min_val) in ga_instance.supported_int_float_types:
+                range_min_mutation = ga_instance.random_mutation_min_val
+                range_max_mutation = ga_instance.random_mutation_max_val
+            else:
+                range_min_mutation = ga_instance.random_mutation_min_val[gene_idx]
+                range_max_mutation = ga_instance.random_mutation_max_val[gene_idx]
+
             all_gene_values = ga_instance.solutions[:, gene_idx]
             # print("all_gene_values", gene_idx, all_gene_values)
             if type(ga_instance.gene_space) in [list, tuple, range, numpy.ndarray]:
                 current_gene_space = list(ga_instance.gene_space)
                 for val in all_gene_values:
-                    if val in current_gene_space:
+                    if None in current_gene_space:
+                        if (val in current_gene_space) or (val >= range_min_init and val < range_max_init) or (val >= range_min_mutation and val < range_max_mutation):
+                            pass
+                        else:
+                            # print("###########")
+                            # print(gene_idx, val)
+                            # print(current_gene_space)
+                            # print(range_min_mutation, range_max_mutation)
+                            # print("\n\n")
+                            num_outside += 1
+                    elif val in current_gene_space:
                         pass
                     else:
                         num_outside += 1
@@ -141,6 +203,11 @@ def test_gene_space_numpy_arange():
 
 def test_gene_space_list():
     num_outside, _ = number_respect_gene_space(gene_space=list(range(10)))
+    
+    assert num_outside == 0
+
+def test_gene_space_list_None():
+    num_outside, _ = number_respect_gene_space(gene_space=[30, None, 40, 50, None, 60, 70, None, None, None])
     
     assert num_outside == 0
 
@@ -318,6 +385,38 @@ def test_nested_gene_space_list2():
 
     assert num_outside == 0
 
+def test_nested_gene_space_list3_None():
+    num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, None], 
+                                                                     [1, 2], 
+                                                                     [2, None],
+                                                                     [3, 4],
+                                                                     [None, 5],
+                                                                     None,
+                                                                     [None, 7],
+                                                                     [None, None],
+                                                                     [8, 9],
+                                                                     None],
+                                                         mutation_by_replacement=True)
+
+    assert num_outside == 0
+
+def test_nested_gene_space_list4_None_custom_mutation_range():
+    num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, None], 
+                                                                     [1, 2], 
+                                                                     [2, None],
+                                                                     [3, 4],
+                                                                     [None, 5],
+                                                                     None,
+                                                                     [None, 7],
+                                                                     [None, None],
+                                                                     [8, 9],
+                                                                     None],
+                                                         random_mutation_min_val=20,
+                                                         random_mutation_max_val=40,
+                                                         mutation_by_replacement=True)
+
+    assert num_outside == 0
+
 def test_nested_gene_space_mix():
     num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, 1, 2, 3, 4], 
                                                                      numpy.arange(5, 10), 
@@ -329,7 +428,8 @@ def test_nested_gene_space_mix():
                                                                      numpy.arange(35, 40),
                                                                      numpy.arange(40, 45),
                                                                      [45, 46, 47, 48, 49]],
-                                                         gene_type=int)
+                                                         gene_type=int,
+                                                         mutation_by_replacement=True)
 
     assert num_outside == 0
 
@@ -344,7 +444,7 @@ def test_nested_gene_space_mix_nested_gene_type():
                                                                      numpy.arange(35, 40),
                                                                      numpy.arange(40, 45),
                                                                      [45, 46, 47, 48, 49]],
-                                                         gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+                                                         gene_type=[int, float, numpy.float64, [float, 3], int, numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
     # print(ga_instance.population)
 
     assert num_outside == 0
@@ -434,6 +534,8 @@ if __name__ == "__main__":
 
     test_gene_space_list()
     print()
+    test_gene_space_list_None()
+    print()
     test_gene_space_list_nested_gene_type()
     print()
 
@@ -476,6 +578,12 @@ if __name__ == "__main__":
     print()
 
     test_nested_gene_space_list2()
+    print()
+
+    test_nested_gene_space_list3_None()
+    print()
+
+    test_nested_gene_space_list4_None_custom_mutation_range()
     print()
 
     test_nested_gene_space_mix()

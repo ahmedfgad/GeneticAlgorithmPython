@@ -603,11 +603,15 @@ class Unique:
         return None, gene
     
     def unpack_gene_space(self, 
+                          range_min,
+                          range_max,
                           num_values_from_inf_range=100):
         """
         Unpack the gene_space for the purpose of selecting a value that solves the duplicates.
         This is by replacing each range by a list of values.
         It accepts:
+            range_min: The range minimum value.
+            range_min: The range maximum value.
             num_values_from_inf_range: For infinite range of float values, a fixed number of values equal to num_values_from_inf_range is selected using the numpy.linspace() function.
         It returns the unpacked gene space.
         """
@@ -662,8 +666,8 @@ class Unique:
                     gene_space_unpacked[space_idx] = [space]
                 elif space is None:
                     # Randomly generate the value using the mutation range.
-                    gene_space_unpacked[space_idx] = numpy.arange(start=self.random_mutation_min_val,
-                                                                  stop=self.random_mutation_max_val)
+                    gene_space_unpacked[space_idx] = numpy.arange(start=range_min,
+                                                                  stop=range_max)
                 elif type(space) is range:
                     # Convert the range to a list.
                     gene_space_unpacked[space_idx] = list(space)
@@ -720,8 +724,8 @@ class Unique:
                     none_indices = numpy.where(numpy.array(gene_space_unpacked[space_idx]) == None)[0]
                     if len(none_indices) > 0:
                         for idx in none_indices:
-                            random_value = numpy.random.uniform(low=self.random_mutation_min_val,
-                                                                high=self.random_mutation_max_val,
+                            random_value = numpy.random.uniform(low=range_min,
+                                                                high=range_max,
                                                                 size=1)[0]
                             gene_space_unpacked[space_idx][idx] = random_value
     

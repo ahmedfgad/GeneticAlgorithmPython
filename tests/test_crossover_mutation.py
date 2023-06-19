@@ -154,6 +154,82 @@ def test_zero_crossover_probability_zero_mutation_probability():
 
     assert result == True
 
+def test_random_mutation_manual_call():
+    result, ga_instance = output_crossover_mutation(mutation_type="random",
+                                                    random_mutation_min_val=888,
+                                                    random_mutation_max_val=999)
+    ga_instance.mutation_num_genes = 9
+
+    temp_offspring = numpy.array(initial_population[0:1])
+    offspring = ga_instance.random_mutation(offspring=temp_offspring.copy())
+
+    comp = offspring - temp_offspring
+    comp_sorted = sorted(comp.copy())
+    comp_sorted = numpy.abs(numpy.unique(comp_sorted))
+
+    # The other 1 added to include the last value in the range.
+    assert len(comp_sorted) in range(1, 1 + 1 + ga_instance.mutation_num_genes)
+    assert comp_sorted[0] == 0
+
+def test_random_mutation_manual_call2():
+    result, ga_instance = output_crossover_mutation(mutation_type="random",
+                                                    random_mutation_min_val=888,
+                                                    random_mutation_max_val=999)
+    ga_instance.mutation_num_genes = 10
+
+    temp_offspring = numpy.array(initial_population[0:1])
+    offspring = ga_instance.random_mutation(offspring=temp_offspring.copy())
+
+    comp = offspring - temp_offspring
+    comp_sorted = sorted(comp.copy())
+    comp_sorted = numpy.abs(numpy.unique(comp_sorted))
+
+    # The other 1 added to include the last value in the range.
+    assert len(comp_sorted) in range(1, 1 + 1 + ga_instance.mutation_num_genes)
+    # assert comp_sorted[0] == 0
+
+def test_random_mutation_manual_call3():
+    # Use random_mutation_min_val & random_mutation_max_val as numbers.
+    random_mutation_min_val = 888
+    random_mutation_max_val = 999
+    result, ga_instance = output_crossover_mutation(mutation_type="random",
+                                                    random_mutation_min_val=random_mutation_min_val,
+                                                    random_mutation_max_val=random_mutation_max_val,
+                                                    mutation_by_replacement=True)
+    ga_instance.mutation_num_genes = 10
+
+    temp_offspring = numpy.array(initial_population[0:1])
+    offspring = ga_instance.random_mutation(offspring=temp_offspring.copy())
+
+    comp = offspring
+    comp_sorted = sorted(comp.copy())
+    comp_sorted = numpy.abs(numpy.unique(comp))
+
+    value_space = list(range(random_mutation_min_val, random_mutation_max_val))
+    for value in comp_sorted:
+        assert value in value_space
+
+def test_random_mutation_manual_call4():
+    # Use random_mutation_min_val & random_mutation_max_val as lists.
+    random_mutation_min_val = [888]*10
+    random_mutation_max_val = [999]*10
+    result, ga_instance = output_crossover_mutation(mutation_type="random",
+                                                    random_mutation_min_val=random_mutation_min_val,
+                                                    random_mutation_max_val=random_mutation_max_val,
+                                                    mutation_by_replacement=True)
+    ga_instance.mutation_num_genes = 10
+
+    temp_offspring = numpy.array(initial_population[0:1])
+    offspring = ga_instance.random_mutation(offspring=temp_offspring.copy())
+
+    comp = offspring
+    comp_sorted = sorted(comp.copy())
+    comp_sorted = numpy.abs(numpy.unique(comp))
+
+    value_space = list(range(random_mutation_min_val[0], random_mutation_max_val[0]))
+    for value in comp_sorted:
+        assert value in value_space
+
 if __name__ == "__main__":
     print()
     test_no_crossover_no_mutation()
@@ -184,5 +260,17 @@ if __name__ == "__main__":
     print()
 
     test_zero_crossover_probability_zero_mutation_probability()
+    print()
+
+    test_random_mutation_manual_call()
+    print()
+
+    test_random_mutation_manual_call2()
+    print()
+
+    test_random_mutation_manual_call3()
+    print()
+
+    test_random_mutation_manual_call4()
     print()
 
