@@ -1,7 +1,7 @@
 Release History
 ===============
 
-.. figure:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
+.. image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :alt: 
 
 .. _pygad-1017:
@@ -250,7 +250,7 @@ Release date: 19 July 2020
    values. It is useful if the gene space is restricted to a certain
    range or to discrete values. For more information, check the `More
    about the ``gene_space``
-   Parameter <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#more-about-the-gene-space-parameter>`__
+   Parameter <https://pygad.readthedocs.io/en/latest/pygad.html#more-about-the-gene-space-parameter>`__
    section. Thanks to `Prof. Tamer A.
    Farrag <https://github.com/tfarrag2000>`__ for requesting this useful
    feature.
@@ -412,11 +412,11 @@ Release Date: 03 January 2021
 
 1.  Support of a new module ``pygad.torchga`` to train PyTorch models
     using PyGAD. Check `its
-    documentation <https://pygad.readthedocs.io/en/latest/README_pygad_torchga_ReadTheDocs.html>`__.
+    documentation <https://pygad.readthedocs.io/en/latest/torchga.html>`__.
 
 2.  Support of adaptive mutation where the mutation rate is determined
     by the fitness value of each solution. Read the `Adaptive
-    Mutation <https://pygad.readthedocs.io/en/latest/README_pygad_torchga_ReadTheDocs.html#adaptive-mutation>`__
+    Mutation <https://pygad.readthedocs.io/en/latest/pygad.html#adaptive-mutation>`__
     section for more details. Also, read this paper: `Libelli, S.
     Marsili, and P. Alba. "Adaptive mutation in genetic algorithms."
     Soft computing 4.2 (2000):
@@ -525,7 +525,7 @@ Release Date: 16 February 2021
    to 5 (exclusive) while the second one has values between 0.2
    (inclusive) and 0.85 (exclusive). For more information, please check
    the `Limit the Gene Value
-   Range <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#limit-the-gene-value-range>`__
+   Range <https://pygad.readthedocs.io/en/latest/pygad.html#limit-the-gene-value-range>`__
    section of the documentation.
 
 2. The ``plot_result()`` method returns the figure so that the user can
@@ -594,7 +594,7 @@ Release Date: 12 March 2021
    solution/chromosome may have duplicate gene values. If ``False``,
    then each gene will have a unique value in its solution. Check the
    `Prevent Duplicates in Gene
-   Values <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#prevent-duplicates-in-gene-values>`__
+   Values <https://pygad.readthedocs.io/en/latest/pygad.html#prevent-duplicates-in-gene-values>`__
    section for more details.
 
 2. The ``last_generation_fitness`` is updated at the end of each
@@ -624,7 +624,7 @@ Release Date: 19 May 2021
    Previously, the ``gene_type`` can be assigned only to a single data
    type that is applied for all genes. For more information, check the
    `More about the ``gene_type``
-   Parameter <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#more-about-the-gene-type-parameter>`__
+   Parameter <https://pygad.readthedocs.io/en/latest/pygad.html#more-about-the-gene-type-parameter>`__
    section. Thanks to `Rainer
    Engel <https://www.linkedin.com/in/rainer-matthias-engel-5ba47a9>`__
    for asking about this feature in `this
@@ -721,7 +721,7 @@ Release Date: 17 June 2021
     ``{"low": 0, "high": 30, "step": 2}`` to have only even values for
     the gene(s) starting from 0 to 30. For more information, check the
     `More about the ``gene_space``
-    Parameter <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#more-about-the-gene-space-parameter>`__
+    Parameter <https://pygad.readthedocs.io/en/latest/pygad.html#more-about-the-gene-space-parameter>`__
     section.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/48
 
@@ -794,7 +794,7 @@ Release Date: 17 June 2021
     ``[float, 2]`` forces a gene with a value like ``0.1234`` to be
     ``0.12``. For more information, check the `More about the
     ``gene_type``
-    Parameter <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#more-about-the-gene-type-parameter>`__
+    Parameter <https://pygad.readthedocs.io/en/latest/pygad.html#more-about-the-gene-type-parameter>`__
     section.
 
 .. _pygad-2151:
@@ -829,7 +829,7 @@ Release Date: 19 June 2021
    ``pygad.GA`` class to create a custom mutation, crossover, and parent
    selection operators. Check the `User-Defined Crossover, Mutation, and
    Parent Selection
-   Operators <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
+   Operators <https://pygad.readthedocs.io/en/latest/pygad.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
    section for more details.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50
 
@@ -994,7 +994,7 @@ Release Date: 8 July 2022
    issue
    `#78 <https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/78>`__
    at GitHub. Check the `Parallel Processing in
-   PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#parallel-processing-in-pygad>`__
+   PyGAD <https://pygad.readthedocs.io/en/latest/pygad.html#parallel-processing-in-pygad>`__
    section for more information and examples.
 
 .. _pygad-2180:
@@ -1021,7 +1021,7 @@ Release Date: 9 September 2022
    the ``run()`` method is called, as the old fitness value are shown on
    the graph alongside with the new fitness values. Read more in this
    section: `Continue without Loosing
-   Progress <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#continue-without-loosing-progress>`__
+   Progress <https://pygad.readthedocs.io/en/latest/pygad.html#continue-without-loosing-progress>`__
 
 4. Thanks `Prof. Fernando Jiménez
    Barrionuevo <http://webs.um.es/fernan>`__ (Dept. of Information and
@@ -1037,7 +1037,7 @@ Release Date: 9 September 2022
    ``keep_elitism``. It defaults to 1 which means for each generation
    keep only the best solution in the next generation. If assigned 0,
    then it has no effect. Read more in this section: `Elitism
-   Selection <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#elitism-selection>`__.
+   Selection <https://pygad.readthedocs.io/en/latest/pygad.html#elitism-selection>`__.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/74
 
 7. A new instance attribute named ``last_generation_elitism`` added to
@@ -1048,7 +1048,7 @@ Release Date: 9 September 2022
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/70 and
    `Prof. Fernando Jiménez Barrionuevo <http://webs.um.es/fernan>`__.
    Read more in this section: `Random
-   Seed <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#random-seed>`__.
+   Seed <https://pygad.readthedocs.io/en/latest/pygad.html#random-seed>`__.
 
 9. Editing the ``pygad.TorchGA`` module to make sure the tensor data is
    moved from GPU to CPU. Thanks to Rasmus Johansson for opening this
@@ -1226,7 +1226,7 @@ Release Date 8 April 2023
     the console and text file instead of using the ``print()`` function.
     This is by assigning the ``logging.Logger`` to the new ``logger``
     parameter. Check the `Logging
-    Outputs <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#logging-outputs>`__
+    Outputs <https://pygad.readthedocs.io/en/latest/pygad.html#logging-outputs>`__
     for more information.
 
 8.  A new instance attribute called ``logger`` to save the logger.
@@ -1235,14 +1235,14 @@ Release Date 8 April 2023
     a new parameter that refers to the instance of the ``pygad.GA``
     class. Check this for an example: `Use Functions and Methods to
     Build Fitness Function and
-    Callbacks <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#use-functions-and-methods-to-build-fitness-and-callbacks>`__.
+    Callbacks <https://pygad.readthedocs.io/en/latest/pygad.html#use-functions-and-methods-to-build-fitness-and-callbacks>`__.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/163
 
 10. Update the documentation to include an example of using functions
     and methods to calculate the fitness and build callbacks. Check this
     for more details: `Use Functions and Methods to Build Fitness
     Function and
-    Callbacks <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#use-functions-and-methods-to-build-fitness-and-callbacks>`__.
+    Callbacks <https://pygad.readthedocs.io/en/latest/pygad.html#use-functions-and-methods-to-build-fitness-and-callbacks>`__.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/92#issuecomment-1443635003
 
 11. Validate the value passed to the ``initial_population`` parameter.
@@ -1988,7 +1988,7 @@ Find the book at these links:
 
 -  `Google Books <https://books.google.com.eg/books?id=xLd9DwAAQBAJ>`__
 
-.. figure:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
+.. image:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
    :alt: 
 
 Contact Us
@@ -2010,7 +2010,7 @@ Contact Us
 
 -  `GitHub <https://github.com/ahmedfgad>`__
 
-.. figure:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
+.. image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :alt: 
 
 Thank you for using

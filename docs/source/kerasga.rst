@@ -4,7 +4,7 @@
 ========================
 
 This section of the PyGAD's library documentation discusses the
-`pygad.kerasga <https://pygad.readthedocs.io/en/latest/README_pygad_kerasga_ReadTheDocs.html>`__
+`pygad.kerasga <https://pygad.readthedocs.io/en/latest/kerasga.html>`__
 module.
 
 The ``pygad.kerarsga`` module has helper a class and 2 functions to
@@ -206,7 +206,19 @@ accepts the following parameters:
 
 3. ``data``: The test data inputs.
 
-It returns the predictions for the data samples.
+4. ``batch_size=None``: The batch size (i.e. number of samples per step
+   or batch).
+
+5. ``verbose=None``: Verbosity mode.
+
+6. ``steps=None``: The total number of steps (batches of samples).
+
+Check documentation of the `Keras
+Model.predict() <https://keras.io/api/models/model_training_apis>`__
+method for more information about the ``batch_size``, ``verbose``, and
+``steps`` parameters.
+
+It returns the predictions of the data samples.
 
 Examples
 ========
@@ -241,7 +253,7 @@ subsections discuss each part in the code.
 
        return solution_fitness
 
-   def callback_generation(ga_instance):
+   def on_generation(ga_instance):
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
@@ -266,7 +278,7 @@ subsections discuss each part in the code.
                                [1.3],
                                [2.5]])
 
-   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
+   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = keras_ga.population_weights # Initial population of network weights
@@ -275,7 +287,7 @@ subsections discuss each part in the code.
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          on_generation=callback_generation)
+                          on_generation=on_generation)
 
    ga_instance.run()
 
@@ -343,8 +355,6 @@ Change this number according to your needs.
    keras_ga = pygad.kerasga.KerasGA(model=model,
                                     num_solutions=10)
 
-.. _prepare-the-training-data-1:
-
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -406,11 +416,11 @@ The fifth step is to instantiate the ``pygad.GA`` class. Note how the
 the Keras models.
 
 For more information, please check the `parameters this class
-accepts <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#init>`__.
+accepts <https://pygad.readthedocs.io/en/latest/pygad.html#init>`__.
 
 .. code:: python
 
-   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
+   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = keras_ga.population_weights # Initial population of network weights
@@ -419,7 +429,7 @@ accepts <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#in
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          on_generation=callback_generation)
+                          on_generation=on_generation)
 
 Run the Genetic Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -441,7 +451,7 @@ shows how the fitness value changes by generation. Call the
 
 Here is the figure.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/93722638-ac261880-fb98-11ea-95d3-e773deb034f4.png
+.. image:: https://user-images.githubusercontent.com/16560492/93722638-ac261880-fb98-11ea-95d3-e773deb034f4.png
    :alt: 
 
 To get information about the best solution found by PyGAD, use the
@@ -516,7 +526,7 @@ previous example.
 
        return solution_fitness
 
-   def callback_generation(ga_instance):
+   def on_generation(ga_instance):
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
@@ -543,7 +553,7 @@ previous example.
                                [0, 1],
                                [1, 0]])
 
-   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
+   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = keras_ga.population_weights # Initial population of network weights.
@@ -553,7 +563,7 @@ previous example.
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          on_generation=callback_generation)
+                          on_generation=on_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
@@ -624,7 +634,7 @@ Compared to the previous regression example, here are the changes:
 After the previous code completes, the next figure shows how the fitness
 value change by generation.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/93722639-b811da80-fb98-11ea-8951-f13a7a266c04.png
+.. image:: https://user-images.githubusercontent.com/16560492/93722639-b811da80-fb98-11ea-8951-f13a7a266c04.png
    :alt: 
 
 Here is some information about the trained model. Its fitness value is
@@ -669,7 +679,7 @@ Here is the code.
 
        return solution_fitness
 
-   def callback_generation(ga_instance):
+   def on_generation(ga_instance):
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
@@ -685,13 +695,13 @@ Here is the code.
                                       num_solutions=10)
 
    # Data inputs
-   data_inputs = numpy.load("dataset_features.npy")
+   data_inputs = numpy.load("../data/dataset_features.npy")
 
    # Data outputs
-   data_outputs = numpy.load("outputs.npy")
+   data_outputs = numpy.load("../data/outputs.npy")
    data_outputs = tensorflow.keras.utils.to_categorical(data_outputs)
 
-   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
+   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
    num_generations = 100 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = keras_ga.population_weights # Initial population of network weights.
@@ -701,7 +711,7 @@ Here is the code.
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          on_generation=callback_generation)
+                          on_generation=on_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
@@ -770,14 +780,14 @@ Note that the class labels are one-hot encoded using the
 
    import numpy
 
-   data_inputs = numpy.load("dataset_features.npy")
+   data_inputs = numpy.load("../data/dataset_features.npy")
 
-   data_outputs = numpy.load("outputs.npy")
+   data_outputs = numpy.load("../data/outputs.npy")
    data_outputs = tensorflow.keras.utils.to_categorical(data_outputs)
 
 The next figure shows how the fitness value changes.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/93722649-c2cc6f80-fb98-11ea-96e7-3f6ce3cfe1cf.png
+.. image:: https://user-images.githubusercontent.com/16560492/93722649-c2cc6f80-fb98-11ea-96e7-3f6ce3cfe1cf.png
    :alt: 
 
 Here are some statistics about the trained model.
@@ -816,7 +826,7 @@ Here is the complete code.
 
        return solution_fitness
 
-   def callback_generation(ga_instance):
+   def on_generation(ga_instance):
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
@@ -841,13 +851,13 @@ Here is the complete code.
                                     num_solutions=10)
 
    # Data inputs
-   data_inputs = numpy.load("dataset_inputs.npy")
+   data_inputs = numpy.load("../data/dataset_inputs.npy")
 
    # Data outputs
-   data_outputs = numpy.load("dataset_outputs.npy")
+   data_outputs = numpy.load("../data/dataset_outputs.npy")
    data_outputs = tensorflow.keras.utils.to_categorical(data_outputs)
 
-   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
+   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
    num_generations = 200 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = keras_ga.population_weights # Initial population of network weights.
@@ -857,7 +867,7 @@ Here is the complete code.
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          on_generation=callback_generation)
+                          on_generation=on_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
@@ -927,7 +937,7 @@ The data consists of 4 classes of images. The image shape is
 ``(100, 100, 3)`` and there are 20 images per class for a total of 80
 training samples. For more information about the dataset, check the
 `Reading the
-Data <https://pygad.readthedocs.io/en/latest/README_pygad_cnn_ReadTheDocs.html#reading-the-data>`__
+Data <https://pygad.readthedocs.io/en/latest/cnn.html#reading-the-data>`__
 section of the ``pygad.cnn`` module.
 
 Simply download these 2 files and read them according to the next code.
@@ -938,14 +948,14 @@ Note that the class labels are one-hot encoded using the
 
    import numpy
 
-   data_inputs = numpy.load("dataset_inputs.npy")
+   data_inputs = numpy.load("../data/dataset_inputs.npy")
 
-   data_outputs = numpy.load("dataset_outputs.npy")
+   data_outputs = numpy.load("../data/dataset_outputs.npy")
    data_outputs = tensorflow.keras.utils.to_categorical(data_outputs)
 
 The next figure shows how the fitness value changes.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/93722654-cc55d780-fb98-11ea-8f95-7b65dc67f5c8.png
+.. image:: https://user-images.githubusercontent.com/16560492/93722654-cc55d780-fb98-11ea-8f95-7b65dc67f5c8.png
    :alt: 
 
 Here are some statistics about the trained model. The model accuracy is
@@ -969,3 +979,100 @@ To improve the model performance, you can do the following:
 
 -  Use different parameters for the genetic algorithm (e.g. number of
    solution, number of generations, etc)
+
+Example 5: Image Classification using Data Generator
+----------------------------------------------------
+
+This example uses the image data generator
+``tensorflow.keras.preprocessing.image.ImageDataGenerator`` to feed data
+to the model. Instead of reading all the data in the memory, the data
+generator generates the data needed by the model and only save it in the
+memory instead of saving all the data. This frees the memory but adds
+more computational time.
+
+.. code:: python
+
+   import tensorflow as tf
+   import tensorflow.keras
+   import pygad.kerasga
+   import pygad
+
+   def fitness_func(ga_instanse, solution, sol_idx):
+       global train_generator, data_outputs, keras_ga, model
+
+       predictions = pygad.kerasga.predict(model=model,
+                                           solution=solution,
+                                           data=train_generator)
+
+       cce = tensorflow.keras.losses.CategoricalCrossentropy()
+       solution_fitness = 1.0 / (cce(data_outputs, predictions).numpy() + 0.00000001)
+
+       return solution_fitness
+
+   def on_generation(ga_instance):
+       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
+       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution(ga_instance.last_generation_fitness)[1]))
+
+   # The dataset path.
+   dataset_path = r'../data/Skin_Cancer_Dataset' 
+
+   num_classes = 2
+   img_size = 224
+
+   # Create a simple CNN. This does not gurantee high classification accuracy.
+   model = tf.keras.models.Sequential()
+   model.add(tf.keras.layers.Input(shape=(img_size, img_size, 3)))
+   model.add(tf.keras.layers.Conv2D(32, (3,3), activation="relu", padding="same"))
+   model.add(tf.keras.layers.MaxPooling2D((2, 2)))
+   model.add(tf.keras.layers.Flatten())
+   model.add(tf.keras.layers.Dropout(rate=0.2))
+   model.add(tf.keras.layers.Dense(num_classes, activation="softmax"))
+
+   # Create an instance of the pygad.kerasga.KerasGA class to build the initial population.
+   keras_ga = pygad.kerasga.KerasGA(model=model,
+                                    num_solutions=10)
+
+   data_generator = tf.keras.preprocessing.image.ImageDataGenerator()
+   train_generator = data_generator.flow_from_directory(dataset_path, 
+                                                        class_mode='categorical',
+                                                        target_size=(224, 224),
+                                                        batch_size=32,
+                                                        shuffle=False)
+   # train_generator.class_indices
+   data_outputs = tf.keras.utils.to_categorical(train_generator.labels)
+
+   # Check the documentation for more information about the parameters: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
+   initial_population = keras_ga.population_weights # Initial population of network weights.
+
+   # Create an instance of the pygad.GA class
+   ga_instance = pygad.GA(num_generations=10, 
+                          num_parents_mating=5, 
+                          initial_population=initial_population,
+                          fitness_func=fitness_func,
+                          on_generation=on_generation)
+
+   # Start the genetic algorithm evolution.
+   ga_instance.run()
+
+   # After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+   ga_instance.plot_fitness(title="PyGAD & Keras - Iteration vs. Fitness", linewidth=4)
+
+   # Returning the details of the best solution.
+   solution, solution_fitness, solution_idx = ga_instance.best_solution(ga_instance.last_generation_fitness)
+   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
+   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+
+   predictions = pygad.kerasga.predict(model=model,
+                                       solution=solution,
+                                       data=train_generator)
+   # print("Predictions : \n", predictions)
+
+   # Calculate the categorical crossentropy for the trained model.
+   cce = tensorflow.keras.losses.CategoricalCrossentropy()
+   print("Categorical Crossentropy : ", cce(data_outputs, predictions).numpy())
+
+   # Calculate the classification accuracy for the trained model.
+   ca = tensorflow.keras.metrics.CategoricalAccuracy()
+   ca.update_state(data_outputs, predictions)
+   accuracy = ca.result().numpy()
+   print("Accuracy : ", accuracy)

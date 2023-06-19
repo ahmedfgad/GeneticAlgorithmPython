@@ -39,7 +39,7 @@ The ``pygad.GA`` class constructor supports the following parameters:
    solution, and 3. its index in the population). If method, then it
    accepts a fourth parameter representing the method's class instance.
    Check the `Preparing the fitness_func
-   Parameter <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#preparing-the-fitness-func-parameter>`__
+   Parameter <https://pygad.readthedocs.io/en/latest/pygad.html#preparing-the-fitness-func-parameter>`__
    section for information about creating such a function.
 
 -  ``fitness_batch_size=None``: A new optional parameter called
@@ -51,7 +51,7 @@ The ``pygad.GA`` class constructor supports the following parameters:
    ``1 < fitness_batch_size <= sol_per_pop``, then the solutions are
    grouped into batches of size ``fitness_batch_size`` and the fitness
    function is called once for each batch. Check the `Batch Fitness
-   Calculation <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#batch-fitness-calculation>`__
+   Calculation <https://pygad.readthedocs.io/en/latest/pygad.html#batch-fitness-calculation>`__
    section for more details and examples. Added in from `PyGAD
    2.19.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-19-0>`__.
 
@@ -114,7 +114,7 @@ The ``pygad.GA`` class constructor supports the following parameters:
    function can be passed starting from `PyGAD
    2.16.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-16-0>`__.
    Check the `User-Defined Crossover, Mutation, and Parent Selection
-   Operators <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
+   Operators <https://pygad.readthedocs.io/en/latest/pygad.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
    section for more details about building a user-defined parent
    selection function.
 
@@ -158,7 +158,7 @@ The ``pygad.GA`` class constructor supports the following parameters:
    function can be passed starting from `PyGAD
    2.16.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-16-0>`__.
    Check the `User-Defined Crossover, Mutation, and Parent Selection
-   Operators <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
+   Operators <https://pygad.readthedocs.io/en/latest/pygad.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
    section for more details about creating a user-defined crossover
    function. Starting from `PyGAD
    2.2.2 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-2-2>`__
@@ -184,7 +184,7 @@ The ``pygad.GA`` class constructor supports the following parameters:
    starting from `PyGAD
    2.16.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-16-0>`__.
    Check the `User-Defined Crossover, Mutation, and Parent Selection
-   Operators <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
+   Operators <https://pygad.readthedocs.io/en/latest/pygad.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
    section for more details about creating a user-defined mutation
    function. Starting from `PyGAD
    2.2.2 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-2-2>`__
@@ -195,10 +195,10 @@ The ``pygad.GA`` class constructor supports the following parameters:
    mutation is supported starting from `PyGAD
    2.10.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-10-0>`__.
    For more information about adaptive mutation, go the the `Adaptive
-   Mutation <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#adaptive-mutation>`__
+   Mutation <https://pygad.readthedocs.io/en/latest/pygad.html#adaptive-mutation>`__
    section. For example about using adaptive mutation, check the `Use
    Adaptive Mutation in
-   PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#use-adaptive-mutation-in-pygad>`__
+   PyGAD <https://pygad.readthedocs.io/en/latest/pygad.html#use-adaptive-mutation-in-pygad>`__
    section.
 
 -  ``mutation_probability=None``: The probability of selecting a gene
@@ -263,7 +263,7 @@ The ``pygad.GA`` class constructor supports the following parameters:
 -  ``gene_space=None``: It is used to specify the possible values for
    each gene in case the user wants to restrict the gene values. It is
    useful if the gene space is restricted to a certain range or to
-   discrete values. It accepts a ``list``, ``tuple``, ``range``, or
+   discrete values. It accepts a ``list``, ``range``, or
    ``numpy.ndarray``. When all genes have the same global space, specify
    their values as a ``list``/``tuple``/``range``/``numpy.ndarray``. For
    example, ``gene_space = [0.3, 5.2, -4, 8]`` restricts the gene values
@@ -399,7 +399,7 @@ The ``pygad.GA`` class constructor supports the following parameters:
    5 threads which is equivalent to
    ``parallel_processing=["thread", 5]``. For more information, check
    the `Parallel Processing in
-   PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#parallel-processing-in-pygad>`__
+   PyGAD <https://pygad.readthedocs.io/en/latest/pygad.html#parallel-processing-in-pygad>`__
    section.
 
 -  ``random_seed=None``: Added in `PyGAD
@@ -417,7 +417,7 @@ The ``pygad.GA`` class constructor supports the following parameters:
    Added in `PyGAD
    3.0.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-3-0-0>`__.
    Check the `Logging
-   Outputs <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#logging-outputs>`__
+   Outputs <https://pygad.readthedocs.io/en/latest/pygad.html#logging-outputs>`__
    for more information.
 
 The user doesn't have to specify all of such parameters while creating
@@ -553,7 +553,14 @@ Other Attributes
    module. Supported in `PyGAD
    3.0.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-3-0-0>`__.
 
-Note that the attributes with its name start with ``last_generation_``
+-  ``gene_space_unpacked``: This is the unpacked version of the
+   ``gene_space`` parameter. For example, ``range(1, 5)`` is unpacked to
+   ``[1, 2, 3, 4]``. For an infinite range like
+   ``{'low': 2, 'high': 4}``, then it is unpacked to a limited number of
+   values (e.g. 100). Supported in `PyGAD
+   3.1.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-3-1-0>`__.
+
+Note that the attributes with names starting with ``last_generation_``
 are updated after each generation.
 
 Other Methods
@@ -601,7 +608,7 @@ Other Methods
    `PyGAD
    2.19.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-19-0>`__.
    Check the `Print Lifecycle
-   Summary <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#print-lifecycle-summary>`__
+   Summary <https://pygad.readthedocs.io/en/latest/pygad.html#print-lifecycle-summary>`__
    section for more details and examples.
 
 The next sections discuss the methods available in the ``pygad.GA``
@@ -1286,7 +1293,7 @@ generations.
 
    ga_instance.plot_fitness()
 
-.. figure:: https://user-images.githubusercontent.com/16560492/78830005-93111d00-79e7-11ea-9d8e-a8d8325a6101.png
+.. image:: https://user-images.githubusercontent.com/16560492/78830005-93111d00-79e7-11ea-9d8e-a8d8325a6101.png
    :alt: 
 
 Information about the Best Solution
@@ -1411,7 +1418,7 @@ instance of the ``pygad.GA`` class. Note that PyGAD stops when either
 all generations are completed or when the function passed to the
 ``on_generation`` parameter returns the string ``stop``.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/220486073-c5b6089d-81e4-44d9-a53c-385f479a7273.jpg
+.. image:: https://user-images.githubusercontent.com/16560492/220486073-c5b6089d-81e4-44d9-a53c-385f479a7273.jpg
    :alt: 
 
 The next code implements all the callback functions to trace the
@@ -1551,7 +1558,7 @@ In PyGAD, if ``f=f_avg``, then the solution is regarded of high quality.
 
 The next figure summarizes the previous steps.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/103468973-e3c26600-4d2c-11eb-8af3-b3bb39b50540.jpg
+.. image:: https://user-images.githubusercontent.com/16560492/103468973-e3c26600-4d2c-11eb-8af3-b3bb39b50540.jpg
    :alt: 
 
 This strategy is applied in PyGAD.
@@ -1571,7 +1578,7 @@ the following 2 simple steps:
    ``mutation_probability``, ``mutation_num_genes``, and
    ``mutation_percent_genes``. Please check the `documentation of each
    of these
-   parameters <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#init>`__
+   parameters <https://pygad.readthedocs.io/en/latest/pygad.html#init>`__
    for more information.
 
 When adaptive mutation is used, then the value assigned to any of the 3
@@ -1658,8 +1665,10 @@ Here is an example that uses adaptive mutation.
 
    ga_instance.plot_fitness(title="PyGAD with Adaptive Mutation", linewidth=5)
 
-Limit the Gene Value Range
-==========================
+.. _limit-the-gene-value-range-using-the-genespace-parameter:
+
+Limit the Gene Value Range using the ``gene_space`` Parameter
+=============================================================
 
 In `PyGAD
 2.11.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-2-11-0>`__,
@@ -1734,6 +1743,157 @@ take any floating-point value from the range that starts from 1
 .. code:: python
 
    gene_space = [{'low': 1, 'high': 5}, {'low': 0.3, 'high': 1.4}, {'low': -0.2, 'high': 4.5}]
+
+.. _more-about-the-genespace-parameter:
+
+More about the ``gene_space`` Parameter
+=======================================
+
+The ``gene_space`` parameter customizes the space of values of each
+gene.
+
+Assuming that all genes have the same global space which include the
+values 0.3, 5.2, -4, and 8, then those values can be assigned to the
+``gene_space`` parameter as a list, tuple, or range. Here is a list
+assigned to this parameter. By doing that, then the gene values are
+restricted to those assigned to the ``gene_space`` parameter.
+
+.. code:: python
+
+   gene_space = [0.3, 5.2, -4, 8]
+
+If some genes have different spaces, then ``gene_space`` should accept a
+nested list or tuple. In this case, the elements could be:
+
+1. Number (of ``int``, ``float``, or ``NumPy`` data types): A single
+   value to be assigned to the gene. This means this gene will have the
+   same value across all generations.
+
+2. ``list``, ``tuple``, ``numpy.ndarray``, or any range like ``range``,
+   ``numpy.arange()``, or ``numpy.linspace``: It holds the space for
+   each individual gene. But this space is usually discrete. That is
+   there is a set of finite values to select from.
+
+3. ``dict``: To sample a value for a gene from a continuous range. The
+   dictionary must have 2 mandatory keys which are ``"low"`` and
+   ``"high"`` in addition to an optional key which is ``"step"``. A
+   random value is returned between the values assigned to the items
+   with ``"low"`` and ``"high"`` keys. If the ``"step"`` exists, then
+   this works as the previous options (i.e. discrete set of values).
+
+4. ``None``: A gene with its space set to ``None`` is initialized
+   randomly from the range specified by the 2 parameters
+   ``init_range_low`` and ``init_range_high``. For mutation, its value
+   is mutated based on a random value from the range specified by the 2
+   parameters ``random_mutation_min_val`` and
+   ``random_mutation_max_val``. If all elements in the ``gene_space``
+   parameter are ``None``, the parameter will not have any effect.
+
+Assuming that a chromosome has 2 genes and each gene has a different
+value space. Then the ``gene_space`` could be assigned a nested
+list/tuple where each element determines the space of a gene.
+
+According to the next code, the space of the first gene is ``[0.4, -5]``
+which has 2 values and the space for the second gene is
+``[0.5, -3.2, 8.8, -9]`` which has 4 values.
+
+.. code:: python
+
+   gene_space = [[0.4, -5], [0.5, -3.2, 8.2, -9]]
+
+For a 2 gene chromosome, if the first gene space is restricted to the
+discrete values from 0 to 4 and the second gene is restricted to the
+values from 10 to 19, then it could be specified according to the next
+code.
+
+.. code:: python
+
+   gene_space = [range(5), range(10, 20)]
+
+The ``gene_space`` can also be assigned to a single range, as given
+below, where the values of all genes are sampled from the same range.
+
+.. code:: python
+
+   gene_space = numpy.arange(15)
+
+The ``gene_space`` can be assigned a dictionary to sample a value from a
+continuous range.
+
+.. code:: python
+
+   gene_space = {"low": 4, "high": 30}
+
+A step also can be assigned to the dictionary. This works as if a range
+is used.
+
+.. code:: python
+
+   gene_space = {"low": 4, "high": 30, "step": 2.5}
+
+..
+
+   Setting a ``dict`` like ``{"low": 0, "high": 10}`` in the
+   ``gene_space`` means that random values from the continuous range [0,
+   10) are sampled. Note that ``0`` is included but ``10`` is not
+   included while sampling. Thus, the maximum value that could be
+   returned is less than ``10`` like ``9.9999``. But if the user decided
+   to round the genes using, for example, ``[float, 2]``, then this
+   value will become 10. So, the user should be careful to the inputs.
+
+If a ``None`` is assigned to only a single gene, then its value will be
+randomly generated initially using the ``init_range_low`` and
+``init_range_high`` parameters in the ``pygad.GA`` class's constructor.
+During mutation, the value are sampled from the range defined by the 2
+parameters ``random_mutation_min_val`` and ``random_mutation_max_val``.
+This is an example where the second gene is given a ``None`` value.
+
+.. code:: python
+
+   gene_space = [range(5), None, numpy.linspace(10, 20, 300)]
+
+If the user did not assign the initial population to the
+``initial_population`` parameter, the initial population is created
+randomly based on the ``gene_space`` parameter. Moreover, the mutation
+is applied based on this parameter.
+
+.. _how-mutation-works-with-the-genespace-parameter:
+
+How Mutation Works with the ``gene_space`` Parameter?
+-----------------------------------------------------
+
+If a gene has its static space defined in the ``gene_space`` parameter,
+then mutation works by replacing the gene value by a value randomly
+selected from the gene space. This happens for both ``int`` and
+``float`` data types.
+
+For example, the following ``gene_space`` has the static space
+``[1, 2, 3]`` defined for the first gene. So, this gene can only have a
+value out of these 3 values.
+
+.. code:: python
+
+   Gene space: [[1, 2, 3],
+                None]
+   Solution: [1, 5]
+
+For a solution like ``[1, -0.5, 4]``, then mutation happens for the
+first gene by simply replacing its current value by a randomly selected
+value (other than its current value if possible). So, the value 1 will
+be replaced by either 2 or 3.
+
+For the second gene, its space is set to ``None``. So, traditional
+mutation happens for this gene by:
+
+1. Generating a random value from the range defined by the
+   ``random_mutation_min_val`` and ``random_mutation_max_val``
+   parameters.
+
+2. Adding this random value to the current gene's value.
+
+If its current value is 5 and the random value is ``-0.5``, then the new
+value is 4.5. If the gene type is integer, then the value will be
+rounded.
 
 Stop at Any Generation
 ======================
@@ -1882,7 +2042,7 @@ offspring will be created.
 
    ga_instance.run()
 
-.. figure:: https://user-images.githubusercontent.com/16560492/189273225-67ffad41-97ab-45e1-9324-429705e17b20.png
+.. image:: https://user-images.githubusercontent.com/16560492/189273225-67ffad41-97ab-45e1-9324-429705e17b20.png
    :alt: 
 
 Note that if the ``keep_elitism`` parameter is effective (i.e. is
@@ -2179,6 +2339,118 @@ non-duplicating genes that may make a room for a unique value in one the
 duplicates. The resultant gene is then ``[3 4 2 0]``. But this option is
 not yet supported in PyGAD.
 
+Solve Duplicates using a Third Gene
+-----------------------------------
+
+When ``allow_duplicate_genes=False`` and a user-defined ``gene_space``
+is used, it sometimes happen that there is no room to solve the
+duplicates between the 2 genes by simply replacing the value of one gene
+by another gene. In `PyGAD
+3.1.0 <https://pygad.readthedocs.io/en/latest/Footer.html#pygad-3-0-1>`__,
+the duplicates are solved by looking for a third gene that will help in
+solving the duplicates. The following examples explain how it works.
+
+Example 1:
+
+Let's assume that this gene space is used and there is a solution with 2
+duplicate genes with the same value 4.
+
+.. code:: python
+
+   Gene space: [[2, 3],
+                [3, 4],
+                [4, 5],
+                [5, 6]]
+   Solution: [3, 4, 4, 5]
+
+By checking the gene space, the second gene can have the values
+``[3, 4]`` and the third gene can have the values ``[4, 5]``. To solve
+the duplicates, we have the value of any of these 2 genes.
+
+If the value of the second gene changes from 4 to 3, then it will be
+duplicate with the first gene. If we are to change the value of the
+third gene from 4 to 5, then it will duplicate with the fourth gene. As
+a conclusion, trying to just selecting a different gene value for either
+the second or third genes will introduce new duplicating genes.
+
+When there are 2 duplicate genes but there is no way to solve their
+duplicates, then the solution is to change a third gene that makes a
+room to solve the duplicates between the 2 genes.
+
+In our example, duplicates between the second and third genes can be
+solved by, for example,:
+
+-  Changing the first gene from 3 to 2 then changing the second gene
+   from 4 to 3.
+
+-  Or changing the fourth gene from 5 to 6 then changing the third gene
+   from 4 to 5.
+
+Generally, this is how to solve such duplicates:
+
+1. For any duplicate gene **GENE1**, select another value.
+
+2. Check which other gene **GENEX** has duplicate with this new value.
+
+3. Find if **GENEX** can have another value that will not cause any more
+   duplicates. If so, go to step 7.
+
+4. If all the other values of **GENEX** will cause duplicates, then try
+   another gene **GENEY**.
+
+5. Repeat steps 3 and 4 until exploring all the genes.
+
+6. If there is no possibility to solve the duplicates, then there is not
+   way to solve the duplicates and we have to keep the duplicate value.
+
+7. If a value for a gene **GENEM** is found that will not cause more
+   duplicates, then use this value for the gene **GENEM**.
+
+8. Replace the value of the gene **GENE1** by the old value of the gene
+   **GENEM**. This solves the duplicates.
+
+This is an example to solve the duplicate for the solution
+``[3, 4, 4, 5]``:
+
+1. Let's use the second gene with value 4. Because the space of this
+   gene is ``[3, 4]``, then the only other value we can select is 3.
+
+2. The first gene also have the value 3.
+
+3. The first gene has another value 2 that will not cause more
+   duplicates in the solution. Then go to step 7.
+
+4. Skip.
+
+5. Skip.
+
+6. Skip.
+
+7. The value of the first gene 3 will be replaced by the new value 2.
+   The new solution is [2, 4, 4, 5].
+
+8. Replace the value of the second gene 4 by the old value of the first
+   gene which is 3. The new solution is [2, 3, 4, 5]. The duplicate is
+   solved.
+
+Example 2:
+
+.. code:: python
+
+   Gene space: [[0, 1], 
+                [1, 2], 
+                [2, 3],
+                [3, 4]]
+   Solution: [1, 2, 2, 3]
+
+The quick summary is:
+
+-  Change the value of the first gene from 1 to 0. The solution becomes
+   [0, 2, 2, 3].
+
+-  Change the value of the second gene from 2 to 1. The solution becomes
+   [0, 1, 2, 3]. The duplicate is solved.
+
 User-Defined Crossover, Mutation, and Parent Selection Operators
 ================================================================
 
@@ -2200,7 +2472,7 @@ Starting from `PyGAD
 the user can create a custom crossover, mutation, and parent selection
 operators and assign these functions to the above parameters. Thus, a
 new operator can be plugged easily into the `PyGAD
-Lifecycle <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#life-cycle-of-pygad>`__.
+Lifecycle <https://pygad.readthedocs.io/en/latest/pygad.html#life-cycle-of-pygad>`__.
 
 This is a sample code that does not use any custom function.
 
@@ -2586,109 +2858,6 @@ This is the same example but using methods instead of functions.
    ga_instance.run()
    ga_instance.plot_fitness()
 
-.. _more-about-the-genespace-parameter:
-
-More about the ``gene_space`` Parameter
-=======================================
-
-The ``gene_space`` parameter customizes the space of values of each
-gene.
-
-Assuming that all genes have the same global space which include the
-values 0.3, 5.2, -4, and 8, then those values can be assigned to the
-``gene_space`` parameter as a list, tuple, or range. Here is a list
-assigned to this parameter. By doing that, then the gene values are
-restricted to those assigned to the ``gene_space`` parameter.
-
-.. code:: python
-
-   gene_space = [0.3, 5.2, -4, 8]
-
-If some genes have different spaces, then ``gene_space`` should accept a
-nested list or tuple. In this case, the elements could be:
-
-1. Number (of ``int``, ``float``, or ``NumPy`` data types): A single
-   value to be assigned to the gene. This means this gene will have the
-   same value across all generations.
-
-2. ``list``, ``tuple``, ``numpy.ndarray``, or any range like ``range``,
-   ``numpy.arange()``, or ``numpy.linspace``: It holds the space for
-   each individual gene. But this space is usually discrete. That is
-   there is a set of finite values to select from.
-
-3. ``dict``: To sample a value for a gene from a continuous range. The
-   dictionary must have 2 mandatory keys which are ``"low"`` and
-   ``"high"`` in addition to an optional key which is ``"step"``. A
-   random value is returned between the values assigned to the items
-   with ``"low"`` and ``"high"`` keys. If the ``"step"`` exists, then
-   this works as the previous options (i.e. discrete set of values).
-
-4. ``None``: A gene with its space set to ``None`` is initialized
-   randomly from the range specified by the 2 parameters
-   ``init_range_low`` and ``init_range_high``. For mutation, its value
-   is mutated based on a random value from the range specified by the 2
-   parameters ``random_mutation_min_val`` and
-   ``random_mutation_max_val``. If all elements in the ``gene_space``
-   parameter are ``None``, the parameter will not have any effect.
-
-Assuming that a chromosome has 2 genes and each gene has a different
-value space. Then the ``gene_space`` could be assigned a nested
-list/tuple where each element determines the space of a gene.
-
-According to the next code, the space of the first gene is ``[0.4, -5]``
-which has 2 values and the space for the second gene is
-``[0.5, -3.2, 8.8, -9]`` which has 4 values.
-
-.. code:: python
-
-   gene_space = [[0.4, -5], [0.5, -3.2, 8.2, -9]]
-
-For a 2 gene chromosome, if the first gene space is restricted to the
-discrete values from 0 to 4 and the second gene is restricted to the
-values from 10 to 19, then it could be specified according to the next
-code.
-
-.. code:: python
-
-   gene_space = [range(5), range(10, 20)]
-
-The ``gene_space`` can also be assigned to a single range, as given
-below, where the values of all genes are sampled from the same range.
-
-.. code:: python
-
-   gene_space = numpy.arange(15)
-
-The ``gene_space`` can be assigned a dictionary to sample a value from a
-continuous range.
-
-.. code:: python
-
-   gene_space = {"low": 4, "high": 30}
-
-A step also can be assigned to the dictionary. This works as if a range
-is used.
-
-.. code:: python
-
-   gene_space = {"low": 4, "high": 30, "step": 2.5}
-
-If a ``None`` is assigned to only a single gene, then its value will be
-randomly generated initially using the ``init_range_low`` and
-``init_range_high`` parameters in the ``pygad.GA`` class's constructor.
-During mutation, the value are sampled from the range defined by the 2
-parameters ``random_mutation_min_val`` and ``random_mutation_max_val``.
-This is an example where the second gene is given a ``None`` value.
-
-.. code:: python
-
-   gene_space = [range(5), None, numpy.linspace(10, 20, 300)]
-
-If the user did not assign the initial population to the
-``initial_population`` parameter, the initial population is created
-randomly based on the ``gene_space`` parameter. Moreover, the mutation
-is applied based on this parameter.
-
 .. _more-about-the-genetype-parameter:
 
 More about the ``gene_type`` Parameter
@@ -3020,7 +3189,7 @@ line connecting the fitness values across all generations:
    ga_instance.plot_fitness()
    # ga_instance.plot_fitness(plot_type="plot")
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122472609-d02f5280-cf8e-11eb-88a7-f9366ff6e7c6.png
+.. image:: https://user-images.githubusercontent.com/16560492/122472609-d02f5280-cf8e-11eb-88a7-f9366ff6e7c6.png
    :alt: 
 
 .. _plottypescatter:
@@ -3036,7 +3205,7 @@ these dots can be changed using the ``linewidth`` parameter.
 
    ga_instance.plot_fitness(plot_type="scatter")
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122473159-75e2c180-cf8f-11eb-942d-31279b286dbd.png
+.. image:: https://user-images.githubusercontent.com/16560492/122473159-75e2c180-cf8f-11eb-942d-31279b286dbd.png
    :alt: 
 
 .. _plottypebar:
@@ -3051,7 +3220,7 @@ bar graph with each individual fitness represented as a bar.
 
    ga_instance.plot_fitness(plot_type="bar")
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122473340-b7736c80-cf8f-11eb-89c5-4f7db3b653cc.png
+.. image:: https://user-images.githubusercontent.com/16560492/122473340-b7736c80-cf8f-11eb-89c5-4f7db3b653cc.png
    :alt: 
 
 .. _plotnewsolutionrate-2:
@@ -3087,7 +3256,7 @@ first generation is always equal to the number of solutions in the
 population (i.e. the value assigned to the ``sol_per_pop`` parameter in
 the constructor of the ``pygad.GA`` class) which is 10 in this example.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122475815-3322e880-cf93-11eb-9648-bf66f823234b.png
+.. image:: https://user-images.githubusercontent.com/16560492/122475815-3322e880-cf93-11eb-9648-bf66f823234b.png
    :alt: 
 
 .. _plottypescatter-2:
@@ -3102,7 +3271,7 @@ The previous graph can be represented as scattered points by setting
 
    ga_instance.plot_new_solution_rate(plot_type="scatter")
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122476108-adec0380-cf93-11eb-80ac-7588bf90492f.png
+.. image:: https://user-images.githubusercontent.com/16560492/122476108-adec0380-cf93-11eb-80ac-7588bf90492f.png
    :alt: 
 
 .. _plottypebar-2:
@@ -3117,7 +3286,7 @@ vertical bar.
 
    ga_instance.plot_new_solution_rate(plot_type="bar")
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122476173-c2c89700-cf93-11eb-9e77-d39737cd3a96.png
+.. image:: https://user-images.githubusercontent.com/16560492/122476173-c2c89700-cf93-11eb-9e77-d39737cd3a96.png
    :alt: 
 
 .. _plotgenes-2:
@@ -3186,7 +3355,7 @@ of the next graph) lasted for 83 generations.
    ga_instance.plot_genes(graph_type="plot", 
                           plot_type="plot")
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122477158-4a62d580-cf95-11eb-8c93-9b6e74cb814c.png
+.. image:: https://user-images.githubusercontent.com/16560492/122477158-4a62d580-cf95-11eb-8c93-9b6e74cb814c.png
    :alt: 
 
 As the default value for the ``solutions`` parameter is ``"all"``, then
@@ -3222,7 +3391,7 @@ scatter plot.
                           plot_type="scatter", 
                           solutions='all')
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122477273-73836600-cf95-11eb-828f-f357c7b0f815.png
+.. image:: https://user-images.githubusercontent.com/16560492/122477273-73836600-cf95-11eb-828f-f357c7b0f815.png
    :alt: 
 
 .. _plottypebar-3:
@@ -3238,7 +3407,7 @@ scatter plot.
                           plot_type="bar", 
                           solutions='all')
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122477370-99106f80-cf95-11eb-8643-865b55e6b844.png
+.. image:: https://user-images.githubusercontent.com/16560492/122477370-99106f80-cf95-11eb-8643-865b55e6b844.png
    :alt: 
 
 .. _graphtypeboxplot:
@@ -3260,7 +3429,7 @@ figure as the default value for the ``solutions`` parameter is
    ga_instance.plot_genes(graph_type="boxplot", 
                           solutions='all')
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122479260-beeb4380-cf98-11eb-8f08-23707929b12c.png
+.. image:: https://user-images.githubusercontent.com/16560492/122479260-beeb4380-cf98-11eb-8f08-23707929b12c.png
    :alt: 
 
 .. _graphtypehistogram:
@@ -3283,7 +3452,7 @@ figure as the default value for the ``solutions`` parameter is
    ga_instance.plot_genes(graph_type="histogram", 
                           solutions='all')
 
-.. figure:: https://user-images.githubusercontent.com/16560492/122477314-8007be80-cf95-11eb-9c95-da3f49204151.png
+.. image:: https://user-images.githubusercontent.com/16560492/122477314-8007be80-cf95-11eb-9c95-da3f49204151.png
    :alt: 
 
 All the previous figures can be created for only the best solutions by
@@ -3298,7 +3467,7 @@ parallel processing becomes supported. This section explains how to use
 parallel processing in PyGAD.
 
 According to the `PyGAD
-lifecycle <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#life-cycle-of-pygad>`__,
+lifecycle <https://pygad.readthedocs.io/en/latest/pygad.html#life-cycle-of-pygad>`__,
 parallel processing can be parallelized in only 2 operations:
 
 1. Population fitness calculation.
@@ -4275,7 +4444,7 @@ Linear Model Optimization
 -------------------------
 
 This example is discussed in the `Steps to Use
-PyGAD <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#steps-to-use-pygad>`__
+PyGAD <https://pygad.readthedocs.io/en/latest/pygad.html#steps-to-use-pygad>`__
 section which optimizes a linear model. Its complete code is listed
 below.
 
@@ -4401,7 +4570,7 @@ to the next code.
 
 Here is the read image.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/36948808-f0ac882e-1fe8-11e8-8d07-1307e3477fd0.jpg
+.. image:: https://user-images.githubusercontent.com/16560492/36948808-f0ac882e-1fe8-11e8-8d07-1307e3477fd0.jpg
    :alt: 
 
 Based on the chromosome representation used in the example, the pixel
@@ -4517,7 +4686,7 @@ generations can be viewed in a plot using the ``plot_fitness()`` method.
 
 Here is the plot after 20,000 generations.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/82232124-77762c00-992e-11ea-9fc6-14a1cd7a04ff.png
+.. image:: https://user-images.githubusercontent.com/16560492/82232124-77762c00-992e-11ea-9fc6-14a1cd7a04ff.png
    :alt: 
 
 Calculate Some Statistics
@@ -4545,13 +4714,13 @@ Evolution by Generation
 
 The solution reached after the 20,000 generations is shown below.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/82232405-e0f63a80-992e-11ea-984f-b6ed76465bd1.png
+.. image:: https://user-images.githubusercontent.com/16560492/82232405-e0f63a80-992e-11ea-984f-b6ed76465bd1.png
    :alt: 
 
 After more generations, the result can be enhanced like what shown
 below.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/82232345-cf149780-992e-11ea-8390-bf1a57a19de7.png
+.. image:: https://user-images.githubusercontent.com/16560492/82232345-cf149780-992e-11ea-8390-bf1a57a19de7.png
    :alt: 
 
 The results can also be enhanced by changing the parameters passed to
@@ -4562,37 +4731,37 @@ Here is how the image is evolved from generation 0 to generation
 
 Generation 0
 
-.. figure:: https://user-images.githubusercontent.com/16560492/36948589-b47276f0-1fe5-11e8-8efe-0cd1a225ea3a.png
+.. image:: https://user-images.githubusercontent.com/16560492/36948589-b47276f0-1fe5-11e8-8efe-0cd1a225ea3a.png
    :alt: 
 
 Generation 1,000
 
-.. figure:: https://user-images.githubusercontent.com/16560492/36948823-16f490ee-1fe9-11e8-97db-3e8905ad5440.png
+.. image:: https://user-images.githubusercontent.com/16560492/36948823-16f490ee-1fe9-11e8-97db-3e8905ad5440.png
    :alt: 
 
 Generation 2,500
 
-.. figure:: https://user-images.githubusercontent.com/16560492/36948832-3f314b60-1fe9-11e8-8f4a-4d9a53b99f3d.png
+.. image:: https://user-images.githubusercontent.com/16560492/36948832-3f314b60-1fe9-11e8-8f4a-4d9a53b99f3d.png
    :alt: 
 
 Generation 4,500
 
-.. figure:: https://user-images.githubusercontent.com/16560492/36948837-53d1849a-1fe9-11e8-9b36-e9e9291e347b.png
+.. image:: https://user-images.githubusercontent.com/16560492/36948837-53d1849a-1fe9-11e8-9b36-e9e9291e347b.png
    :alt: 
 
 Generation 7,000
 
-.. figure:: https://user-images.githubusercontent.com/16560492/36948852-66f1b176-1fe9-11e8-9f9b-460804e94004.png
+.. image:: https://user-images.githubusercontent.com/16560492/36948852-66f1b176-1fe9-11e8-9f9b-460804e94004.png
    :alt: 
 
 Generation 8,000
 
-.. figure:: https://user-images.githubusercontent.com/16560492/36948865-7fbb5158-1fe9-11e8-8c04-8ac3c1f7b1b1.png
+.. image:: https://user-images.githubusercontent.com/16560492/36948865-7fbb5158-1fe9-11e8-8c04-8ac3c1f7b1b1.png
    :alt: 
 
 Generation 20,000
 
-.. figure:: https://user-images.githubusercontent.com/16560492/82232405-e0f63a80-992e-11ea-984f-b6ed76465bd1.png
+.. image:: https://user-images.githubusercontent.com/16560492/82232405-e0f63a80-992e-11ea-984f-b6ed76465bd1.png
    :alt: 
 
 Clustering

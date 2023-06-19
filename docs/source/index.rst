@@ -247,7 +247,7 @@ pygad Module
    :maxdepth: 4
    :caption: pygad Module TOC
 
-   pygad.rst
+   README_pygad_ReadTheDocs.rst
 
 
 
@@ -262,7 +262,7 @@ pygad.nn Module
    :maxdepth: 4
    :caption: pygad.nn Module TOC
 
-   nn.rst
+   README_pygad_nn_ReadTheDocs.rst
 
 
 
@@ -278,7 +278,7 @@ pygad.gann Module
    :maxdepth: 4
    :caption: pygad.gann Module TOC
 
-   gann.rst
+   README_pygad_gann_ReadTheDocs.rst
 
 
 
@@ -298,7 +298,7 @@ pygad.cnn Module
    :maxdepth: 4
    :caption: pygad.cnn Module TOC
 
-   cnn.rst
+   README_pygad_cnn_ReadTheDocs.rst
 
 
 
@@ -318,7 +318,7 @@ pygad.gacnn Module
    :maxdepth: 4
    :caption: pygad.gacnn Module TOC
 
-   gacnn.rst
+   README_pygad_gacnn_ReadTheDocs.rst
 
 
 
@@ -333,7 +333,7 @@ pygad.kerasga Module
    :maxdepth: 4
    :caption: pygad.kerasga Module TOC
 
-   kerasga.rst
+   README_pygad_kerasga_ReadTheDocs.rst
 
 
 
@@ -348,7 +348,7 @@ pygad.torchga Module
    :maxdepth: 4
    :caption: pygad.torchga Module TOC
 
-   torchga.rst
+   README_pygad_torchga_ReadTheDocs.rst
 
 
 
@@ -363,7 +363,7 @@ More Information
    :maxdepth: 4
    :caption: More Information
 
-   releases.rst
+   Footer.rst
 
 
 

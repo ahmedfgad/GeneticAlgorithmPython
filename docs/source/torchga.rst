@@ -211,7 +211,7 @@ subsections discuss each part in the code.
 
        return solution_fitness
 
-   def callback_generation(ga_instance):
+   def on_generation(ga_instance):
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
@@ -243,7 +243,7 @@ subsections discuss each part in the code.
                                 [1.3],
                                 [2.5]])
 
-   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
+   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = torch_ga.population_weights # Initial population of network weights
@@ -252,7 +252,7 @@ subsections discuss each part in the code.
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          on_generation=callback_generation)
+                          on_generation=on_generation)
 
    ga_instance.run()
 
@@ -307,8 +307,6 @@ Change this number according to your needs.
 
    torch_ga = torchga.TorchGA(model=model,
                               num_solutions=10)
-
-.. _prepare-the-training-data-1:
 
 Prepare the Training Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -372,11 +370,11 @@ The fifth step is to instantiate the ``pygad.GA`` class. Note how the
 the PyTorch models.
 
 For more information, please check the `parameters this class
-accepts <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#init>`__.
+accepts <https://pygad.readthedocs.io/en/latest/pygad.html#init>`__.
 
 .. code:: python
 
-   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
+   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = torch_ga.population_weights # Initial population of network weights
@@ -385,7 +383,7 @@ accepts <https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#in
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          on_generation=callback_generation)
+                          on_generation=on_generation)
 
 Run the Genetic Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -407,7 +405,7 @@ shows how the fitness value changes by generation. Call the
 
 Here is the figure.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/103469779-22f5b480-4d37-11eb-80dc-95503065ebb1.png
+.. image:: https://user-images.githubusercontent.com/16560492/103469779-22f5b480-4d37-11eb-80dc-95503065ebb1.png
    :alt: 
 
 To get information about the best solution found by PyGAD, use the
@@ -479,7 +477,7 @@ previous example.
 
        return solution_fitness
 
-   def callback_generation(ga_instance):
+   def on_generation(ga_instance):
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
@@ -513,7 +511,7 @@ previous example.
                                 [0.0, 1.0],
                                 [1.0, 0.0]])
 
-   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
+   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
    num_generations = 250 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = torch_ga.population_weights # Initial population of network weights.
@@ -523,7 +521,7 @@ previous example.
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          on_generation=callback_generation)
+                          on_generation=on_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
@@ -595,7 +593,7 @@ Compared to the previous regression example, here are the changes:
 After the previous code completes, the next figure shows how the fitness
 value change by generation.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/103469818-c646c980-4d37-11eb-98c3-d9d591acd5e2.png
+.. image:: https://user-images.githubusercontent.com/16560492/103469818-c646c980-4d37-11eb-98c3-d9d591acd5e2.png
    :alt: 
 
 Here is some information about the trained model. Its fitness value is
@@ -640,7 +638,7 @@ Here is the code.
 
        return solution_fitness
 
-   def callback_generation(ga_instance):
+   def on_generation(ga_instance):
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
@@ -670,7 +668,7 @@ Here is the code.
    # temp_outs = numpy.zeros((data_outputs.shape[0], numpy.unique(data_outputs).size), dtype=numpy.uint8)
    # temp_outs[numpy.arange(data_outputs.shape[0]), numpy.uint8(data_outputs)] = 1
 
-   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
+   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
    num_generations = 200 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = torch_ga.population_weights # Initial population of network weights.
@@ -680,7 +678,7 @@ Here is the code.
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          on_generation=callback_generation)
+                          on_generation=on_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
@@ -747,7 +745,7 @@ vector extracted from each image has a length 360.
 
 The next figure shows how the fitness value changes.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/103469855-5d138600-4d38-11eb-84b1-b5eff8faa7bc.png
+.. image:: https://user-images.githubusercontent.com/16560492/103469855-5d138600-4d38-11eb-84b1-b5eff8faa7bc.png
    :alt: 
 
 Here are some statistics about the trained model.
@@ -785,7 +783,7 @@ Here is the complete code.
 
        return solution_fitness
 
-   def callback_generation(ga_instance):
+   def on_generation(ga_instance):
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
        print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
@@ -829,7 +827,7 @@ Here is the complete code.
    # Data outputs
    data_outputs = torch.from_numpy(numpy.load("dataset_outputs.npy")).long()
 
-   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html#pygad-ga-class
+   # Prepare the PyGAD parameters. Check the documentation for more information: https://pygad.readthedocs.io/en/latest/pygad.html#pygad-ga-class
    num_generations = 200 # Number of generations.
    num_parents_mating = 5 # Number of solutions to be selected as parents in the mating pool.
    initial_population = torch_ga.population_weights # Initial population of network weights.
@@ -839,7 +837,7 @@ Here is the complete code.
                           num_parents_mating=num_parents_mating, 
                           initial_population=initial_population,
                           fitness_func=fitness_func,
-                          on_generation=callback_generation)
+                          on_generation=on_generation)
 
    # Start the genetic algorithm evolution.
    ga_instance.run()
@@ -916,7 +914,7 @@ The data consists of 4 classes of images. The image shape is
 ``(100, 100, 3)`` and there are 20 images per class for a total of 80
 training samples. For more information about the dataset, check the
 `Reading the
-Data <https://pygad.readthedocs.io/en/latest/README_pygad_cnn_ReadTheDocs.html#reading-the-data>`__
+Data <https://pygad.readthedocs.io/en/latest/cnn.html#reading-the-data>`__
 section of the ``pygad.cnn`` module.
 
 Simply download these 2 files and read them according to the next code.
@@ -931,7 +929,7 @@ Simply download these 2 files and read them according to the next code.
 
 The next figure shows how the fitness value changes.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/103469887-c7c4c180-4d38-11eb-98a7-1c5e73e918d0.png
+.. image:: https://user-images.githubusercontent.com/16560492/103469887-c7c4c180-4d38-11eb-98a7-1c5e73e918d0.png
    :alt: 
 
 Here are some statistics about the trained model. The model accuracy is
