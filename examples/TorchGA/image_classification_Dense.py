@@ -14,7 +14,7 @@ def fitness_func(ga_instanse, solution, sol_idx):
 
     return solution_fitness
 
-def callback_generation(ga_instance):
+def on_generation(ga_instance):
     print("Generation = {generation}".format(generation=ga_instance.generations_completed))
     print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
 
@@ -54,7 +54,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
                        num_parents_mating=num_parents_mating, 
                        initial_population=initial_population,
                        fitness_func=fitness_func,
-                       on_generation=callback_generation)
+                       on_generation=on_generation)
 
 # Start the genetic algorithm evolution.
 ga_instance.run()
