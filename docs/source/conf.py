@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'PyGAD'
-copyright = '2020, Ahmed Fawzy Gad'
+copyright = '2023, Ahmed Fawzy Gad'
 author = 'Ahmed Fawzy Gad'
 
 # The full version, including alpha/beta/rc tags
