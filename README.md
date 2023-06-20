@@ -21,7 +21,7 @@ The library is under active development and more features are added regularly. I
 
 # Installation
 
-To install [PyGAD](https://pypi.org/project/pygad), simply use pip to download and install the library from [PyPI](https://pypi.org/project/pygad) (Python Package Index). The library lives a PyPI at this page https://pypi.org/project/pygad.
+To install [PyGAD](https://pypi.org/project/pygad), simply use pip to download and install the library from [PyPI](https://pypi.org/project/pygad) (Python Package Index). The library is at PyPI at this page https://pypi.org/project/pygad.
 
 Install PyGAD with the following command:
 
@@ -29,7 +29,7 @@ Install PyGAD with the following command:
 pip install pygad
 ```
 
-To get started with PyGAD, please read the documentation at [Read The Docs](https://pygad.readthedocs.io) https://pygad.readthedocs.io.
+To get started with PyGAD, please read the documentation at [Read The Docs](https://pygad.readthedocs.io/) https://pygad.readthedocs.io.
 
 # PyGAD Source Code
 
@@ -146,7 +146,7 @@ on_stop()
 
 # Example
 
-Check the [PyGAD's documentation](https://pygad.readthedocs.io/en/latest/README_pygad_ReadTheDocs.html) for information about the implementation of this example.
+Check the [PyGAD's documentation](https://pygad.readthedocs.io/en/latest/pygad.html) for information about the implementation of this example.
 
 ```python
 import pygad

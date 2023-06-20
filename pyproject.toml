@@ -1,10 +1,15 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+# Consider migrating to hatching later: https://hatch.pypa.io/latest/intro/#existing-project
+# requires = ["setuptools>=61.0"]
+# requires = ["setuptools==59.2"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+# requires = ["hatchling"]
+# build-backend = "hatchling.build"
 
 [project]
 name = "pygad"
-version = "3.0.1"
+version = "3.1.0"
 description = "PyGAD: A Python Library for Building the Genetic Algorithm and Training Machine Learning Algoithms (Keras & PyTorch)."
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3"
