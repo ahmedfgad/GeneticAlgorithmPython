@@ -18,17 +18,6 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
-
-[tool.hatch.version]
-path = "pygad/__init__.py"
-
-[tool.hatch.build.targets.sdist]
-include = [
-    "/pygad",
-]
-
-[project.urls]
 "Homepage" = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
 "Documentation" = "https://pygad.readthedocs.io"
 "GitHub Repository" = "https://github.com/ahmedfgad/GeneticAlgorithmPython"
@@ -37,6 +26,14 @@ include = [
 "Donation Stripe" = "https://donate.stripe.com/eVa5kO866elKgM0144"
 "Donation Open Collective" = "https://opencollective.com/pygad"
 "Donation Paypal" = "http://paypal.me/ahmedfgad"
+
+[tool.hatch.version]
+path = "pygad/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/pygad",
+]
 
 [project.optional-dependencies]
 deep_learning = ["keras", "torch"]
