@@ -6,11 +6,12 @@ name: PyGAD PyTest / Python 3.12
 # But Python 3.12 does not support distutils.
 # Let's wait until setuptools changes its dependencies.
 
-on:
-  push:
-    branches:
+# on:
+#   push:
+#     branches:
       # - github-actions
       # - master
+on: workflow_dispatch
 
 jobs:
   job_id_1:
