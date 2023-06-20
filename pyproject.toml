@@ -1,20 +1,47 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+# Consider migrating to hatching later: https://hatch.pypa.io/latest/intro/#existing-project
+# requires = ["setuptools>=61.0"]
+# requires = ["setuptools==59.2"]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+# requires = ["hatchling"]
+# build-backend = "hatchling.build"
 
 [project]
 name = "pygad"
-dynamic = ["version"]
+version = "3.1.0"
 description = "PyGAD: A Python Library for Building the Genetic Algorithm and Training Machine Learning Algoithms (Keras & PyTorch)."
-readme = "README.md"
-license = ""
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3"
+license = {file = "LICENSE"}
 authors = [
-    { name = "Ahmed Fawzy Gad", email = "ahmed.f.gad@gmail.com" },
+  {name = "Ahmed Gad", email = "ahmed.f.gad@gmail.com"},
 ]
+maintainers = [
+{name = "Ahmed Gad", email = "ahmed.f.gad@gmail.com"}
+]
+classifiers = [
+  "License :: OSI Approved :: BSD License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development",
+  "Topic :: Utilities",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Intended Audience :: Other Audience"
+]
+keywords = ["genetic algorithm", "GA", "optimization", "evolutionary algorithm", "natural evolution", "pygad", "machine learning", "deep learning", "neural networks", "tensorflow", "keras", "pytorch"]
 dependencies = [
-    "cloudpickle",
-    "matplotlib",
-    "numpy",
+  "numpy",
+  "matplotlib",
+  "cloudpickle",
 ]
 
 [project.urls]
@@ -26,14 +53,6 @@ dependencies = [
 "Donation Stripe" = "https://donate.stripe.com/eVa5kO866elKgM0144"
 "Donation Open Collective" = "https://opencollective.com/pygad"
 "Donation Paypal" = "http://paypal.me/ahmedfgad"
-
-[tool.hatch.version]
-path = "pygad/__init__.py"
-
-[tool.hatch.build.targets.sdist]
-include = [
-    "/pygad",
-]
 
 [project.optional-dependencies]
 deep_learning = ["keras", "torch"]
