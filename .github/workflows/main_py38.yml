@@ -1,4 +1,4 @@
-name: Python 3.8 Testing PyGAD using PyTest
+name: PyGAD PyTest / Python 3.8
 
 on:
   push:
