@@ -1290,6 +1290,115 @@ Release Date 20 April 2023
    selection.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/179
 
+.. _pygad-310:
+
+PyGAD 3.1.0
+-----------
+
+Release Date 20 June 2023
+
+1.  Fix a bug when the initial population has duplciate genes if a
+    nested gene space is used.
+
+2.  The ``gene_space`` parameter can no longer be assigned a tuple.
+
+3.  Fix a bug when the ``gene_space`` parameter has a member of type
+    ``tuple``.
+
+4.  A new instance attribute called ``gene_space_unpacked`` which has
+    the unpacked ``gene_space``. It is used to solve duplicates. For
+    infinite ranges in the ``gene_space``, they are unpacked to a
+    limited number of values (e.g. 100).
+
+5.  Bug fixes when creating the initial population using ``gene_space``
+    attribute.
+
+6.  When a ``dict`` is used with the ``gene_space`` attribute, the new
+    gene value was calculated by summing 2 values: 1) the value sampled
+    from the ``dict`` 2) a random value returned from the random
+    mutation range defined by the 2 parameters
+    ``random_mutation_min_val`` and ``random_mutation_max_val``. This
+    might cause the gene value to exceed the range limit defined in the
+    ``gene_space``. To respect the ``gene_space`` range, this release
+    only returns the value from the ``dict`` without summing it to a
+    random value.
+
+7.  Formatting the strings using f-string instead of the ``format()``
+    method. https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/189
+
+8.  In the ``__init__()`` of the ``pygad.GA`` class, the logged error
+    messages are handled using a ``try-except`` block instead of
+    repeating the ``logger.error()`` command.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/189
+
+9.  A new class named ``CustomLogger`` is created in the ``pygad.cnn``
+    module to create a default logger using the ``logging`` module
+    assigned to the ``logger`` attribute. This class is extended in all
+    other classes in the module. The constructors of these classes have
+    a new parameter named ``logger`` which defaults to ``None``. If no
+    logger is passed, then the default logger in the ``CustomLogger``
+    class is used.
+
+10. Except for the ``pygad.nn`` module, the ``print()`` function in all
+    other modules are replaced by the ``logging`` module to log
+    messages.
+
+11. The callback functions/methods ``on_fitness()``, ``on_parents()``,
+    ``on_crossover()``, and ``on_mutation()`` can return values. These
+    returned values override the corresponding properties. The output of
+    ``on_fitness()`` overrides the population fitness. The
+    ``on_parents()`` function/method must return 2 values representing
+    the parents and their indices. The output of ``on_crossover()``
+    overrides the crossover offspring. The output of ``on_mutation()``
+    overrides the mutation offspring.
+
+12. Fix a bug when adaptive mutation is used while
+    ``fitness_batch_size``>1.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/195
+
+13. When ``allow_duplicate_genes=False`` and a user-defined
+    ``gene_space`` is used, it sometimes happen that there is no room to
+    solve the duplicates between the 2 genes by simply replacing the
+    value of one gene by another gene. This release tries to solve such
+    duplicates by looking for a third gene that will help in solving the
+    duplicates. These examples explain how it works. Check `this
+    section <https://pygad.readthedocs.io/en/latest/pygad.html#prevent-duplicates-in-gene-values>`__
+    for more information.
+
+14. Use probabilities to select parents using the rank parent selection
+    method.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/205
+
+15. The 2 parameters ``random_mutation_min_val`` and
+    ``random_mutation_max_val`` can accept iterables
+    (list/tuple/numpy.ndarray) with length equal to the number of genes.
+    This enables customizing the mutation range for each individual
+    gene.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/198
+
+16. The 2 parameters ``init_range_low`` and ``init_range_high`` can
+    accept iterables (list/tuple/numpy.ndarray) with length equal to the
+    number of genes. This enables customizing the initial range for each
+    individual gene when creating the initial population.
+
+17. The ``data`` parameter in the ``predict()`` function of the
+    ``pygad.kerasga`` module can be assigned a data generator.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/115
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/207
+
+18. The ``predict()`` function of the ``pygad.kerasga`` module accepts 3
+    optional parameters: 1) ``batch_size=None``, ``verbose=0``, and
+    ``steps=None``. Check documentation of the `Keras
+    Model.predict() <https://keras.io/api/models/model_training_apis>`__
+    method for more information.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/207
+
+19. The documentation is updated to explain how mutation works when
+    ``gene_space`` is used with ``int`` or ``float`` data types. Check
+    `this
+    section <https://pygad.readthedocs.io/en/latest/pygad.html#limit-the-gene-value-range-using-the-gene-space-parameter>`__.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/198
+
 PyGAD Projects at GitHub
 ========================
 
