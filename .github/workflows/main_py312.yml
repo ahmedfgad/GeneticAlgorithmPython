@@ -22,8 +22,9 @@ jobs:
 
       - name: Build PyGAD from the Repository
         run: |
-          python3 -m pip install --upgrade build
-          python3 -m build
+          # python3 -m pip install --upgrade build
+          python3 -m build --sdist --wheel
+          # python3 -m build
 
       - name: Install PyGAD after Building the .whl File
         run: |
