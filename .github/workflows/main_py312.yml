@@ -1,4 +1,4 @@
-name: PyGAD PyTest / Python 3.12
+name: PyGAD PyTest - Python 3.12
 
 on:
   push:
