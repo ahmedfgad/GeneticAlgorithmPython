@@ -1,9 +1,15 @@
 name: PyGAD PyTest / Python 3.12
 
+# Cannot install packages in Python 3.12.
+# The reason is that we use setuptools to install the packages.
+# setuptools depends on distutils.
+# But Python 3.12 does not support distutils.
+# Let's wait until setuptools changes its dependencies.
+
 on:
   push:
     branches:
-      - github-actions
+      # - github-actions
       # - master
 
 jobs:
@@ -22,19 +28,12 @@ jobs:
 
       - name: Build PyGAD from the Repository
         run: |
-          # pip3 install distutils
-          echo 'SETUPTOOLS_USE_DISTUTILS=stdlib'
-          # sudo apt-get install python3-distutils
           python3 -m pip install --upgrade build
           python3 -m build
 
-          # pip3 install setuptools==58.2.0
-          # python3.12 -m build --sdist --wheel
-
       - name: Install PyGAD after Building the .whl File
         run: |
-          # find ./dist/*.whl | xargs pip install
-          find ./dist/*.whl | xargs python3.12 -m pip install
+          find ./dist/*.whl | xargs pip install
 
       - name: Install PyTest
         run: pip install pytest
