@@ -32,7 +32,7 @@ jobs:
 
       - name: Install PyGAD after Building the .whl File
         run: |
-          find ./dist/*.whl | xargs -m pip install
+          find ./dist/*.whl | xargs pip install
           # find ./dist/*.whl | xargs python3.12 -m pip install
 
       - name: Install PyTest
