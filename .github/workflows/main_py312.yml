@@ -1,4 +1,4 @@
-name: PyGAD PyTest - Python 3.12
+name: PyGAD PyTest / Python 3.12
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
       - name: Setup Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12' 
+          python-version: '3.12.0-beta.2' 
 
       - name: Build PyGAD from the Repository
         run: |
