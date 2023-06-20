@@ -22,7 +22,8 @@ jobs:
 
       - name: Build PyGAD from the Repository
         run: |
-          pip3 install distutils
+          # pip3 install distutils
+          sudo apt-get install python3-distutils
           python3 -m pip install --upgrade build
           python3 -m build
 
