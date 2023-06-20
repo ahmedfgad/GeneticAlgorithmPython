@@ -23,6 +23,7 @@ jobs:
       - name: Build PyGAD from the Repository
         run: |
           # python3 -m pip install --upgrade build
+          pip3 install setuptools==58.2.0
           pip3 install build
           python3 -m build --sdist --wheel
           # python3 -m build
