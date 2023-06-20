@@ -25,12 +25,12 @@ jobs:
           # python3 -m pip install --upgrade build
           pip3 install setuptools==58.2.0
           pip3 install build
-          python3 -m build --sdist --wheel
+          python3.12 -m build --sdist --wheel
           # python3 -m build
 
       - name: Install PyGAD after Building the .whl File
         run: |
-          find ./dist/*.whl | xargs python3 -m pip install
+          find ./dist/*.whl | xargs python3.12 -m pip install
 
       - name: Install PyTest
         run: pip install pytest
