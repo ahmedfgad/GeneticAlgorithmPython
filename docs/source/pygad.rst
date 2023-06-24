@@ -4136,6 +4136,107 @@ and also saved in the text file.
    2023-04-03 19:04:27 INFO: Generation = 10
    2023-04-03 19:04:27 INFO: Fitness    = 0.000389832593101348
 
+Solve Non-Deterministic Problems
+================================
+
+PyGAD can be used to solve both deterministic and non-deterministic
+problems. Deterministic are those that return the same fitness for the
+same solution. For non-deterministic problems, a different fitness value
+would be returned for the same solution.
+
+By default, PyGAD settings are set to solve deterministic problems.
+PyGAD can save the explored solutions and their fitness to reuse in the
+future. These instances attributes can save the solutions:
+
+1. ``solutions``: Exists if ``save_solutions=True``.
+
+2. ``best_solutions``: Exists if ``save_best_solutions=True``.
+
+3. ``last_generation_elitism``: Exists if ``keep_elitism`` > 0.
+
+4. ``last_generation_parents``: Exists if ``keep_parents`` > 0 or
+   ``keep_parents=-1``.
+
+To configure PyGAD for non-deterministic problems, we have to disable
+saving the previous solutions. This is by setting these parameters:
+
+1. ``keep_elisitm=0``
+
+2. ``keep_parents=0``
+
+3. ``keep_solutions=False``
+
+4. ``keep_best_solutions=False``
+
+.. code:: python
+
+   import pygad
+   ...
+   ga_instance = pygad.GA(...,
+                          keep_elitism=0,
+                          keep_parents=0,
+                          save_solutions=False,
+                          save_best_solutions=False,
+                          ...)
+
+This way PyGAD will not save any explored solution and thus the fitness
+function have to be called for each individual solution.
+
+Reuse the Fitness instead of Calling the Fitness Function
+=========================================================
+
+It may happen that a previously explored solution in generation X is
+explored again in another generation Y (where Y > X). For some problems,
+calling the fitness function takes much time.
+
+For deterministic problems, it is better to not call the fitness
+function for an already explored solutions. Instead, reuse the fitness
+of the old solution. PyGAD supports some options to help you save time
+calling the fitness function for a previously explored solution.
+
+The parameters explored in this section can be set in the constructor of
+the ``pygad.GA`` class.
+
+The ``cal_pop_fitness()`` method of the ``pygad.GA`` class checks these
+parameters to see if there is a possibility of reusing the fitness
+instead of calling the fitness function.
+
+.. _1-savesolutions:
+
+1. ``save_solutions``
+---------------------
+
+It defaults to ``False``. If set to ``True``, then the population of
+each generation is saved into the ``solutions`` attribute of the
+``pygad.GA`` instance. In other words, every single solution is saved in
+the ``solutions`` attribute.
+
+.. _2-savebestsolutions:
+
+2. ``save_best_solutions``
+--------------------------
+
+It defaults to ``False``. If ``True``, then it only saves the best
+solution in every generation.
+
+.. _3-keepelitism:
+
+3. ``keep_elitism``
+-------------------
+
+It accepts an integer and defaults to 1. If set to a positive integer,
+then it keeps the elitism of one generation available in the next
+generation.
+
+.. _4-keepparents:
+
+4. ``keep_parents``
+-------------------
+
+It accepts an integer and defaults to -1. It set to ``-1`` or a positive
+integer, then it keeps the parents of one generation available in the
+next generation.
+
 Batch Fitness Calculation
 =========================
 

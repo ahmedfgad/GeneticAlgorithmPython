@@ -1646,11 +1646,15 @@ class GA(utils.parent_selection.ParentSelection,
                     # The functions numpy.any()/numpy.all()/numpy.where()/numpy.equal() are very slow.
                     # So, list membership operator 'in' is used to check if the solution exists in the 'self.solutions' list.
                     # Make sure that both the solution and 'self.solutions' are of type 'list' not 'numpy.ndarray'.
-                    # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(self.solutions == numpy.array(sol), axis=1))):
-                    # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(numpy.equal(self.solutions, numpy.array(sol)), axis=1))):
+                    # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(self.solutions == numpy.array(sol), axis=1)))
+                    # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(numpy.equal(self.solutions, numpy.array(sol)), axis=1)))
+                    # print("BBBBBB", len(self.best_solutions))
                     if (self.save_solutions) and (len(self.solutions) > 0) and (list(sol) in self.solutions):
                         solution_idx = self.solutions.index(list(sol))
                         fitness = self.solutions_fitness[solution_idx]
+                    elif (self.save_best_solutions) and (len(self.best_solutions) > 0) and (list(sol) in self.best_solutions):
+                        solution_idx = self.best_solutions.index(list(sol))
+                        fitness = self.best_solutions_fitness[solution_idx]
                     elif (self.keep_elitism > 0) and (self.last_generation_elitism is not None) and (len(self.last_generation_elitism) > 0) and (list(sol) in last_generation_elitism_as_list):
                         # Return the index of the elitism from the elitism array 'self.last_generation_elitism'.
                         # This is not its index within the population. It is just its index in the 'self.last_generation_elitism' array.
@@ -1859,7 +1863,7 @@ class GA(utils.parent_selection.ParentSelection,
 
             # Appending the best solution in the initial population to the best_solutions list.
             if self.save_best_solutions:
-                self.best_solutions.append(best_solution)
+                self.best_solutions.append(list(best_solution))
 
             for generation in range(generation_first_idx, generation_last_idx):
                 if not (self.on_fitness is None):
@@ -2085,7 +2089,7 @@ class GA(utils.parent_selection.ParentSelection,
 
                 # Appending the best solution in the current generation to the best_solutions list.
                 if self.save_best_solutions:
-                    self.best_solutions.append(best_solution)
+                    self.best_solutions.append(list(best_solution))
 
                 # If the on_generation attribute is not None, then cal the callback function after the generation.
                 if not (self.on_generation is None):
