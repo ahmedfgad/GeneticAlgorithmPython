@@ -1648,7 +1648,6 @@ class GA(utils.parent_selection.ParentSelection,
                     # Make sure that both the solution and 'self.solutions' are of type 'list' not 'numpy.ndarray'.
                     # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(self.solutions == numpy.array(sol), axis=1)))
                     # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(numpy.equal(self.solutions, numpy.array(sol)), axis=1)))
-                    # print("BBBBBB", len(self.best_solutions))
                     if (self.save_solutions) and (len(self.solutions) > 0) and (list(sol) in self.solutions):
                         solution_idx = self.solutions.index(list(sol))
                         fitness = self.solutions_fitness[solution_idx]
