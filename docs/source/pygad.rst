@@ -4237,6 +4237,48 @@ It accepts an integer and defaults to -1. It set to ``-1`` or a positive
 integer, then it keeps the parents of one generation available in the
 next generation.
 
+Why the Fitness Function is not Called for Solution at Index 0?
+===============================================================
+
+PyGAD has a parameter called ``keep_elitism`` which defaults to 1. This
+parameter defines the number of best solutions in generation **X** to
+keep in the next generation **X+1**. The best solutions are just copied
+from generation **X** to generation **X+1** without making any change.
+
+.. code:: python
+
+   ga_instance = pygad.GA(...,
+                          keep_elitism=1,
+                          ...)
+
+The best solutions are copied at the beginning of the population. If
+``keep_elitism=1``, this means the best solution in generation X is kept
+in the next generation X+1 at index 0 of the population. If
+``keep_elitism=2``, this means the 2 best solutions in generation X are
+kept in the next generation X+1 at indices 0 and 1 of the population of
+generation 1.
+
+Because the fitness of these best solutions are already calculated in
+generation X, then their fitness values will not be recalculated at
+generation X+1 (i.e. the fitness function will not be called for these
+solutions again). Instead, their fitness values are just reused. This is
+why you see that no solution with index 0 is passed to the fitness
+function.
+
+To force calling the fitness function for each solution in every
+generation, consider setting ``keep_elitism`` and ``keep_parents`` to 0.
+Moreover, keep the 2 parameters ``save_solutions`` and
+``save_best_solutions`` to their default value ``False``.
+
+.. code:: python
+
+   ga_instance = pygad.GA(...,
+                          keep_elitism=0,
+                          keep_parents=0,
+                          save_solutions=False,
+                          save_best_solutions=False,
+                          ...)
+
 Batch Fitness Calculation
 =========================
 
