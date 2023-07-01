@@ -909,7 +909,9 @@ It accepts the following parameters:
 -  ``pop_fitness=None``: An optional parameter that accepts a list of
    the fitness values of the solutions in the population. If ``None``,
    then the ``cal_pop_fitness()`` method is called to calculate the
-   fitness values of the population.
+   fitness values of the ``self.population``. Use 
+   ``ga_instance.last_generation_fitness`` to use latest fitness value
+   and skip recalculation of the population fitness.
 
 It returns the following:
 
