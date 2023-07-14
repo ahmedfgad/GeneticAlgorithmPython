@@ -535,7 +535,7 @@ value (i.e. accuracy) of 100 is reached after around 180 generations.
 
    ga_instance.plot_fitness()
 
-.. figure:: https://user-images.githubusercontent.com/16560492/82078638-c11e0700-96e1-11ea-8aa9-c36761c5e9c7.png
+.. image:: https://user-images.githubusercontent.com/16560492/82078638-c11e0700-96e1-11ea-8aa9-c36761c5e9c7.png
    :alt: 
 
 By running the code again, a different initial population is created and
@@ -930,7 +930,7 @@ The number of wrong classifications is only 1 and the accuracy is
 
 The next figure shows how fitness value evolves by generation.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/82152993-21898180-9865-11ea-8387-b995f88b83f7.png
+.. image:: https://user-images.githubusercontent.com/16560492/82152993-21898180-9865-11ea-8387-b995f88b83f7.png
    :alt: 
 
 Regression Example 1
@@ -998,10 +998,10 @@ for regression.
        GANN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
-       print("Change     = {change}".format(change=ga_instance.best_solution()[1] - last_fitness))
+       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1]))
+       print("Change     = {change}".format(change=ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1] - last_fitness))
 
-       last_fitness = ga_instance.best_solution()[1].copy()
+       last_fitness = ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1].copy()
 
    # Holds the fitness value of the previous generation.
    last_fitness = 0
@@ -1011,8 +1011,8 @@ for regression.
                               [8, 15, 20, 13]])
 
    # Preparing the NumPy array of the outputs.
-   data_outputs = numpy.array([0.1, 
-                               1.5])
+   data_outputs = numpy.array([[0.1, 0.2],
+                               [1.8, 1.5]])
 
    # The length of the input vector for each sample (i.e. number of neurons in the input layer).
    num_inputs = data_inputs.shape[1]
@@ -1022,7 +1022,7 @@ for regression.
    GANN_instance = pygad.gann.GANN(num_solutions=num_solutions,
                                    num_neurons_input=num_inputs,
                                    num_neurons_hidden_layers=[2],
-                                   num_neurons_output=1,
+                                   num_neurons_output=2,
                                    hidden_activations=["relu"],
                                    output_activation="None")
 
@@ -1071,7 +1071,7 @@ for regression.
    ga_instance.plot_fitness()
 
    # Returning the details of the best solution.
-   solution, solution_fitness, solution_idx = ga_instance.best_solution()
+   solution, solution_fitness, solution_idx = ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)
    print("Parameters of the best solution : {solution}".format(solution=solution))
    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
@@ -1092,7 +1092,7 @@ for regression.
 The next figure shows how the fitness value changes for the generations
 used.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/92948154-3cf24b00-f459-11ea-94ea-952b66ab2145.png
+.. image:: https://user-images.githubusercontent.com/16560492/92948154-3cf24b00-f459-11ea-94ea-952b66ab2145.png
    :alt: 
 
 Regression Example 2 - Fish Weight Prediction
@@ -1164,15 +1164,15 @@ Here is the complete code.
        GANN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
        print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
-       print("Change     = {change}".format(change=ga_instance.best_solution()[1] - last_fitness))
+       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1]))
+       print("Change     = {change}".format(change=ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1] - last_fitness))
 
-       last_fitness = ga_instance.best_solution()[1].copy()
+       last_fitness = ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1].copy()
 
    # Holds the fitness value of the previous generation.
    last_fitness = 0
 
-   data = numpy.array(pandas.read_csv("Fish.csv"))
+   data = numpy.array(pandas.read_csv("../data/Fish.csv"))
 
    # Preparing the NumPy array of the inputs.
    data_inputs = numpy.asarray(data[:, 2:], dtype=numpy.float32)
@@ -1237,7 +1237,7 @@ Here is the complete code.
    ga_instance.plot_fitness()
 
    # Returning the details of the best solution.
-   solution, solution_fitness, solution_idx = ga_instance.best_solution()
+   solution, solution_fitness, solution_idx = ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)
    print("Parameters of the best solution : {solution}".format(solution=solution))
    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
    print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
@@ -1258,5 +1258,5 @@ Here is the complete code.
 The next figure shows how the fitness value changes for the 500
 generations used.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/92948486-bbe78380-f459-11ea-9e31-0d4c7269d606.png
+.. image:: https://user-images.githubusercontent.com/16560492/92948486-bbe78380-f459-11ea-9e31-0d4c7269d606.png
    :alt: 

@@ -345,7 +345,11 @@ class GA(utils.parent_selection.ParentSelection,
             elif len(gene_type) == 2 and gene_type[0] in GA.supported_float_types and (type(gene_type[1]) in GA.supported_int_types or gene_type[1] is None):
                 self.gene_type = gene_type
                 self.gene_type_single = True
-            # A single data type of int with precision.
+            # A single data type of integer with precision None ([int, None]).
+            elif len(gene_type) == 2 and gene_type[0] in GA.supported_int_types and gene_type[1] is None:
+                self.gene_type = gene_type
+                self.gene_type_single = True
+            # Raise an exception for a single data type of int with integer precision.
             elif len(gene_type) == 2 and gene_type[0] in GA.supported_int_types and (type(gene_type[1]) in GA.supported_int_types or gene_type[1] is None):
                 self.gene_type_single = False
                 raise ValueError(f"Integers cannot have precision. Please use the integer data type directly instead of {gene_type}.")
@@ -362,10 +366,8 @@ class GA(utils.parent_selection.ParentSelection,
                     self.valid_parameters = False
                     raise ValueError(f"When the parameter 'gene_type' is nested, then it can be either [float, int<precision>] or with length equal to the value passed to the 'num_genes' parameter. Instead, value {gene_type} with len(gene_type) ({len(gene_type)}) != len(num_genes) ({num_genes}) found.")
                 for gene_type_idx, gene_type_val in enumerate(gene_type):
-                    if gene_type_val in GA.supported_float_types:
-                        # If the gene type is float and no precision is passed, set it to None.
-                        gene_type[gene_type_idx] = [gene_type_val, None]
-                    elif gene_type_val in GA.supported_int_types:
+                    if gene_type_val in GA.supported_int_float_types:
+                        # If the gene type is float and no precision is passed or an integer, set its precision to None.
                         gene_type[gene_type_idx] = [gene_type_val, None]
                     elif type(gene_type_val) in [list, tuple, numpy.ndarray]:
                         # A float type is expected in a list/tuple/numpy.ndarray of length 2.
@@ -376,6 +378,12 @@ class GA(utils.parent_selection.ParentSelection,
                                 else:
                                     self.valid_parameters = False
                                     raise TypeError(f"In the 'gene_type' parameter, the precision for float gene data types must be an integer but the element {gene_type_val} at index {gene_type_idx} has a precision of {gene_type_val[1]} with type {gene_type_val[0]}.")
+                            elif gene_type_val[0] in GA.supported_int_types:
+                                if gene_type_val[1] is None:
+                                    pass
+                                else:
+                                    self.valid_parameters = False
+                                    raise TypeError(f"In the 'gene_type' parameter, either do not set a precision for integer data types or set it to None. But the element {gene_type_val} at index {gene_type_idx} has a precision of {gene_type_val[1]} with type {gene_type_val[0]}.")
                             else:
                                 self.valid_parameters = False
                                 raise TypeError(
@@ -1638,11 +1646,14 @@ class GA(utils.parent_selection.ParentSelection,
                     # The functions numpy.any()/numpy.all()/numpy.where()/numpy.equal() are very slow.
                     # So, list membership operator 'in' is used to check if the solution exists in the 'self.solutions' list.
                     # Make sure that both the solution and 'self.solutions' are of type 'list' not 'numpy.ndarray'.
-                    # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(self.solutions == numpy.array(sol), axis=1))):
-                    # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(numpy.equal(self.solutions, numpy.array(sol)), axis=1))):
+                    # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(self.solutions == numpy.array(sol), axis=1)))
+                    # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(numpy.equal(self.solutions, numpy.array(sol)), axis=1)))
                     if (self.save_solutions) and (len(self.solutions) > 0) and (list(sol) in self.solutions):
                         solution_idx = self.solutions.index(list(sol))
                         fitness = self.solutions_fitness[solution_idx]
+                    elif (self.save_best_solutions) and (len(self.best_solutions) > 0) and (list(sol) in self.best_solutions):
+                        solution_idx = self.best_solutions.index(list(sol))
+                        fitness = self.best_solutions_fitness[solution_idx]
                     elif (self.keep_elitism > 0) and (self.last_generation_elitism is not None) and (len(self.last_generation_elitism) > 0) and (list(sol) in last_generation_elitism_as_list):
                         # Return the index of the elitism from the elitism array 'self.last_generation_elitism'.
                         # This is not its index within the population. It is just its index in the 'self.last_generation_elitism' array.
@@ -1851,7 +1862,7 @@ class GA(utils.parent_selection.ParentSelection,
 
             # Appending the best solution in the initial population to the best_solutions list.
             if self.save_best_solutions:
-                self.best_solutions.append(best_solution)
+                self.best_solutions.append(list(best_solution))
 
             for generation in range(generation_first_idx, generation_last_idx):
                 if not (self.on_fitness is None):
@@ -2077,7 +2088,7 @@ class GA(utils.parent_selection.ParentSelection,
 
                 # Appending the best solution in the current generation to the best_solutions list.
                 if self.save_best_solutions:
-                    self.best_solutions.append(best_solution)
+                    self.best_solutions.append(list(best_solution))
 
                 # If the on_generation attribute is not None, then cal the callback function after the generation.
                 if not (self.on_generation is None):
