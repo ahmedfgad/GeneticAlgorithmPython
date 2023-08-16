@@ -476,6 +476,9 @@ class Mutation:
         if self.fitness_batch_size in [1, None]:
             # Calculate the fitness for each individual solution.
             for idx in range(first_idx, last_idx):
+                # We cannot return the index of the solution within the population.
+                # Because the new solution (offspring) does not yet exist in the population.
+                # The user should handle this situation if the solution index is used anywhere.
                 fitness[idx] = self.fitness_func(self, 
                                                  temp_population[idx], 
                                                  None)
@@ -495,6 +498,9 @@ class Mutation:
                     batch_last_index = first_idx + (batch_idx + 1) * self.fitness_batch_size
 
                 # Calculate the fitness values for the batch.
+                # We cannot return the index/indices of the solution(s) within the population.
+                # Because the new solution(s) (offspring) do(es) not yet exist in the population.
+                # The user should handle this situation if the solution index is used anywhere.
                 fitness_temp = self.fitness_func(self, 
                                                  temp_population[batch_first_index:batch_last_index], 
                                                  None) 
