@@ -649,6 +649,10 @@ its complete code is listed below.
    def fitness_func(ga_instance, solution, sol_idx):
        global GANN_instance, data_inputs, data_outputs
 
+       # If adaptive mutation is used, sometimes sol_idx is None.
+       if sol_idx == None:
+           sol_idx = 1
+
        predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[sol_idx],
                                       data_inputs=data_inputs)
        correct_predictions = numpy.where(predictions == data_outputs)[0].size
@@ -659,7 +663,7 @@ its complete code is listed below.
    def callback_generation(ga_instance):
        global GANN_instance, last_fitness
 
-       population_matrices = pygad.gann.population_as_matrices(population_networks=GANN_instance.population_networks, 
+       population_matrices = pygad.gann.population_as_matrices(population_networks=GANN_instance.population_networks,
                                                                population_vectors=ga_instance.population)
 
        GANN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
@@ -680,9 +684,9 @@ its complete code is listed below.
                               [0, 0]])
 
    # Preparing the NumPy array of the outputs.
-   data_outputs = numpy.array([0, 
-                               1, 
-                               1, 
+   data_outputs = numpy.array([0,
+                               1,
+                               1,
                                0])
 
    # The length of the input vector for each sample (i.e. number of neurons in the input layer).
@@ -712,21 +716,21 @@ its complete code is listed below.
 
    num_generations = 500 # Number of generations.
 
-   mutation_percent_genes = 5 # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
+   mutation_percent_genes = [5, 10] # Percentage of genes to mutate. This parameter has no action if the parameter mutation_num_genes exists.
 
    parent_selection_type = "sss" # Type of parent selection.
 
    crossover_type = "single_point" # Type of the crossover operator.
 
-   mutation_type = "random" # Type of the mutation operator.
+   mutation_type = "adaptive" # Type of the mutation operator.
 
    keep_parents = 1 # Number of parents to keep in the next population. -1 means keep all parents and 0 means keep nothing.
 
    init_range_low = -2
    init_range_high = 5
 
-   ga_instance = pygad.GA(num_generations=num_generations, 
-                          num_parents_mating=num_parents_mating, 
+   ga_instance = pygad.GA(num_generations=num_generations,
+                          num_parents_mating=num_parents_mating,
                           initial_population=initial_population,
                           fitness_func=fitness_func,
                           mutation_percent_genes=mutation_percent_genes,
@@ -736,6 +740,7 @@ its complete code is listed below.
                           crossover_type=crossover_type,
                           mutation_type=mutation_type,
                           keep_parents=keep_parents,
+                          suppress_warnings=True,
                           on_generation=callback_generation)
 
    ga_instance.run()
