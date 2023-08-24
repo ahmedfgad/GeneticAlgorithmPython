@@ -1361,7 +1361,7 @@ Release Date 20 June 2023
     solve the duplicates between the 2 genes by simply replacing the
     value of one gene by another gene. This release tries to solve such
     duplicates by looking for a third gene that will help in solving the
-    duplicates. These examples explain how it works. Check `this
+    duplicates. Check `this
     section <https://pygad.readthedocs.io/en/latest/pygad.html#prevent-duplicates-in-gene-values>`__
     for more information.
 
@@ -1886,6 +1886,11 @@ Research Papers using PyGAD
 ===========================
 
 A number of research papers used PyGAD and here are some of them:
+
+-  Alberto Meola, Manuel Winkler, Sören Weinrich, Metaheuristic
+   optimization of data preparation and machine learning hyperparameters
+   for prediction of dynamic methane production, Bioresource Technology,
+   Volume 372, 2023, 128604, ISSN 0960-8524.
 
 -  Jaros, Marta, and Jiri Jaros. "Performance-Cost Optimization of
    Moldable Scientific Workflows."
