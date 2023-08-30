@@ -79,20 +79,20 @@ def crowding_distance(front):
         obj_sorted = sorted(obj, key=lambda x: x[1])
     
         # Get the minimum and maximum values for the current objective.
-        obj_min_val = obj_sorted[0][1]
-        obj_max_val = obj_sorted[-1][1]
+        obj_min_val = min(population[:, obj_idx])
+        obj_max_val = max(population[:, obj_idx])
         denominator = obj_max_val - obj_min_val
         # To avoid division by zero, set the denominator to a tiny value.
         if denominator == 0:
             denominator = 0.0000001
-    
+
         # Set the crowding distance to the first and last solutions (after being sorted) to infinity.
-        inf_val = 999999999
+        inf_val = float('inf')
         # crowding_distance[0] = inf_val
         obj_sorted[0][2] = inf_val
         # crowding_distance[-1] = inf_val
         obj_sorted[-1][2] = inf_val
-    
+
         # If there are only 2 solutions in the current front, then do not proceed.
         # The crowding distance for such 2 solutions is infinity.
         if len(obj_sorted) <= 2:
