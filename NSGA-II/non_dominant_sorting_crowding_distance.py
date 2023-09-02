@@ -1,13 +1,31 @@
 import numpy
 
-population_fitness = numpy.array([[20, 2.2],
-                                  [60, 4.4],
-                                  [65, 3.5],
-                                  [15, 4.4],
-                                  [55, 4.5],
-                                  [50, 1.8],
-                                  [80, 4.0],
-                                  [25, 4.6]])
+fitness = numpy.array([[20, 2.2],
+                       [60, 4.4],
+                       [65, 3.5],
+                       [15, 4.4],
+                       [55, 4.5],
+                       [50, 1.8],
+                       [80, 4.0],
+                       [25, 4.6]])
+
+# fitness = numpy.array([20,
+#                        60,
+#                        65,
+#                        15,
+#                        55,
+#                        50,
+#                        80,
+#                        25])
+
+# fitness = numpy.array([[20],
+#                        [60],
+#                        [65],
+#                        [15],
+#                        [55],
+#                        [50],
+#                        [80],
+#                        [25]])
 
 def get_non_dominated_set(curr_solutions):
     """
@@ -66,13 +84,13 @@ def get_non_dominated_set(curr_solutions):
     # Return the dominated and non-dominated sets.
     return dominated_set, non_dominated_set
 
-def non_dominated_sorting(population_fitness):
+def non_dominated_sorting(fitness):
     """
-    Apply the non-dominant sorting over the population_fitness to create the pareto fronts based on non-dominaned sorting of the solutions.
+    Apply the non-dominant sorting over the fitness to create the pareto fronts based on non-dominaned sorting of the solutions.
 
     Parameters
     ----------
-    population_fitness : TYPE
+    fitness : TYPE
         An array of the population fitness across all objective function.
 
     Returns
@@ -87,15 +105,15 @@ def non_dominated_sorting(population_fitness):
     # The remaining set to be explored for non-dominance.
     # Initially it is set to the entire population.
     # The solutions of each non-dominated set are removed after each iteration.
-    remaining_set = population_fitness.copy()
+    remaining_set = fitness.copy()
 
     # Zipping the solution index with the solution's fitness.
     # This helps to easily identify the index of each solution.
     # Each element has:
         # 1) The index of the solution.
         # 2) An array of the fitness values of this solution across all objectives.
-    # remaining_set = numpy.array(list(zip(range(0, population_fitness.shape[0]), non_dominated_set)))
-    remaining_set = list(zip(range(0, population_fitness.shape[0]), remaining_set))
+    # remaining_set = numpy.array(list(zip(range(0, fitness.shape[0]), non_dominated_set)))
+    remaining_set = list(zip(range(0, fitness.shape[0]), remaining_set))
 
     # A list mapping the index of each pareto front to the set of solutions in this front.
     solutions_fronts_indices = [-1]*len(remaining_set)
@@ -116,7 +134,7 @@ def non_dominated_sorting(population_fitness):
 
     return pareto_fronts, solutions_fronts_indices
 
-def crowding_distance(pareto_front):
+def crowding_distance(pareto_front, fitness):
     """
     Calculate the crowding dstance for all solutions in the current pareto front.
 
@@ -124,6 +142,8 @@ def crowding_distance(pareto_front):
     ----------
     pareto_front : TYPE
         The set of solutions in the current pareto front.
+    fitness : TYPE
+        The fitness of the current population.
 
     Returns
     -------
@@ -164,8 +184,8 @@ def crowding_distance(pareto_front):
         obj_sorted = sorted(obj, key=lambda x: x[1])
     
         # Get the minimum and maximum values for the current objective.
-        obj_min_val = min(population_fitness[:, obj_idx])
-        obj_max_val = max(population_fitness[:, obj_idx])
+        obj_min_val = min(fitness[:, obj_idx])
+        obj_max_val = max(fitness[:, obj_idx])
         denominator = obj_max_val - obj_min_val
         # To avoid division by zero, set the denominator to a tiny value.
         if denominator == 0:
@@ -217,9 +237,11 @@ def crowding_distance(pareto_front):
     return obj_crowding_dist_list, crowding_dist_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices
 
 def tournament_selection_nsga2(self,
-                               pareto_fronts,
-                               solutions_fronts_indices, 
-                               num_parents):
+                               fitness,
+                               num_parents
+                               # pareto_fronts,
+                               # solutions_fronts_indices, 
+                               ):
 
     """
     Select the parents using the tournament selection technique for NSGA-II. 
@@ -231,9 +253,10 @@ def tournament_selection_nsga2(self,
     Later, the selected parents will mate to produce the offspring.
 
     It accepts 2 parameters:
+        -fitness: The fitness values for the current population.
+        -num_parents: The number of parents to be selected.
         -pareto_fronts: A nested array of all the pareto fronts. Each front has its solutions.
         -solutions_fronts_indices: A list of the pareto front index of each solution in the current population.
-        -num_parents: The number of parents to be selected.
 
     It returns an array of the selected parents alongside their indices in the population.
     """
@@ -245,6 +268,11 @@ def tournament_selection_nsga2(self,
 
     # The indices of the selected parents.
     parents_indices = []
+
+    # TODO If there is only a single objective, each pareto front is expected to have only 1 solution.
+    # TODO Make a test to check for that behaviour.
+    # Find the pareto fronts and the solutions' indicies in each front.
+    pareto_fronts, solutions_fronts_indices = non_dominated_sorting(fitness)
 
     # Randomly generate pairs of indices to apply for NSGA-II tournament selection for selecting the parents solutions.
     rand_indices = numpy.random.randint(low=0.0, 
@@ -284,7 +312,8 @@ def tournament_selection_nsga2(self,
                 # Reaching here means the pareto front has more than 1 solution.
 
                 # Calculate the crowding distance of the solutions of the pareto front.
-                obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = crowding_distance(pareto_front.copy())
+                obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = crowding_distance(pareto_front=pareto_front.copy(),
+                                                                                                                                                            fitness=fitness)
 
                 # This list has the sorted front-based indices for the solutions in the current pareto front.
                 crowding_dist_front_sorted_indices = list(crowding_dist_front_sorted_indices)
@@ -333,9 +362,11 @@ def tournament_selection_nsga2(self,
     return parents, numpy.array(parents_indices)
 
 def nsga2_selection(self,
-                    pareto_fronts,
-                    solutions_fronts_indices, 
-                    num_parents):
+                    fitness,
+                    num_parents
+                    # pareto_fronts,
+                    # solutions_fronts_indices
+                    ):
 
     """
     Select the parents using the Non-Dominated Sorting Genetic Algorithm II (NSGA-II). 
@@ -348,9 +379,10 @@ def nsga2_selection(self,
     Later, the selected parents will mate to produce the offspring.
 
     It accepts 2 parameters:
+        -fitness: The fitness values for the current population.
+        -num_parents: The number of parents to be selected.
         -pareto_fronts: A nested array of all the pareto fronts. Each front has its solutions.
         -solutions_fronts_indices: A list of the pareto front index of each solution in the current population.
-        -num_parents: The number of parents to be selected.
 
     It returns an array of the selected parents alongside their indices in the population.
     """
@@ -362,6 +394,11 @@ def nsga2_selection(self,
 
     # The indices of the selected parents.
     parents_indices = []
+
+    # TODO If there is only a single objective, each pareto front is expected to have only 1 solution.
+    # TODO Make a test to check for that behaviour.
+    # Find the pareto fronts and the solutions' indicies in each front.
+    pareto_fronts, solutions_fronts_indices = non_dominated_sorting(fitness)
 
     # The number of remaining parents to be selected.
     num_remaining_parents = num_parents
@@ -387,7 +424,8 @@ def nsga2_selection(self,
             # If only a subset of the front is needed, then use the crowding distance to sort the solutions and select only the number needed.
 
             # Calculate the crowding distance of the solutions of the pareto front.
-            obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = crowding_distance(current_pareto_front.copy())
+            obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = crowding_distance(pareto_front=current_pareto_front.copy(),
+                                                                                                                                                        fitness=fitness)
 
             for selected_solution_idx in crowding_dist_pop_sorted_indices[0:num_remaining_parents]:
                 # Insert the parent into the parents array.
@@ -404,8 +442,10 @@ def nsga2_selection(self,
     # Make sure the parents indices is returned as a NumPy array.
     return parents, numpy.array(parents_indices)
 
-
-pareto_fronts, solutions_fronts_indices = non_dominated_sorting(population_fitness)
+# TODO If there is only a single objective, each pareto front is expected to have only 1 solution.
+# TODO Make a test to check for that behaviour.
+# Find the pareto fronts and the solutions' indicies in each front.
+pareto_fronts, solutions_fronts_indices = non_dominated_sorting(fitness)
 # # print('\nsolutions_fronts_indices\n', solutions_fronts_indices)
 # for i, s in enumerate(pareto_fronts):
 #     # print(f'Dominated Pareto Front Set {i+1}:\n{s}')
@@ -422,27 +462,33 @@ obj.gene_type = [float, 0]
 obj.K_tournament = 2
 
 parents, parents_indices = tournament_selection_nsga2(self=obj, 
-                                                      pareto_fronts=pareto_fronts,
-                                                      solutions_fronts_indices=solutions_fronts_indices,
-                                                      num_parents=40)
+                                                      fitness=fitness,
+                                                      num_parents=4
+                                                      # pareto_fronts=pareto_fronts,
+                                                      # solutions_fronts_indices=solutions_fronts_indices,
+                                                      )
 print(f'Tournament Parent Selection for NSGA-II - Indices: \n{parents_indices}')
 
 parents, parents_indices = nsga2_selection(self=obj,
-                                           pareto_fronts=pareto_fronts,
-                                           solutions_fronts_indices=solutions_fronts_indices, 
-                                           num_parents=40)
+                                           fitness=fitness,
+                                           num_parents=4
+                                           # pareto_fronts=pareto_fronts,
+                                           # solutions_fronts_indices=solutions_fronts_indices, 
+                                           )
 print(f'NSGA-II Parent Selection - Indices: \n{parents_indices}')
 
 # for idx in range(len(pareto_fronts)):
 #     # Fetch the current pareto front.
 #     pareto_front = pareto_fronts[idx]
-#     obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = crowding_distance(pareto_front.copy())
+#     obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = crowding_distance(pareto_front=pareto_front.copy(),
+#                                                                                                                                                 fitness=fitness)
 #     print('Front IDX', crowding_dist_front_sorted_indices)
 #     print('POP IDX  ', crowding_dist_pop_sorted_indices)
 #     print(f'Sorted Sum of Crowd Dists\n{crowding_distance_sum}')
 
 # # Fetch the current pareto front.
 # pareto_front = pareto_fronts[0]
-# obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = crowding_distance(pareto_front.copy())
+# obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = crowding_distance(pareto_front=pareto_front.copy(),
+#                                                                                                                                             fitness=fitness)
 # print('\n', crowding_dist_pop_sorted_indices)
 # print(f'Sorted Sum of Crowd Dists\n{crowding_distance_sum}')

@@ -870,6 +870,10 @@ class GA(utils.parent_selection.ParentSelection,
                     self.select_parents = self.random_selection
                 elif (parent_selection_type == "tournament"):
                     self.select_parents = self.tournament_selection
+                elif (parent_selection_type == "tournament_nsga2"): # Supported in PyGAD >= 3.2
+                    self.select_parents = self.tournament_selection_nsga2
+                elif (parent_selection_type == "nsga2"): # Supported in PyGAD >= 3.2
+                    self.select_parents = self.nsga2_selection
                 elif (parent_selection_type == "rank"):
                     self.select_parents = self.rank_selection
                 else:
