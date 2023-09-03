@@ -1,4 +1,5 @@
 import numpy
+import pygad
 
 def get_non_dominated_set(curr_solutions):
     """
@@ -208,3 +209,43 @@ def crowding_distance(pareto_front, fitness):
     crowding_dist_pop_sorted_indices = crowding_dist_pop_sorted_indices.astype(int)
 
     return obj_crowding_dist_list, crowding_dist_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices
+
+def sort_solutions_nsga2(fitness):
+    """
+    Sort the solutions based on the fitness.
+    The sorting procedure differs based on whether the problem is single-objective or multi-objective optimization.
+    If it is multi-objective, then non-dominated sorting and crowding distance are applied.
+    At first, non-dominated sorting is applied to classify the solutions into pareto fronts.
+    Then the solutions inside each front are sorted using crowded distance.
+    The solutions inside pareto front X always come before those in front X+1.
+
+    Parameters
+    ----------
+    fitness : TYPE
+        The fitness of the entire population.
+
+    Returns
+    -------
+    solutions_sorted : TYPE
+        The indices of the sorted solutions.
+
+    """
+    if type(fitness[0]) in [list, tuple, numpy.ndarray]:
+        # Multi-objective optimization problem.
+        solutions_sorted = []
+        # Split the solutions into pareto fronts using non-dominated sorting.
+        pareto_fronts, solutions_fronts_indices = non_dominated_sorting(fitness)
+        for pareto_front in pareto_fronts:
+            # Sort the solutions in the front using crowded distance.
+            _, _, _, crowding_dist_pop_sorted_indices = crowding_distance(pareto_front=pareto_front.copy(),
+                                                                          fitness=fitness)
+            crowding_dist_pop_sorted_indices = list(crowding_dist_pop_sorted_indices)
+            # Append the sorted solutions into the list.
+            solutions_sorted.extend(crowding_dist_pop_sorted_indices)
+    elif type(fitness[0]) in pygad.GA.supported_int_float_types:
+        # Single-objective optimization problem.
+        solutions_sorted = sorted(range(len(fitness)), key=lambda k: fitness[k])
+        # Reverse the sorted solutions so that the best solution comes first.
+        solutions_sorted.reverse()
+
+    return solutions_sorted
