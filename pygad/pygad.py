@@ -1683,6 +1683,12 @@ class GA(utils.parent_selection.ParentSelection,
                         if self.fitness_batch_size in [1, None]:
                             fitness = self.fitness_func(self, sol, sol_idx)
                             if type(fitness) in GA.supported_int_float_types:
+                                # The fitness function returns a single numeric value.
+                                # This is a single-objective optimization problem.
+                                pass
+                            elif type(fitness) in [list, tuple, numpy.ndarray]:
+                                # The fitness function returns a list/tuple/numpy.ndarray.
+                                # This is a multi-objective optimization problem.
                                 pass
                             else:
                                 raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
@@ -1718,6 +1724,12 @@ class GA(utils.parent_selection.ParentSelection,
 
                         for index, fitness in zip(batch_indices, batch_fitness):
                             if type(fitness) in GA.supported_int_float_types:
+                                # The fitness function returns a single numeric value.
+                                # This is a single-objective optimization problem.
+                                pop_fitness[index] = fitness
+                            elif type(fitness) in [list, tuple, numpy.ndarray]:
+                                # The fitness function returns a list/tuple/numpy.ndarray.
+                                # This is a multi-objective optimization problem.
                                 pop_fitness[index] = fitness
                             else:
                                 raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
@@ -1779,6 +1791,12 @@ class GA(utils.parent_selection.ParentSelection,
                     if self.fitness_batch_size in [1, None]:
                         for index, fitness in zip(solutions_to_submit_indices, executor.map(self.fitness_func, [self]*len(solutions_to_submit_indices), solutions_to_submit, solutions_to_submit_indices)):
                             if type(fitness) in GA.supported_int_float_types:
+                                # The fitness function returns a single numeric value.
+                                # This is a single-objective optimization problem.
+                                pop_fitness[index] = fitness
+                            elif type(fitness) in [list, tuple, numpy.ndarray]:
+                                # The fitness function returns a list/tuple/numpy.ndarray.
+                                # This is a multi-objective optimization problem.
                                 pop_fitness[index] = fitness
                             else:
                                 raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
@@ -1810,6 +1828,12 @@ class GA(utils.parent_selection.ParentSelection,
 
                             for index, fitness in zip(batch_indices, batch_fitness):
                                 if type(fitness) in GA.supported_int_float_types:
+                                    # The fitness function returns a single numeric value.
+                                    # This is a single-objective optimization problem.
+                                    pop_fitness[index] = fitness
+                                elif type(fitness) in [list, tuple, numpy.ndarray]:
+                                    # The fitness function returns a list/tuple/numpy.ndarray.
+                                    # This is a multi-objective optimization problem.
                                     pop_fitness[index] = fitness
                                 else:
                                     raise ValueError(f"The fitness function should return a number but the value ({fitness}) of type {type(fitness)} found.")

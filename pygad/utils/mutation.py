@@ -471,7 +471,13 @@ class Mutation:
 
         first_idx = len(parents_to_keep)
         last_idx = fitness.shape[0]
-        fitness[first_idx:last_idx] = [0]*(last_idx - first_idx)
+        if len(fitness.shape) > 1:
+            # TODO This is a multi-objective optimization problem.
+            # fitness[first_idx:last_idx] = [0]*(last_idx - first_idx)
+            raise ValueError('Edit adaptive mutation to work with multi-objective optimization problems.')
+        else:
+            # This is a single-objective optimization problem.
+            fitness[first_idx:last_idx] = [0]*(last_idx - first_idx)
 
         if self.fitness_batch_size in [1, None]:
             # Calculate the fitness for each individual solution.
@@ -667,7 +673,7 @@ class Mutation:
                                                                                          gene_type=self.gene_type,
                                                                                          num_trials=10)
         return offspring
-        
+
     def adaptive_mutation_randomly(self, offspring):
 
         """

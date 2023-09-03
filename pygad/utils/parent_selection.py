@@ -395,7 +395,9 @@ class ParentSelection:
 
         # The number of remaining parents to be selected.
         num_remaining_parents = num_parents
-    
+
+        # Index of the current parent.
+        current_parent_idx = 0
         # A loop variable holding the index of the current pareto front.
         pareto_front_idx = 0
         while num_remaining_parents != 0 and pareto_front_idx < len(pareto_fronts):
@@ -407,10 +409,12 @@ class ParentSelection:
                 for sol_idx in range(len(current_pareto_front)):
                     selected_solution_idx = current_pareto_front[sol_idx, 0]
                     # Insert the parent into the parents array.
-                    parents[sol_idx, :] = self.population[selected_solution_idx, :].copy()
+                    parents[current_parent_idx, :] = self.population[selected_solution_idx, :].copy()
                     # Insert the index of the selected parent.
                     parents_indices.append(selected_solution_idx)
-    
+                    # Increase the parent index.
+                    current_parent_idx += 1
+
                 # Decrement the number of remaining parents by the length of the pareto front.
                 num_remaining_parents -= len(current_pareto_front)
             else:
@@ -422,9 +426,11 @@ class ParentSelection:
 
                 for selected_solution_idx in crowding_dist_pop_sorted_indices[0:num_remaining_parents]:
                     # Insert the parent into the parents array.
-                    parents[sol_idx, :] = self.population[selected_solution_idx, :].copy()
+                    parents[current_parent_idx, :] = self.population[selected_solution_idx, :].copy()
                     # Insert the index of the selected parent.
                     parents_indices.append(selected_solution_idx)
+                    # Increase the parent index.
+                    current_parent_idx += 1
     
                 # Decrement the number of remaining parents by the number of selected parents.
                 num_remaining_parents -= num_remaining_parents
