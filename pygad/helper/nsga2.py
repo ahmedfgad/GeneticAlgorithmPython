@@ -36,8 +36,8 @@ def get_non_dominated_set(curr_solutions):
             # Checking for if any solution dominates the current solution by applying the 2 conditions.
             # le_eq (less than or equal): All elements must be True.
             # le (less than): Only 1 element must be True.
-            le_eq = two_solutions[:, 1] <= two_solutions[:, 0]
-            le = two_solutions[:, 1] < two_solutions[:, 0]
+            le_eq = two_solutions[:, 1] >= two_solutions[:, 0]
+            le = two_solutions[:, 1] > two_solutions[:, 0]
 
             # If the 2 conditions hold, then a solution dominates the current solution.
             # The current solution is not considered a member of the dominated set.
@@ -175,8 +175,9 @@ def crowding_distance(pareto_front, fitness):
         # If there are only 2 solutions in the current pareto front, then do not proceed.
         # The crowding distance for such 2 solutions is infinity.
         if len(obj_sorted) <= 2:
+            obj_crowding_dist_list.append(obj_sorted)
             break
-    
+
         for idx in range(1, len(obj_sorted)-1):
             # Calculate the crowding distance.
             crowding_dist = obj_sorted[idx+1][1] - obj_sorted[idx-1][1]

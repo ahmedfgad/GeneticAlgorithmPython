@@ -7,17 +7,23 @@ from ..helper import nsga2
 
 class ParentSelection:
     def steady_state_selection(self, fitness, num_parents):
-    
+
         """
-        Selects the parents using the steady-state selection technique. Later, these parents will mate to produce the offspring.
+        Selects the parents using the steady-state selection technique. 
+        This is by sorting the solutions based on the fitness and select the best ones as parents.
+        Later, these parents will mate to produce the offspring.
+
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns an array of the selected parents.
+        It returns:
+            -An array of the selected parents.
+            -The indices of the selected solutions.
         """
 
-        fitness_sorted = sorted(range(len(fitness)), key=lambda k: fitness[k])
-        fitness_sorted.reverse()
+        # Return the indices of the sorted solutions (all solutions in the population).
+        # This function works with both single- and multi-objective optimization problems.
+        fitness_sorted = nsga2.sort_solutions_nsga2(fitness=fitness)
 
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
         if self.gene_type_single == True:
@@ -38,11 +44,14 @@ class ParentSelection:
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns an array of the selected parents.
+        It returns:
+            -An array of the selected parents.
+            -The indices of the selected solutions.
         """
 
-        # This has the index of each solution in the population.
-        fitness_sorted = sorted(range(len(fitness)), key=lambda k: fitness[k])
+        # Return the indices of the sorted solutions (all solutions in the population).
+        # This function works with both single- and multi-objective optimization problems.
+        fitness_sorted = nsga2.sort_solutions_nsga2(fitness=fitness)
 
         # Rank the solutions based on their fitness. The worst is gives the rank 1. The best has the rank N.
         rank = numpy.arange(1, self.sol_per_pop+1)
@@ -74,7 +83,9 @@ class ParentSelection:
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns an array of the selected parents.
+        It returns:
+            -An array of the selected parents.
+            -The indices of the selected solutions.
         """
 
         if self.gene_type_single == True:
@@ -96,25 +107,40 @@ class ParentSelection:
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns an array of the selected parents.
+        It returns:
+            -An array of the selected parents.
+            -The indices of the selected solutions.
         """
-    
+
+        # Return the indices of the sorted solutions (all solutions in the population).
+        # This function works with both single- and multi-objective optimization problems.
+        fitness_sorted = nsga2.sort_solutions_nsga2(fitness=fitness)
+
         if self.gene_type_single == True:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
         else:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
-    
+
         parents_indices = []
-    
+
         for parent_num in range(num_parents):
+            # Generate random indices for the candiadate solutions.
             rand_indices = numpy.random.randint(low=0.0, high=len(fitness), size=self.K_tournament)
-            K_fitnesses = fitness[rand_indices]
-            selected_parent_idx = numpy.where(K_fitnesses == numpy.max(K_fitnesses))[0][0]
+            # K_fitnesses = fitness[rand_indices]
+            # selected_parent_idx = numpy.where(K_fitnesses == numpy.max(K_fitnesses))[0][0]
+
+            # Find the rank of the candidate solutions. The lower the rank, the better the solution.
+            rand_indices_rank = [fitness_sorted.index(rand_idx) for rand_idx in rand_indices]
+            # Select the solution with the lowest rank as a parent.
+            selected_parent_idx = rand_indices_rank.index(min(rand_indices_rank))
+
+            # Append the index of the selected parent.
             parents_indices.append(rand_indices[selected_parent_idx])
+            # Insert the selected parent.
             parents[parent_num, :] = self.population[rand_indices[selected_parent_idx], :].copy()
-    
+
         return parents, numpy.array(parents_indices)
-    
+
     def roulette_wheel_selection(self, fitness, num_parents):
     
         """
@@ -122,9 +148,27 @@ class ParentSelection:
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns an array of the selected parents.
+        It returns:
+            -An array of the selected parents.
+            -The indices of the selected solutions.
         """
-    
+
+        ## Make edits to work with multi-objective optimization.
+        ## The objective is to convert the fitness from M-D array to just 1D array.
+        ## There are 2 ways:
+            # 1) By summing the fitness values of each solution. 
+            # 2) By using only 1 objective to create the roulette wheel and excluding the others.
+
+        # Take the sum of the fitness values of each solution.
+        if len(fitness.shape) > 1:
+            # Multi-objective optimization problem.
+            # Sum the fitness values of each solution to reduce the fitness from M-D array to just 1D array.
+            fitness = numpy.sum(fitness, axis=1)
+        else:
+            # Single-objective optimization problem.
+            pass
+
+        # Reaching this step extends that fitness is a 1D array.
         fitness_sum = numpy.sum(fitness)
         if fitness_sum == 0:
             self.logger.error("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
@@ -170,7 +214,9 @@ class ParentSelection:
             probs_start[min_probs_idx] = curr
             curr = curr + probs[min_probs_idx]
             probs_end[min_probs_idx] = curr
-            probs[min_probs_idx] = 99999999999
+            # Replace 99999999999 by float('inf')
+            # probs[min_probs_idx] = 99999999999
+            probs[min_probs_idx] = float('inf')
 
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
         if self.gene_type_single == True:
@@ -187,14 +233,34 @@ class ParentSelection:
         It accepts 2 parameters:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
-        It returns an array of the selected parents.
+        It returns:
+            -An array of the selected parents.
+            -The indices of the selected solutions.
         """
 
+        ## Make edits to work with multi-objective optimization.
+        ## The objective is to convert the fitness from M-D array to just 1D array.
+        ## There are 2 ways:
+            # 1) By summing the fitness values of each solution. 
+            # 2) By using only 1 objective to create the roulette wheel and excluding the others.
+
+        # Take the sum of the fitness values of each solution.
+        if len(fitness.shape) > 1:
+            # Multi-objective optimization problem.
+            # Sum the fitness values of each solution to reduce the fitness from M-D array to just 1D array.
+            fitness = numpy.sum(fitness, axis=1)
+        else:
+            # Single-objective optimization problem.
+            pass
+
+        # Reaching this step extends that fitness is a 1D array.
         fitness_sum = numpy.sum(fitness)
         if fitness_sum == 0:
             self.logger.error("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
             raise ZeroDivisionError("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
+
         probs = fitness / fitness_sum
+
         probs_start = numpy.zeros(probs.shape, dtype=float) # An array holding the start values of the ranges of probabilities.
         probs_end = numpy.zeros(probs.shape, dtype=float) # An array holding the end values of the ranges of probabilities.
 
@@ -206,7 +272,9 @@ class ParentSelection:
             probs_start[min_probs_idx] = curr
             curr = curr + probs[min_probs_idx]
             probs_end[min_probs_idx] = curr
-            probs[min_probs_idx] = 99999999999
+            # Replace 99999999999 by float('inf')
+            # probs[min_probs_idx] = 99999999999
+            probs[min_probs_idx] = float('inf')
 
         pointers_distance = 1.0 / self.num_parents_mating # Distance between different pointers.
         first_pointer = numpy.random.uniform(low=0.0, 
@@ -234,8 +302,6 @@ class ParentSelection:
     def tournament_selection_nsga2(self,
                                    fitness,
                                    num_parents
-                                   # pareto_fronts,
-                                   # solutions_fronts_indices, 
                                    ):
     
         """
@@ -253,7 +319,9 @@ class ParentSelection:
             -pareto_fronts: A nested array of all the pareto fronts. Each front has its solutions.
             -solutions_fronts_indices: A list of the pareto front index of each solution in the current population.
     
-        It returns an array of the selected parents alongside their indices in the population.
+        It returns:
+            -An array of the selected parents.
+            -The indices of the selected solutions.
         """
     
         if self.gene_type_single == True:
@@ -263,19 +331,15 @@ class ParentSelection:
     
         # The indices of the selected parents.
         parents_indices = []
-    
+
         # TODO If there is only a single objective, each pareto front is expected to have only 1 solution.
-        # TODO Make a test to check for that behaviour.
+        # TODO Make a test to check for that behaviour and add it to the GitHub actions tests.
         pareto_fronts, solutions_fronts_indices = nsga2.non_dominated_sorting(fitness)
     
         # Randomly generate pairs of indices to apply for NSGA-II tournament selection for selecting the parents solutions.
         rand_indices = numpy.random.randint(low=0.0, 
                                             high=len(solutions_fronts_indices), 
                                             size=(num_parents, self.K_tournament))
-        # rand_indices[0, 0] = 5
-        # rand_indices[0, 1] = 3
-        # rand_indices[1, 0] = 1
-        # rand_indices[1, 1] = 6
     
         for parent_num in range(num_parents):
             # Return the indices of the current 2 solutions.
@@ -346,7 +410,7 @@ class ParentSelection:
                         else:
                             # If the random number is >= 0.5, then select the second solution.
                             selected_parent_idx = current_indices[1]
-    
+
             # Insert the selected parent index.
             parents_indices.append(selected_parent_idx)
             # Insert the selected parent.
@@ -358,8 +422,6 @@ class ParentSelection:
     def nsga2_selection(self,
                         fitness,
                         num_parents
-                        # pareto_fronts,
-                        # solutions_fronts_indices
                         ):
     
         """
@@ -378,7 +440,9 @@ class ParentSelection:
             -pareto_fronts: A nested array of all the pareto fronts. Each front has its solutions.
             -solutions_fronts_indices: A list of the pareto front index of each solution in the current population.
     
-        It returns an array of the selected parents alongside their indices in the population.
+        It returns:
+            -An array of the selected parents.
+            -The indices of the selected solutions.
         """
     
         if self.gene_type_single == True:

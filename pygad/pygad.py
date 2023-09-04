@@ -2099,7 +2099,7 @@ class GA(utils.parent_selection.ParentSelection,
                                         :] = self.last_generation_offspring_mutation
                 else:
                     self.last_generation_elitism, self.last_generation_elitism_indices = self.steady_state_selection(self.last_generation_fitness,
-                                                                                                                    num_parents=self.keep_elitism)
+                                                                                                                     num_parents=self.keep_elitism)
                     self.population[0:self.last_generation_elitism.shape[0],
                                     :] = self.last_generation_elitism
                     self.population[self.last_generation_elitism.shape[0]:, :] = self.last_generation_offspring_mutation
