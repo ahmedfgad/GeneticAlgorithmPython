@@ -64,7 +64,7 @@ class NSGA2:
     
     def non_dominated_sorting(self, fitness):
         """
-        Apply the non-dominant sorting over the fitness to create the pareto fronts based on non-dominaned sorting of the solutions.
+        Apply non-dominant sorting over the fitness to create the pareto fronts based on non-dominaned sorting of the solutions.
     
         Parameters
         ----------
@@ -114,7 +114,7 @@ class NSGA2:
 
     def crowding_distance(self, pareto_front, fitness):
         """
-        Calculate the crowding dstance for all solutions in the current pareto front.
+        Calculate the crowding distance for all solutions in the current pareto front.
     
         Parameters
         ----------

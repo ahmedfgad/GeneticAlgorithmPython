@@ -3,32 +3,13 @@ The pygad.visualize.plot module has methods to create plots.
 """
 
 import numpy
-import warnings
 import matplotlib.pyplot
 import pygad
 
 class Plot:
-    def plot_result(self, 
-                    title="PyGAD - Generation vs. Fitness", 
-                    xlabel="Generation", 
-                    ylabel="Fitness", 
-                    linewidth=3, 
-                    font_size=14, 
-                    plot_type="plot",
-                    color="#64f20c",
-                    save_dir=None):
 
-        if not self.suppress_warnings: 
-            warnings.warn("Please use the plot_fitness() method instead of plot_result(). The plot_result() method will be removed in the future.")
-
-        return self.plot_fitness(title=title, 
-                                 xlabel=xlabel, 
-                                 ylabel=ylabel, 
-                                 linewidth=linewidth, 
-                                 font_size=font_size, 
-                                 plot_type=plot_type,
-                                 color=color,
-                                 save_dir=save_dir)
+    def __init__():
+        pass
 
     def plot_fitness(self, 
                      title="PyGAD - Generation vs. Fitness", 
