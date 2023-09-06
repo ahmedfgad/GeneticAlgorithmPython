@@ -1309,6 +1309,8 @@ class GA(utils.parent_selection.ParentSelection,
             self.last_generation_elitism = None
             # Added in PyGAD 2.19.0. A NumPy array holding the indices of the elitism of the current generation. It works only if the 'keep_elitism' parameter has a non-zero value.
             self.last_generation_elitism_indices = None
+            # Supported in PyGAD 3.2.0. It holds the pareto fronts when solving a multi-objective problem.
+            self.pareto_fronts = None
         except Exception as e:
             self.logger.exception(e)
             sys.exit(-1)
