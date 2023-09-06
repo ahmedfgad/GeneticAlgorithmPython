@@ -9,6 +9,9 @@ import pygad
 
 class Mutation:
 
+    def __init__():
+        pass
+
     def random_mutation(self, offspring):
 
         """

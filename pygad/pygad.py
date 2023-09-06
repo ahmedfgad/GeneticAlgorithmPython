@@ -11,9 +11,11 @@ from pygad import helper
 from pygad import visualize
 import sys
 
+# Extend all the classes so that they can be referenced by just the `self` object of the `pygad.GA` class.
 class GA(utils.parent_selection.ParentSelection,
          utils.crossover.Crossover,
          utils.mutation.Mutation,
+         utils.nsga2.NSGA2,
          helper.unique.Unique,
          visualize.plot.Plot):
 

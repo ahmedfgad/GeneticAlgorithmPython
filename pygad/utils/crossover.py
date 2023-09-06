@@ -6,6 +6,10 @@ import numpy
 import random
 
 class Crossover:
+
+    def __init__():
+        pass
+
     def single_point_crossover(self, parents, offspring_size):
 
         """

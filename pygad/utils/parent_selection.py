@@ -3,9 +3,12 @@ The pygad.utils.parent_selection module has all the built-in parent selection op
 """
 
 import numpy
-from ..helper import nsga2
 
 class ParentSelection:
+
+    def __init__():
+        pass
+
     def steady_state_selection(self, fitness, num_parents):
 
         """
@@ -23,7 +26,7 @@ class ParentSelection:
 
         # Return the indices of the sorted solutions (all solutions in the population).
         # This function works with both single- and multi-objective optimization problems.
-        fitness_sorted = nsga2.sort_solutions_nsga2(fitness=fitness)
+        fitness_sorted = self.sort_solutions_nsga2(fitness=fitness)
 
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
         if self.gene_type_single == True:
@@ -51,7 +54,7 @@ class ParentSelection:
 
         # Return the indices of the sorted solutions (all solutions in the population).
         # This function works with both single- and multi-objective optimization problems.
-        fitness_sorted = nsga2.sort_solutions_nsga2(fitness=fitness)
+        fitness_sorted = self.sort_solutions_nsga2(fitness=fitness)
 
         # Rank the solutions based on their fitness. The worst is gives the rank 1. The best has the rank N.
         rank = numpy.arange(1, self.sol_per_pop+1)
@@ -114,7 +117,7 @@ class ParentSelection:
 
         # Return the indices of the sorted solutions (all solutions in the population).
         # This function works with both single- and multi-objective optimization problems.
-        fitness_sorted = nsga2.sort_solutions_nsga2(fitness=fitness)
+        fitness_sorted = self.sort_solutions_nsga2(fitness=fitness)
 
         if self.gene_type_single == True:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
@@ -312,7 +315,7 @@ class ParentSelection:
         If 2 solutions are in the same pareto front, then crowding distance is calculated. The solution with the higher crowding distance is selected.
         If the 2 solutions are in the same pareto front and have the same crowding distance, then a solution is randomly selected.
         Later, the selected parents will mate to produce the offspring.
-    
+
         It accepts 2 parameters:
             -fitness: The fitness values for the current population.
             -num_parents: The number of parents to be selected.
@@ -332,10 +335,11 @@ class ParentSelection:
         # The indices of the selected parents.
         parents_indices = []
 
-        # TODO If there is only a single objective, each pareto front is expected to have only 1 solution.
+        # If there is only a single objective, each pareto front is expected to have only 1 solution.
         # TODO Make a test to check for that behaviour and add it to the GitHub actions tests.
-        pareto_fronts, solutions_fronts_indices = nsga2.non_dominated_sorting(fitness)
-    
+        pareto_fronts, solutions_fronts_indices = self.non_dominated_sorting(fitness)
+        self.pareto_fronts = pareto_fronts.copy()
+
         # Randomly generate pairs of indices to apply for NSGA-II tournament selection for selecting the parents solutions.
         rand_indices = numpy.random.randint(low=0.0, 
                                             high=len(solutions_fronts_indices), 
@@ -362,7 +366,7 @@ class ParentSelection:
     
                 # Fetch the current pareto front.
                 pareto_front = pareto_fronts[parent_fronts_indices[0]] # Index 1 can also be used.
-    
+
                 # If there is only 1 solution in the pareto front, just return it without calculating the crowding distance (it is useless).
                 if pareto_front.shape[0] == 1:
                     selected_parent_idx = current_indices[0] # Index 1 can also be used.
@@ -370,7 +374,7 @@ class ParentSelection:
                     # Reaching here means the pareto front has more than 1 solution.
     
                     # Calculate the crowding distance of the solutions of the pareto front.
-                    obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = nsga2.crowding_distance(pareto_front=pareto_front.copy(),
+                    obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = self.crowding_distance(pareto_front=pareto_front.copy(),
                                                                                                                                                                       fitness=fitness)
     
                     # This list has the sorted front-based indices for the solutions in the current pareto front.
@@ -452,10 +456,11 @@ class ParentSelection:
     
         # The indices of the selected parents.
         parents_indices = []
-    
-        # TODO If there is only a single objective, each pareto front is expected to have only 1 solution.
+
+        # If there is only a single objective, each pareto front is expected to have only 1 solution.
         # TODO Make a test to check for that behaviour.
-        pareto_fronts, solutions_fronts_indices = nsga2.non_dominated_sorting(fitness)
+        pareto_fronts, solutions_fronts_indices = self.non_dominated_sorting(fitness)
+        self.pareto_fronts = pareto_fronts.copy()
 
         # The number of remaining parents to be selected.
         num_remaining_parents = num_parents
@@ -485,8 +490,8 @@ class ParentSelection:
                 # If only a subset of the front is needed, then use the crowding distance to sort the solutions and select only the number needed.
     
                 # Calculate the crowding distance of the solutions of the pareto front.
-                obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = nsga2.crowding_distance(pareto_front=current_pareto_front.copy(),
-                                                                                                                                                                  fitness=fitness)
+                obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = self.crowding_distance(pareto_front=current_pareto_front.copy(),
+                                                                                                                                                                 fitness=fitness)
 
                 for selected_solution_idx in crowding_dist_pop_sorted_indices[0:num_remaining_parents]:
                     # Insert the parent into the parents array.
