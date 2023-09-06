@@ -1,6 +1,6 @@
 # PyGAD:  Genetic Algorithm in Python
 
-[PyGAD](https://pypi.org/project/pygad) is an open-source easy-to-use Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. It supports Keras and PyTorch.
+[PyGAD](https://pypi.org/project/pygad) is an open-source easy-to-use Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. It supports Keras and PyTorch. PyGAD supports optimizing both single-objective and multi-objective problems.
 
 Check documentation of the [PyGAD](https://pygad.readthedocs.io/en/latest).
 
@@ -146,7 +146,7 @@ on_stop()
 
 # Example
 
-Check the [PyGAD's documentation](https://pygad.readthedocs.io/en/latest/pygad.html) for information about the implementation of this example.
+Check the [PyGAD's documentation](https://pygad.readthedocs.io/en/latest/pygad.html) for information about the implementation of this example. It solves a single-objective problem.
 
 ```python
 import pygad
