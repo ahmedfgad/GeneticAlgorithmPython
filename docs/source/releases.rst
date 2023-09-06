@@ -1399,6 +1399,67 @@ Release Date 20 June 2023
     section <https://pygad.readthedocs.io/en/latest/pygad.html#limit-the-gene-value-range-using-the-gene-space-parameter>`__.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/198
 
+.. _pygad-320:
+
+PyGAD 3.2.0
+-----------
+
+Release Date 6 September 2023
+
+1.  A new module ``pygad.utils.nsga2`` is created that has the ``NSGA2``
+    class that includes the functionalities of NSGA-II. The class has
+    these methods: 1) ``get_non_dominated_set()`` 2)
+    ``non_dominated_sorting()`` 3) ``crowding_distance()`` 4)
+    ``sort_solutions_nsga2()``
+
+2.  Support of multi-objective optimization using Non-Dominated Sorting
+    Genetic Algorithm II (NSGA-II) using the ``NSGA2`` class in the
+    ``pygad.utils.nsga2`` module. Just return a ``list``, ``tuple``, or
+    ``numpy.ndarray`` from the fitness function and the library will
+    consider the problem as multi-objective optimization. All the
+    objectives are expected to be maximization.
+
+3.  The parent selection methods and adaptive mutation are edited to
+    support multi-objective optimization.
+
+4.  Two new NSGA-II parent selection methods are supported in the
+    ``pygad.utils.parent_selection`` module: 1) Tournament selection for
+    NSGA-II 2) NSGA-II selection.
+
+5.  The ``plot_fitness()`` method in the ``pygad.plot`` module has a new
+    optional parameter named ``label`` to accept the label of the plots.
+    This is only used for multi-objective problems. Otherwise, it is
+    ignored. It defaults to ``None`` and accepts a ``list``, ``tuple``,
+    or ``numpy.ndarray``. The labels are used in a legend inside the
+    plot.
+
+6.  The default color in the methods of the ``pygad.plot`` module is
+    changed to the greenish ``#64f20c`` color.
+
+7.  A new instance attribute named ``pareto_fronts`` added to the
+    ``pygad.GA`` instances that holds the pareto fronts when solving a
+    multi-objective problem.
+
+8.  The ``gene_type`` accepts a ``list``, ``tuple``, or
+    ``numpy.ndarray`` for integer data types given that the precision is
+    set to ``None`` (e.g. ``gene_type=[float, [int, None]]``).
+
+9.  In the ``cal_pop_fitness()`` method, the fitness value is re-used if
+    ``save_best_solutions=True`` and the solution is found in the
+    ``best_solutions`` attribute. These parameters also can help
+    re-using the fitness of a solution instead of calling the fitness
+    function: ``keep_elitism``, ``keep_parents``, and
+    ``save_solutions``.
+
+10. The value ``99999999999`` is replaced by ``float('inf')`` in the 2
+    methods ``wheel_cumulative_probs()`` and
+    ``stochastic_universal_selection()`` inside the
+    ``pygad.utils.parent_selection.ParentSelection`` class.
+
+11. The ``plot_result()`` method in the ``pygad.visualize.plot.Plot``
+    class is removed. Instead, please use the ``plot_fitness()`` if you
+    did not upgrade yet.
+
 PyGAD Projects at GitHub
 ========================
 
