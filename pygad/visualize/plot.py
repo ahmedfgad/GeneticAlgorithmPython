@@ -44,7 +44,7 @@ class Plot:
             raise RuntimeError("The plot_fitness() (i.e. plot_result()) method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
 
         fig = matplotlib.pyplot.figure()
-        if len(self.best_solutions_fitness[0]) > 1:
+        if type(self.best_solutions_fitness[0]) in [list, tuple, numpy.ndarray] and len(self.best_solutions_fitness[0]) > 1:
             # Multi-objective optimization problem.
             if type(linewidth) in pygad.GA.supported_int_float_types:
                 linewidth = [linewidth]

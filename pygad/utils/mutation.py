@@ -704,7 +704,7 @@ class Mutation:
             # Compare the fitness of each offspring to the average fitness of each objective function.
             fitness_comparison = offspring_fitness[offspring_idx] < average_fitness
             # Check if the problem is single or multi-objective optimization.
-            if type(fitness_comparison) is bool:
+            if type(fitness_comparison) in [bool, numpy.bool_]:
                 # Single-objective optimization problem.
                 if fitness_comparison:
                     adaptive_mutation_num_genes = self.mutation_num_genes[0]
