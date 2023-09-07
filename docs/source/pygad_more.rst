@@ -359,10 +359,10 @@ value out of these 3 values.
                 None]
    Solution: [1, 5]
 
-For a solution like ``[1, -0.5, 4]``, then mutation happens for the
-first gene by simply replacing its current value by a randomly selected
-value (other than its current value if possible). So, the value 1 will
-be replaced by either 2 or 3.
+For a solution like ``[1, 5]``, then mutation happens for the first gene
+by simply replacing its current value by a randomly selected value
+(other than its current value if possible). So, the value 1 will be
+replaced by either 2 or 3.
 
 For the second gene, its space is set to ``None``. So, traditional
 mutation happens for this gene by:
