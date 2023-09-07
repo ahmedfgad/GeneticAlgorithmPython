@@ -1695,7 +1695,7 @@ class GA(utils.parent_selection.ParentSelection,
                                 # This is a multi-objective optimization problem.
                                 pass
                             else:
-                                raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+                                raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {fitness} of type {type(fitness)} found.")
                         else:
                             # Reaching this point means that batch processing is in effect to calculate the fitness values.
                             # Do not continue the loop as no fitness is calculated. The fitness will be calculated later in batch mode.
@@ -1736,7 +1736,7 @@ class GA(utils.parent_selection.ParentSelection,
                                 # This is a multi-objective optimization problem.
                                 pop_fitness[index] = fitness
                             else:
-                                raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+                                raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {fitness} of type {type(fitness)} found.")
             else:
                 # Calculating the fitness value of each solution in the current population.
                 for sol_idx, sol in enumerate(self.population):
@@ -1803,7 +1803,7 @@ class GA(utils.parent_selection.ParentSelection,
                                 # This is a multi-objective optimization problem.
                                 pop_fitness[index] = fitness
                             else:
-                                raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+                                raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {fitness} of type {type(fitness)} found.")
                     else:
                         # Reaching this block means that batch processing is used. The fitness values are calculated in batches.
 
@@ -1840,7 +1840,7 @@ class GA(utils.parent_selection.ParentSelection,
                                     # This is a multi-objective optimization problem.
                                     pop_fitness[index] = fitness
                                 else:
-                                    raise ValueError(f"The fitness function should return a number but the value ({fitness}) of type {type(fitness)} found.")
+                                    raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value ({fitness}) of type {type(fitness)} found.")
 
             pop_fitness = numpy.array(pop_fitness)
         except Exception as ex:

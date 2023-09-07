@@ -2,6 +2,7 @@ import numpy
 import pygad
 
 class NSGA2:
+
     def __init__():
         pass
 
@@ -32,20 +33,21 @@ class NSGA2:
             for idx2, sol2 in enumerate(curr_solutions):
                 if idx1 == idx2:
                     continue
+
                 # Zipping the 2 solutions so the corresponding genes are in the same list.
                 # The returned array is of size (N, 2) where N is the number of genes.
                 two_solutions = numpy.array(list(zip(sol1[1], sol2[1])))
-    
-                #TODO Consider repacing < by > for maximization problems.
-                # Checking for if any solution dominates the current solution by applying the 2 conditions.
-                # le_eq (less than or equal): All elements must be True.
-                # le (less than): Only 1 element must be True.
-                le_eq = two_solutions[:, 1] >= two_solutions[:, 0]
-                le = two_solutions[:, 1] > two_solutions[:, 0]
-    
+
+                # Use < for minimization problems and > for maximization problems.
+                # Checking if any solution dominates the current solution by applying the 2 conditions.
+                # gr_eq (greater than or equal): All elements must be True.
+                # gr (greater than): Only 1 element must be True.
+                gr_eq = two_solutions[:, 1] >= two_solutions[:, 0]
+                gr = two_solutions[:, 1] > two_solutions[:, 0]
+
                 # If the 2 conditions hold, then a solution dominates the current solution.
                 # The current solution is not considered a member of the dominated set.
-                if le_eq.all() and le.any():
+                if gr_eq.all() and gr.any():
                     # Set the is_dominated flag to False to NOT insert the current solution in the current dominated set.
                     # Instead, insert it into the non-dominated set.
                     is_dominated = False
@@ -77,6 +79,15 @@ class NSGA2:
             An array of the pareto fronts.
 
         """
+
+        # Verify that the problem is multi-objective optimization as non-dominated sorting is only applied to multi-objective problems.
+        if type(fitness[0]) in [list, tuple, numpy.ndarray]:
+            pass
+        elif type(fitness[0]) in self.supported_int_float_types:
+            raise TypeError('Non-dominated sorting is only applied when optimizing multi-objective problems.\n\nBut a single-objective optimization problem found as the fitness function returns a single numeric value.\n\nTo use multi-objective optimization, consider returning an iterable of any of these data types:\n1)list\n2)tuple\n3)numpy.ndarray')
+        else:
+            raise TypeError(f'Non-dominated sorting is only applied when optimizing multi-objective problems. \n\nTo use multi-objective optimization, consider returning an iterable of any of these data types:\n1)list\n2)tuple\n3)numpy.ndarray\n\nBut the data type {type(fitness[0])} found.')
+
         # A list of all non-dominated sets.
         pareto_fronts = []
     

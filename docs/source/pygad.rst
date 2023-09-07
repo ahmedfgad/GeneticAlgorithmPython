@@ -595,24 +595,6 @@ Other Methods
 -  ``adaptive_mutation_population_fitness()``: Returns the average
    fitness value used in the adaptive mutation to filter the solutions.
 
--  ``solve_duplicate_genes_randomly()``: Solves the duplicates in a
-   solution by randomly selecting new values for the duplicating genes.
-
--  ``solve_duplicate_genes_by_space()``: Solves the duplicates in a
-   solution by selecting values for the duplicating genes from the gene
-   space
-
--  ``unique_int_gene_from_range()``: Finds a unique integer value for
-   the gene.
-
--  ``unique_genes_by_space()``: Loops through all the duplicating genes
-   to find unique values that from their gene spaces to solve the
-   duplicates. For each duplicating gene, a call to the
-   ``unique_gene_by_space()`` is made.
-
--  ``unique_gene_by_space()``: Returns a unique gene value for a single
-   gene based on its value space to solve the duplicates.
-
 -  ``summary()``: Prints a Keras-like summary of the PyGAD lifecycle.
    This helps to have an overview of the architecture. Supported in
    `PyGAD
@@ -961,31 +943,6 @@ generation.
 It works only after completing at least 1 generation. If no generation
 is completed (at least 1), an exception is raised.
 
-This method accepts the following parameters:
-
-1. ``title``: Title of the figure.
-
-2. ``xlabel``: X-axis label.
-
-3. ``ylabel``: Y-axis label.
-
-4. ``linewidth``: Line width of the plot. Defaults to ``3``.
-
-5. ``font_size``: Font size for the labels and title. Defaults to
-   ``14``.
-
-6. ``plot_type``: Type of the plot which can be either ``"plot"``
-   (default), ``"scatter"``, or ``"bar"``.
-
-7. ``color``: Color of the plot which defaults to the greenish color
-   ``"#64f20c"``.
-
-8. ``label``: The label used for the legend in the figures of
-   multi-objective problems. It is not used for single-objective
-   problems. It defaults to ``None`` which means no labels used.
-
-9. ``save_dir``: Directory to save the figure.
-
 .. _plotnewsolutionrate:
 
 ``plot_new_solution_rate()``
@@ -998,26 +955,6 @@ constructor of the ``pygad.GA`` class.
 
 It works only after completing at least 1 generation. If no generation
 is completed (at least 1), an exception is raised.
-
-This method accepts the following parameters:
-
-1. ``title``: Title of the figure.
-
-2. ``xlabel``: X-axis label.
-
-3. ``ylabel``: Y-axis label.
-
-4. ``linewidth``: Line width of the plot. Defaults to ``3``.
-
-5. ``font_size``: Font size for the labels and title. Defaults to
-   ``14``.
-
-6. ``plot_type``: Type of the plot which can be either ``"plot"``
-   (default), ``"scatter"``, or ``"bar"``.
-
-7. ``color``: Color of the plot which defaults to ``"#3870FF"``.
-
-8. ``save_dir``: Directory to save the figure.
 
 .. _plotgenes:
 
@@ -1038,43 +975,6 @@ This is controlled by the ``graph_type`` parameter.
 
 It works only after completing at least 1 generation. If no generation
 is completed (at least 1), an exception is raised.
-
-This method accepts the following parameters:
-
-1.  ``title``: Title of the figure.
-
-2.  ``xlabel``: X-axis label.
-
-3.  ``ylabel``: Y-axis label.
-
-4.  ``linewidth``: Line width of the plot. Defaults to ``3``.
-
-5.  ``font_size``: Font size for the labels and title. Defaults to
-    ``14``.
-
-6.  ``plot_type``: Type of the plot which can be either ``"plot"``
-    (default), ``"scatter"``, or ``"bar"``.
-
-7.  ``graph_type``: Type of the graph which can be either ``"plot"``
-    (default), ``"boxplot"``, or ``"histogram"``.
-
-8.  ``fill_color``: Fill color of the graph which defaults to
-    ``"#3870FF"``. This has no effect if ``graph_type="plot"``.
-
-9.  ``color``: Color of the plot which defaults to ``"#3870FF"``.
-
-10. ``solutions``: Defaults to ``"all"`` which means use all solutions.
-    If ``"best"`` then only the best solutions are used.
-
-11. ``save_dir``: Directory to save the figure.
-
-An exception is raised if:
-
--  ``solutions="all"`` while ``save_solutions=False`` in the constructor
-   of the ``pygad.GA`` class. .
-
--  ``solutions="best"`` while ``save_best_solutions=False`` in the
-   constructor of the ``pygad.GA`` class. .
 
 ``save()``
 ----------
@@ -1160,7 +1060,8 @@ optimization problem is single-objective or multi-objective.
 -  If the fitness function returns a ``list``, ``tuple``, or
    ``numpy.ndarray``, then the problem is single-objective. Even if
    there is only one element, the problem is still considered
-   multi-objective.
+   multi-objective. Each element represents the fitness value of its
+   corresponding objective.
 
 Using a user-defined fitness function allows the user to freely use
 PyGAD to solve any problem by passing the appropriate fitness
@@ -1579,6 +1480,108 @@ below.
    # Loading the saved GA instance.
    loaded_ga_instance = pygad.load(filename=filename)
    loaded_ga_instance.plot_fitness()
+
+Linear Model Optimization - Multi-Objective
+-------------------------------------------
+
+This is a multi-objective optimization example that optimizes these 2
+functions:
+
+1. ``y1 = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6``
+
+2. ``y2 = f(w1:w6) = w1x7 + w2x8 + w3x9 + w4x10 + w5x11 + 6wx12``
+
+Where:
+
+1. ``(x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7)`` and ``y=50``
+
+2. ``(x7,x8,x9,x10,x11,x12)=(-2,0.7,-9,1.4,3,5)`` and ``y=30``
+
+The 2 functions use the same parameters (weights) ``w1`` to ``w6``.
+
+The goal is to use PyGAD to find the optimal values for such weights
+that satisfy the 2 functions ``y1`` and ``y2``.
+
+To use PyGAD to solve multi-objective problems, the only adjustment is
+to return a ``list``, ``tuple``, or ``numpy.ndarray`` from the fitness
+function. Each element represents the fitness of an objective in order.
+That is the first element is the fitness of the first objective, the
+second element is the fitness for the second objective, and so on.
+
+.. code:: python
+
+   import pygad
+   import numpy
+
+   """
+   Given these 2 functions:
+       y1 = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
+       y2 = f(w1:w6) = w1x7 + w2x8 + w3x9 + w4x10 + w5x11 + 6wx12
+       where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=50
+       and   (x7,x8,x9,x10,x11,x12)=(-2,0.7,-9,1.4,3,5) and y=30
+   What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize these 2 functions.
+   This is a multi-objective optimization problem.
+
+   PyGAD considers the problem as multi-objective if the fitness function returns:
+       1) List.
+       2) Or tuple.
+       3) Or numpy.ndarray.
+   """
+
+   function_inputs1 = [4,-2,3.5,5,-11,-4.7] # Function 1 inputs.
+   function_inputs2 = [-2,0.7,-9,1.4,3,5] # Function 2 inputs.
+   desired_output1 = 50 # Function 1 output.
+   desired_output2 = 30 # Function 2 output.
+
+   def fitness_func(ga_instance, solution, solution_idx):
+       output1 = numpy.sum(solution*function_inputs1)
+       output2 = numpy.sum(solution*function_inputs2)
+       fitness1 = 1.0 / (numpy.abs(output1 - desired_output1) + 0.000001)
+       fitness2 = 1.0 / (numpy.abs(output2 - desired_output2) + 0.000001)
+       return [fitness1, fitness2]
+
+   num_generations = 100
+   num_parents_mating = 10
+
+   sol_per_pop = 20
+   num_genes = len(function_inputs1)
+
+   ga_instance = pygad.GA(num_generations=num_generations,
+                          num_parents_mating=num_parents_mating,
+                          sol_per_pop=sol_per_pop,
+                          num_genes=num_genes,
+                          fitness_func=fitness_func,
+                          parent_selection_type='nsga2')
+
+   ga_instance.run()
+
+   ga_instance.plot_fitness(label=['Obj 1', 'Obj 2'])
+
+   solution, solution_fitness, solution_idx = ga_instance.best_solution(ga_instance.last_generation_fitness)
+   print(f"Parameters of the best solution : {solution}")
+   print(f"Fitness value of the best solution = {solution_fitness}")
+
+   prediction = numpy.sum(numpy.array(function_inputs1)*solution)
+   print(f"Predicted output 1 based on the best solution : {prediction}")
+   prediction = numpy.sum(numpy.array(function_inputs2)*solution)
+   print(f"Predicted output 2 based on the best solution : {prediction}")
+
+This is the result of the print statements. The predicted outputs are
+close to the desired outputs.
+
+.. code:: 
+
+   Parameters of the best solution : [ 0.79676439 -2.98823386 -4.12677662  5.70539445 -2.02797016 -1.07243922]
+   Fitness value of the best solution = [  1.68090829 349.8591915 ]
+   Predicted output 1 based on the best solution : 50.59491545442283
+   Predicted output 2 based on the best solution : 29.99714270722312
+
+This is the figure created by the ``plot_fitness()`` method. The fitness
+of the first objective has the green color. The blue color is used for
+the second objective fitness.
+
+.. image:: https://github.com/ahmedfgad/GeneticAlgorithmPython/assets/16560492/7896f8d8-01c5-4ff9-8d15-52191c309b63
+   :alt: 
 
 Reproducing Images
 ------------------

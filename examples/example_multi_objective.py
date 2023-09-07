@@ -53,7 +53,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 # Running the GA to optimize the parameters of the function.
 ga_instance.run()
 
-ga_instance.plot_fitness()
+ga_instance.plot_fitness(labels=['Obj 1', 'Obj 2'])
 
 # Returning the details of the best solution.
 solution, solution_fitness, solution_idx = ga_instance.best_solution(ga_instance.last_generation_fitness)

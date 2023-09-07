@@ -331,7 +331,13 @@ class ParentSelection:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
         else:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
-    
+
+        # Verify that the problem is multi-objective optimization as the tournament NSGA-II selection is only applied to multi-objective problems.
+        if type(fitness[0]) in [list, tuple, numpy.ndarray]:
+            pass
+        elif type(fitness[0]) in self.supported_int_float_types:
+            raise ValueError('The tournament NSGA-II parent selection operator is only applied when optimizing multi-objective problems.\n\nBut a single-objective optimization problem found as the fitness function returns a single numeric value.\n\nTo use multi-objective optimization, consider returning an iterable of any of these data types:\n1)list\n2)tuple\n3)numpy.ndarray')
+
         # The indices of the selected parents.
         parents_indices = []
 
@@ -427,7 +433,7 @@ class ParentSelection:
                         fitness,
                         num_parents
                         ):
-    
+
         """
         Select the parents using the Non-Dominated Sorting Genetic Algorithm II (NSGA-II). 
         The selection is done using non-dominated sorting and crowding distance.
@@ -443,17 +449,23 @@ class ParentSelection:
             -num_parents: The number of parents to be selected.
             -pareto_fronts: A nested array of all the pareto fronts. Each front has its solutions.
             -solutions_fronts_indices: A list of the pareto front index of each solution in the current population.
-    
+
         It returns:
             -An array of the selected parents.
             -The indices of the selected solutions.
         """
-    
+
         if self.gene_type_single == True:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
         else:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
-    
+
+        # Verify that the problem is multi-objective optimization as the NSGA-II selection is only applied to multi-objective problems.
+        if type(fitness[0]) in [list, tuple, numpy.ndarray]:
+            pass
+        elif type(fitness[0]) in self.supported_int_float_types:
+            raise ValueError('The NSGA-II parent selection operator is only applied when optimizing multi-objective problems.\n\nBut a single-objective optimization problem found as the fitness function returns a single numeric value.\n\nTo use multi-objective optimization, consider returning an iterable of any of these data types:\n1)list\n2)tuple\n3)numpy.ndarray')
+
         # The indices of the selected parents.
         parents_indices = []
 
