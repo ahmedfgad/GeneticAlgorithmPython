@@ -405,7 +405,7 @@ solutions within the population.
        population_matrices = gacnn.population_as_matrices(population_networks=GACNN_instance.population_networks, population_vectors=ga_instance.population)
        GACNN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
+       print(f"Generation = {ga_instance.generations_completed}")
 
 After preparing the fitness and callback function, next is to create an
 instance of the ``pygad.GA`` class.
@@ -462,7 +462,7 @@ be called to show how the fitness values evolve by generation.
 
    ga_instance.plot_fitness()
 
-.. figure:: https://user-images.githubusercontent.com/16560492/83429675-ab744580-a434-11ea-8f21-9d3804b50d15.png
+.. image:: https://user-images.githubusercontent.com/16560492/83429675-ab744580-a434-11ea-8f21-9d3804b50d15.png
    :alt: 
 
 Information about the Best Solution
@@ -483,9 +483,9 @@ Here is how such information is returned.
 .. code:: python
 
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Parameters of the best solution : {solution}".format(solution=solution))
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Parameters of the best solution : {solution}")
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
 .. code:: 
 
@@ -504,7 +504,7 @@ the labels correctly.
 .. code:: python
 
    predictions = pygad.cnn.predict(last_layer=GANN_instance.population_networks[solution_idx], data_inputs=data_inputs)
-   print("Predictions of the trained network : {predictions}".format(predictions=predictions))
+   print(f"Predictions of the trained network : {predictions}")
 
 Calculating Some Statistics
 ---------------------------
@@ -518,9 +518,9 @@ addition to the classification accuracy.
    num_wrong = numpy.where(predictions != data_outputs)[0]
    num_correct = data_outputs.size - num_wrong.size
    accuracy = 100 * (num_correct/data_outputs.size)
-   print("Number of correct classifications : {num_correct}.".format(num_correct=num_correct))
-   print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
-   print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
+   print(f"Number of correct classifications : {num_correct}.")
+   print(f"Number of wrong classifications : {num_wrong.size}.")
+   print(f"Classification accuracy : {accuracy}.")
 
 .. code:: 
 
@@ -575,8 +575,8 @@ complete code is listed below.
 
        GACNN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solutions_fitness))
+       print(f"Generation = {ga_instance.generations_completed}")
+       print(f"Fitness    = {ga_instance.best_solutions_fitness}")
 
    data_inputs = numpy.load("dataset_inputs.npy")
    data_outputs = numpy.load("dataset_outputs.npy")
@@ -642,21 +642,21 @@ complete code is listed below.
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Parameters of the best solution : {solution}".format(solution=solution))
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Parameters of the best solution : {solution}")
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
    if ga_instance.best_solution_generation != -1:
-       print("Best fitness value reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
+       print(f"Best fitness value reached after {ga_instance.best_solution_generation} generations.")
 
    # Predicting the outputs of the data using the best solution.
    predictions = GACNN_instance.population_networks[solution_idx].predict(data_inputs=data_inputs)
-   print("Predictions of the trained network : {predictions}".format(predictions=predictions))
+   print(f"Predictions of the trained network : {predictions}")
 
    # Calculating some statistics
    num_wrong = numpy.where(predictions != data_outputs)[0]
    num_correct = data_outputs.size - num_wrong.size
    accuracy = 100 * (num_correct/data_outputs.size)
-   print("Number of correct classifications : {num_correct}.".format(num_correct=num_correct))
-   print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
-   print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
+   print(f"Number of correct classifications : {num_correct}.")
+   print(f"Number of wrong classifications : {num_wrong.size}.")
+   print(f"Classification accuracy : {accuracy}.")

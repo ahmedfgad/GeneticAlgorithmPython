@@ -212,8 +212,8 @@ subsections discuss each part in the code.
        return solution_fitness
 
    def on_generation(ga_instance):
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+       print(f"Generation = {ga_instance.generations_completed}")
+       print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
    # Create the PyTorch model.
    input_layer = torch.nn.Linear(3, 5)
@@ -261,8 +261,8 @@ subsections discuss each part in the code.
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
    # Make predictions based on the best solution.
    predictions = pygad.torchga.predict(model=model, 
@@ -415,8 +415,8 @@ To get information about the best solution found by PyGAD, use the
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
 .. code:: python
 
@@ -478,8 +478,8 @@ previous example.
        return solution_fitness
 
    def on_generation(ga_instance):
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+       print(f"Generation = {ga_instance.generations_completed}")
+       print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
    # Create the PyTorch model.
    input_layer  = torch.nn.Linear(2, 4)
@@ -531,8 +531,8 @@ previous example.
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
    # Make predictions based on the best solution.
    predictions = pygad.torchga.predict(model=model, 
@@ -639,8 +639,8 @@ Here is the code.
        return solution_fitness
 
    def on_generation(ga_instance):
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+       print(f"Generation = {ga_instance.generations_completed}")
+       print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
    # Build the PyTorch model using the functional API.
    input_layer = torch.nn.Linear(360, 50)
@@ -688,8 +688,8 @@ Here is the code.
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
    # Fetch the parameters of the best solution.
    best_solution_weights = torchga.model_weights_as_dict(model=model,
@@ -784,8 +784,8 @@ Here is the complete code.
        return solution_fitness
 
    def on_generation(ga_instance):
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+       print(f"Generation = {ga_instance.generations_completed}")
+       print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
    # Build the PyTorch model.
    input_layer = torch.nn.Conv2d(in_channels=3, out_channels=5, kernel_size=7)
@@ -847,8 +847,8 @@ Here is the complete code.
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
    # Make predictions based on the best solution.
    predictions = pygad.torchga.predict(model=model, 

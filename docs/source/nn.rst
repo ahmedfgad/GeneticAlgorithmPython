@@ -181,7 +181,7 @@ points to the layer **N-2**, the layer **N-2** points to the layer
 **N-3**, and so on until reaching the end of the linked list which is
 layer 1 (input layer).
 
-.. figure:: https://user-images.githubusercontent.com/16560492/81918975-816af880-95d7-11ea-83e3-34d14c3316db.jpg
+.. image:: https://user-images.githubusercontent.com/16560492/81918975-816af880-95d7-11ea-83e3-34d14c3316db.jpg
    :alt: 
 
 The one way linked list allows returning all properties of all layers in
@@ -680,9 +680,9 @@ addition to the classification accuracy.
    num_wrong = numpy.where(predictions != data_outputs)[0]
    num_correct = data_outputs.size - num_wrong.size
    accuracy = 100 * (num_correct/data_outputs.size)
-   print("Number of correct classifications : {num_correct}.".format(num_correct=num_correct))
-   print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
-   print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
+   print(f"Number of correct classifications : {num_correct}.")
+   print(f"Number of wrong classifications : {num_wrong.size}.")
+   print(f"Classification accuracy : {accuracy}.")
 
 It is very important to note that it is not expected that the
 classification accuracy is high because no training algorithm is used.
@@ -746,9 +746,9 @@ has 2 neurons, one for each class.
    num_wrong = numpy.where(predictions != data_outputs)[0]
    num_correct = data_outputs.size - num_wrong.size
    accuracy = 100 * (num_correct/data_outputs.size)
-   print("Number of correct classifications : {num_correct}.".format(num_correct=num_correct))
-   print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
-   print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
+   print(f"Number of correct classifications : {num_correct}.")
+   print(f"Number of wrong classifications : {num_wrong.size}.")
+   print(f"Classification accuracy : {accuracy}.")
 
 Image Classification
 --------------------
@@ -805,9 +805,9 @@ files before running this code.
    num_wrong = numpy.where(predictions != data_outputs)[0]
    num_correct = data_outputs.size - num_wrong.size
    accuracy = 100 * (num_correct/data_outputs.size)
-   print("Number of correct classifications : {num_correct}.".format(num_correct=num_correct))
-   print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
-   print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
+   print(f"Number of correct classifications : {num_correct}.")
+   print(f"Number of wrong classifications : {num_wrong.size}.")
+   print(f"Classification accuracy : {accuracy}.")
 
 Regression Example 1
 --------------------
@@ -839,7 +839,7 @@ what to do to make the code works for regression:
 .. code:: python
 
    abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
-   print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+   print(f"Absolute error : {abs_error}.")
 
 Here is the complete code. Yet, there is no algorithm used to train the
 network and thus the network is expected to give bad results. Later, the
@@ -886,7 +886,7 @@ classification networks.
 
    # Calculating some statistics
    abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
-   print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+   print(f"Absolute error : {abs_error}.")
 
 Regression Example 2 - Fish Weight Prediction
 ---------------------------------------------
@@ -928,7 +928,7 @@ error is calculated.
 .. code:: python
 
    abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
-   print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+   print(f"Absolute error : {abs_error}.")
 
 Here is the complete code.
 
@@ -973,4 +973,4 @@ Here is the complete code.
 
    # Calculating some statistics
    abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
-   print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+   print(f"Absolute error : {abs_error}.")

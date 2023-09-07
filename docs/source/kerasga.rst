@@ -254,8 +254,8 @@ subsections discuss each part in the code.
        return solution_fitness
 
    def on_generation(ga_instance):
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+       print(f"Generation = {ga_instance.generations_completed}")
+       print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
    input_layer  = tensorflow.keras.layers.Input(3)
    dense_layer1 = tensorflow.keras.layers.Dense(5, activation="relu")(input_layer)
@@ -296,18 +296,18 @@ subsections discuss each part in the code.
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
    # Make prediction based on the best solution.
    predictions = pygad.kerasga.predict(model=model,
                                        solution=solution,
                                        data=data_inputs)
-   print("Predictions : \n", predictions)
+   print(f"Predictions : \n{predictions}")
 
    mae = tensorflow.keras.losses.MeanAbsoluteError()
    abs_error = mae(data_outputs, predictions).numpy()
-   print("Absolute Error : ", abs_error)
+   print(f"Absolute Error : {abs_error}")
 
 Create a Keras Model
 ~~~~~~~~~~~~~~~~~~~~
@@ -461,8 +461,8 @@ To get information about the best solution found by PyGAD, use the
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
 .. code:: python
 
@@ -478,7 +478,7 @@ return the model predictions based on the best solution.
    predictions = pygad.kerasga.predict(model=model,
                                        solution=solution,
                                        data=data_inputs)
-   print("Predictions : \n", predictions)
+   print(f"Predictions : \n{predictions}")
 
 .. code:: python
 
@@ -494,7 +494,7 @@ The next code measures the trained model error.
 
    mae = tensorflow.keras.losses.MeanAbsoluteError()
    abs_error = mae(data_outputs, predictions).numpy()
-   print("Absolute Error : ", abs_error)
+   print(f"Absolute Error : {abs_error}")
 
 .. code:: 
 
@@ -527,8 +527,8 @@ previous example.
        return solution_fitness
 
    def on_generation(ga_instance):
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+       print(f"Generation = {ga_instance.generations_completed}")
+       print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
    # Build the keras model using the functional API.
    input_layer  = tensorflow.keras.layers.Input(2)
@@ -573,14 +573,14 @@ previous example.
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
    # Make predictions based on the best solution.
    predictions = pygad.kerasga.predict(model=model,
                                        solution=solution,
                                        data=data_inputs)
-   print("Predictions : \n", predictions)
+   print(f"Predictions : \n{predictions}")
 
    # Calculate the binary crossentropy for the trained model.
    bce = tensorflow.keras.losses.BinaryCrossentropy()
@@ -590,7 +590,7 @@ previous example.
    ba = tensorflow.keras.metrics.BinaryAccuracy()
    ba.update_state(data_outputs, predictions)
    accuracy = ba.result().numpy()
-   print("Accuracy : ", accuracy)
+   print(f"Accuracy : {accuracy}")
 
 Compared to the previous regression example, here are the changes:
 
@@ -680,8 +680,8 @@ Here is the code.
        return solution_fitness
 
    def on_generation(ga_instance):
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+       print(f"Generation = {ga_instance.generations_completed}")
+       print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
    # Build the keras model using the functional API.
    input_layer  = tensorflow.keras.layers.Input(360)
@@ -721,24 +721,24 @@ Here is the code.
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
    # Make predictions based on the best solution.
    predictions = pygad.kerasga.predict(model=model,
                                        solution=solution,
                                        data=data_inputs)
-   # print("Predictions : \n", predictions)
+   # print(f"Predictions : \n{predictions}")
 
    # Calculate the categorical crossentropy for the trained model.
    cce = tensorflow.keras.losses.CategoricalCrossentropy()
-   print("Categorical Crossentropy : ", cce(data_outputs, predictions).numpy())
+   print(f"Categorical Crossentropy : {cce(data_outputs, predictions).numpy()}")
 
    # Calculate the classification accuracy for the trained model.
    ca = tensorflow.keras.metrics.CategoricalAccuracy()
    ca.update_state(data_outputs, predictions)
    accuracy = ca.result().numpy()
-   print("Accuracy : ", accuracy)
+   print(f"Accuracy : {accuracy}")
 
 Compared to the previous binary classification example, this example has
 multiple classes (4) and thus the loss is measured using categorical
@@ -827,8 +827,8 @@ Here is the complete code.
        return solution_fitness
 
    def on_generation(ga_instance):
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+       print(f"Generation = {ga_instance.generations_completed}")
+       print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
    # Build the keras model using the functional API.
    input_layer = tensorflow.keras.layers.Input(shape=(100, 100, 3))
@@ -877,24 +877,24 @@ Here is the complete code.
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
    # Make predictions based on the best solution.
    predictions = pygad.kerasga.predict(model=model,
                                        solution=solution,
                                        data=data_inputs)
-   # print("Predictions : \n", predictions)
+   # print(f"Predictions : \n{predictions}")
 
    # Calculate the categorical crossentropy for the trained model.
    cce = tensorflow.keras.losses.CategoricalCrossentropy()
-   print("Categorical Crossentropy : ", cce(data_outputs, predictions).numpy())
+   print(f"Categorical Crossentropy : {cce(data_outputs, predictions).numpy()}")
 
    # Calculate the classification accuracy for the trained model.
    ca = tensorflow.keras.metrics.CategoricalAccuracy()
    ca.update_state(data_outputs, predictions)
    accuracy = ca.result().numpy()
-   print("Accuracy : ", accuracy)
+   print(f"Accuracy : {accuracy}")
 
 Compared to the previous example, the only change is that the
 architecture uses convolutional and max-pooling layers. The shape of
@@ -1010,8 +1010,8 @@ more computational time.
        return solution_fitness
 
    def on_generation(ga_instance):
-       print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-       print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution(ga_instance.last_generation_fitness)[1]))
+       print("Generation = {ga_instance.generations_completed}")
+       print("Fitness    = {ga_instance.best_solution(ga_instance.last_generation_fitness)[1]}")
 
    # The dataset path.
    dataset_path = r'../data/Skin_Cancer_Dataset' 
@@ -1059,20 +1059,20 @@ more computational time.
 
    # Returning the details of the best solution.
    solution, solution_fitness, solution_idx = ga_instance.best_solution(ga_instance.last_generation_fitness)
-   print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-   print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+   print(f"Fitness value of the best solution = {solution_fitness}")
+   print(f"Index of the best solution : {solution_idx}")
 
    predictions = pygad.kerasga.predict(model=model,
                                        solution=solution,
                                        data=train_generator)
-   # print("Predictions : \n", predictions)
+   # print(f"Predictions : \n{predictions}")
 
    # Calculate the categorical crossentropy for the trained model.
    cce = tensorflow.keras.losses.CategoricalCrossentropy()
-   print("Categorical Crossentropy : ", cce(data_outputs, predictions).numpy())
+   print(f"Categorical Crossentropy : {cce(data_outputs, predictions).numpy()}")
 
    # Calculate the classification accuracy for the trained model.
    ca = tensorflow.keras.metrics.CategoricalAccuracy()
    ca.update_state(data_outputs, predictions)
    accuracy = ca.result().numpy()
-   print("Accuracy : ", accuracy)
+   print(f"Accuracy : {accuracy}")
