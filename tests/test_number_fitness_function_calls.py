@@ -56,8 +56,8 @@ def number_calls_fitness_function(keep_elitism=1,
         if mutation_type == "adaptive":
             expected_num_fitness_calls += num_generations * (sol_per_pop - keep_elitism)
 
-    print("Expected number of fitness function calls is {expected_num_fitness_calls}.".format(expected_num_fitness_calls=expected_num_fitness_calls))
-    print("Actual number of fitness function calls is {actual_num_fitness_calls}.".format(actual_num_fitness_calls=actual_num_fitness_calls))
+    print(f"Expected number of fitness function calls is {expected_num_fitness_calls}.")
+    print(f"Actual number of fitness function calls is {actual_num_fitness_calls}.")
     return actual_num_fitness_calls, expected_num_fitness_calls
 
 def test_number_calls_fitness_function_default_keep():
