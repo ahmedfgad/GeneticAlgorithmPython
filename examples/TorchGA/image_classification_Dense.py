@@ -15,8 +15,8 @@ def fitness_func(ga_instanse, solution, sol_idx):
     return solution_fitness
 
 def on_generation(ga_instance):
-    print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-    print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+    print(f"Generation = {ga_instance.generations_completed}")
+    print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
 # Build the PyTorch model using the functional API.
 input_layer = torch.nn.Linear(360, 50)
@@ -64,8 +64,8 @@ ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewi
 
 # Returning the details of the best solution.
 solution, solution_fitness, solution_idx = ga_instance.best_solution()
-print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+print(f"Fitness value of the best solution = {solution_fitness}")
+print(f"Index of the best solution : {solution_idx}")
 
 predictions = pygad.torchga.predict(model=model, 
                                     solution=solution, 
@@ -73,8 +73,8 @@ predictions = pygad.torchga.predict(model=model,
 # print("Predictions : \n", predictions)
 
 # Calculate the crossentropy loss of the trained model.
-print("Crossentropy : ", loss_function(predictions, data_outputs).detach().numpy())
+print(f"Crossentropy : {loss_function(predictions, data_outputs).detach().numpy()}")
 
 # Calculate the classification accuracy for the trained model.
 accuracy = torch.true_divide(torch.sum(torch.max(predictions, axis=1).indices == data_outputs), len(data_outputs))
-print("Accuracy : ", accuracy.detach().numpy())
+print(f"Accuracy : {accuracy.detach().numpy()}")

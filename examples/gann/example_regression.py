@@ -20,9 +20,9 @@ def callback_generation(ga_instance):
 
     GANN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
-    print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-    print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1]))
-    print("Change     = {change}".format(change=ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1] - last_fitness))
+    print(f"Generation = {ga_instance.generations_completed}")
+    print(f"Fitness    = {ga_instance.best_solution()[1]}")
+    print(f"Change     = {ga_instance.best_solution()[1] - last_fitness}")
 
     last_fitness = ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1].copy()
 
@@ -95,19 +95,19 @@ ga_instance.plot_fitness()
 
 # Returning the details of the best solution.
 solution, solution_fitness, solution_idx = ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)
-print("Parameters of the best solution : {solution}".format(solution=solution))
-print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+print(f"Parameters of the best solution : {solution}")
+print(f"Fitness value of the best solution = {solution_fitness}")
+print(f"Index of the best solution : {solution_idx}")
 
 if ga_instance.best_solution_generation != -1:
-    print("Best fitness value reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
+    print(f"Best fitness value reached after {ga_instance.best_solution_generation} generations.")
 
 # Predicting the outputs of the data using the best solution.
 predictions = pygad.nn.predict(last_layer=GANN_instance.population_networks[solution_idx],
                                data_inputs=data_inputs,
                                problem_type="regression")
-print("Predictions of the trained network : {predictions}".format(predictions=predictions))
+print("Predictions of the trained network : {predictions}")
 
 # Calculating some statistics
 abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
-print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+print(f"Absolute error : {abs_error}.")

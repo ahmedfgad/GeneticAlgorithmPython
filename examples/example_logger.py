@@ -29,8 +29,8 @@ def fitness_func(ga_instance, solution, solution_idx):
     return fitness
 
 def on_generation(ga_instance):
-    ga_instance.logger.info("Generation = {generation}".format(generation=ga_instance.generations_completed))
-    ga_instance.logger.info("Fitness    = {fitness}".format(fitness=ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1]))
+    ga_instance.logger.info(f"Generation = {ga_instance.generations_completed}")
+    ga_instance.logger.info(f"Fitness    = {ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)[1]}")
 
 ga_instance = pygad.GA(num_generations=10,
                        sol_per_pop=40,

@@ -119,9 +119,9 @@ ga_instance = pygad.GA(num_generations=100,
 ga_instance.run()
 
 best_solution, best_solution_fitness, best_solution_idx = ga_instance.best_solution()
-print("Best solution is {bs}".format(bs=best_solution))
-print("Fitness of the best solution is {bsf}".format(bsf=best_solution_fitness))
-print("Best solution found after {gen} generations".format(gen=ga_instance.best_solution_generation))
+print(f"Best solution is {best_solution}")
+print(f"Fitness of the best solution is {best_solution_fitness}")
+print(f"Best solution found after {ga_instance.best_solution_generation} generations")
 
 cluster_centers, all_clusters_dists, cluster_indices, clusters, clusters_sum_dist = cluster_data(best_solution, best_solution_idx)
 

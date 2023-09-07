@@ -46,6 +46,6 @@ predictions = pygad.nn.predict(last_layer=output_layer, data_inputs=data_inputs)
 num_wrong = numpy.where(predictions != data_outputs)[0]
 num_correct = data_outputs.size - num_wrong.size
 accuracy = 100 * (num_correct/data_outputs.size)
-print("Number of correct classifications : {num_correct}.".format(num_correct=num_correct))
-print("Number of wrong classifications : {num_wrong}.".format(num_wrong=num_wrong.size))
-print("Classification accuracy : {accuracy}.".format(accuracy=accuracy))
+print(f"Number of correct classifications : {num_correct}.")
+print(f"Number of wrong classifications : {num_wrong.size}.")
+print(f"Classification accuracy : {accuracy}.")
