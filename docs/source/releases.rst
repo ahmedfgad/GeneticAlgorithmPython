@@ -1404,7 +1404,7 @@ Release Date 20 June 2023
 PyGAD 3.2.0
 -----------
 
-Release Date 6 September 2023
+Release Date 7 September 2023
 
 1.  A new module ``pygad.utils.nsga2`` is created that has the ``NSGA2``
     class that includes the functionalities of NSGA-II. The class has
