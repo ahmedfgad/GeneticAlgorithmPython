@@ -300,8 +300,22 @@ visualize Module
 
 
 
-
 .. _header-n8:
+
+helper Module
+===============
+
+
+.. toctree::
+   :maxdepth: 4
+   :caption: helper Module TOC
+
+   helper.rst
+
+
+
+
+.. _header-n9:
 
 pygad.nn Module
 ===============
@@ -317,7 +331,7 @@ pygad.nn Module
 
 
 
-.. _header-n9:
+.. _header-n10:
 
 pygad.gann Module
 =================
@@ -337,7 +351,7 @@ pygad.gann Module
 
 
 
-.. _header-n10:
+.. _header-n11:
 
 pygad.cnn Module
 =================
@@ -351,7 +365,7 @@ pygad.cnn Module
 
 
 
-.. _header-n11:
+.. _header-n12:
 
 pygad.gacnn Module
 =================
@@ -366,7 +380,7 @@ pygad.gacnn Module
 
 
 
-.. _header-n12:
+.. _header-n13:
 
 pygad.kerasga Module
 =================
@@ -381,7 +395,7 @@ pygad.kerasga Module
 
 
 
-.. _header-n13:
+.. _header-n14:
 
 pygad.torchga Module
 =================
@@ -394,9 +408,7 @@ pygad.torchga Module
    torchga.rst
 
 
-
-
-.. _header-n14:
+.. _header-n15:
 
 Releases
 =================
@@ -407,20 +419,6 @@ Releases
    :caption: Releases
 
    releases.rst
-
-
-
-.. _header-n15:
-
-helper Module
-=================
-
-
-.. toctree::
-   :maxdepth: 4
-   :caption: helper Module TOC
-
-   helper.rst
 
 
 
