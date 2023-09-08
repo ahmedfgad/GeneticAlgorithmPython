@@ -9,6 +9,9 @@ import pygad
 
 class Mutation:
 
+    def __init__():
+        pass
+
     def random_mutation(self, offspring):
 
         """
@@ -471,7 +474,14 @@ class Mutation:
 
         first_idx = len(parents_to_keep)
         last_idx = fitness.shape[0]
-        fitness[first_idx:last_idx] = [0]*(last_idx - first_idx)
+        if len(fitness.shape) > 1:
+            # TODO This is a multi-objective optimization problem.
+            # fitness[first_idx:last_idx] = [0]*(last_idx - first_idx)
+            fitness[first_idx:last_idx] = numpy.zeros(shape=(last_idx - first_idx, fitness.shape[1]))
+            # raise ValueError('Edit adaptive mutation to work with multi-objective optimization problems.')
+        else:
+            # This is a single-objective optimization problem.
+            fitness[first_idx:last_idx] = [0]*(last_idx - first_idx)
 
         if self.fitness_batch_size in [1, None]:
             # Calculate the fitness for each individual solution.
@@ -508,7 +518,13 @@ class Mutation:
                 for idx in range(batch_first_index, batch_last_index):
                     fitness[idx] = fitness_temp[idx - batch_first_index]
 
-        average_fitness = numpy.mean(fitness)
+        if len(fitness.shape) > 1:
+            # TODO This is a multi-objective optimization problem.
+            # Calculate the average of each objective's fitness across all solutions in the population.
+            average_fitness = numpy.mean(fitness, axis=0)
+        else:
+            # This is a single-objective optimization problem.
+            average_fitness = numpy.mean(fitness)
 
         return average_fitness, fitness[len(parents_to_keep):]
 
@@ -667,7 +683,7 @@ class Mutation:
                                                                                          gene_type=self.gene_type,
                                                                                          num_trials=10)
         return offspring
-        
+
     def adaptive_mutation_randomly(self, offspring):
 
         """
@@ -684,10 +700,30 @@ class Mutation:
         # Adaptive random mutation changes one or more genes in each offspring randomly.
         # The number of genes to mutate depends on the solution's fitness value.
         for offspring_idx in range(offspring.shape[0]):
-            if offspring_fitness[offspring_idx] < average_fitness:
-                adaptive_mutation_num_genes = self.mutation_num_genes[0]
+            ## TODO Make edits to work with multi-objective optimization.
+            # Compare the fitness of each offspring to the average fitness of each objective function.
+            fitness_comparison = offspring_fitness[offspring_idx] < average_fitness
+            # Check if the problem is single or multi-objective optimization.
+            if type(fitness_comparison) in [bool, numpy.bool_]:
+                # Single-objective optimization problem.
+                if fitness_comparison:
+                    adaptive_mutation_num_genes = self.mutation_num_genes[0]
+                else:
+                    adaptive_mutation_num_genes = self.mutation_num_genes[1]
             else:
-                adaptive_mutation_num_genes = self.mutation_num_genes[1]
+                # Multi-objective optimization problem.
+
+                # Get the sum of the pool array (result of comparison).
+                # True is considered 1 and False is 0.
+                fitness_comparison_sum = sum(fitness_comparison)
+                # Check if more than or equal to 50% of the objectives have fitness greater than the average.
+                # If True, then use the first percentage. 
+                # If False, use the second percentage.
+                if fitness_comparison_sum >= len(fitness_comparison)/2:
+                    adaptive_mutation_num_genes = self.mutation_num_genes[0]
+                else:
+                    adaptive_mutation_num_genes = self.mutation_num_genes[1]
+
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
             for gene_idx in mutation_indices:
 

@@ -16,8 +16,8 @@ def fitness_func(ga_instanse, solution, sol_idx):
     return solution_fitness
 
 def on_generation(ga_instance):
-    print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-    print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+    print(f"Generation = {ga_instance.generations_completed}")
+    print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
 # Build the keras model using the functional API.
 input_layer  = tensorflow.keras.layers.Input(360)
@@ -57,8 +57,8 @@ ga_instance.plot_fitness(title="PyGAD & Keras - Iteration vs. Fitness", linewidt
 
 # Returning the details of the best solution.
 solution, solution_fitness, solution_idx = ga_instance.best_solution()
-print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+print(f"Fitness value of the best solution = {solution_fitness}")
+print(f"Index of the best solution : {solution_idx}")
 
 # Fetch the parameters of the best solution.
 predictions = pygad.kerasga.predict(model=model,
@@ -68,13 +68,13 @@ predictions = pygad.kerasga.predict(model=model,
 
 # Calculate the categorical crossentropy for the trained model.
 cce = tensorflow.keras.losses.CategoricalCrossentropy()
-print("Categorical Crossentropy : ", cce(data_outputs, predictions).numpy())
+print(f"Categorical Crossentropy : {cce(data_outputs, predictions).numpy()}")
 
 # Calculate the classification accuracy for the trained model.
 ca = tensorflow.keras.metrics.CategoricalAccuracy()
 ca.update_state(data_outputs, predictions)
 accuracy = ca.result().numpy()
-print("Accuracy : ", accuracy)
+print(f"Accuracy : {accuracy}")
 
 # model.compile(optimizer="Adam", loss="mse", metrics=["mae"])
 

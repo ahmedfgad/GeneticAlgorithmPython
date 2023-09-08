@@ -19,9 +19,10 @@ optimizing machine learning algorithms. It works with
 different types of crossover, mutation, and parent selection operators.
 `PyGAD <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ allows
 different types of problems to be optimized using the genetic algorithm
-by customizing the fitness function.
+by customizing the fitness function. It works with both single-objective
+and multi-objective optimization problems.
 
-.. figure:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
+.. image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :alt: 
 
 *Logo designed by* `Asmaa
@@ -107,6 +108,11 @@ equation.
 
 A very important step is to implement the fitness function that will be
 used for calculating the fitness value for each solution. Here is one.
+
+If the fitness function returns a number, then the problem is
+single-objective. If a ``list``, ``tuple``, or ``numpy.ndarray`` is
+returned, then it is a multi-objective problem (applicable even if a
+single element exists).
 
 .. code:: python
 
@@ -213,7 +219,7 @@ PyGAD's Modules
 8.  The ``visualize`` module to visualize the results.
 
 9.  The ``utils`` module contains the operators (crossover, mutation,
-    and parent selection).
+    and parent selection) and the NSGA-II code.
 
 10. The ``helper`` module has some helper functions.
 
@@ -251,8 +257,65 @@ pygad Module
 
 
 
-
 .. _header-n5:
+
+More About pygad Module
+===============
+
+
+.. toctree::
+   :maxdepth: 4
+   :caption: More About pygad Module TOC
+
+   pygad_more.rst
+
+
+
+
+.. _header-n6:
+
+utils Module
+===============
+
+
+.. toctree::
+   :maxdepth: 4
+   :caption: utils Module TOC
+
+   utils.rst
+
+
+
+.. _header-n7:
+
+visualize Module
+===============
+
+
+.. toctree::
+   :maxdepth: 4
+   :caption: visualize Module TOC
+
+   visualize.rst
+
+
+
+.. _header-n8:
+
+helper Module
+===============
+
+
+.. toctree::
+   :maxdepth: 4
+   :caption: helper Module TOC
+
+   helper.rst
+
+
+
+
+.. _header-n9:
 
 pygad.nn Module
 ===============
@@ -268,7 +331,7 @@ pygad.nn Module
 
 
 
-.. _header-n6:
+.. _header-n10:
 
 pygad.gann Module
 =================
@@ -288,7 +351,7 @@ pygad.gann Module
 
 
 
-.. _header-n7:
+.. _header-n11:
 
 pygad.cnn Module
 =================
@@ -302,13 +365,7 @@ pygad.cnn Module
 
 
 
-
-
-
-
-
-
-.. _header-n8:
+.. _header-n12:
 
 pygad.gacnn Module
 =================
@@ -323,7 +380,7 @@ pygad.gacnn Module
 
 
 
-.. _header-n9:
+.. _header-n13:
 
 pygad.kerasga Module
 =================
@@ -338,7 +395,7 @@ pygad.kerasga Module
 
 
 
-.. _header-n10:
+.. _header-n14:
 
 pygad.torchga Module
 =================
@@ -351,20 +408,17 @@ pygad.torchga Module
    torchga.rst
 
 
+.. _header-n15:
 
-
-.. _header-n11:
-
-More Information
+Releases
 =================
 
 
 .. toctree::
    :maxdepth: 4
-   :caption: More Information
+   :caption: Releases
 
    releases.rst
-
 
 
 

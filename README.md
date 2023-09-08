@@ -1,6 +1,6 @@
 # PyGAD:  Genetic Algorithm in Python
 
-[PyGAD](https://pypi.org/project/pygad) is an open-source easy-to-use Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. It supports Keras and PyTorch.
+[PyGAD](https://pypi.org/project/pygad) is an open-source easy-to-use Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. It supports Keras and PyTorch. PyGAD supports optimizing both single-objective and multi-objective problems.
 
 Check documentation of the [PyGAD](https://pygad.readthedocs.io/en/latest).
 
@@ -146,7 +146,7 @@ on_stop()
 
 # Example
 
-Check the [PyGAD's documentation](https://pygad.readthedocs.io/en/latest/pygad.html) for information about the implementation of this example.
+Check the [PyGAD's documentation](https://pygad.readthedocs.io/en/latest/pygad.html) for information about the implementation of this example. It solves a single-objective problem.
 
 ```python
 import pygad
@@ -183,9 +183,9 @@ num_genes = len(function_inputs)
 last_fitness = 0
 def callback_generation(ga_instance):
     global last_fitness
-    print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-    print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
-    print("Change     = {change}".format(change=ga_instance.best_solution()[1] - last_fitness))
+    print(f"Generation = {ga_instance.generations_completed}")
+    print(f"Fitness    = {ga_instance.best_solution()[1]}")
+    print(f"Change     = {ga_instance.best_solution()[1] - last_fitness}")
     last_fitness = ga_instance.best_solution()[1]
 
 # Creating an instance of the GA class inside the ga module. Some parameters are initialized within the constructor.
@@ -204,15 +204,15 @@ ga_instance.plot_fitness()
 
 # Returning the details of the best solution.
 solution, solution_fitness, solution_idx = ga_instance.best_solution()
-print("Parameters of the best solution : {solution}".format(solution=solution))
-print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+print(f"Parameters of the best solution : {solution}")
+print(f"Fitness value of the best solution = {solution_fitness}")
+print(f"Index of the best solution : {solution_idx}")
 
 prediction = numpy.sum(numpy.array(function_inputs)*solution)
-print("Predicted output based on the best solution : {prediction}".format(prediction=prediction))
+print(f"Predicted output based on the best solution : {prediction}")
 
 if ga_instance.best_solution_generation != -1:
-    print("Best fitness value reached after {best_solution_generation} generations.".format(best_solution_generation=ga_instance.best_solution_generation))
+    print(g"Best fitness value reached after {ga_instance.best_solution_generation} generations.")
 
 # Saving the GA instance.
 filename = 'genetic' # The filename to which the instance is saved. The name is without extension.

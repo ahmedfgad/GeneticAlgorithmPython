@@ -3,41 +3,24 @@ The pygad.visualize.plot module has methods to create plots.
 """
 
 import numpy
-import warnings
 import matplotlib.pyplot
+import pygad
 
 class Plot:
-    def plot_result(self, 
-                    title="PyGAD - Generation vs. Fitness", 
-                    xlabel="Generation", 
-                    ylabel="Fitness", 
-                    linewidth=3, 
-                    font_size=14, 
-                    plot_type="plot",
-                    color="#3870FF",
-                    save_dir=None):
 
-        if not self.suppress_warnings: 
-            warnings.warn("Please use the plot_fitness() method instead of plot_result(). The plot_result() method will be removed in the future.")
-
-        return self.plot_fitness(title=title, 
-                                 xlabel=xlabel, 
-                                 ylabel=ylabel, 
-                                 linewidth=linewidth, 
-                                 font_size=font_size, 
-                                 plot_type=plot_type,
-                                 color=color,
-                                 save_dir=save_dir)
+    def __init__():
+        pass
 
     def plot_fitness(self, 
-                    title="PyGAD - Generation vs. Fitness", 
-                    xlabel="Generation", 
-                    ylabel="Fitness", 
-                    linewidth=3, 
-                    font_size=14, 
-                    plot_type="plot",
-                    color="#3870FF",
-                    save_dir=None):
+                     title="PyGAD - Generation vs. Fitness", 
+                     xlabel="Generation", 
+                     ylabel="Fitness", 
+                     linewidth=3, 
+                     font_size=14, 
+                     plot_type="plot",
+                     color="#64f20c",
+                     label=None,
+                     save_dir=None):
 
         """
         Creates, shows, and returns a figure that summarizes how the fitness value evolved by generation. Can only be called after completing at least 1 generation. If no generation is completed, an exception is raised.
@@ -47,9 +30,10 @@ class Plot:
             xlabel: Label on the X-axis.
             ylabel: Label on the Y-axis.
             linewidth: Line width of the plot. Defaults to 3.
-            font_size: Font size for the labels and title. Defaults to 14.
+            font_size: Font size for the labels and title. Defaults to 14. Can be a list/tuple/numpy.ndarray if the problem is multi-objective optimization.
             plot_type: Type of the plot which can be either "plot" (default), "scatter", or "bar".
-            color: Color of the plot which defaults to "#3870FF".
+            color: Color of the plot which defaults to "#64f20c". Can be a list/tuple/numpy.ndarray if the problem is multi-objective optimization.
+            label: The label used for the legend in the figures of multi-objective problems. It is not used for single-objective problems.
             save_dir: Directory to save the figure.
 
         Returns the figure.
@@ -60,15 +44,69 @@ class Plot:
             raise RuntimeError("The plot_fitness() (i.e. plot_result()) method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
 
         fig = matplotlib.pyplot.figure()
-        if plot_type == "plot":
-            matplotlib.pyplot.plot(self.best_solutions_fitness, linewidth=linewidth, color=color)
-        elif plot_type == "scatter":
-            matplotlib.pyplot.scatter(range(len(self.best_solutions_fitness)), self.best_solutions_fitness, linewidth=linewidth, color=color)
-        elif plot_type == "bar":
-            matplotlib.pyplot.bar(range(len(self.best_solutions_fitness)), self.best_solutions_fitness, linewidth=linewidth, color=color)
+        if type(self.best_solutions_fitness[0]) in [list, tuple, numpy.ndarray] and len(self.best_solutions_fitness[0]) > 1:
+            # Multi-objective optimization problem.
+            if type(linewidth) in pygad.GA.supported_int_float_types:
+                linewidth = [linewidth]
+                linewidth.extend([linewidth[0]]*len(self.best_solutions_fitness[0]))
+            elif type(linewidth) in [list, tuple, numpy.ndarray]:
+                pass
+
+            if type(color) is str:
+                color = [color]
+                color.extend([None]*len(self.best_solutions_fitness[0]))
+            elif type(color) in [list, tuple, numpy.ndarray]:
+                pass
+            
+            if label is None:
+                label = [None]*len(self.best_solutions_fitness[0])
+
+            # Loop through each objective to plot its fitness.
+            for objective_idx in range(len(self.best_solutions_fitness[0])):
+                # Return the color, line width, and label of the current plot.
+                current_color = color[objective_idx]
+                current_linewidth = linewidth[objective_idx]
+                current_label = label[objective_idx]
+                # Return the fitness values for the current objective function across all best solutions acorss all generations.
+                fitness = numpy.array(self.best_solutions_fitness)[:, objective_idx]
+                if plot_type == "plot":
+                    matplotlib.pyplot.plot(fitness, 
+                                           linewidth=current_linewidth, 
+                                           color=current_color,
+                                           label=current_label)
+                elif plot_type == "scatter":
+                    matplotlib.pyplot.scatter(range(len(fitness)), 
+                                              fitness, 
+                                              linewidth=current_linewidth, 
+                                              color=current_color,
+                                              label=current_label)
+                elif plot_type == "bar":
+                    matplotlib.pyplot.bar(range(len(fitness)), 
+                                          fitness, 
+                                          linewidth=current_linewidth, 
+                                          color=current_color,
+                                          label=current_label)
+        else:
+            # Single-objective optimization problem.
+            if plot_type == "plot":
+                matplotlib.pyplot.plot(self.best_solutions_fitness, 
+                                       linewidth=linewidth, 
+                                       color=color)
+            elif plot_type == "scatter":
+                matplotlib.pyplot.scatter(range(len(self.best_solutions_fitness)), 
+                                          self.best_solutions_fitness, 
+                                          linewidth=linewidth, 
+                                          color=color)
+            elif plot_type == "bar":
+                matplotlib.pyplot.bar(range(len(self.best_solutions_fitness)), 
+                                      self.best_solutions_fitness, 
+                                      linewidth=linewidth, 
+                                      color=color)
         matplotlib.pyplot.title(title, fontsize=font_size)
         matplotlib.pyplot.xlabel(xlabel, fontsize=font_size)
         matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
+        # Create a legend out of the labels.
+        matplotlib.pyplot.legend()
 
         if not save_dir is None:
             matplotlib.pyplot.savefig(fname=save_dir, 
@@ -84,7 +122,7 @@ class Plot:
                                linewidth=3, 
                                font_size=14, 
                                plot_type="plot",
-                               color="#3870FF",
+                               color="#64f20c",
                                save_dir=None):
 
         """
@@ -97,7 +135,7 @@ class Plot:
             linewidth: Line width of the plot. Defaults to 3.
             font_size: Font size for the labels and title. Defaults to 14.
             plot_type: Type of the plot which can be either "plot" (default), "scatter", or "bar".
-            color: Color of the plot which defaults to "#3870FF".
+            color: Color of the plot which defaults to "#64f20c".
             save_dir: Directory to save the figure.
 
         Returns the figure.
@@ -154,7 +192,7 @@ class Plot:
                    font_size=14,
                    plot_type="plot",
                    graph_type="plot",
-                   fill_color="#3870FF",
+                   fill_color="#64f20c",
                    color="black",
                    solutions="all",
                    save_dir=None):
@@ -172,7 +210,7 @@ class Plot:
             font_size: Font size for the labels and title. Defaults to 14.
             plot_type: Type of the plot which can be either "plot" (default), "scatter", or "bar".
             graph_type: Type of the graph which can be either "plot" (default), "boxplot", or "histogram".
-            fill_color: Fill color of the graph which defaults to "#3870FF". This has no effect if graph_type="plot".
+            fill_color: Fill color of the graph which defaults to "#64f20c". This has no effect if graph_type="plot".
             color: Color of the plot which defaults to "black".
             solutions: Defaults to "all" which means use all solutions. If "best" then only the best solutions are used.
             save_dir: Directory to save the figure.

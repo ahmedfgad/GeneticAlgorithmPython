@@ -56,7 +56,7 @@ def number_duplicate_genes(gene_space=None,
             print(solution)
         num_duplicates += num
 
-    print("Number of duplicates is {num_duplicates}.".format(num_duplicates=num_duplicates))
+    print(f"Number of duplicates is {num_duplicates}.")
     return num_duplicates
 
 def test_number_duplicates_default():

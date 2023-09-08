@@ -43,4 +43,4 @@ predictions = pygad.nn.predict(last_layer=output_layer,
 
 # Calculating some statistics
 abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
-print("Absolute error : {abs_error}.".format(abs_error=abs_error))
+print(f"Absolute error : {abs_error}.")

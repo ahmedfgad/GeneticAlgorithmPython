@@ -121,7 +121,7 @@ def number_respect_gene_space(gene_space=None,
                         else:
                             num_outside += 1
 
-    print("Number of outside range is {num_outside}.".format(num_outside=num_outside))
+    print(f"Number of outside range is {num_outside}.")
     return num_outside, ga_instance
 
 def test_gene_space_range():

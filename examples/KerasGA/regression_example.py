@@ -17,8 +17,8 @@ def fitness_func(ga_instanse, solution, sol_idx):
     return solution_fitness
 
 def on_generation(ga_instance):
-    print("Generation = {generation}".format(generation=ga_instance.generations_completed))
-    print("Fitness    = {fitness}".format(fitness=ga_instance.best_solution()[1]))
+    print(f"Generation = {ga_instance.generations_completed}")
+    print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
 # Create the Keras model.
 input_layer  = tensorflow.keras.layers.Input(3)
@@ -61,17 +61,17 @@ ga_instance.plot_fitness(title="PyGAD & Keras - Iteration vs. Fitness", linewidt
 
 # Returning the details of the best solution.
 solution, solution_fitness, solution_idx = ga_instance.best_solution()
-print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
-print("Index of the best solution : {solution_idx}".format(solution_idx=solution_idx))
+print(f"Fitness value of the best solution = {solution_fitness}")
+print(f"Index of the best solution : {solution_idx}")
 
 predictions = pygad.kerasga.predict(model=model,
                                     solution=solution,
                                     data=data_inputs)
-print("Predictions : \n", predictions)
+print(f"Predictions : \n{predictions}")
 
 mae = tensorflow.keras.losses.MeanAbsoluteError()
 abs_error = mae(data_outputs, predictions).numpy()
-print("Absolute Error : ", abs_error)
+print(f"Absolute Error : {abs_error}")
 
 # model.compile(optimizer="Adam", loss="mse", metrics=["mae"])
 

@@ -66,7 +66,7 @@ def output_crossover_mutation(gene_space=None,
     comparison_result = numpy.array(comparison_result)
     result = numpy.all(comparison_result == True)
 
-    print("Comparison result is {result}".format(result=result))
+    print(f"Comparison result is {result}")
     return result, ga_instance
 
 def test_no_crossover_no_mutation():

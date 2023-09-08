@@ -75,8 +75,8 @@ def number_lifecycle_callback_functions_calls(stop_criteria=None,
     # Use 'generations_completed' instead of 'num_generations' because the evolution may stops in the on_generation() callback.
     expected_num_callbacks_calls = 1 + ga_instance.generations_completed * 5 + 1
 
-    print("Expected {expected_num_callbacks_calls}.".format(expected_num_callbacks_calls=expected_num_callbacks_calls))
-    print("Actual {actual_num_callbacks_calls}.".format(actual_num_callbacks_calls=actual_num_callbacks_calls))
+    print(f"Expected {expected_num_callbacks_calls}.")
+    print(f"Actual {actual_num_callbacks_calls}.")
     return actual_num_callbacks_calls, expected_num_callbacks_calls
 
 def number_lifecycle_callback_methods_calls(stop_criteria=None,
@@ -154,8 +154,8 @@ def number_lifecycle_callback_methods_calls(stop_criteria=None,
     # Use 'generations_completed' instead of 'num_generations' because the evolution may stops in the on_generation() callback.
     expected_num_callbacks_calls = 1 + ga_instance.generations_completed * 5 + 1
 
-    print("Expected {expected_num_callbacks_calls}.".format(expected_num_callbacks_calls=expected_num_callbacks_calls))
-    print("Actual {actual_num_callbacks_calls}.".format(actual_num_callbacks_calls=actual_num_callbacks_calls))
+    print(f"Expected {expected_num_callbacks_calls}.")
+    print(f"Actual {actual_num_callbacks_calls}.")
     return actual_num_callbacks_calls, expected_num_callbacks_calls
 
 def test_number_lifecycle_callback_functions_calls():

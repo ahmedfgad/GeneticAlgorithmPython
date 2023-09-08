@@ -11,9 +11,11 @@ from pygad import helper
 from pygad import visualize
 import sys
 
+# Extend all the classes so that they can be referenced by just the `self` object of the `pygad.GA` class.
 class GA(utils.parent_selection.ParentSelection,
          utils.crossover.Crossover,
          utils.mutation.Mutation,
+         utils.nsga2.NSGA2,
          helper.unique.Unique,
          visualize.plot.Plot):
 
@@ -870,6 +872,10 @@ class GA(utils.parent_selection.ParentSelection,
                     self.select_parents = self.random_selection
                 elif (parent_selection_type == "tournament"):
                     self.select_parents = self.tournament_selection
+                elif (parent_selection_type == "tournament_nsga2"): # Supported in PyGAD >= 3.2
+                    self.select_parents = self.tournament_selection_nsga2
+                elif (parent_selection_type == "nsga2"): # Supported in PyGAD >= 3.2
+                    self.select_parents = self.nsga2_selection
                 elif (parent_selection_type == "rank"):
                     self.select_parents = self.rank_selection
                 else:
@@ -1303,6 +1309,8 @@ class GA(utils.parent_selection.ParentSelection,
             self.last_generation_elitism = None
             # Added in PyGAD 2.19.0. A NumPy array holding the indices of the elitism of the current generation. It works only if the 'keep_elitism' parameter has a non-zero value.
             self.last_generation_elitism_indices = None
+            # Supported in PyGAD 3.2.0. It holds the pareto fronts when solving a multi-objective problem.
+            self.pareto_fronts = None
         except Exception as e:
             self.logger.exception(e)
             sys.exit(-1)
@@ -1679,9 +1687,15 @@ class GA(utils.parent_selection.ParentSelection,
                         if self.fitness_batch_size in [1, None]:
                             fitness = self.fitness_func(self, sol, sol_idx)
                             if type(fitness) in GA.supported_int_float_types:
+                                # The fitness function returns a single numeric value.
+                                # This is a single-objective optimization problem.
+                                pass
+                            elif type(fitness) in [list, tuple, numpy.ndarray]:
+                                # The fitness function returns a list/tuple/numpy.ndarray.
+                                # This is a multi-objective optimization problem.
                                 pass
                             else:
-                                raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+                                raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {fitness} of type {type(fitness)} found.")
                         else:
                             # Reaching this point means that batch processing is in effect to calculate the fitness values.
                             # Do not continue the loop as no fitness is calculated. The fitness will be calculated later in batch mode.
@@ -1714,9 +1728,15 @@ class GA(utils.parent_selection.ParentSelection,
 
                         for index, fitness in zip(batch_indices, batch_fitness):
                             if type(fitness) in GA.supported_int_float_types:
+                                # The fitness function returns a single numeric value.
+                                # This is a single-objective optimization problem.
+                                pop_fitness[index] = fitness
+                            elif type(fitness) in [list, tuple, numpy.ndarray]:
+                                # The fitness function returns a list/tuple/numpy.ndarray.
+                                # This is a multi-objective optimization problem.
                                 pop_fitness[index] = fitness
                             else:
-                                raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+                                raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {fitness} of type {type(fitness)} found.")
             else:
                 # Calculating the fitness value of each solution in the current population.
                 for sol_idx, sol in enumerate(self.population):
@@ -1775,9 +1795,15 @@ class GA(utils.parent_selection.ParentSelection,
                     if self.fitness_batch_size in [1, None]:
                         for index, fitness in zip(solutions_to_submit_indices, executor.map(self.fitness_func, [self]*len(solutions_to_submit_indices), solutions_to_submit, solutions_to_submit_indices)):
                             if type(fitness) in GA.supported_int_float_types:
+                                # The fitness function returns a single numeric value.
+                                # This is a single-objective optimization problem.
+                                pop_fitness[index] = fitness
+                            elif type(fitness) in [list, tuple, numpy.ndarray]:
+                                # The fitness function returns a list/tuple/numpy.ndarray.
+                                # This is a multi-objective optimization problem.
                                 pop_fitness[index] = fitness
                             else:
-                                raise ValueError(f"The fitness function should return a number but the value {fitness} of type {type(fitness)} found.")
+                                raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {fitness} of type {type(fitness)} found.")
                     else:
                         # Reaching this block means that batch processing is used. The fitness values are calculated in batches.
 
@@ -1806,9 +1832,15 @@ class GA(utils.parent_selection.ParentSelection,
 
                             for index, fitness in zip(batch_indices, batch_fitness):
                                 if type(fitness) in GA.supported_int_float_types:
+                                    # The fitness function returns a single numeric value.
+                                    # This is a single-objective optimization problem.
+                                    pop_fitness[index] = fitness
+                                elif type(fitness) in [list, tuple, numpy.ndarray]:
+                                    # The fitness function returns a list/tuple/numpy.ndarray.
+                                    # This is a multi-objective optimization problem.
                                     pop_fitness[index] = fitness
                                 else:
-                                    raise ValueError(f"The fitness function should return a number but the value ({fitness}) of type {type(fitness)} found.")
+                                    raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value ({fitness}) of type {type(fitness)} found.")
 
             pop_fitness = numpy.array(pop_fitness)
         except Exception as ex:
@@ -2071,7 +2103,7 @@ class GA(utils.parent_selection.ParentSelection,
                                         :] = self.last_generation_offspring_mutation
                 else:
                     self.last_generation_elitism, self.last_generation_elitism_indices = self.steady_state_selection(self.last_generation_fitness,
-                                                                                                                    num_parents=self.keep_elitism)
+                                                                                                                     num_parents=self.keep_elitism)
                     self.population[0:self.last_generation_elitism.shape[0],
                                     :] = self.last_generation_elitism
                     self.population[self.last_generation_elitism.shape[0]:, :] = self.last_generation_offspring_mutation
