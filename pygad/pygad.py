@@ -1708,8 +1708,7 @@ class GA(utils.parent_selection.ParentSelection,
                     # Reaching this block means that batch fitness calculation is used.
 
                     # Indices of the solutions to calculate their fitness.
-                    solutions_indices = numpy.where(
-                        numpy.array(pop_fitness) == "undefined")[0]
+                    solutions_indices = [idx for idx, fit in enumerate(pop_fitness) if type(fit) is str and fit == "undefined"]
                     # Number of batches.
                     num_batches = int(numpy.ceil(len(solutions_indices) / self.fitness_batch_size))
                     # For each batch, get its indices and call the fitness function.
