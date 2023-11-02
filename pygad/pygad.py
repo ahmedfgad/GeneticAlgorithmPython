@@ -1646,7 +1646,9 @@ class GA(utils.parent_selection.ParentSelection,
                 last_generation_elitism_as_list = [
                     list(gen_elitism) for gen_elitism in self.last_generation_elitism]
 
-            pop_fitness = ["undefined"] * len(self.population)
+            undefined_pop_fitness = object()
+
+            pop_fitness = [undefined_pop_fitness] * len(self.population)
             if self.parallel_processing is None:
                 # Calculating the fitness value of each solution in the current population.
                 for sol_idx, sol in enumerate(self.population):
@@ -1709,6 +1711,7 @@ class GA(utils.parent_selection.ParentSelection,
 
                     # Indices of the solutions to calculate their fitness.
                     solutions_indices = [idx for idx, fit in enumerate(pop_fitness) if type(fit) is str and fit == "undefined"]
+
                     # Number of batches.
                     num_batches = int(numpy.ceil(len(solutions_indices) / self.fitness_batch_size))
                     # For each batch, get its indices and call the fitness function.
@@ -1786,7 +1789,7 @@ class GA(utils.parent_selection.ParentSelection,
                     solutions_to_submit = []
                     for sol_idx, sol in enumerate(self.population):
                         # The "undefined" value means that the fitness of this solution must be calculated.
-                        if pop_fitness[sol_idx] == "undefined":
+                        if pop_fitness[sol_idx] is undefined_pop_fitness:
                             solutions_to_submit.append(sol.copy())
                             solutions_to_submit_indices.append(sol_idx)
 
