@@ -1171,16 +1171,18 @@ class GA(utils.parent_selection.ParentSelection,
                 # reach_{target_fitness}: Stop if the target fitness value is reached.
                 # saturate_{num_generations}: Stop if the fitness value does not change (saturates) for the given number of generations.
                 criterion = stop_criteria.split("_")
+                stop_word = criterion[0]
+                # criterion[1] might be a single or multiple numbers.
+                number = criterion[1:]
+                if stop_word in self.supported_stop_words:
+                    pass
+                else:
+                    self.valid_parameters = False
+                    raise ValueError(f"In the 'stop_criteria' parameter, the supported stop words are '{self.supported_stop_words}' but '{stop_word}' found.")
+
                 if len(criterion) == 2:
-                    stop_word = criterion[0]
-                    number = criterion[1]
-
-                    if stop_word in self.supported_stop_words:
-                        pass
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError(f"In the 'stop_criteria' parameter, the supported stop words are '{self.supported_stop_words}' but '{stop_word}' found.")
-
+                    # There is only a single number.
+                    number = number[0]
                     if number.replace(".", "").isnumeric():
                         number = float(number)
                     else:
@@ -1188,6 +1190,21 @@ class GA(utils.parent_selection.ParentSelection,
                         raise ValueError(f"The value following the stop word in the 'stop_criteria' parameter must be a number but the value ({number}) of type {type(number)} found.")
 
                     self.stop_criteria.append([stop_word, number])
+                elif len(criterion) > 2:
+                    if stop_word == 'reach':
+                        pass
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError(f"Passing multiple numbers following the keyword in the 'stop_criteria' parameter is expected only with the 'reach' keyword but the keyword ({stop_word}) found.")
+
+                    for idx, num in enumerate(number):
+                        if num.replace(".", "").isnumeric():
+                            number[idx] = float(num)
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"The value(s) following the stop word in the 'stop_criteria' parameter must be numeric but the value ({num}) of type {type(num)} found.")
+
+                    self.stop_criteria.append([stop_word] + number)
 
                 else:
                     self.valid_parameters = False
@@ -2133,15 +2150,56 @@ class GA(utils.parent_selection.ParentSelection,
                 if not self.stop_criteria is None:
                     for criterion in self.stop_criteria:
                         if criterion[0] == "reach":
-                            if max(self.last_generation_fitness) >= criterion[1]:
+                            # Single-objective problem.
+                            if type(self.last_generation_fitness[0]) in GA.supported_int_float_types:
+                                if max(self.last_generation_fitness) >= criterion[1]:
+                                    stop_run = True
+                                    break
+                            # Multi-objective problem.
+                            elif type(self.last_generation_fitness[0]) in [list, tuple, numpy.ndarray]:
+                                # Validate the value passed to the criterion.
+                                if len(criterion[1:]) == 1:
+                                    # There is a single value used across all the objectives.
+                                    pass
+                                elif len(criterion[1:]) > 1:
+                                    # There are multiple values. The number of values must be equal to the number of objectives.
+                                    if len(criterion[1:]) == len(self.last_generation_fitness[0]):
+                                        pass
+                                    else:
+                                        self.valid_parameters = False
+                                        raise ValueError(f"When the the 'reach' keyword is used with the 'stop_criteria' parameter for solving a multi-objective problem, then the number of numeric values following the keyword can be:\n1) A single numeric value to be used across all the objective functions.\n2) A number of numeric values equal to the number of objective functions.\nBut the value {criterion} found with {len(criterion)-1} numeric values which is not equal to the number of objective functions {len(self.last_generation_fitness[0])}.")
+
                                 stop_run = True
-                                break
+                                for obj_idx in range(len(self.last_generation_fitness[0])):
+                                    # Use the objective index to return the proper value for the criterion.
+
+                                    if len(criterion[1:]) == len(self.last_generation_fitness[0]):
+                                        reach_fitness_value = criterion[obj_idx + 1]
+                                    elif len(criterion[1:]) == 1:
+                                        reach_fitness_value = criterion[1]
+
+                                    if max(self.last_generation_fitness[:, obj_idx]) >= reach_fitness_value:
+                                        pass
+                                    else:
+                                        stop_run = False
+                                        break
                         elif criterion[0] == "saturate":
                             criterion[1] = int(criterion[1])
                             if (self.generations_completed >= criterion[1]):
-                                if (self.best_solutions_fitness[self.generations_completed - criterion[1]] - self.best_solutions_fitness[self.generations_completed - 1]) == 0:
+                                # Single-objective problem.
+                                if type(self.last_generation_fitness[0]) in GA.supported_int_float_types:
+                                    if (self.best_solutions_fitness[self.generations_completed - criterion[1]] - self.best_solutions_fitness[self.generations_completed - 1]) == 0:
+                                        stop_run = True
+                                        break
+                                # Multi-objective problem.
+                                elif type(self.last_generation_fitness[0]) in [list, tuple, numpy.ndarray]:
                                     stop_run = True
-                                    break
+                                    for obj_idx in range(len(self.last_generation_fitness[0])):
+                                        if (self.best_solutions_fitness[self.generations_completed - criterion[1]][obj_idx] - self.best_solutions_fitness[self.generations_completed - 1][obj_idx]) == 0:
+                                            pass
+                                        else:
+                                            stop_run = False
+                                            break
 
                 if stop_run:
                     break
