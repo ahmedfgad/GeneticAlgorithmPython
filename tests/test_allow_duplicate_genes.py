@@ -24,10 +24,20 @@ def number_duplicate_genes(gene_space=None,
                            init_range_low=-4,
                            init_range_high=4,
                            random_seed=123,
-                           initial_population=None):
+                           initial_population=None,
+                           parent_selection_type='sss',
+                           multi_objective=False):
 
-    def fitness_func(ga, solution, idx):
+    def fitness_func_no_batch_single(ga, solution, idx):
         return random.random()
+
+    def fitness_func_no_batch_multi(ga, solution, idx):
+        return [random.random(), random.random()]
+
+    if multi_objective == True:
+        fitness_func = fitness_func_no_batch_multi
+    else:
+        fitness_func = fitness_func_no_batch_single
 
     ga_instance = pygad.GA(num_generations=num_generations,
                            num_parents_mating=5,
@@ -37,6 +47,7 @@ def number_duplicate_genes(gene_space=None,
                            gene_space=gene_space,
                            gene_type=gene_type,
                            initial_population=initial_population,
+                           parent_selection_type=parent_selection_type,
                            init_range_low=init_range_low,
                            init_range_high=init_range_high,
                            random_mutation_min_val=random_mutation_min_val,
@@ -64,23 +75,30 @@ def test_number_duplicates_default():
     
     assert num_duplicates == 0
 
-def test_number_duplicates_default_initial_population():
-    num_duplicates = number_duplicate_genes(initial_population=initial_population)
+def test_number_duplicates_default_initial_population(multi_objective=False,
+                                                      parent_selection_type='sss'):
+    num_duplicates = number_duplicate_genes(initial_population=initial_population,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
     
     assert num_duplicates == 0
 
-def test_number_duplicates_float_gene_type():
+def test_number_duplicates_float_gene_type(multi_objective=False,
+                                           parent_selection_type='sss'):
     num_genes = 10
     num_duplicates = number_duplicate_genes(gene_type=float,
                                             num_genes=num_genes,
                                             init_range_low=0,
                                             init_range_high=1,
                                             random_mutation_min_val=0,
-                                            random_mutation_max_val=1)
+                                            random_mutation_max_val=1,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_float_gene_type_initial_population():
+def test_number_duplicates_float_gene_type_initial_population(multi_objective=False,
+                                                              parent_selection_type='sss'):
     num_genes = 10
     num_duplicates = number_duplicate_genes(gene_type=float,
                                             num_genes=num_genes,
@@ -88,11 +106,14 @@ def test_number_duplicates_float_gene_type_initial_population():
                                             init_range_high=1,
                                             initial_population=initial_population,
                                             random_mutation_min_val=0,
-                                            random_mutation_max_val=1)
+                                            random_mutation_max_val=1,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_int_gene_type():
+def test_number_duplicates_int_gene_type(multi_objective=False,
+                                         parent_selection_type='sss'):
     num_genes = 10
     init_range_low = 0
     init_range_high = init_range_low + num_genes
@@ -104,11 +125,14 @@ def test_number_duplicates_int_gene_type():
                                             init_range_low=init_range_low,
                                             init_range_high=init_range_high,
                                             random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
+                                            random_mutation_max_val=random_mutation_max_val,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_int_gene_type_initial_population():
+def test_number_duplicates_int_gene_type_initial_population(multi_objective=False,
+                                                            parent_selection_type='sss'):
     num_genes = 10
     init_range_low = 0
     init_range_high = init_range_low + num_genes
@@ -121,11 +145,14 @@ def test_number_duplicates_int_gene_type_initial_population():
                                             init_range_high=init_range_high,
                                             initial_population=initial_population,
                                             random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
+                                            random_mutation_max_val=random_mutation_max_val,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_int_gene_type_replacement():
+def test_number_duplicates_int_gene_type_replacement(multi_objective=False,
+                                                     parent_selection_type='sss'):
     num_genes = 10
     init_range_low = 0
     init_range_high = init_range_low + num_genes
@@ -137,11 +164,14 @@ def test_number_duplicates_int_gene_type_replacement():
                                             init_range_low=init_range_low,
                                             init_range_high=init_range_high,
                                             random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
+                                            random_mutation_max_val=random_mutation_max_val,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_int_gene_type_replacement_initial_population():
+def test_number_duplicates_int_gene_type_replacement_initial_population(multi_objective=False,
+                                                                        parent_selection_type='sss'):
     num_genes = 10
     init_range_low = 0
     init_range_high = init_range_low + num_genes
@@ -154,54 +184,75 @@ def test_number_duplicates_int_gene_type_replacement_initial_population():
                                             init_range_high=init_range_high,
                                             initial_population=initial_population,
                                             random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
+                                            random_mutation_max_val=random_mutation_max_val,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_single_gene_space():
-    num_duplicates = number_duplicate_genes(gene_space=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                                            num_genes=10)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_gene_space_initial_population():
+def test_number_duplicates_single_gene_space(multi_objective=False,
+                                             parent_selection_type='sss'):
     num_duplicates = number_duplicate_genes(gene_space=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                                             num_genes=10,
-                                            initial_population=initial_population)
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_single_range_gene_space():
-    num_genes = 10
-    num_duplicates = number_duplicate_genes(gene_space=range(num_genes),
-                                            num_genes=num_genes)
+def test_number_duplicates_single_gene_space_initial_population(multi_objective=False,
+                                                                parent_selection_type='sss'):
+    num_duplicates = number_duplicate_genes(gene_space=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                                            num_genes=10,
+                                            initial_population=initial_population,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_single_range_gene_space_initial_population():
+def test_number_duplicates_single_range_gene_space(multi_objective=False,
+                                                   parent_selection_type='sss'):
     num_genes = 10
     num_duplicates = number_duplicate_genes(gene_space=range(num_genes),
                                             num_genes=num_genes,
-                                            initial_population=initial_population)
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_single_numpy_range_gene_space():
+def test_number_duplicates_single_range_gene_space_initial_population(multi_objective=False,
+                                                                      parent_selection_type='sss'):
     num_genes = 10
-    num_duplicates = number_duplicate_genes(gene_space=numpy.arange(num_genes),
-                                            num_genes=num_genes)
+    num_duplicates = number_duplicate_genes(gene_space=range(num_genes),
+                                            num_genes=num_genes,
+                                            initial_population=initial_population,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_single_numpy_range_gene_space_initial_population():
+def test_number_duplicates_single_numpy_range_gene_space(multi_objective=False,
+                                                         parent_selection_type='sss'):
     num_genes = 10
     num_duplicates = number_duplicate_genes(gene_space=numpy.arange(num_genes),
                                             num_genes=num_genes,
-                                            initial_population=initial_population)
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_nested_gene_space():
+def test_number_duplicates_single_numpy_range_gene_space_initial_population(multi_objective=False,
+                                                                            parent_selection_type='sss'):
+    num_genes = 10
+    num_duplicates = number_duplicate_genes(gene_space=numpy.arange(num_genes),
+                                            num_genes=num_genes,
+                                            initial_population=initial_population,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
+
+    assert num_duplicates == 0
+
+def test_number_duplicates_nested_gene_space(multi_objective=False,
+                                             parent_selection_type='sss'):
     num_duplicates = number_duplicate_genes(gene_space=[[0, 1], 
                                                         [1, 2], 
                                                         [2, 3],
@@ -213,11 +264,14 @@ def test_number_duplicates_nested_gene_space():
                                                         [8, 9],
                                                         [9, 10]],
                                             gene_type=int,
-                                            num_genes=10)
+                                            num_genes=10,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
-def test_number_duplicates_nested_gene_space_initial_population():
+def test_number_duplicates_nested_gene_space_initial_population(multi_objective=False,
+                                                                parent_selection_type='sss'):
     num_duplicates = number_duplicate_genes(gene_space=[[0, 1], 
                                                         [1, 2], 
                                                         [2, 3],
@@ -230,7 +284,9 @@ def test_number_duplicates_nested_gene_space_initial_population():
                                                         [9, 10]],
                                             gene_type=int,
                                             num_genes=10,
-                                            initial_population=initial_population)
+                                            initial_population=initial_population,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
@@ -274,7 +330,8 @@ def test_number_duplicates_nested_gene_space_initial_population():
 
     # assert num_duplicates == 0
 
-def test_number_duplicates_nested_gene_space_nested_gene_type_initial_population():
+def test_number_duplicates_nested_gene_space_nested_gene_type_initial_population(multi_objective=False,
+                                                                                 parent_selection_type='sss'):
     num_duplicates = number_duplicate_genes(gene_space=[[0, 1], 
                                                         [1, 2], 
                                                         [2, 3],
@@ -287,11 +344,14 @@ def test_number_duplicates_nested_gene_space_nested_gene_type_initial_population
                                                         [9, 10]],
                                             gene_type=[int, int, int, int, int, int, int, int, int, int],
                                             num_genes=10,
-                                            initial_population=initial_population)
+                                            initial_population=initial_population,
+                                            parent_selection_type=parent_selection_type,
+                                            multi_objective=multi_objective)
 
     assert num_duplicates == 0
 
 if __name__ == "__main__":
+    #### Single-objective
     print()
     test_number_duplicates_default()
     print()
@@ -337,5 +397,114 @@ if __name__ == "__main__":
     # test_number_duplicates_nested_gene_space_nested_gene_type()
     # print()
     test_number_duplicates_nested_gene_space_nested_gene_type_initial_population()
+    print()
+
+    #### Multi-objective
+    print()
+    test_number_duplicates_default_initial_population(multi_objective=True)
+    print()
+
+    test_number_duplicates_float_gene_type(multi_objective=True)
+    print()
+    test_number_duplicates_float_gene_type_initial_population(multi_objective=True)
+    print()
+
+    test_number_duplicates_int_gene_type(multi_objective=True)
+    print()
+    test_number_duplicates_int_gene_type_initial_population(multi_objective=True)
+    print()
+
+    test_number_duplicates_int_gene_type_replacement(multi_objective=True)
+    print()
+    test_number_duplicates_int_gene_type_replacement_initial_population(multi_objective=True)
+    print()
+
+    test_number_duplicates_single_gene_space(multi_objective=True)
+    print()
+    test_number_duplicates_single_gene_space_initial_population(multi_objective=True)
+    print()
+
+    test_number_duplicates_single_range_gene_space(multi_objective=True)
+    print()
+    test_number_duplicates_single_range_gene_space_initial_population(multi_objective=True)
+    print()
+
+    test_number_duplicates_single_numpy_range_gene_space(multi_objective=True)
+    print()
+    test_number_duplicates_single_numpy_range_gene_space_initial_population(multi_objective=True)
+    print()
+
+    test_number_duplicates_nested_gene_space(multi_objective=True)
+    print()
+    test_number_duplicates_nested_gene_space_initial_population(multi_objective=True)
+    print()
+
+    # This example causes duplicates that can only be solved by changing a chain of genes.
+    # test_number_duplicates_nested_gene_space_nested_gene_type(multi_objective=True)
+    # print()
+    test_number_duplicates_nested_gene_space_nested_gene_type_initial_population(multi_objective=True)
+    print()
+
+    #### Multi-objective NSGA-II Parent Selection
+    print()
+    test_number_duplicates_default_initial_population(multi_objective=True,
+                                                      parent_selection_type='nsga2')
+    print()
+
+    test_number_duplicates_float_gene_type(multi_objective=True,
+                                                      parent_selection_type='nsga2')
+    print()
+    test_number_duplicates_float_gene_type_initial_population(multi_objective=True,
+                                                              parent_selection_type='nsga2')
+    print()
+
+    test_number_duplicates_int_gene_type(multi_objective=True,
+                                         parent_selection_type='nsga2')
+    print()
+    test_number_duplicates_int_gene_type_initial_population(multi_objective=True,
+                                                            parent_selection_type='nsga2')
+    print()
+
+    test_number_duplicates_int_gene_type_replacement(multi_objective=True,
+                                                     parent_selection_type='nsga2')
+    print()
+    test_number_duplicates_int_gene_type_replacement_initial_population(multi_objective=True,
+                                                                        parent_selection_type='nsga2')
+    print()
+
+    test_number_duplicates_single_gene_space(multi_objective=True,
+                                             parent_selection_type='nsga2')
+    print()
+    test_number_duplicates_single_gene_space_initial_population(multi_objective=True,
+                                                                parent_selection_type='nsga2')
+    print()
+
+    test_number_duplicates_single_range_gene_space(multi_objective=True,
+                                                   parent_selection_type='nsga2')
+    print()
+    test_number_duplicates_single_range_gene_space_initial_population(multi_objective=True,
+                                                                      parent_selection_type='nsga2')
+    print()
+
+    test_number_duplicates_single_numpy_range_gene_space(multi_objective=True,
+                                                         parent_selection_type='nsga2')
+    print()
+    test_number_duplicates_single_numpy_range_gene_space_initial_population(multi_objective=True,
+                                                                            parent_selection_type='nsga2')
+    print()
+
+    test_number_duplicates_nested_gene_space(multi_objective=True,
+                                             parent_selection_type='nsga2')
+    print()
+    test_number_duplicates_nested_gene_space_initial_population(multi_objective=True,
+                                                                parent_selection_type='nsga2')
+    print()
+
+    # This example causes duplicates that can only be solved by changing a chain of genes.
+    # test_number_duplicates_nested_gene_space_nested_gene_type(multi_objective=True,
+    #                                                           parent_selection_type='nsga2')
+    # print()
+    test_number_duplicates_nested_gene_space_nested_gene_type_initial_population(multi_objective=True,
+                                                                                 parent_selection_type='nsga2')
     print()
 
