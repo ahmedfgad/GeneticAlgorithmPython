@@ -30,15 +30,26 @@ def number_respect_gene_space(gene_space=None,
                               random_mutation_max_val=1,
                               init_range_low=-4,
                               init_range_high=4,
-                              initial_population=None):
+                              initial_population=None,
+                              parent_selection_type='sss',
+                              multi_objective=False):
 
-    def fitness_func(ga, solution, idx):
+    def fitness_func_no_batch_single(ga, solution, idx):
         return random.random()
+
+    def fitness_func_no_batch_multi(ga, solution, idx):
+        return [random.random(), random.random()]
+
+    if multi_objective == True:
+        fitness_func = fitness_func_no_batch_multi
+    else:
+        fitness_func = fitness_func_no_batch_single
 
     ga_instance = pygad.GA(num_generations=num_generations,
                            num_parents_mating=5,
                            fitness_func=fitness_func,
                            sol_per_pop=10,
+                           parent_selection_type=parent_selection_type,
                            num_genes=num_genes,
                            gene_space=gene_space,
                            gene_type=gene_type,
@@ -124,90 +135,133 @@ def number_respect_gene_space(gene_space=None,
     print(f"Number of outside range is {num_outside}.")
     return num_outside, ga_instance
 
-def test_gene_space_range():
-    num_outside, _ = number_respect_gene_space(gene_space=range(10))
-    
-    assert num_outside == 0
-
-def test_gene_space_numpy_arange():
-    num_outside, _ = number_respect_gene_space(gene_space=numpy.arange(10))
-    
-    assert num_outside == 0
-
-def test_gene_space_list():
-    num_outside, _ = number_respect_gene_space(gene_space=list(range(10)))
-    
-    assert num_outside == 0
-
-def test_gene_space_numpy():
-    num_outside, _ = number_respect_gene_space(gene_space=numpy.array(list(range(10))))
-    
-    assert num_outside == 0
-
-def test_gene_space_dict_without_step():
-    num_outside, ga_instance = number_respect_gene_space(gene_space={"low": 0, "high": 10})
-    # print(ga_instance.population)
-
-    assert num_outside == 0
-
-def test_gene_space_dict_with_step():
-    num_outside, ga_instance = number_respect_gene_space(gene_space={"low": 0, "high": 10, "step": 2})
-
-    assert num_outside == 0
-
-def test_gene_space_list_single_value():
-    num_outside, ga_instance = number_respect_gene_space(gene_space=[5])
-
-    # print(ga_instance.population)
-
-    assert num_outside == 0
-
-def test_gene_space_range_nested_gene_type():
+def test_gene_space_range(parent_selection_type='sss',
+                          multi_objective=False):
     num_outside, _ = number_respect_gene_space(gene_space=range(10),
-                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
     
     assert num_outside == 0
 
-def test_gene_space_numpy_arange_nested_gene_type():
+def test_gene_space_numpy_arange(parent_selection_type='sss',
+                                 multi_objective=False):
     num_outside, _ = number_respect_gene_space(gene_space=numpy.arange(10),
-                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
     
     assert num_outside == 0
 
-def test_gene_space_list_nested_gene_type():
+def test_gene_space_list(parent_selection_type='sss',
+                         multi_objective=False):
     num_outside, _ = number_respect_gene_space(gene_space=list(range(10)),
-                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
     
     assert num_outside == 0
 
-def test_gene_space_numpy_nested_gene_type():
+def test_gene_space_numpy(parent_selection_type='sss',
+                          multi_objective=False):
     num_outside, _ = number_respect_gene_space(gene_space=numpy.array(list(range(10))),
-                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
     
     assert num_outside == 0
 
-def test_gene_space_dict_without_step_nested_gene_type():
+def test_gene_space_dict_without_step(parent_selection_type='sss',
+                                      multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space={"low": 0, "high": 10},
-                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
     # print(ga_instance.population)
 
     assert num_outside == 0
 
-def test_gene_space_dict_with_step_nested_gene_type():
+def test_gene_space_dict_with_step(parent_selection_type='sss',
+                                   multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space={"low": 0, "high": 10, "step": 2},
-                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
 
     assert num_outside == 0
 
-def test_gene_space_list_single_value_nested_gene_type():
+def test_gene_space_list_single_value(parent_selection_type='sss',
+                                      multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[5],
-                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
 
     # print(ga_instance.population)
 
     assert num_outside == 0
 
-def test_nested_gene_space_range():
+def test_gene_space_range_nested_gene_type(parent_selection_type='sss',
+                                           multi_objective=False):
+    num_outside, _ = number_respect_gene_space(gene_space=range(10),
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
+    
+    assert num_outside == 0
+
+def test_gene_space_numpy_arange_nested_gene_type(parent_selection_type='sss',
+                                                  multi_objective=False):
+    num_outside, _ = number_respect_gene_space(gene_space=numpy.arange(10),
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
+    
+    assert num_outside == 0
+
+def test_gene_space_list_nested_gene_type(parent_selection_type='sss',
+                                          multi_objective=False):
+    num_outside, _ = number_respect_gene_space(gene_space=list(range(10)),
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
+    
+    assert num_outside == 0
+
+def test_gene_space_numpy_nested_gene_type(parent_selection_type='sss',
+                                           multi_objective=False):
+    num_outside, _ = number_respect_gene_space(gene_space=numpy.array(list(range(10))),
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
+    
+    assert num_outside == 0
+
+def test_gene_space_dict_without_step_nested_gene_type(parent_selection_type='sss',
+                                                       multi_objective=False):
+    num_outside, ga_instance = number_respect_gene_space(gene_space={"low": 0, "high": 10},
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
+    # print(ga_instance.population)
+
+    assert num_outside == 0
+
+def test_gene_space_dict_with_step_nested_gene_type(parent_selection_type='sss',
+                                                    multi_objective=False):
+    num_outside, ga_instance = number_respect_gene_space(gene_space={"low": 0, "high": 10, "step": 2},
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
+
+    assert num_outside == 0
+
+def test_gene_space_list_single_value_nested_gene_type(parent_selection_type='sss',
+                                                       multi_objective=False):
+    num_outside, ga_instance = number_respect_gene_space(gene_space=[5],
+                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
+                                               parent_selection_type=parent_selection_type,
+                                               multi_objective=multi_objective)
+
+    # print(ga_instance.population)
+
+    assert num_outside == 0
+
+def test_nested_gene_space_range(parent_selection_type='sss',
+                                 multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[range(0, 10),
                                                                      range(10, 20),
                                                                      range(20, 30),
@@ -217,27 +271,15 @@ def test_nested_gene_space_range():
                                                                      range(60, 70),
                                                                      range(70, 80),
                                                                      range(80, 90),
-                                                                     range(90, 100)])
+                                                                     range(90, 100)],
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
     # print(ga_instance.population)
 
     assert num_outside == 0
 
-def test_nested_gene_space_dict_without_step():
-    num_outside, ga_instance = number_respect_gene_space(gene_space=[{"low": 0, "high": 10},
-                                                                     {"low": 10, "high": 20},
-                                                                     {"low": 20, "high": 30},
-                                                                     {"low": 30, "high": 40},
-                                                                     {"low": 40, "high": 50},
-                                                                     {"low": 50, "high": 60},
-                                                                     {"low": 60, "high": 70},
-                                                                     {"low": 70, "high": 80},
-                                                                     {"low": 80, "high": 90},
-                                                                     {"low": 90, "high": 100}])
-    # print(ga_instance.population)
-
-    assert num_outside == 0
-
-def test_nested_gene_space_dict_without_step_float_gene_type():
+def test_nested_gene_space_dict_without_step(parent_selection_type='sss',
+                                             multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[{"low": 0, "high": 10},
                                                                      {"low": 10, "high": 20},
                                                                      {"low": 20, "high": 30},
@@ -248,12 +290,33 @@ def test_nested_gene_space_dict_without_step_float_gene_type():
                                                                      {"low": 70, "high": 80},
                                                                      {"low": 80, "high": 90},
                                                                      {"low": 90, "high": 100}],
-                                                         gene_type=[float, 3])
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
     # print(ga_instance.population)
 
     assert num_outside == 0
 
-def test_nested_gene_space_dict_with_step():
+def test_nested_gene_space_dict_without_step_float_gene_type(parent_selection_type='sss',
+                                                             multi_objective=False):
+    num_outside, ga_instance = number_respect_gene_space(gene_space=[{"low": 0, "high": 10},
+                                                                     {"low": 10, "high": 20},
+                                                                     {"low": 20, "high": 30},
+                                                                     {"low": 30, "high": 40},
+                                                                     {"low": 40, "high": 50},
+                                                                     {"low": 50, "high": 60},
+                                                                     {"low": 60, "high": 70},
+                                                                     {"low": 70, "high": 80},
+                                                                     {"low": 80, "high": 90},
+                                                                     {"low": 90, "high": 100}],
+                                                         gene_type=[float, 3],
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
+    # print(ga_instance.population)
+
+    assert num_outside == 0
+
+def test_nested_gene_space_dict_with_step(parent_selection_type='sss',
+                                          multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[{"low": 0, "high": 10, "step": 1},
                                                                      {"low": 10, "high": 20, "step": 1.5},
                                                                      {"low": 20, "high": 30, "step": 2},
@@ -263,13 +326,16 @@ def test_nested_gene_space_dict_with_step():
                                                                      {"low": 60, "high": 70, "step": 4},
                                                                      {"low": 70, "high": 80, "step": 4.5},
                                                                      {"low": 80, "high": 90, "step": 5},
-                                                                     {"low": 90, "high": 100, "step": 5.5}])
+                                                                     {"low": 90, "high": 100, "step": 5.5}],
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
     # print(ga_instance.population)
 
     assert num_outside == 0
 
 
-def test_nested_gene_space_numpy_arange():
+def test_nested_gene_space_numpy_arange(parent_selection_type='sss',
+                                        multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[numpy.arange(0, 10),
                                                                      numpy.arange(10, 20),
                                                                      numpy.arange(20, 30),
@@ -279,12 +345,15 @@ def test_nested_gene_space_numpy_arange():
                                                                      numpy.arange(60, 70),
                                                                      numpy.arange(70, 80),
                                                                      numpy.arange(80, 90),
-                                                                     numpy.arange(90, 100)])
+                                                                     numpy.arange(90, 100)],
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
     # print(ga_instance.population)
 
     assert num_outside == 0
 
-def test_nested_gene_space_list():
+def test_nested_gene_space_list(parent_selection_type='sss',
+                                multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                                                                      [-10, 10, 20, 30, 40, 50, 60, 70, 80, 90],
                                                                      [-11, 11, 22, 33, 44, 55, 66, 77, 88, 99],
@@ -294,12 +363,15 @@ def test_nested_gene_space_list():
                                                                      [-10.5, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9],
                                                                      [-15, 15, 25, 35, 45, 55, 65, 75, 85, 95],
                                                                      [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
-                                                                     [40, 41, 42, 43, 44, 45, 46, 47, 48, 49]])
+                                                                     [40, 41, 42, 43, 44, 45, 46, 47, 48, 49]],
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
     # print(ga_instance.population)
 
     assert num_outside == 0
 
-def test_nested_gene_space_list2():
+def test_nested_gene_space_list2(parent_selection_type='sss',
+                                 multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, 1], 
                                                                      [1, 2], 
                                                                      [2, 3],
@@ -309,11 +381,14 @@ def test_nested_gene_space_list2():
                                                                      [6, 7],
                                                                      [7, 8],
                                                                      [8, 9],
-                                                                     [9, 10]])
+                                                                     [9, 10]],
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
 
     assert num_outside == 0
 
-def test_nested_gene_space_mix():
+def test_nested_gene_space_mix(parent_selection_type='sss',
+                               multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, 1, 2, 3, 4], 
                                                                      numpy.arange(5, 10), 
                                                                      range(10, 15),
@@ -324,11 +399,14 @@ def test_nested_gene_space_mix():
                                                                      numpy.arange(35, 40),
                                                                      numpy.arange(40, 45),
                                                                      [45, 46, 47, 48, 49]],
-                                                         gene_type=int)
+                                                         gene_type=int,
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
 
     assert num_outside == 0
 
-def test_nested_gene_space_mix_nested_gene_type():
+def test_nested_gene_space_mix_nested_gene_type(parent_selection_type='sss',
+                                                multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, 1, 2, 3, 4], 
                                                                      numpy.arange(5, 10), 
                                                                      range(10, 15),
@@ -339,12 +417,15 @@ def test_nested_gene_space_mix_nested_gene_type():
                                                                      numpy.arange(35, 40),
                                                                      numpy.arange(40, 45),
                                                                      [45, 46, 47, 48, 49]],
-                                                         gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+                                                         gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
     # print(ga_instance.population)
 
     assert num_outside == 0
 
-def test_nested_gene_space_mix_initial_population():
+def test_nested_gene_space_mix_initial_population(parent_selection_type='sss',
+                                                  multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 
                                                                      numpy.arange(0, 10), 
                                                                      range(0, 10),
@@ -356,12 +437,15 @@ def test_nested_gene_space_mix_initial_population():
                                                                      {"low": 0, "high": 10},
                                                                      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]],
                                                          gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
-                                                         initial_population=initial_population)
+                                                         initial_population=initial_population,
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
     # print(ga_instance.population)
 
     assert num_outside == 0
 
-def test_nested_gene_space_mix_initial_population_single_gene_type():
+def test_nested_gene_space_mix_initial_population_single_gene_type(parent_selection_type='sss',
+                                                                   multi_objective=False):
     num_outside, ga_instance = number_respect_gene_space(gene_space=[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 
                                                                      numpy.arange(0, 10), 
                                                                      range(0, 10),
@@ -372,13 +456,16 @@ def test_nested_gene_space_mix_initial_population_single_gene_type():
                                                                      numpy.arange(0, 10),
                                                                      {"low": 0, "high": 10},
                                                                      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]],
-                                                         gene_type=[float, 2],
-                                                         initial_population=initial_population)
+                                                         gene_type=[float, 4],
+                                                         initial_population=initial_population,
+                                                         parent_selection_type=parent_selection_type,
+                                                         multi_objective=multi_objective)
     # print(ga_instance.population)
 
     assert num_outside == 0
 
 if __name__ == "__main__":
+    #### Single-objective
     print()
     test_gene_space_range()
     print()
@@ -447,3 +534,173 @@ if __name__ == "__main__":
 
     test_nested_gene_space_mix_initial_population_single_gene_type()
     print()
+
+
+
+    #### Multi-objective
+    print()
+    test_gene_space_range(multi_objective=True)
+    print()
+    test_gene_space_range_nested_gene_type(multi_objective=True)
+    print()
+
+    test_gene_space_numpy_arange(multi_objective=True)
+    print()
+    test_gene_space_numpy_arange_nested_gene_type(multi_objective=True)
+    print()
+
+    test_gene_space_list(multi_objective=True)
+    print()
+    test_gene_space_list_nested_gene_type(multi_objective=True)
+    print()
+
+    test_gene_space_list_single_value(multi_objective=True)
+    print()
+    test_gene_space_list_single_value_nested_gene_type(multi_objective=True)
+    print()
+
+    test_gene_space_numpy(multi_objective=True)
+    print()
+    test_gene_space_numpy_nested_gene_type(multi_objective=True)
+    print()
+
+    test_gene_space_dict_without_step(multi_objective=True)
+    print()
+    test_gene_space_dict_without_step_nested_gene_type(multi_objective=True)
+    print()
+
+    test_gene_space_dict_with_step(multi_objective=True)
+    print()
+    test_gene_space_dict_with_step_nested_gene_type(multi_objective=True)
+    print()
+
+    test_nested_gene_space_range(multi_objective=True)
+    print()
+
+    test_nested_gene_space_dict_without_step(multi_objective=True)
+    print()
+
+    test_nested_gene_space_dict_without_step_float_gene_type()
+    print()
+
+    test_nested_gene_space_dict_with_step(multi_objective=True)
+    print()
+
+    test_nested_gene_space_numpy_arange(multi_objective=True)
+    print()
+
+    test_nested_gene_space_list(multi_objective=True)
+    print()
+
+    test_nested_gene_space_list2(multi_objective=True)
+    print()
+
+    test_nested_gene_space_mix(multi_objective=True)
+    print()
+
+    test_nested_gene_space_mix_nested_gene_type(multi_objective=True)
+    print()
+
+    test_nested_gene_space_mix_initial_population(multi_objective=True)
+    print()
+
+    test_nested_gene_space_mix_initial_population_single_gene_type(multi_objective=True)
+    print()
+
+
+    #### Multi-objective NSGA-II Parent Selection
+    print()
+    test_gene_space_range(multi_objective=True,
+                          parent_selection_type='nsga2')
+    print()
+    test_gene_space_range_nested_gene_type(multi_objective=True,
+                                           parent_selection_type='nsga2')
+    print()
+
+    test_gene_space_numpy_arange(multi_objective=True,
+                                 parent_selection_type='nsga2')
+    print()
+    test_gene_space_numpy_arange_nested_gene_type(multi_objective=True,
+                                                  parent_selection_type='nsga2')
+    print()
+
+    test_gene_space_list(multi_objective=True,
+                         parent_selection_type='nsga2')
+    print()
+    test_gene_space_list_nested_gene_type(multi_objective=True,
+                                          parent_selection_type='nsga2')
+    print()
+
+    test_gene_space_list_single_value(multi_objective=True,
+                                      parent_selection_type='nsga2')
+    print()
+    test_gene_space_list_single_value_nested_gene_type(multi_objective=True,
+                                                       parent_selection_type='nsga2')
+    print()
+
+    test_gene_space_numpy(multi_objective=True,
+                          parent_selection_type='nsga2')
+    print()
+    test_gene_space_numpy_nested_gene_type(multi_objective=True,
+                                           parent_selection_type='nsga2')
+    print()
+
+    test_gene_space_dict_without_step(multi_objective=True,
+                                      parent_selection_type='nsga2')
+    print()
+    test_gene_space_dict_without_step_nested_gene_type(multi_objective=True,
+                                                       parent_selection_type='nsga2')
+    print()
+
+    test_gene_space_dict_with_step(multi_objective=True,
+                                   parent_selection_type='nsga2')
+    print()
+    test_gene_space_dict_with_step_nested_gene_type(multi_objective=True,
+                                                    parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_range(multi_objective=True,
+                                 parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_dict_without_step(multi_objective=True,
+                                             parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_dict_without_step_float_gene_type(multi_objective=True,
+                                                             parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_dict_with_step(multi_objective=True,
+                                          parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_numpy_arange(multi_objective=True,
+                                        parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_list(multi_objective=True,
+                                parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_list2(multi_objective=True,
+                                 parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_mix(multi_objective=True,
+                               parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_mix_nested_gene_type(multi_objective=True,
+                                                parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_mix_initial_population(multi_objective=True,
+                                                  parent_selection_type='nsga2')
+    print()
+
+    test_nested_gene_space_mix_initial_population_single_gene_type(multi_objective=True,
+                                                                   parent_selection_type='nsga2')
+    print()
+
+
