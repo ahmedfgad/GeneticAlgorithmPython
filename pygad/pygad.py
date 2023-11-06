@@ -880,7 +880,7 @@ class GA(utils.parent_selection.ParentSelection,
                     self.select_parents = self.rank_selection
                 else:
                     self.valid_parameters = False
-                    raise TypeError(f"Undefined parent selection type: {parent_selection_type}. \nThe assigned value to the 'parent_selection_type' parameter does not refer to one of the supported parent selection techniques which are: \n-sss (for steady state selection)\n-rws (for roulette wheel selection)\n-sus (for stochastic universal selection)\n-rank (for rank selection)\n-random (for random selection)\n-tournament (for tournament selection).\n")
+                    raise TypeError(f"Undefined parent selection type: {parent_selection_type}. \nThe assigned value to the 'parent_selection_type' parameter does not refer to one of the supported parent selection techniques which are: \n-sss (steady state selection)\n-rws (roulette wheel selection)\n-sus (stochastic universal selection)\n-rank (rank selection)\n-random (random selection)\n-tournament (tournament selection)\n-tournament_nsga2: (Tournament selection for NSGA-II)\n-nsga2: (NSGA-II parent selection).\n")
 
             # For tournament selection, validate the K value.
             if (parent_selection_type == "tournament"):

@@ -578,10 +578,31 @@ class Mutation:
         # Adaptive mutation changes one or more genes in each offspring randomly.
         # The number of genes to mutate depends on the solution's fitness value.
         for offspring_idx in range(offspring.shape[0]):
-            if offspring_fitness[offspring_idx] < average_fitness:
-                adaptive_mutation_num_genes = self.mutation_num_genes[0]
+            ## TODO Make edits to work with multi-objective optimization.
+            # Compare the fitness of each offspring to the average fitness of each objective function.
+            fitness_comparison = offspring_fitness[offspring_idx] < average_fitness
+
+            # Check if the problem is single or multi-objective optimization.
+            if type(fitness_comparison) in [bool, numpy.bool_]:
+                # Single-objective optimization problem.
+                if offspring_fitness[offspring_idx] < average_fitness:
+                    adaptive_mutation_num_genes = self.mutation_num_genes[0]
+                else:
+                    adaptive_mutation_num_genes = self.mutation_num_genes[1]
             else:
-                adaptive_mutation_num_genes = self.mutation_num_genes[1]
+                # Multi-objective optimization problem.
+
+                # Get the sum of the pool array (result of comparison).
+                # True is considered 1 and False is 0.
+                fitness_comparison_sum = sum(fitness_comparison)
+                # Check if more than or equal to 50% of the objectives have fitness greater than the average.
+                # If True, then use the first percentage. 
+                # If False, use the second percentage.
+                if fitness_comparison_sum >= len(fitness_comparison)/2:
+                    adaptive_mutation_num_genes = self.mutation_num_genes[0]
+                else:
+                    adaptive_mutation_num_genes = self.mutation_num_genes[1]
+
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
             for gene_idx in mutation_indices:
 
@@ -703,6 +724,7 @@ class Mutation:
             ## TODO Make edits to work with multi-objective optimization.
             # Compare the fitness of each offspring to the average fitness of each objective function.
             fitness_comparison = offspring_fitness[offspring_idx] < average_fitness
+
             # Check if the problem is single or multi-objective optimization.
             if type(fitness_comparison) in [bool, numpy.bool_]:
                 # Single-objective optimization problem.
@@ -791,10 +813,30 @@ class Mutation:
         # Adaptive random mutation changes one or more genes in each offspring randomly.
         # The probability of mutating a gene depends on the solution's fitness value.
         for offspring_idx in range(offspring.shape[0]):
-            if offspring_fitness[offspring_idx] < average_fitness:
-                adaptive_mutation_probability = self.mutation_probability[0]
+            ## TODO Make edits to work with multi-objective optimization.
+            # Compare the fitness of each offspring to the average fitness of each objective function.
+            fitness_comparison = offspring_fitness[offspring_idx] < average_fitness
+
+            # Check if the problem is single or multi-objective optimization.
+            if type(fitness_comparison) in [bool, numpy.bool_]:
+                # Single-objective optimization problem.
+                if offspring_fitness[offspring_idx] < average_fitness:
+                    adaptive_mutation_probability = self.mutation_probability[0]
+                else:
+                    adaptive_mutation_probability = self.mutation_probability[1]
             else:
-                adaptive_mutation_probability = self.mutation_probability[1]
+                # Multi-objective optimization problem.
+
+                # Get the sum of the pool array (result of comparison).
+                # True is considered 1 and False is 0.
+                fitness_comparison_sum = sum(fitness_comparison)
+                # Check if more than or equal to 50% of the objectives have fitness greater than the average.
+                # If True, then use the first percentage. 
+                # If False, use the second percentage.
+                if fitness_comparison_sum >= len(fitness_comparison)/2:
+                    adaptive_mutation_probability = self.mutation_probability[0]
+                else:
+                    adaptive_mutation_probability = self.mutation_probability[1]
 
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
@@ -914,10 +956,30 @@ class Mutation:
         # Adaptive random mutation changes one or more genes in each offspring randomly.
         # The probability of mutating a gene depends on the solution's fitness value.
         for offspring_idx in range(offspring.shape[0]):
-            if offspring_fitness[offspring_idx] < average_fitness:
-                adaptive_mutation_probability = self.mutation_probability[0]
+            ## TODO Make edits to work with multi-objective optimization.
+            # Compare the fitness of each offspring to the average fitness of each objective function.
+            fitness_comparison = offspring_fitness[offspring_idx] < average_fitness
+
+            # Check if the problem is single or multi-objective optimization.
+            if type(fitness_comparison) in [bool, numpy.bool_]:
+                # Single-objective optimization problem.
+                if offspring_fitness[offspring_idx] < average_fitness:
+                    adaptive_mutation_probability = self.mutation_probability[0]
+                else:
+                    adaptive_mutation_probability = self.mutation_probability[1]
             else:
-                adaptive_mutation_probability = self.mutation_probability[1]
+                # Multi-objective optimization problem.
+
+                # Get the sum of the pool array (result of comparison).
+                # True is considered 1 and False is 0.
+                fitness_comparison_sum = sum(fitness_comparison)
+                # Check if more than or equal to 50% of the objectives have fitness greater than the average.
+                # If True, then use the first percentage. 
+                # If False, use the second percentage.
+                if fitness_comparison_sum >= len(fitness_comparison)/2:
+                    adaptive_mutation_probability = self.mutation_probability[0]
+                else:
+                    adaptive_mutation_probability = self.mutation_probability[1]
 
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
