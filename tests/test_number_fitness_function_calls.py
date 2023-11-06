@@ -14,13 +14,25 @@ num_parents_mating = 5
 def number_calls_fitness_function(keep_elitism=1, 
                                   keep_parents=-1,
                                   mutation_type="random",
-                                  mutation_percent_genes="default"):
+                                  mutation_percent_genes="default",
+                                  parent_selection_type='sss',
+                                  multi_objective=False):
 
     actual_num_fitness_calls = 0
-    def fitness_func(ga, solution, idx):
+    def fitness_func_no_batch_single(ga, solution, idx):
         nonlocal actual_num_fitness_calls
         actual_num_fitness_calls = actual_num_fitness_calls + 1
         return 1
+
+    def fitness_func_no_batch_multi(ga_instance, solution, solution_idx):
+        nonlocal actual_num_fitness_calls
+        actual_num_fitness_calls = actual_num_fitness_calls + 1
+        return [1, 1]
+
+    if multi_objective == True:
+        fitness_func = fitness_func_no_batch_multi
+    else:
+        fitness_func = fitness_func_no_batch_single
 
     ga_optimizer = pygad.GA(num_generations=num_generations,
                             sol_per_pop=sol_per_pop,
@@ -28,6 +40,7 @@ def number_calls_fitness_function(keep_elitism=1,
                             num_parents_mating=num_parents_mating,
                             fitness_func=fitness_func,
                             mutation_type=mutation_type,
+                            parent_selection_type=parent_selection_type,
                             mutation_percent_genes=mutation_percent_genes,
                             keep_elitism=keep_elitism,
                             keep_parents=keep_parents,
@@ -64,46 +77,68 @@ def test_number_calls_fitness_function_default_keep():
     actual, expected = number_calls_fitness_function()
     assert actual == expected
 
-def test_number_calls_fitness_function_no_keep():
-    actual, expected = number_calls_fitness_function(keep_elitism=0, 
-                                                     keep_parents=0)
-    assert actual == expected
-
-def test_number_calls_fitness_function_keep_elitism():
-    actual, expected = number_calls_fitness_function(keep_elitism=3, 
-                                                     keep_parents=0)
-    assert actual == expected
-
-def test_number_calls_fitness_function_keep_parents():
-    actual, expected = number_calls_fitness_function(keep_elitism=0, 
-                                                     keep_parents=4)
-    assert actual == expected
-
-def test_number_calls_fitness_function_both_keep():
-    actual, expected = number_calls_fitness_function(keep_elitism=3, 
-                                                     keep_parents=4)
-    assert actual == expected
-
-def test_number_calls_fitness_function_no_keep_adaptive_mutation():
+def test_number_calls_fitness_function_no_keep(multi_objective=False,
+                                               parent_selection_type='sss'):
     actual, expected = number_calls_fitness_function(keep_elitism=0, 
                                                      keep_parents=0,
-                                                     mutation_type="adaptive",
-                                                     mutation_percent_genes=[10, 5])
+                                                     parent_selection_type=parent_selection_type,
+                                                     multi_objective=multi_objective)
     assert actual == expected
 
-def test_number_calls_fitness_function_default_adaptive_mutation():
-    actual, expected = number_calls_fitness_function(mutation_type="adaptive",
-                                                     mutation_percent_genes=[10, 5])
+def test_number_calls_fitness_function_keep_elitism(multi_objective=False,
+                                                    parent_selection_type='sss'):
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=0,
+                                                     parent_selection_type=parent_selection_type,
+                                                     multi_objective=multi_objective)
     assert actual == expected
 
-def test_number_calls_fitness_function_both_keep_adaptive_mutation():
+def test_number_calls_fitness_function_keep_parents(multi_objective=False,
+                                                    parent_selection_type='sss'):
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=4,
+                                                     parent_selection_type=parent_selection_type,
+                                                     multi_objective=multi_objective)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep(multi_objective=False,
+                                                 parent_selection_type='sss'):
     actual, expected = number_calls_fitness_function(keep_elitism=3, 
                                                      keep_parents=4,
+                                                     parent_selection_type=parent_selection_type,
+                                                     multi_objective=multi_objective)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_adaptive_mutation(multi_objective=False,
+                                                                 parent_selection_type='sss'):
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     parent_selection_type=parent_selection_type,
                                                      mutation_type="adaptive",
-                                                     mutation_percent_genes=[10, 5])
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=multi_objective)
+    assert actual == expected
+
+def test_number_calls_fitness_function_default_adaptive_mutation(multi_objective=False,
+                                                                 parent_selection_type='sss'):
+    actual, expected = number_calls_fitness_function(mutation_type="adaptive",
+                                                     parent_selection_type=parent_selection_type,
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=multi_objective)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_adaptive_mutation(multi_objective=False,
+                                                                   parent_selection_type='sss'):
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     parent_selection_type=parent_selection_type,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=multi_objective)
     assert actual == expected
 
 if __name__ == "__main__":
+    #### Single-objective
     print()
     test_number_calls_fitness_function_default_keep()
     print()
@@ -121,3 +156,45 @@ if __name__ == "__main__":
     print()
     test_number_calls_fitness_function_both_keep_adaptive_mutation()
     print()
+
+    #### Multi-Objective
+    print()
+    test_number_calls_fitness_function_no_keep(multi_objective=True)
+    print()
+    test_number_calls_fitness_function_keep_elitism(multi_objective=True)
+    print()
+    test_number_calls_fitness_function_keep_parents(multi_objective=True)
+    print()
+    test_number_calls_fitness_function_both_keep(multi_objective=True)
+    print()
+    test_number_calls_fitness_function_no_keep_adaptive_mutation(multi_objective=True)
+    print()
+    test_number_calls_fitness_function_default_adaptive_mutation(multi_objective=True)
+    print()
+    test_number_calls_fitness_function_both_keep_adaptive_mutation(multi_objective=True)
+    print()
+
+    #### Multi-Objective NSGA-II Parent Selection
+    print()
+    test_number_calls_fitness_function_no_keep(multi_objective=True,
+                                               parent_selection_type='nsga2')
+    print()
+    test_number_calls_fitness_function_keep_elitism(multi_objective=True,
+                                                    parent_selection_type='nsga2')
+    print()
+    test_number_calls_fitness_function_keep_parents(multi_objective=True,
+                                                    parent_selection_type='nsga2')
+    print()
+    test_number_calls_fitness_function_both_keep(multi_objective=True,
+                                                 parent_selection_type='nsga2')
+    print()
+    test_number_calls_fitness_function_no_keep_adaptive_mutation(multi_objective=True,
+                                                                 parent_selection_type='nsga2')
+    print()
+    test_number_calls_fitness_function_default_adaptive_mutation(multi_objective=True,
+                                                                 parent_selection_type='nsga2')
+    print()
+    test_number_calls_fitness_function_both_keep_adaptive_mutation(multi_objective=True,
+                                                                   parent_selection_type='nsga2')
+    print()
+
