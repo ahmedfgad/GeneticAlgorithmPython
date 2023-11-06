@@ -781,7 +781,7 @@ class GA(utils.parent_selection.ParentSelection,
                                 self.valid_parameters = False
                                 raise ValueError(f"When mutation_type='adaptive', then the 'mutation_percent_genes' parameter must have only 2 elements but ({len(mutation_percent_genes)}) element(s) found.")
                         else:
-                            if self.mutation_probability is None:
+                            if self.mutation_percent_genes is None:
                                 self.valid_parameters = False
                                 raise TypeError(f"Unexpected type of the 'mutation_percent_genes' parameter. When mutation_type='adaptive', then the 'mutation_percent_genes' parameter should exist and assigned a list/tuple/numpy.ndarray with 2 values but ({mutation_percent_genes}) found.")
                 # The mutation_num_genes parameter exists. Checking whether adaptive mutation is used.
