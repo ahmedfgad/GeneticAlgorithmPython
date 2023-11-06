@@ -73,6 +73,8 @@ def output_adaptive_mutation(gene_space=None,
                            allow_duplicate_genes=True,
                            mutation_by_replacement=mutation_by_replacement,
                            save_solutions=True,
+                           ## Use a static 'mutation_probability'.
+                           ## An ambigius error in GitHub actions happen when using mutation_num_genes and mutation_probability. I do not know the reason.
                            # mutation_num_genes=mutation_num_genes,
                            mutation_probability=[0.2, 0.1],
                            mutation_type=mutation_type,
