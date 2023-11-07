@@ -212,7 +212,7 @@ prediction = numpy.sum(numpy.array(function_inputs)*solution)
 print(f"Predicted output based on the best solution : {prediction}")
 
 if ga_instance.best_solution_generation != -1:
-    print(g"Best fitness value reached after {ga_instance.best_solution_generation} generations.")
+    print(f"Best fitness value reached after {ga_instance.best_solution_generation} generations.")
 
 # Saving the GA instance.
 filename = 'genetic' # The filename to which the instance is saved. The name is without extension.
