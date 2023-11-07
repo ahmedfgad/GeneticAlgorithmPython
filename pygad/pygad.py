@@ -1803,9 +1803,13 @@ class GA(utils.parent_selection.ParentSelection,
                     solutions_to_submit = []
                     for sol_idx, sol in enumerate(self.population):
                         # The "undefined" value means that the fitness of this solution must be calculated.
-                        if pop_fitness[sol_idx] == "undefined":
-                            solutions_to_submit.append(sol.copy())
-                            solutions_to_submit_indices.append(sol_idx)
+                        if type(pop_fitness[sol_idx]) is str:
+                            if pop_fitness[sol_idx] == "undefined":
+                                solutions_to_submit.append(sol.copy())
+                                solutions_to_submit_indices.append(sol_idx)
+                        elif type(pop_fitness[sol_idx]) in [list, tuple, numpy.ndarray]:
+                            # This is a multi-objective problem.
+                            pass
 
                     # Check if batch processing is used. If not, then calculate the fitness value for individual solutions.
                     if self.fitness_batch_size in [1, None]:
