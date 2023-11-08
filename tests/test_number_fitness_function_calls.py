@@ -127,79 +127,348 @@ def test_number_calls_fitness_function_default_keep():
     actual, expected = number_calls_fitness_function()
     assert actual == expected
 
-def test_number_calls_fitness_function_no_keep(multi_objective=False,
-                                               parent_selection_type='sss',
-                                               fitness_batch_size=None):
+def test_number_calls_fitness_function_no_keep():
     actual, expected = number_calls_fitness_function(keep_elitism=0, 
-                                                     keep_parents=0,
-                                                     parent_selection_type=parent_selection_type,
-                                                     multi_objective=multi_objective,
-                                                     fitness_batch_size=fitness_batch_size)
+                                                     keep_parents=0)
     assert actual == expected
 
-def test_number_calls_fitness_function_keep_elitism(multi_objective=False,
-                                                    parent_selection_type='sss',
-                                                    fitness_batch_size=None):
+def test_number_calls_fitness_function_keep_elitism():
     actual, expected = number_calls_fitness_function(keep_elitism=3, 
-                                                     keep_parents=0,
-                                                     parent_selection_type=parent_selection_type,
-                                                     multi_objective=multi_objective,
-                                                     fitness_batch_size=fitness_batch_size)
+                                                     keep_parents=0)
     assert actual == expected
 
-def test_number_calls_fitness_function_keep_parents(multi_objective=False,
-                                                    parent_selection_type='sss',
-                                                    fitness_batch_size=None):
+def test_number_calls_fitness_function_keep_parents():
     actual, expected = number_calls_fitness_function(keep_elitism=0, 
-                                                     keep_parents=4,
-                                                     parent_selection_type=parent_selection_type,
-                                                     multi_objective=multi_objective,
-                                                     fitness_batch_size=fitness_batch_size)
+                                                     keep_parents=4)
     assert actual == expected
 
-def test_number_calls_fitness_function_both_keep(multi_objective=False,
-                                                 parent_selection_type='sss',
-                                                 fitness_batch_size=None):
+def test_number_calls_fitness_function_both_keep():
     actual, expected = number_calls_fitness_function(keep_elitism=3, 
-                                                     keep_parents=4,
-                                                     parent_selection_type=parent_selection_type,
-                                                     multi_objective=multi_objective,
-                                                     fitness_batch_size=fitness_batch_size)
+                                                     keep_parents=4)
     assert actual == expected
 
-def test_number_calls_fitness_function_no_keep_adaptive_mutation(multi_objective=False,
-                                                                 parent_selection_type='sss',
-                                                                 fitness_batch_size=None):
+def test_number_calls_fitness_function_no_keep_adaptive_mutation():
     actual, expected = number_calls_fitness_function(keep_elitism=0, 
                                                      keep_parents=0,
-                                                     parent_selection_type=parent_selection_type,
                                                      mutation_type="adaptive",
-                                                     mutation_percent_genes=[10, 5],
-                                                     multi_objective=multi_objective,
-                                                     fitness_batch_size=fitness_batch_size)
+                                                     mutation_percent_genes=[10, 5])
     assert actual == expected
 
-def test_number_calls_fitness_function_default_adaptive_mutation(multi_objective=False,
-                                                                 parent_selection_type='sss',
-                                                                 fitness_batch_size=None):
+def test_number_calls_fitness_function_default_adaptive_mutation():
     actual, expected = number_calls_fitness_function(mutation_type="adaptive",
-                                                     parent_selection_type=parent_selection_type,
-                                                     mutation_percent_genes=[10, 5],
-                                                     multi_objective=multi_objective,
-                                                     fitness_batch_size=fitness_batch_size)
+                                                     mutation_percent_genes=[10, 5])
     assert actual == expected
 
-def test_number_calls_fitness_function_both_keep_adaptive_mutation(multi_objective=False,
-                                                                   parent_selection_type='sss',
-                                                                   fitness_batch_size=None):
+def test_number_calls_fitness_function_both_keep_adaptive_mutation():
     actual, expected = number_calls_fitness_function(keep_elitism=3, 
                                                      keep_parents=4,
-                                                     parent_selection_type=parent_selection_type,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5])
+    assert actual == expected
+
+#### Multi Objective
+def test_number_calls_fitness_function_no_keep_multi_objective():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_keep_elitism_multi_objective():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=0,
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_keep_parents_multi_objective():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=4,
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_multi_objective():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_adaptive_mutation_multi_objective():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
                                                      mutation_type="adaptive",
                                                      mutation_percent_genes=[10, 5],
-                                                     multi_objective=multi_objective,
-                                                     fitness_batch_size=fitness_batch_size)
+                                                     multi_objective=True)
     assert actual == expected
+
+def test_number_calls_fitness_function_default_adaptive_mutation_multi_objective():
+    actual, expected = number_calls_fitness_function(mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_adaptive_mutation_multi_objective():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True)
+    assert actual == expected
+
+#### Multi Objective NSGA-II Parent Selection
+def test_number_calls_fitness_function_no_keep_multi_objective_nsga2():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_keep_elitism_multi_objective_nsga2():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=0,
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_keep_parents_multi_objective_nsga2():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=4,
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_multi_objective_nsga2():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_adaptive_mutation_multi_objective_nsga2():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_default_adaptive_mutation_multi_objective_nsga2():
+    actual, expected = number_calls_fitness_function(mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_adaptive_mutation_multi_objective_nsga2():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True)
+    assert actual == expected
+
+
+######## Batch Fitness Calculation
+#### Single Objective
+def test_number_calls_fitness_function_no_keep_batch_1():
+    actual, expected = number_calls_fitness_function(fitness_batch_size=1)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_batch_4():
+    actual, expected = number_calls_fitness_function(fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_batch_9():
+    actual, expected = number_calls_fitness_function(fitness_batch_size=9)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_batch_10():
+    actual, expected = number_calls_fitness_function(fitness_batch_size=10)
+    assert actual == expected
+
+def test_number_calls_fitness_function_keep_elitism_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=0,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_keep_parents_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=4,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_adaptive_mutation_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_default_adaptive_mutation_batch_4():
+    actual, expected = number_calls_fitness_function(mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_adaptive_mutation_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+#### Multi Objective
+def test_number_calls_fitness_function_no_keep_multi_objective_batch_1():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=1)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_multi_objective_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_multi_objective_batch_9():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=9)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_multi_objective_batch_10():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=10)
+    assert actual == expected
+
+def test_number_calls_fitness_function_keep_elitism_multi_objective_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=0,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_keep_parents_multi_objective_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=4,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_multi_objective_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_adaptive_mutation_multi_objective_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_default_adaptive_mutation_multi_objective_batch_4():
+    actual, expected = number_calls_fitness_function(mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_adaptive_mutation_multi_objective_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+#### Multi Objective NSGA-II Parent Selection
+def test_number_calls_fitness_function_no_keep_multi_objective_nsga2_batch_1():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=1)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_multi_objective_nsga2_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_multi_objective_nsga2_batch_9():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=9)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_multi_objective_nsga2_batch_10():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=10)
+    assert actual == expected
+
+def test_number_calls_fitness_function_keep_elitism_multi_objective_nsga2_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=0,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_keep_parents_multi_objective_nsga2_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=4,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_multi_objective_nsga2_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_no_keep_adaptive_mutation_multi_objective_nsga2_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=0, 
+                                                     keep_parents=0,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_default_adaptive_mutation_multi_objective_nsga2_batch_4():
+    actual, expected = number_calls_fitness_function(mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
+def test_number_calls_fitness_function_both_keep_adaptive_mutation_multi_objective_nsga2_batch_4():
+    actual, expected = number_calls_fitness_function(keep_elitism=3, 
+                                                     keep_parents=4,
+                                                     mutation_type="adaptive",
+                                                     mutation_percent_genes=[10, 5],
+                                                     multi_objective=True,
+                                                     fitness_batch_size=4)
+    assert actual == expected
+
 
 if __name__ == "__main__":
     #### Single-objective
@@ -223,157 +492,106 @@ if __name__ == "__main__":
 
     #### Multi-Objective
     print()
-    test_number_calls_fitness_function_no_keep(multi_objective=True)
+    test_number_calls_fitness_function_no_keep_multi_objective()
     print()
-    test_number_calls_fitness_function_keep_elitism(multi_objective=True)
+    test_number_calls_fitness_function_keep_elitism_multi_objective()
     print()
-    test_number_calls_fitness_function_keep_parents(multi_objective=True)
+    test_number_calls_fitness_function_keep_parents_multi_objective()
     print()
-    test_number_calls_fitness_function_both_keep(multi_objective=True)
+    test_number_calls_fitness_function_both_keep_multi_objective()
     print()
-    test_number_calls_fitness_function_no_keep_adaptive_mutation(multi_objective=True)
+    test_number_calls_fitness_function_no_keep_adaptive_mutation_multi_objective()
     print()
-    test_number_calls_fitness_function_default_adaptive_mutation(multi_objective=True)
+    test_number_calls_fitness_function_default_adaptive_mutation_multi_objective()
     print()
-    test_number_calls_fitness_function_both_keep_adaptive_mutation(multi_objective=True)
+    test_number_calls_fitness_function_both_keep_adaptive_mutation_multi_objective()
     print()
 
     #### Multi-Objective NSGA-II Parent Selection
     print()
-    test_number_calls_fitness_function_no_keep(multi_objective=True,
-                                               parent_selection_type='nsga2')
+    test_number_calls_fitness_function_no_keep_multi_objective_nsga2()
     print()
-    test_number_calls_fitness_function_keep_elitism(multi_objective=True,
-                                                    parent_selection_type='nsga2')
+    test_number_calls_fitness_function_keep_elitism_multi_objective_nsga2()
     print()
-    test_number_calls_fitness_function_keep_parents(multi_objective=True,
-                                                    parent_selection_type='nsga2')
+    test_number_calls_fitness_function_keep_parents_multi_objective_nsga2()
     print()
-    test_number_calls_fitness_function_both_keep(multi_objective=True,
-                                                 parent_selection_type='nsga2')
+    test_number_calls_fitness_function_both_keep_multi_objective_nsga2()
     print()
-    test_number_calls_fitness_function_no_keep_adaptive_mutation(multi_objective=True,
-                                                                 parent_selection_type='nsga2')
+    test_number_calls_fitness_function_no_keep_adaptive_mutation_multi_objective_nsga2()
     print()
-    test_number_calls_fitness_function_default_adaptive_mutation(multi_objective=True,
-                                                                 parent_selection_type='nsga2')
+    test_number_calls_fitness_function_default_adaptive_mutation_multi_objective_nsga2()
     print()
-    test_number_calls_fitness_function_both_keep_adaptive_mutation(multi_objective=True,
-                                                                   parent_selection_type='nsga2')
+    test_number_calls_fitness_function_both_keep_adaptive_mutation_multi_objective_nsga2()
     print()
 
 
     ######## Batch Fitness
     #### Single-objective
     print()
-    test_number_calls_fitness_function_no_keep(fitness_batch_size=1)
+    test_number_calls_fitness_function_no_keep_batch_1()
     print()
-    test_number_calls_fitness_function_no_keep(fitness_batch_size=2)
+    test_number_calls_fitness_function_no_keep_batch_4()
     print()
-    test_number_calls_fitness_function_no_keep(fitness_batch_size=3)
+    test_number_calls_fitness_function_no_keep_batch_9()
     print()
-    test_number_calls_fitness_function_no_keep(fitness_batch_size=4)
+    test_number_calls_fitness_function_no_keep_batch_10()
     print()
-    test_number_calls_fitness_function_no_keep(fitness_batch_size=5)
+    test_number_calls_fitness_function_keep_elitism_batch_4()
     print()
-    test_number_calls_fitness_function_no_keep(fitness_batch_size=6)
+    test_number_calls_fitness_function_keep_parents_batch_4()
     print()
-    test_number_calls_fitness_function_no_keep(fitness_batch_size=7)
+    test_number_calls_fitness_function_both_keep_batch_4()
     print()
-    test_number_calls_fitness_function_no_keep(fitness_batch_size=8)
+    test_number_calls_fitness_function_no_keep_adaptive_mutation_batch_4()
     print()
-    test_number_calls_fitness_function_no_keep(fitness_batch_size=9)
+    test_number_calls_fitness_function_default_adaptive_mutation_batch_4()
     print()
-    test_number_calls_fitness_function_no_keep(fitness_batch_size=10)
-    print()
-    test_number_calls_fitness_function_keep_elitism(fitness_batch_size=4)
-    print()
-    test_number_calls_fitness_function_keep_parents(fitness_batch_size=4)
-    print()
-    test_number_calls_fitness_function_both_keep(fitness_batch_size=4)
-    print()
-    test_number_calls_fitness_function_no_keep_adaptive_mutation(fitness_batch_size=4)
-    print()
-    test_number_calls_fitness_function_default_adaptive_mutation(fitness_batch_size=4)
-    print()
-    test_number_calls_fitness_function_both_keep_adaptive_mutation(fitness_batch_size=4)
+    test_number_calls_fitness_function_both_keep_adaptive_mutation_batch_4()
     print()
 
     #### Multi-Objective
     print()
-    test_number_calls_fitness_function_no_keep(multi_objective=True,
-                                               fitness_batch_size=1)
+    test_number_calls_fitness_function_no_keep_multi_objective_batch_1()
     print()
-    test_number_calls_fitness_function_no_keep(multi_objective=True,
-                                               fitness_batch_size=4)
+    test_number_calls_fitness_function_no_keep_multi_objective_batch_4()
     print()
-    test_number_calls_fitness_function_no_keep(multi_objective=True,
-                                               fitness_batch_size=9)
+    test_number_calls_fitness_function_no_keep_multi_objective_batch_9()
     print()
-    test_number_calls_fitness_function_no_keep(multi_objective=True,
-                                               fitness_batch_size=10)
+    test_number_calls_fitness_function_no_keep_multi_objective_batch_10()
     print()
-    test_number_calls_fitness_function_keep_elitism(multi_objective=True,
-                                                    fitness_batch_size=4)
+    test_number_calls_fitness_function_keep_elitism_multi_objective_batch_4()
     print()
-    test_number_calls_fitness_function_keep_parents(multi_objective=True,
-                                                    fitness_batch_size=4)
+    test_number_calls_fitness_function_keep_parents_multi_objective_batch_4()
     print()
-    test_number_calls_fitness_function_both_keep(multi_objective=True,
-                                                 fitness_batch_size=4)
+    test_number_calls_fitness_function_both_keep_multi_objective_batch_4()
     print()
-    test_number_calls_fitness_function_no_keep_adaptive_mutation(multi_objective=True,
-                                                                 fitness_batch_size=4)
+    test_number_calls_fitness_function_no_keep_adaptive_mutation_multi_objective_batch_4()
     print()
-    test_number_calls_fitness_function_default_adaptive_mutation(multi_objective=True,
-                                                                 fitness_batch_size=4)
+    test_number_calls_fitness_function_default_adaptive_mutation_multi_objective_batch_4()
     print()
-    test_number_calls_fitness_function_both_keep_adaptive_mutation(multi_objective=True,
-                                                                   fitness_batch_size=4)
+    test_number_calls_fitness_function_both_keep_adaptive_mutation_multi_objective_batch_4()
     print()
 
     #### Multi-Objective NSGA-II Parent Selection
     print()
-    test_number_calls_fitness_function_no_keep(multi_objective=True,
-                                               parent_selection_type='nsga2',
-                                               fitness_batch_size=1)
+    test_number_calls_fitness_function_no_keep_multi_objective_nsga2_batch_1()
     print()
-    test_number_calls_fitness_function_no_keep(multi_objective=True,
-                                               parent_selection_type='nsga2',
-                                               fitness_batch_size=4)
+    test_number_calls_fitness_function_no_keep_multi_objective_nsga2_batch_4()
     print()
-    test_number_calls_fitness_function_no_keep(multi_objective=True,
-                                               parent_selection_type='nsga2',
-                                               fitness_batch_size=9)
+    test_number_calls_fitness_function_no_keep_multi_objective_nsga2_batch_9()
     print()
-    test_number_calls_fitness_function_no_keep(multi_objective=True,
-                                               parent_selection_type='nsga2',
-                                               fitness_batch_size=10)
+    test_number_calls_fitness_function_no_keep_multi_objective_nsga2_batch_10()
     print()
-    test_number_calls_fitness_function_keep_elitism(multi_objective=True,
-                                                    parent_selection_type='nsga2',
-                                                    fitness_batch_size=4)
+    test_number_calls_fitness_function_keep_elitism_multi_objective_nsga2_batch_4()
     print()
-    test_number_calls_fitness_function_keep_parents(multi_objective=True,
-                                                    parent_selection_type='nsga2',
-                                                    fitness_batch_size=4)
+    test_number_calls_fitness_function_keep_parents_multi_objective_nsga2_batch_4()
     print()
-    test_number_calls_fitness_function_both_keep(multi_objective=True,
-                                                 parent_selection_type='nsga2',
-                                                 fitness_batch_size=4)
+    test_number_calls_fitness_function_both_keep_multi_objective_nsga2_batch_4()
     print()
-    test_number_calls_fitness_function_no_keep_adaptive_mutation(multi_objective=True,
-                                                                 parent_selection_type='nsga2',
-                                                                 fitness_batch_size=4)
+    test_number_calls_fitness_function_no_keep_adaptive_mutation_multi_objective_nsga2_batch_4()
     print()
-    test_number_calls_fitness_function_default_adaptive_mutation(multi_objective=True,
-                                                                 parent_selection_type='nsga2',
-                                                                 fitness_batch_size=4)
+    test_number_calls_fitness_function_default_adaptive_mutation_multi_objective_nsga2_batch_4()
     print()
-    test_number_calls_fitness_function_both_keep_adaptive_mutation(multi_objective=True,
-                                                                   parent_selection_type='nsga2',
-                                                                   fitness_batch_size=4)
+    test_number_calls_fitness_function_both_keep_adaptive_mutation_multi_objective_nsga2_batch_4()
     print()
-
-
 
