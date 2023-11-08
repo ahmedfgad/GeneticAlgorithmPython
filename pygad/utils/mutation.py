@@ -6,6 +6,7 @@ import numpy
 import random
 
 import pygad
+import concurrent.futures
 
 class Mutation:
 
@@ -483,40 +484,108 @@ class Mutation:
             # This is a single-objective optimization problem.
             fitness[first_idx:last_idx] = [0]*(last_idx - first_idx)
 
-        if self.fitness_batch_size in [1, None]:
-            # Calculate the fitness for each individual solution.
-            for idx in range(first_idx, last_idx):
-                # We cannot return the index of the solution within the population.
-                # Because the new solution (offspring) does not yet exist in the population.
-                # The user should handle this situation if the solution index is used anywhere.
-                fitness[idx] = self.fitness_func(self, 
-                                                 temp_population[idx], 
-                                                 None)
+        # # No parallel processing.
+        if self.parallel_processing is None:
+            if self.fitness_batch_size in [1, None]:
+                # Calculate the fitness for each individual solution.
+                for idx in range(first_idx, last_idx):
+                    # We cannot return the index of the solution within the population.
+                    # Because the new solution (offspring) does not yet exist in the population.
+                    # The user should handle this situation if the solution index is used anywhere.
+                    fitness[idx] = self.fitness_func(self, 
+                                                      temp_population[idx], 
+                                                      None)
+            else:
+                # Calculate the fitness for batch of solutions.
+    
+                # Number of batches.
+                num_batches = int(numpy.ceil((last_idx - first_idx) / self.fitness_batch_size))
+    
+                for batch_idx in range(num_batches):
+                    # The index of the first solution in the current batch.
+                    batch_first_index = first_idx + batch_idx * self.fitness_batch_size
+                    # The index of the last solution in the current batch.
+                    if batch_idx == (num_batches - 1):
+                        batch_last_index = last_idx
+                    else:
+                        batch_last_index = first_idx + (batch_idx + 1) * self.fitness_batch_size
+    
+                    # Calculate the fitness values for the batch.
+                    # We cannot return the index/indices of the solution(s) within the population.
+                    # Because the new solution(s) (offspring) do(es) not yet exist in the population.
+                    # The user should handle this situation if the solution index is used anywhere.
+                    fitness_temp = self.fitness_func(self, 
+                                                     temp_population[batch_first_index:batch_last_index], 
+                                                     None) 
+                    # Insert the fitness of each solution at the proper index.
+                    for idx in range(batch_first_index, batch_last_index):
+                        fitness[idx] = fitness_temp[idx - batch_first_index]
+
         else:
-            # Calculate the fitness for batch of solutions.
-
-            # Number of batches.
-            num_batches = int(numpy.ceil((last_idx - first_idx) / self.fitness_batch_size))
-
-            for batch_idx in range(num_batches):
-                # The index of the first solution in the current batch.
-                batch_first_index = first_idx + batch_idx * self.fitness_batch_size
-                # The index of the last solution in the current batch.
-                if batch_idx == (num_batches - 1):
-                    batch_last_index = last_idx
+            # Parallel processing
+            # Decide which class to use based on whether the user selected "process" or "thread"
+            # TODO Add ExecutorClass as an instance attribute in the pygad.GA instances. Then retrieve this instance here instead of creating a new one.
+            if self.parallel_processing[0] == "process":
+                ExecutorClass = concurrent.futures.ProcessPoolExecutor
+            else:
+                ExecutorClass = concurrent.futures.ThreadPoolExecutor
+    
+            # We can use a with statement to ensure threads are cleaned up promptly (https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor-example)
+            with ExecutorClass(max_workers=self.parallel_processing[1]) as executor:
+                # Indices of the solutions to calculate its fitness.
+                solutions_to_submit_indices = list(range(first_idx, last_idx))
+                # The solutions to calculate its fitness.
+                solutions_to_submit = [temp_population[sol_idx].copy() for sol_idx in solutions_to_submit_indices]
+                if self.fitness_batch_size in [1, None]:
+                    # Use parallel processing to calculate the fitness of the solutions.
+                    for index, sol_fitness in zip(solutions_to_submit_indices, executor.map(self.fitness_func, [self]*len(solutions_to_submit_indices), solutions_to_submit, solutions_to_submit_indices)):
+                        if type(sol_fitness) in self.supported_int_float_types:
+                            # The fitness function returns a single numeric value.
+                            # This is a single-objective optimization problem.
+                            fitness[index] = sol_fitness
+                        elif type(sol_fitness) in [list, tuple, numpy.ndarray]:
+                            # The fitness function returns a list/tuple/numpy.ndarray.
+                            # This is a multi-objective optimization problem.
+                            fitness[index] = sol_fitness
+                        else:
+                            raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {sol_fitness} of type {type(sol_fitness)} found.")
                 else:
-                    batch_last_index = first_idx + (batch_idx + 1) * self.fitness_batch_size
+                    # Reaching this point means that batch processing is in effect to calculate the fitness values.
+                    # Number of batches.
+                    num_batches = int(numpy.ceil(len(solutions_to_submit_indices) / self.fitness_batch_size))
+                    # Each element of the `batches_solutions` list represents the solutions in one batch.
+                    batches_solutions = []
+                    # Each element of the `batches_indices` list represents the solutions' indices in one batch.
+                    batches_indices = []
+                    # For each batch, get its indices and call the fitness function.
+                    for batch_idx in range(num_batches):
+                        batch_first_index = batch_idx * self.fitness_batch_size
+                        batch_last_index = (batch_idx + 1) * self.fitness_batch_size
+                        batch_indices = solutions_to_submit_indices[batch_first_index:batch_last_index]
+                        batch_solutions = self.population[batch_indices, :]
+    
+                        batches_solutions.append(batch_solutions)
+                        batches_indices.append(batch_indices)
 
-                # Calculate the fitness values for the batch.
-                # We cannot return the index/indices of the solution(s) within the population.
-                # Because the new solution(s) (offspring) do(es) not yet exist in the population.
-                # The user should handle this situation if the solution index is used anywhere.
-                fitness_temp = self.fitness_func(self, 
-                                                 temp_population[batch_first_index:batch_last_index], 
-                                                 None) 
-                # Insert the fitness of each solution at the proper index.
-                for idx in range(batch_first_index, batch_last_index):
-                    fitness[idx] = fitness_temp[idx - batch_first_index]
+                    for batch_indices, batch_fitness in zip(batches_indices, executor.map(self.fitness_func, [self]*len(solutions_to_submit_indices), batches_solutions, batches_indices)):
+                        if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
+                            raise TypeError(f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
+                        elif len(numpy.array(batch_fitness)) != len(batch_indices):
+                            raise ValueError(f"There is a mismatch between the number of solutions passed to the fitness function ({len(batch_indices)}) and the number of fitness values returned ({len(batch_fitness)}). They must match.")
+
+                        for index, sol_fitness in zip(batch_indices, batch_fitness):
+                            if type(sol_fitness) in self.supported_int_float_types:
+                                # The fitness function returns a single numeric value.
+                                # This is a single-objective optimization problem.
+                                fitness[index] = sol_fitness
+                            elif type(sol_fitness) in [list, tuple, numpy.ndarray]:
+                                # The fitness function returns a list/tuple/numpy.ndarray.
+                                # This is a multi-objective optimization problem.
+                                fitness[index] = sol_fitness
+                            else:
+                                raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value ({sol_fitness}) of type {type(sol_fitness)} found.")
+
+
 
         if len(fitness.shape) > 1:
             # TODO This is a multi-objective optimization problem.

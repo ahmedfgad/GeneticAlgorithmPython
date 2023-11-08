@@ -15,6 +15,24 @@ initial_population = [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
 
+#### Define the fitness functions in the top-level of the module so that they are picklable and usable in the process-based parallel processing works.
+#### If the functions are defined inside a class/method/function, they are not picklable and this error is raised: AttributeError: Can't pickle local object
+#### Process-based parallel processing must have the used functions picklable.
+def fitness_func_no_batch_single(ga, solution, idx):
+    return random.random()
+
+def fitness_func_batch_single(ga, soluions, idxs):
+    return numpy.random.uniform(size=len(soluions))
+
+def fitness_func_no_batch_multi(ga, solution, idx):
+    return [random.random(), random.random()]
+
+def fitness_func_batch_multi(ga, soluions, idxs):
+    f = []
+    for sol in soluions:
+        f.append([random.random(), random.random()])
+    return f
+
 def output_adaptive_mutation(gene_space=None,
                              gene_type=float,
                              num_genes=10,
@@ -29,22 +47,8 @@ def output_adaptive_mutation(gene_space=None,
                              fitness_batch_size=None,
                              mutation_type="adaptive",
                              parent_selection_type='sss',
+                             parallel_processing=None,
                              multi_objective=False):
-
-    def fitness_func_no_batch_single(ga, solution, idx):
-        return random.random()
-
-    def fitness_func_batch_single(ga, soluions, idxs):
-        return numpy.random.uniform(size=len(soluions))
-    
-    def fitness_func_no_batch_multi(ga, solution, idx):
-        return [random.random(), random.random()]
-
-    def fitness_func_batch_multi(ga, soluions, idxs):
-        f = []
-        for sol in soluions:
-            f.append([random.random(), random.random()])
-        return f
 
     if fitness_batch_size is None or (type(fitness_batch_size) in pygad.GA.supported_int_types and fitness_batch_size == 1):
         if multi_objective == True:
@@ -80,6 +84,7 @@ def output_adaptive_mutation(gene_space=None,
                            mutation_type=mutation_type,
                            suppress_warnings=True,
                            fitness_batch_size=fitness_batch_size,
+                           parallel_processing=parallel_processing,
                            random_seed=1)
 
     ga_instance.run()
@@ -89,55 +94,64 @@ def output_adaptive_mutation(gene_space=None,
 def test_adaptive_mutation(multi_objective=False,
                            parent_selection_type='sss',
                            mutation_num_genes=None,
-                           mutation_probability=None):
+                           mutation_probability=None,
+                           parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
     # assert result == True
 
 def test_adaptive_mutation_gene_space(multi_objective=False,
                                       parent_selection_type='sss',
                                       mutation_num_genes=None,
-                                      mutation_probability=None):
+                                      mutation_probability=None,
+                                      parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(gene_space=range(10),
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
     # assert result == True
 
 def test_adaptive_mutation_int_gene_type(multi_objective=False,
                                          parent_selection_type='sss',
                                          mutation_num_genes=None,
-                                         mutation_probability=None):
+                                         mutation_probability=None,
+                                         parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(gene_type=int,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
     # assert result == True
 
 def test_adaptive_mutation_gene_space_gene_type(multi_objective=False,
                                                 parent_selection_type='sss',
                                                 mutation_num_genes=None,
-                                                mutation_probability=None):
+                                                mutation_probability=None,
+                                                parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(gene_space={"low": 0, "high": 10},
                                                    gene_type=[float, 2],
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
     # assert result == True
 
 def test_adaptive_mutation_nested_gene_space(multi_objective=False,
                                              parent_selection_type='sss',
                                              mutation_num_genes=None,
-                                             mutation_probability=None):
+                                             mutation_probability=None,
+                                             parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(gene_space=[[0, 1, 2, 3, 4], 
                                                                 numpy.arange(5, 10), 
                                                                 range(10, 15),
@@ -151,25 +165,29 @@ def test_adaptive_mutation_nested_gene_space(multi_objective=False,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
     # assert result == True
 
 def test_adaptive_mutation_nested_gene_type(multi_objective=False,
                                             parent_selection_type='sss',
                                             mutation_num_genes=None,
-                                            mutation_probability=None):
+                                            mutation_probability=None,
+                                            parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
     # assert result == True
 
 def test_adaptive_mutation_nested_gene_space_nested_gene_type(multi_objective=False,
                                                               parent_selection_type='sss',
                                                               mutation_num_genes=None,
-                                                              mutation_probability=None):
+                                                              mutation_probability=None,
+                                                              parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(gene_space=[[0, 1, 2, 3, 4], 
                                                                 numpy.arange(5, 10), 
                                                                 range(10, 15),
@@ -184,136 +202,161 @@ def test_adaptive_mutation_nested_gene_space_nested_gene_type(multi_objective=Fa
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
     # assert result == True
 
 def test_adaptive_mutation_initial_population(multi_objective=False,
                                               parent_selection_type='sss',
                                               mutation_num_genes=None,
-                                              mutation_probability=None):
+                                              mutation_probability=None,
+                                              parallel_processing=None):
     global initial_population
     result, ga_instance = output_adaptive_mutation(initial_population=initial_population,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
     # assert result == True
 
 def test_adaptive_mutation_initial_population_nested_gene_type(multi_objective=False,
                                                                parent_selection_type='sss',
                                                                mutation_num_genes=None,
-                                                               mutation_probability=None):
+                                                               mutation_probability=None,
+                                                               parallel_processing=None):
     global initial_population
     result, ga_instance = output_adaptive_mutation(initial_population=initial_population,
                                                    gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
     # assert result == True
 
 def test_adaptive_mutation_fitness_batch_size_1(multi_objective=False,
                                                 parent_selection_type='sss',
                                                 mutation_num_genes=None,
-                                                mutation_probability=None):
+                                                mutation_probability=None,
+                                                parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(fitness_batch_size=1,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
 def test_adaptive_mutation_fitness_batch_size_2(multi_objective=False,
                                                 parent_selection_type='sss',
                                                 mutation_num_genes=None,
-                                                mutation_probability=None):
+                                                mutation_probability=None,
+                                                parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(fitness_batch_size=2,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
 def test_adaptive_mutation_fitness_batch_size_3(multi_objective=False,
                                                 parent_selection_type='sss',
                                                 mutation_num_genes=None,
-                                                mutation_probability=None):
+                                                mutation_probability=None,
+                                                parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(fitness_batch_size=3,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
 def test_adaptive_mutation_fitness_batch_size_4(multi_objective=False,
                                                 parent_selection_type='sss',
                                                 mutation_num_genes=None,
-                                                mutation_probability=None):
+                                                mutation_probability=None,
+                                                parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(fitness_batch_size=4,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
 def test_adaptive_mutation_fitness_batch_size_5(multi_objective=False,
                                                 parent_selection_type='sss',
                                                 mutation_num_genes=None,
-                                                mutation_probability=None):
+                                                mutation_probability=None,
+                                                parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(fitness_batch_size=5,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
 def test_adaptive_mutation_fitness_batch_size_6(multi_objective=False,
                                                 parent_selection_type='sss',
                                                 mutation_num_genes=None,
-                                                mutation_probability=None):
+                                                mutation_probability=None,
+                                                parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(fitness_batch_size=6,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
 def test_adaptive_mutation_fitness_batch_size_7(multi_objective=False,
                                                 parent_selection_type='sss',
                                                 mutation_num_genes=None,
-                                                mutation_probability=None):
+                                                mutation_probability=None,
+                                                parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(fitness_batch_size=7,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
 def test_adaptive_mutation_fitness_batch_size_8(multi_objective=False,
                                                 parent_selection_type='sss',
                                                 mutation_num_genes=None,
-                                                mutation_probability=None):
+                                                mutation_probability=None,
+                                                parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(fitness_batch_size=8,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
 def test_adaptive_mutation_fitness_batch_size_9(multi_objective=False,
                                                 parent_selection_type='sss',
                                                 mutation_num_genes=None,
-                                                mutation_probability=None):
+                                                mutation_probability=None,
+                                                parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(fitness_batch_size=9,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
 def test_adaptive_mutation_fitness_batch_size_10(multi_objective=False,
                                                  parent_selection_type='sss',
                                                  mutation_num_genes=None,
-                                                 mutation_probability=None):
+                                                 mutation_probability=None,
+                                                 parallel_processing=None):
     result, ga_instance = output_adaptive_mutation(fitness_batch_size=10,
                                                    parent_selection_type=parent_selection_type,
                                                    multi_objective=multi_objective,
                                                    mutation_num_genes=mutation_num_genes,
-                                                   mutation_probability=mutation_probability)
+                                                   mutation_probability=mutation_probability,
+                                                   parallel_processing=parallel_processing)
 
 if __name__ == "__main__":
     #### Single-objective mutation_probability
@@ -782,4 +825,389 @@ if __name__ == "__main__":
                                                  parent_selection_type='nsga2',
                                                  mutation_num_genes=[6, 4])
     print()
+
+
+    ######## Parallel Processing
+    #### Single-objective mutation_probability
+    print()
+    test_adaptive_mutation(mutation_probability=[0.2, 0.1],
+                           parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_int_gene_type(mutation_probability=[0.2, 0.1],
+                                         parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_gene_space(mutation_probability=[0.2, 0.1],
+                                      parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_gene_space_gene_type(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_nested_gene_space(mutation_probability=[0.2, 0.1],
+                                             parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_nested_gene_type(mutation_probability=[0.2, 0.1],
+                                            parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_initial_population(mutation_probability=[0.2, 0.1],
+                                              parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_initial_population_nested_gene_type(mutation_probability=[0.2, 0.1],
+                                                               parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_1(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_1(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_2(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_3(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_4(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_5(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_6(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_7(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_8(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_9(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_10(mutation_probability=[0.2, 0.1],
+                                                 parallel_processing=['thread', 4])
+    print()
+    test_adaptive_mutation(mutation_probability=[0.2, 0.1],
+                           parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_int_gene_type(mutation_probability=[0.2, 0.1],
+                                         parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_gene_space(mutation_probability=[0.2, 0.1],
+                                      parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_gene_space_gene_type(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_nested_gene_space(mutation_probability=[0.2, 0.1],
+                                             parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_nested_gene_type(mutation_probability=[0.2, 0.1],
+                                            parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_initial_population(mutation_probability=[0.2, 0.1],
+                                              parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_initial_population_nested_gene_type(mutation_probability=[0.2, 0.1],
+                                                               parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_1(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_1(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_2(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_3(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_4(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_5(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_6(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_7(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_8(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_9(mutation_probability=[0.2, 0.1],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_10(mutation_probability=[0.2, 0.1],
+                                                 parallel_processing=['process', 4])
+    print()
+
+    #### Multi-objective NSGA-II Parent Selection mutation_num_genes
+    print()
+    test_adaptive_mutation(multi_objective=True,
+                           parent_selection_type='nsga2',
+                           mutation_num_genes=[6, 4],
+                           parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_int_gene_type(multi_objective=True,
+                                         parent_selection_type='nsga2',
+                                         mutation_num_genes=[6, 4],
+                                         parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_gene_space(multi_objective=True,
+                                      parent_selection_type='nsga2',
+                                      mutation_num_genes=[6, 4],
+                                      parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_gene_space_gene_type(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_nested_gene_space(multi_objective=True,
+                                             parent_selection_type='nsga2',
+                                             mutation_num_genes=[6, 4],
+                                             parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_nested_gene_type(multi_objective=True,
+                                            parent_selection_type='nsga2',
+                                            mutation_num_genes=[6, 4],
+                                            parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_initial_population(multi_objective=True,
+                                              parent_selection_type='nsga2',
+                                              mutation_num_genes=[6, 4],
+                                              parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_initial_population_nested_gene_type(multi_objective=True,
+                                                               parent_selection_type='nsga2',
+                                                               mutation_num_genes=[6, 4],
+                                                               parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_1(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_1(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_2(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_3(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_4(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_5(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_6(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_7(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_8(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_9(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['thread', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_10(multi_objective=True,
+                                                 parent_selection_type='nsga2',
+                                                 mutation_num_genes=[6, 4],
+                                                 parallel_processing=['thread', 4])
+    print()
+    test_adaptive_mutation(multi_objective=True,
+                           parent_selection_type='nsga2',
+                           mutation_num_genes=[6, 4],
+                           parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_int_gene_type(multi_objective=True,
+                                         parent_selection_type='nsga2',
+                                         mutation_num_genes=[6, 4],
+                                         parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_gene_space(multi_objective=True,
+                                      parent_selection_type='nsga2',
+                                      mutation_num_genes=[6, 4],
+                                      parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_gene_space_gene_type(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_nested_gene_space(multi_objective=True,
+                                             parent_selection_type='nsga2',
+                                             mutation_num_genes=[6, 4],
+                                             parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_nested_gene_type(multi_objective=True,
+                                            parent_selection_type='nsga2',
+                                            mutation_num_genes=[6, 4],
+                                            parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_initial_population(multi_objective=True,
+                                              parent_selection_type='nsga2',
+                                              mutation_num_genes=[6, 4],
+                                              parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_initial_population_nested_gene_type(multi_objective=True,
+                                                               parent_selection_type='nsga2',
+                                                               mutation_num_genes=[6, 4],
+                                                               parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_1(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_1(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_2(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_3(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_4(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_5(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_6(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_7(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_8(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_9(multi_objective=True,
+                                                parent_selection_type='nsga2',
+                                                mutation_num_genes=[6, 4],
+                                                parallel_processing=['process', 4])
+    print()
+
+    test_adaptive_mutation_fitness_batch_size_10(multi_objective=True,
+                                                 parent_selection_type='nsga2',
+                                                 mutation_num_genes=[6, 4],
+                                                 parallel_processing=['process', 4])
+    print()
+
 

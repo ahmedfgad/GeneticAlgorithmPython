@@ -1849,7 +1849,6 @@ class GA(utils.parent_selection.ParentSelection,
                             if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
                                 raise TypeError(f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
                             elif len(numpy.array(batch_fitness)) != len(batch_indices):
-                                
                                 raise ValueError(f"There is a mismatch between the number of solutions passed to the fitness function ({len(batch_indices)}) and the number of fitness values returned ({len(batch_fitness)}). They must match.")
 
                             for index, fitness in zip(batch_indices, batch_fitness):
