@@ -80,42 +80,48 @@ def output_crossover_mutation(gene_space=None,
     print(f"Comparison result is {result}")
     return result, ga_instance
 
-def test_no_crossover_no_mutation(multi_objective=False,
-                                  parent_selection_type='sss'):
-    result, ga_instance = output_crossover_mutation(parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+def test_no_crossover_no_mutation():
+    result, ga_instance = output_crossover_mutation()
 
     assert result == True
 
-def test_no_crossover_no_mutation_gene_space(multi_objective=False,
-                                             parent_selection_type='sss'):
-    result, ga_instance = output_crossover_mutation(gene_space=range(10),
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+def test_no_crossover_no_mutation_gene_space():
+    result, ga_instance = output_crossover_mutation(gene_space=range(10))
 
     assert result == True
 
-def test_no_crossover_no_mutation_int_gene_type(multi_objective=False,
-                                                parent_selection_type='sss'):
-    result, ga_instance = output_crossover_mutation(gene_type=int,
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+def test_no_crossover_no_mutation_int_gene_type():
+    result, ga_instance = output_crossover_mutation(gene_type=int)
 
     assert result == True
 
 
-def test_no_crossover_no_mutation_gene_space_gene_type(multi_objective=False,
-                                                       parent_selection_type='sss'):
+def test_no_crossover_no_mutation_gene_space_gene_type():
     result, ga_instance = output_crossover_mutation(gene_space={"low": 0, "high": 10},
-                                                    gene_type=[float, 2],
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+                                                    gene_type=[float, 2])
 
     assert result == True
 
 
-def test_no_crossover_no_mutation_nested_gene_space(multi_objective=False,
-                                                    parent_selection_type='sss'):
+def test_no_crossover_no_mutation_nested_gene_space():
+    result, ga_instance = output_crossover_mutation(gene_space=[[0, 1, 2, 3, 4], 
+                                                                numpy.arange(5, 10), 
+                                                                range(10, 15),
+                                                                {"low": 15, "high": 20},
+                                                                {"low": 20, "high": 30, "step": 2},
+                                                                None,
+                                                                numpy.arange(30, 35),
+                                                                numpy.arange(35, 40),
+                                                                numpy.arange(40, 45),
+                                                                [45, 46, 47, 48, 49]])
+    assert result == True
+
+def test_no_crossover_no_mutation_nested_gene_type():
+    result, ga_instance = output_crossover_mutation(gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+
+    assert result == True
+
+def test_no_crossover_no_mutation_nested_gene_space_nested_gene_type():
     result, ga_instance = output_crossover_mutation(gene_space=[[0, 1, 2, 3, 4], 
                                                                 numpy.arange(5, 10), 
                                                                 range(10, 15),
@@ -126,84 +132,43 @@ def test_no_crossover_no_mutation_nested_gene_space(multi_objective=False,
                                                                 numpy.arange(35, 40),
                                                                 numpy.arange(40, 45),
                                                                 [45, 46, 47, 48, 49]],
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
-    assert result == True
-
-def test_no_crossover_no_mutation_nested_gene_type(multi_objective=False,
-                                                   parent_selection_type='sss'):
-    result, ga_instance = output_crossover_mutation(gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+                                                    gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
 
     assert result == True
 
-def test_no_crossover_no_mutation_nested_gene_space_nested_gene_type(multi_objective=False,
-                                                                     parent_selection_type='sss'):
-    result, ga_instance = output_crossover_mutation(gene_space=[[0, 1, 2, 3, 4], 
-                                                                numpy.arange(5, 10), 
-                                                                range(10, 15),
-                                                                {"low": 15, "high": 20},
-                                                                {"low": 20, "high": 30, "step": 2},
-                                                                None,
-                                                                numpy.arange(30, 35),
-                                                                numpy.arange(35, 40),
-                                                                numpy.arange(40, 45),
-                                                                [45, 46, 47, 48, 49]],
-                                                    gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+def test_no_crossover_no_mutation_initial_population():
+    global initial_population
+    result, ga_instance = output_crossover_mutation(initial_population=initial_population)
 
     assert result == True
 
-def test_no_crossover_no_mutation_initial_population(multi_objective=False,
-                                                     parent_selection_type='sss'):
+def test_no_crossover_no_mutation_initial_population_nested_gene_type():
     global initial_population
     result, ga_instance = output_crossover_mutation(initial_population=initial_population,
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+                                                    gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
 
     assert result == True
 
-def test_no_crossover_no_mutation_initial_population_nested_gene_type(multi_objective=False,
-                                                                      parent_selection_type='sss'):
-    global initial_population
-    result, ga_instance = output_crossover_mutation(initial_population=initial_population,
-                                                    gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]],
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
-
-    assert result == True
-
-def test_crossover_no_mutation_zero_crossover_probability(multi_objective=False,
-                                                          parent_selection_type='sss'):
+def test_crossover_no_mutation_zero_crossover_probability():
     global initial_population
     result, ga_instance = output_crossover_mutation(crossover_type="single_point",
-                                                    crossover_probability=0.0,
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+                                                    crossover_probability=0.0)
 
     assert result == True
 
-def test_zero_crossover_probability_zero_mutation_probability(multi_objective=False,
-                                                              parent_selection_type='sss'):
+def test_zero_crossover_probability_zero_mutation_probability():
     global initial_population
     result, ga_instance = output_crossover_mutation(crossover_type="single_point",
                                                     crossover_probability=0.0,
                                                     mutation_type="random",
-                                                    mutation_probability=0.0,
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+                                                    mutation_probability=0.0)
 
     assert result == True
 
-def test_random_mutation_manual_call(multi_objective=False,
-                                     parent_selection_type='sss'):
+def test_random_mutation_manual_call():
     result, ga_instance = output_crossover_mutation(mutation_type="random",
                                                     random_mutation_min_val=888,
-                                                    random_mutation_max_val=999,
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+                                                    random_mutation_max_val=999)
     ga_instance.mutation_num_genes = 9
 
     temp_offspring = numpy.array(initial_population[0:1])
@@ -217,13 +182,10 @@ def test_random_mutation_manual_call(multi_objective=False,
     assert len(comp_sorted) in range(1, 1 + 1 + ga_instance.mutation_num_genes)
     assert comp_sorted[0] == 0
 
-def test_random_mutation_manual_call2(multi_objective=False,
-                                      parent_selection_type='sss'):
+def test_random_mutation_manual_call2():
     result, ga_instance = output_crossover_mutation(mutation_type="random",
                                                     random_mutation_min_val=888,
-                                                    random_mutation_max_val=999,
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+                                                    random_mutation_max_val=999)
     ga_instance.mutation_num_genes = 10
 
     temp_offspring = numpy.array(initial_population[0:1])
@@ -237,17 +199,14 @@ def test_random_mutation_manual_call2(multi_objective=False,
     assert len(comp_sorted) in range(1, 1 + 1 + ga_instance.mutation_num_genes)
     # assert comp_sorted[0] == 0
 
-def test_random_mutation_manual_call3(multi_objective=False,
-                                      parent_selection_type='sss'):
+def test_random_mutation_manual_call3():
     # Use random_mutation_min_val & random_mutation_max_val as numbers.
     random_mutation_min_val = 888
     random_mutation_max_val = 999
     result, ga_instance = output_crossover_mutation(mutation_type="random",
                                                     random_mutation_min_val=random_mutation_min_val,
                                                     random_mutation_max_val=random_mutation_max_val,
-                                                    mutation_by_replacement=True,
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+                                                    mutation_by_replacement=True)
     ga_instance.mutation_num_genes = 10
 
     temp_offspring = numpy.array(initial_population[0:1])
@@ -261,17 +220,14 @@ def test_random_mutation_manual_call3(multi_objective=False,
     for value in comp_sorted:
         assert value in value_space
 
-def test_random_mutation_manual_call4(multi_objective=False,
-                                      parent_selection_type='sss'):
+def test_random_mutation_manual_call4():
     # Use random_mutation_min_val & random_mutation_max_val as lists.
     random_mutation_min_val = [888]*10
     random_mutation_max_val = [999]*10
     result, ga_instance = output_crossover_mutation(mutation_type="random",
                                                     random_mutation_min_val=random_mutation_min_val,
                                                     random_mutation_max_val=random_mutation_max_val,
-                                                    mutation_by_replacement=True,
-                                                    parent_selection_type=parent_selection_type,
-                                                    multi_objective=multi_objective)
+                                                    mutation_by_replacement=True)
     ga_instance.mutation_num_genes = 10
 
     temp_offspring = numpy.array(initial_population[0:1])
@@ -329,107 +285,3 @@ if __name__ == "__main__":
 
     test_random_mutation_manual_call4()
     print()
-
-    #### Multi-objective
-    print()
-    test_no_crossover_no_mutation(multi_objective=True)
-    print()
-
-    test_no_crossover_no_mutation_int_gene_type(multi_objective=True)
-    print()
-
-    test_no_crossover_no_mutation_gene_space(multi_objective=True)
-    print()
-
-    test_no_crossover_no_mutation_gene_space_gene_type(multi_objective=True)
-    print()
-
-    test_no_crossover_no_mutation_nested_gene_space(multi_objective=True)
-    print()
-
-    test_no_crossover_no_mutation_nested_gene_type(multi_objective=True)
-    print()
-
-    test_no_crossover_no_mutation_initial_population(multi_objective=True)
-    print()
-
-    test_no_crossover_no_mutation_initial_population_nested_gene_type(multi_objective=True)
-    print()
-
-    test_crossover_no_mutation_zero_crossover_probability(multi_objective=True)
-    print()
-
-    test_zero_crossover_probability_zero_mutation_probability(multi_objective=True)
-    print()
-
-    test_random_mutation_manual_call(multi_objective=True)
-    print()
-
-    test_random_mutation_manual_call2(multi_objective=True)
-    print()
-
-    test_random_mutation_manual_call3(multi_objective=True)
-    print()
-
-    test_random_mutation_manual_call4(multi_objective=True)
-    print()
-
-
-    #### Multi-objective NSGA-II Parent Selection
-    print()
-    test_no_crossover_no_mutation(multi_objective=True,
-                                  parent_selection_type='nsga2')
-    print()
-
-    test_no_crossover_no_mutation_int_gene_type(multi_objective=True,
-                                                parent_selection_type='nsga2')
-    print()
-
-    test_no_crossover_no_mutation_gene_space(multi_objective=True,
-                                             parent_selection_type='nsga2')
-    print()
-
-    test_no_crossover_no_mutation_gene_space_gene_type(multi_objective=True,
-                                                       parent_selection_type='nsga2')
-    print()
-
-    test_no_crossover_no_mutation_nested_gene_space(multi_objective=True,
-                                                    parent_selection_type='nsga2')
-    print()
-
-    test_no_crossover_no_mutation_nested_gene_type(multi_objective=True,
-                                                   parent_selection_type='nsga2')
-    print()
-
-    test_no_crossover_no_mutation_initial_population(multi_objective=True,
-                                                     parent_selection_type='nsga2')
-    print()
-
-    test_no_crossover_no_mutation_initial_population_nested_gene_type(multi_objective=True,
-                                                                      parent_selection_type='nsga2')
-    print()
-
-    test_crossover_no_mutation_zero_crossover_probability(multi_objective=True,
-                                                          parent_selection_type='nsga2')
-    print()
-
-    test_zero_crossover_probability_zero_mutation_probability(multi_objective=True,
-                                                              parent_selection_type='nsga2')
-    print()
-
-    test_random_mutation_manual_call(multi_objective=True,
-                                     parent_selection_type='nsga2')
-    print()
-
-    test_random_mutation_manual_call2(multi_objective=True,
-                                      parent_selection_type='nsga2')
-    print()
-
-    test_random_mutation_manual_call3(multi_objective=True,
-                                      parent_selection_type='nsga2')
-    print()
-
-    test_random_mutation_manual_call4(multi_objective=True,
-                                      parent_selection_type='nsga2')
-    print()
-

@@ -1,4 +1,5 @@
 import pygad
+import random
 
 num_generations = 100
 
@@ -9,7 +10,7 @@ def number_lifecycle_callback_functions_calls(stop_criteria=None,
     actual_num_callbacks_calls = 0
 
     def fitness_func(ga_instanse, solution, solution_idx):
-        return 1
+        return random.random()
 
     def on_start(ga_instance):
         nonlocal actual_num_callbacks_calls

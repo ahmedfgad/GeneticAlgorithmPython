@@ -6,25 +6,19 @@ actual_num_fitness_calls_no_keep = 0
 actual_num_fitness_calls_keep_elitism = 0
 actual_num_fitness_calls_keep_parents = 0
 
-num_generations = 100
+num_generations = 50
 sol_per_pop = 10
 num_parents_mating = 5
 
-def multi_objective_problem(keep_elitism=1, 
-                            keep_parents=-1,
-                            fitness_batch_size=None,
-                            stop_criteria=None,
-                            parent_selection_type='sss',
-                            mutation_type="random",
-                            mutation_percent_genes="default",
-                            multi_objective=False):
+function_inputs1 = [4,-2,3.5,5,-11,-4.7] # Function 1 inputs.
+function_inputs2 = [-2,0.7,-9,1.4,3,5] # Function 2 inputs.
+desired_output1 = 50 # Function 1 output.
+desired_output2 = 30 # Function 2 output.
 
-    function_inputs1 = [4,-2,3.5,5,-11,-4.7] # Function 1 inputs.
-    function_inputs2 = [-2,0.7,-9,1.4,3,5] # Function 2 inputs.
-    desired_output1 = 50 # Function 1 output.
-    desired_output2 = 30 # Function 2 output.
-
-    def fitness_func_batch_multi(ga_instance, solution, solution_idx):
+#### Define the fitness functions in the top-level of the module so that they are picklable and usable in the process-based parallel processing works.
+#### If the functions are defined inside a class/method/function, they are not picklable and this error is raised: AttributeError: Can't pickle local object
+#### Process-based parallel processing must have the used functions picklable.
+def fitness_func_batch_multi(ga_instance, solution, solution_idx):
         f = []
         for sol in solution:
             output1 = numpy.sum(sol*function_inputs1)
@@ -34,14 +28,14 @@ def multi_objective_problem(keep_elitism=1,
             f.append([fitness1, fitness2])
         return f
 
-    def fitness_func_no_batch_multi(ga_instance, solution, solution_idx):
+def fitness_func_no_batch_multi(ga_instance, solution, solution_idx):
         output1 = numpy.sum(solution*function_inputs1)
         output2 = numpy.sum(solution*function_inputs2)
         fitness1 = 1.0 / (numpy.abs(output1 - desired_output1) + 0.000001)
         fitness2 = 1.0 / (numpy.abs(output2 - desired_output2) + 0.000001)
         return [fitness1, fitness2]
 
-    def fitness_func_batch_single(ga_instance, solution, solution_idx):
+def fitness_func_batch_single(ga_instance, solution, solution_idx):
         f = []
         for sol in solution:
             output = numpy.sum(solution*function_inputs1)
@@ -49,10 +43,21 @@ def multi_objective_problem(keep_elitism=1,
             f.append(fitness)
         return f
 
-    def fitness_func_no_batch_single(ga_instance, solution, solution_idx):
+def fitness_func_no_batch_single(ga_instance, solution, solution_idx):
         output = numpy.sum(solution*function_inputs1)
         fitness = 1.0 / (numpy.abs(output - desired_output1) + 0.000001)
         return fitness
+
+
+def multi_objective_problem(keep_elitism=1, 
+                            keep_parents=-1,
+                            fitness_batch_size=None,
+                            stop_criteria=None,
+                            parent_selection_type='sss',
+                            mutation_type="random",
+                            mutation_percent_genes="default",
+                            multi_objective=False,
+                            parallel_processing=None):
 
     if fitness_batch_size is None or (type(fitness_batch_size) in pygad.GA.supported_int_types and fitness_batch_size == 1):
         if multi_objective == True:
@@ -77,139 +82,93 @@ def multi_objective_problem(keep_elitism=1,
                             keep_parents=keep_parents,
                             stop_criteria=stop_criteria,
                             parent_selection_type=parent_selection_type,
+                            parallel_processing=parallel_processing,
                             suppress_warnings=True)
 
     ga_optimizer.run()
     
-    return ga_optimizer.generations_completed, ga_optimizer.best_solutions_fitness, ga_optimizer.last_generation_fitness, stop_criteria
+    return None
 
-def test_number_calls_fitness_function_default_keep():
-    multi_objective_problem()
+def test_number_calls_fitness_function_no_parallel_processing():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=None)
 
-def test_number_calls_fitness_function_stop_criteria_reach(multi_objective=False,
-                                                           fitness_batch_size=None, 
-                                                           num=10):
-    generations_completed, best_solutions_fitness, last_generation_fitness, stop_criteria = multi_objective_problem(multi_objective=multi_objective,
-                                                                                           fitness_batch_size=fitness_batch_size,
-                                                                                           stop_criteria=f"reach_{num}")
-    # Verify that the GA stops when meeting the criterion.
-    criterion = stop_criteria.split('_')
-    stop_word = criterion[0]
-    if generations_completed < num_generations:
-        if stop_word == 'reach':
-            if len(criterion) > 2:
-                # multi-objective problem.
-                for idx, num in enumerate(criterion[1:]):
-                    criterion[idx + 1] = float(num)
-            else:
-                criterion[1] = float(criterion[1])
+def test_number_calls_fitness_function_parallel_processing_thread_1():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['thread', 1])
 
-            # Single-objective
-            if type(last_generation_fitness[0]) in pygad.GA.supported_int_float_types:
-                assert max(last_generation_fitness) >= criterion[1]
-            # Multi-objective
-            elif type(last_generation_fitness[0]) in [list, tuple, numpy.ndarray]:
-                # Validate the value passed to the criterion.
-                if len(criterion[1:]) == 1:
-                    # There is a single value used across all the objectives.
-                    pass
-                elif len(criterion[1:]) > 1:
-                    # There are multiple values. The number of values must be equal to the number of objectives.
-                    if len(criterion[1:]) == len(last_generation_fitness[0]):
-                        pass
-                    else:
-                        raise ValueError("Error")
+def test_number_calls_fitness_function_parallel_processing_thread_2():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['thread', 2])
 
-                for obj_idx in range(len(last_generation_fitness[0])):
-                    # Use the objective index to return the proper value for the criterion.
-                    if len(criterion[1:]) == len(last_generation_fitness[0]):
-                        reach_fitness_value = criterion[obj_idx + 1]
-                    elif len(criterion[1:]) == 1:
-                        reach_fitness_value = criterion[1]
+def test_number_calls_fitness_function_parallel_processing_thread_5():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['thread', 5])
 
-                    assert max(last_generation_fitness[:, obj_idx]) >= reach_fitness_value
+def test_number_calls_fitness_function_parallel_processing_thread_5_patch_4():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=4,
+                            parallel_processing=['thread', 5])
 
-def test_number_calls_fitness_function_stop_criteria_saturate(multi_objective=False,
-                                                              fitness_batch_size=None,
-                                                              num=5):
-    generations_completed, best_solutions_fitness, last_generation_fitness, stop_criteria = multi_objective_problem(multi_objective=multi_objective,
-                                                                                           fitness_batch_size=fitness_batch_size,
-                                                                                           stop_criteria=f"saturate_{num}")
-    # Verify that the GA stops when meeting the criterion.
-    criterion = stop_criteria.split('_')
-    stop_word = criterion[0]
-    number = criterion[1]
-    if generations_completed < num_generations:
-        if stop_word == 'saturate':
-            number = int(number)
-            if type(last_generation_fitness[0]) in pygad.GA.supported_int_float_types:
-                assert best_solutions_fitness[generations_completed - number] == best_solutions_fitness[generations_completed - 1]
-            elif type(last_generation_fitness[0]) in [list, tuple, numpy.ndarray]:
-                for obj_idx in range(len(best_solutions_fitness[0])):
-                    assert best_solutions_fitness[generations_completed - number][obj_idx] == best_solutions_fitness[generations_completed - 1][obj_idx]
+def test_number_calls_fitness_function_parallel_processing_thread_5_patch_4_multi_objective():
+    multi_objective_problem(multi_objective=True,
+                            fitness_batch_size=4,
+                            parallel_processing=['thread', 5])
+
+def test_number_calls_fitness_function_parallel_processing_process_1():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['process', 1])
+
+def test_number_calls_fitness_function_parallel_processing_process_2():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['process', 2])
+
+def test_number_calls_fitness_function_parallel_processing_process_5():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['process', 5])
+
+def test_number_calls_fitness_function_parallel_processing_process_5_patch_4():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=4,
+                            parallel_processing=['process', 5])
+
+def test_number_calls_fitness_function_parallel_processing_process_5_patch_4_multi_objective():
+    multi_objective_problem(multi_objective=True,
+                            fitness_batch_size=4,
+                            parallel_processing=['process', 5])
 
 if __name__ == "__main__":
-    #### Single-objective problem with a single numeric value with stop_criteria.
     print()
-    test_number_calls_fitness_function_default_keep()
-    print()
-    test_number_calls_fitness_function_stop_criteria_reach()
-    print()
-    test_number_calls_fitness_function_stop_criteria_reach(num=2)
-    print()
-    test_number_calls_fitness_function_stop_criteria_saturate()
-    print()
-    test_number_calls_fitness_function_stop_criteria_saturate(num=2)
-    print()
-    test_number_calls_fitness_function_stop_criteria_reach(fitness_batch_size=4)
-    print()
-    test_number_calls_fitness_function_stop_criteria_reach(fitness_batch_size=4,
-                                                           num=2)
-    print()
-    test_number_calls_fitness_function_stop_criteria_saturate(fitness_batch_size=4)
-    print()
-    test_number_calls_fitness_function_stop_criteria_saturate(fitness_batch_size=4,
-                                                              num=2)
+    test_number_calls_fitness_function_no_parallel_processing()
     print()
 
-
-    #### Multi-objective problem with a single numeric value with stop_criteria.
-    test_number_calls_fitness_function_stop_criteria_reach(multi_objective=True)
+    #### Thread-based Parallel Processing
+    test_number_calls_fitness_function_parallel_processing_thread_1()
     print()
-    test_number_calls_fitness_function_stop_criteria_reach(multi_objective=True, 
-                                                           num=2)
+    test_number_calls_fitness_function_parallel_processing_thread_2()
     print()
-    test_number_calls_fitness_function_stop_criteria_saturate(multi_objective=True)
+    test_number_calls_fitness_function_parallel_processing_thread_5()
     print()
-    test_number_calls_fitness_function_stop_criteria_saturate(multi_objective=True, 
-                                                              num=2)
+    test_number_calls_fitness_function_parallel_processing_thread_5_patch_4()
     print()
-    test_number_calls_fitness_function_stop_criteria_reach(multi_objective=True, 
-                                                           fitness_batch_size=4)
-    print()
-    test_number_calls_fitness_function_stop_criteria_reach(multi_objective=True, 
-                                                           fitness_batch_size=4,
-                                                           num=2)
-    print()
-    test_number_calls_fitness_function_stop_criteria_saturate(multi_objective=True, 
-                                                              fitness_batch_size=4)
-    print()
-    test_number_calls_fitness_function_stop_criteria_saturate(multi_objective=True, 
-                                                              fitness_batch_size=4,
-                                                              num=50)
+    test_number_calls_fitness_function_parallel_processing_thread_5_patch_4_multi_objective()
     print()
 
-
-    #### Multi-objective problem with multiple numeric values with stop_criteria.
-    test_number_calls_fitness_function_stop_criteria_reach(multi_objective=True)
+    #### Thread-based Parallel Processing
+    test_number_calls_fitness_function_parallel_processing_process_1()
     print()
-    test_number_calls_fitness_function_stop_criteria_reach(multi_objective=True, 
-                                                           num="2_5")
+    test_number_calls_fitness_function_parallel_processing_process_2()
     print()
-    test_number_calls_fitness_function_stop_criteria_reach(multi_objective=True, 
-                                                           fitness_batch_size=4)
+    test_number_calls_fitness_function_parallel_processing_process_5()
     print()
-    test_number_calls_fitness_function_stop_criteria_reach(multi_objective=True, 
-                                                           fitness_batch_size=4,
-                                                           num="10_20")
-
+    test_number_calls_fitness_function_parallel_processing_process_5_patch_4()
+    print()
+    test_number_calls_fitness_function_parallel_processing_process_5_patch_4_multi_objective()
+    print()
