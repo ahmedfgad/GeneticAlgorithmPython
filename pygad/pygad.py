@@ -1808,7 +1808,7 @@ class GA(utils.parent_selection.ParentSelection,
                                 solutions_to_submit.append(sol.copy())
                                 solutions_to_submit_indices.append(sol_idx)
                         elif type(pop_fitness[sol_idx]) in [list, tuple, numpy.ndarray]:
-                            # This is a multi-objective problem.
+                            # This is a multi-objective problem. The fitness is already calculated. Nothing to do.
                             pass
 
                     # Check if batch processing is used. If not, then calculate the fitness value for individual solutions.
