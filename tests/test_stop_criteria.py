@@ -10,7 +10,6 @@ num_generations = 50
 sol_per_pop = 10
 num_parents_mating = 5
 
-
 function_inputs1 = [4,-2,3.5,5,-11,-4.7] # Function 1 inputs.
 function_inputs2 = [-2,0.7,-9,1.4,3,5] # Function 2 inputs.
 desired_output1 = 50 # Function 1 output.
@@ -90,57 +89,86 @@ def multi_objective_problem(keep_elitism=1,
     
     return None
 
-def test_number_calls_fitness_function_parallel_processing(multi_objective=False,
-                                                           fitness_batch_size=None,
-                                                           parallel_processing=None):
-    multi_objective_problem(multi_objective=multi_objective,
-                            fitness_batch_size=fitness_batch_size,
-                            parallel_processing=parallel_processing)
+def test_number_calls_fitness_function_no_parallel_processing():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=None)
+
+def test_number_calls_fitness_function_parallel_processing_thread_1():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['thread', 1])
+
+def test_number_calls_fitness_function_parallel_processing_thread_2():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['thread', 2])
+
+def test_number_calls_fitness_function_parallel_processing_thread_5():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['thread', 5])
+
+def test_number_calls_fitness_function_parallel_processing_thread_5_patch_4():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=4,
+                            parallel_processing=['thread', 5])
+
+def test_number_calls_fitness_function_parallel_processing_thread_5_patch_4_multi_objective():
+    multi_objective_problem(multi_objective=True,
+                            fitness_batch_size=4,
+                            parallel_processing=['thread', 5])
+
+def test_number_calls_fitness_function_parallel_processing_process_1():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['process', 1])
+
+def test_number_calls_fitness_function_parallel_processing_process_2():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['process', 2])
+
+def test_number_calls_fitness_function_parallel_processing_process_5():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=None,
+                            parallel_processing=['process', 5])
+
+def test_number_calls_fitness_function_parallel_processing_process_5_patch_4():
+    multi_objective_problem(multi_objective=False,
+                            fitness_batch_size=4,
+                            parallel_processing=['process', 5])
+
+def test_number_calls_fitness_function_parallel_processing_process_5_patch_4_multi_objective():
+    multi_objective_problem(multi_objective=True,
+                            fitness_batch_size=4,
+                            parallel_processing=['process', 5])
 
 if __name__ == "__main__":
+    print()
+    test_number_calls_fitness_function_no_parallel_processing()
+    print()
+
     #### Thread-based Parallel Processing
+    test_number_calls_fitness_function_parallel_processing_thread_1()
     print()
-    test_number_calls_fitness_function_parallel_processing(parallel_processing=['thread', 1])
+    test_number_calls_fitness_function_parallel_processing_thread_2()
     print()
-    test_number_calls_fitness_function_parallel_processing(parallel_processing=['thread', 2])
+    test_number_calls_fitness_function_parallel_processing_thread_5()
     print()
-    test_number_calls_fitness_function_parallel_processing(parallel_processing=['thread', 5])
+    test_number_calls_fitness_function_parallel_processing_thread_5_patch_4()
     print()
-    test_number_calls_fitness_function_parallel_processing(fitness_batch_size=4,
-                                                           parallel_processing=['thread', 5])
-    print()
-    test_number_calls_fitness_function_parallel_processing(fitness_batch_size=4,
-                                                           parallel_processing=['thread', 5])
-    print()
-    print()
-    test_number_calls_fitness_function_parallel_processing(multi_objective=True,
-                                                           fitness_batch_size=4,
-                                                           parallel_processing=['thread', 5])
-    print()
-    test_number_calls_fitness_function_parallel_processing(multi_objective=True,
-                                                           fitness_batch_size=4,
-                                                           parallel_processing=['thread', 5])
-
-    #### Process-based Parallel Processing
-    test_number_calls_fitness_function_parallel_processing(parallel_processing=['process', 1])
-    print()
-    test_number_calls_fitness_function_parallel_processing(parallel_processing=['process', 2])
-    print()
-    test_number_calls_fitness_function_parallel_processing(parallel_processing=['process', 5])
-    print()
-    test_number_calls_fitness_function_parallel_processing(fitness_batch_size=4,
-                                                            parallel_processing=['thread', 5])
-    print()
-    test_number_calls_fitness_function_parallel_processing(fitness_batch_size=4,
-                                                            parallel_processing=['process', 5])
-    print()
-    print()
-    test_number_calls_fitness_function_parallel_processing(multi_objective=True,
-                                                            fitness_batch_size=4,
-                                                            parallel_processing=['process', 5])
-    print()
-    test_number_calls_fitness_function_parallel_processing(multi_objective=True,
-                                                            fitness_batch_size=4,
-                                                            parallel_processing=['process', 5])
+    test_number_calls_fitness_function_parallel_processing_thread_5_patch_4_multi_objective()
     print()
 
+    #### Thread-based Parallel Processing
+    test_number_calls_fitness_function_parallel_processing_process_1()
+    print()
+    test_number_calls_fitness_function_parallel_processing_process_2()
+    print()
+    test_number_calls_fitness_function_parallel_processing_process_5()
+    print()
+    test_number_calls_fitness_function_parallel_processing_process_5_patch_4()
+    print()
+    test_number_calls_fitness_function_parallel_processing_process_5_patch_4_multi_objective()
+    print()

@@ -5,6 +5,8 @@ num_generations = 100
 sol_per_pop = 10
 num_parents_mating = 5
 
+# TODO Verify that the each entry in 'solutions_fitness' and 'best_solutions_fitness' have values equal to the number of objectives.
+
 def number_saved_solutions(keep_elitism=1, 
                            keep_parents=-1,
                            mutation_type="random",
@@ -77,405 +79,1211 @@ def number_saved_solutions(keep_elitism=1,
     print(f"Actual number of best solutions is {len(ga_optimizer.best_solutions)}.")
     return expected_num_solutions, len(ga_optimizer.solutions), len(ga_optimizer.solutions_fitness), expected_num_best_solutions, len(ga_optimizer.best_solutions)
 
+#### Single Objective
 def test_save_solutions_default_keep():
     expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions()
     assert expected_solutions == actual_solutions
     assert expected_solutions == actual_solutions_fitness
     assert expected_best_solutions == actual_best_solutions
 
-def test_save_solutions_no_keep(multi_objective=False,
-                                parent_selection_type='sss',
-                                fitness_batch_size=None,
-                                save_solutions=False,
-                                save_best_solutions=False):
-    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
-                                                                                                                                            keep_parents=0,
-                                                                                                                                            parent_selection_type=parent_selection_type,
-                                                                                                                                            multi_objective=multi_objective,
-                                                                                                                                            fitness_batch_size=fitness_batch_size,
-                                                                                                                                            save_solutions=save_solutions,
-                                                                                                                                            save_best_solutions=save_best_solutions)
+def test_save_solutions_no_keep():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions()
     assert expected_solutions == actual_solutions
     assert expected_solutions == actual_solutions_fitness
     assert expected_best_solutions == actual_best_solutions
 
-def test_save_solutions_keep_elitism(multi_objective=False,
-                                     parent_selection_type='sss',
-                                     fitness_batch_size=None,
-                                     save_solutions=False,
-                                     save_best_solutions=False):
+def test_save_solutions_no_keep_save_solutions():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(save_solutions=True,
+                                                                                                                                            save_best_solutions=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_save_solutions():
     expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
                                                                                                                                             keep_parents=0,
-                                                                                                                                            parent_selection_type=parent_selection_type,
-                                                                                                                                            multi_objective=multi_objective,
-                                                                                                                                            fitness_batch_size=fitness_batch_size,
-                                                                                                                                            save_solutions=save_solutions,
-                                                                                                                                            save_best_solutions=save_best_solutions)
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True)
     assert expected_solutions == actual_solutions
     assert expected_solutions == actual_solutions_fitness
     assert expected_best_solutions == actual_best_solutions
 
-def test_save_solutions_keep_parents(multi_objective=False,
-                                     parent_selection_type='sss',
-                                     fitness_batch_size=None,
-                                     save_solutions=False,
-                                     save_best_solutions=False):
+def test_save_solutions_keep_parents():
     expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
-                                                                                                                                            keep_parents=4,
-                                                                                                                                            parent_selection_type=parent_selection_type,
-                                                                                                                                            multi_objective=multi_objective,
-                                                                                                                                            fitness_batch_size=fitness_batch_size,
-                                                                                                                                            save_solutions=save_solutions,
-                                                                                                                                            save_best_solutions=save_best_solutions)
+                                                                                                                                            keep_parents=4)
     assert expected_solutions == actual_solutions
     assert expected_solutions == actual_solutions_fitness
     assert expected_best_solutions == actual_best_solutions
 
-def test_save_solutions_both_keep(multi_objective=False,
-                                  parent_selection_type='sss',
-                                  fitness_batch_size=None,
-                                  save_solutions=False,
-                                  save_best_solutions=False):
+def test_save_solutions_keep_parents_save_solutions():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_save_solutions():
     expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
                                                                                                                                             keep_parents=4,
-                                                                                                                                            parent_selection_type=parent_selection_type,
-                                                                                                                                            multi_objective=multi_objective,
-                                                                                                                                            fitness_batch_size=fitness_batch_size,
-                                                                                                                                            save_solutions=save_solutions,
-                                                                                                                                            save_best_solutions=save_best_solutions)
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True)
     assert expected_solutions == actual_solutions
     assert expected_solutions == actual_solutions_fitness
     assert expected_best_solutions == actual_best_solutions
 
-def test_save_solutions_no_keep_adaptive_mutation(multi_objective=False,
-                                                  parent_selection_type='sss',
-                                                  fitness_batch_size=None,
-                                                  save_solutions=False,
-                                                  save_best_solutions=False):
+def test_save_solutions_no_keep_adaptive_mutation():
     expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
                                                                                                                                             keep_parents=0,
-                                                                                                                                            parent_selection_type=parent_selection_type,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5])
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_save_solutions():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
                                                                                                                                             mutation_type="adaptive",
                                                                                                                                             mutation_percent_genes=[10, 5],
-                                                                                                                                            multi_objective=multi_objective,
-                                                                                                                                            fitness_batch_size=fitness_batch_size,
-                                                                                                                                            save_solutions=save_solutions,
-                                                                                                                                            save_best_solutions=save_best_solutions)
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True)
     assert expected_solutions == actual_solutions
     assert expected_solutions == actual_solutions_fitness
     assert expected_best_solutions == actual_best_solutions
 
-def test_save_solutions_default_adaptive_mutation(multi_objective=False,
-                                                  parent_selection_type='sss',
-                                                  fitness_batch_size=None,
-                                                  save_solutions=False,
-                                                  save_best_solutions=False):
+def test_save_solutions_default_adaptive_mutation():
     expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(mutation_type="adaptive",
-                                                                                                                                            parent_selection_type=parent_selection_type,
-                                                                                                                                            mutation_percent_genes=[10, 5],
-                                                                                                                                            multi_objective=multi_objective,
-                                                                                                                                            fitness_batch_size=fitness_batch_size,
-                                                                                                                                            save_solutions=save_solutions,
-                                                                                                                                            save_best_solutions=save_best_solutions)
+                                                                                                                                            mutation_percent_genes=[10, 5])
     assert expected_solutions == actual_solutions
     assert expected_solutions == actual_solutions_fitness
     assert expected_best_solutions == actual_best_solutions
 
-def test_save_solutions_both_keep_adaptive_mutation(multi_objective=False,
-                                                    parent_selection_type='sss',
-                                                    fitness_batch_size=None,
-                                                    save_solutions=False,
-                                                    save_best_solutions=False):
+def test_save_solutions_both_keep_adaptive_mutation():
     expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
                                                                                                                                             keep_parents=4,
-                                                                                                                                            parent_selection_type=parent_selection_type,
                                                                                                                                             mutation_type="adaptive",
-                                                                                                                                            mutation_percent_genes=[10, 5],
-                                                                                                                                            multi_objective=multi_objective,
-                                                                                                                                            fitness_batch_size=fitness_batch_size,
-                                                                                                                                            save_solutions=save_solutions,
-                                                                                                                                            save_best_solutions=save_best_solutions)
+                                                                                                                                            mutation_percent_genes=[10, 5])
     assert expected_solutions == actual_solutions
     assert expected_solutions == actual_solutions_fitness
     assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_save_solutions():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+
+#### Multi Objective
+def test_save_solutions_default_keep_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_save_solutions_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_save_solutions_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_parents_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_parents_save_solutions_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_save_solutions_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_save_solutions_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_default_adaptive_mutation_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_save_solutions_multi_objective():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+
+#### Multi Objective NSGA-II Parent Selection
+def test_save_solutions_default_keep_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_save_solutions_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_save_solutions_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_parents_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_parents_save_solutions_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_save_solutions_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_save_solutions_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_default_adaptive_mutation_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_save_solutions_multi_objective_nsga2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2')
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+######## Batch Fitness
+#### Single Objective
+def test_save_solutions_no_keep_batch_1():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(fitness_batch_size=1)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_batch_2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(fitness_batch_size=2)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_batch_3():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(fitness_batch_size=3)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_batch_5():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(fitness_batch_size=5)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_batch_6():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(fitness_batch_size=6)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_batch_7():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(fitness_batch_size=7)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_batch_8():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(fitness_batch_size=8)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_batch_9():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(fitness_batch_size=9)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_batch_10():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(fitness_batch_size=10)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+
+def test_save_solutions_no_keep_save_solutions_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_save_solutions_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_parents_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_parents_save_solutions_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_save_solutions_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_save_solutions_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_default_adaptive_mutation_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_save_solutions_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+
+#### Multi Objective
+def test_save_solutions_no_keep_multi_objective_batch_1():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            fitness_batch_size=1)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_batch_2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            fitness_batch_size=2)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_batch_3():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            fitness_batch_size=3)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_batch_5():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            fitness_batch_size=5)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_batch_6():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            fitness_batch_size=6)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_batch_7():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            fitness_batch_size=7)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_batch_8():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            fitness_batch_size=8)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_batch_9():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            fitness_batch_size=9)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_batch_10():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            fitness_batch_size=10)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_save_solutions_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_save_solutions_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_parents_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_parents_save_solutions_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_save_solutions_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_save_solutions_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_default_adaptive_mutation_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_save_solutions_multi_objective_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+
+#### Multi Objective NSGA-II Parent Selection
+def test_save_solutions_no_keep_multi_objective_nsga2_batch_1():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=1)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_nsga2_batch_2():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=2)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_nsga2_batch_3():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=3)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_nsga2_batch_5():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=5)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_nsga2_batch_6():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=6)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_nsga2_batch_7():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=7)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_nsga2_batch_8():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=8)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_nsga2_batch_9():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=9)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_multi_objective_nsga2_batch_10():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=10)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_save_solutions_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_elitism_save_solutions_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_parents_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_keep_parents_save_solutions_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_save_solutions_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_no_keep_adaptive_mutation_save_solutions_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=0, 
+                                                                                                                                            keep_parents=0,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_default_adaptive_mutation_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+def test_save_solutions_both_keep_adaptive_mutation_save_solutions_multi_objective_nsga2_batch_4():
+    expected_solutions, actual_solutions, actual_solutions_fitness, expected_best_solutions, actual_best_solutions = number_saved_solutions(keep_elitism=3, 
+                                                                                                                                            keep_parents=4,
+                                                                                                                                            mutation_type="adaptive",
+                                                                                                                                            mutation_percent_genes=[10, 5],
+                                                                                                                                            save_solutions=True,
+                                                                                                                                            save_best_solutions=True,
+                                                                                                                                            multi_objective=True,
+                                                                                                                                            parent_selection_type='nsga2',
+                                                                                                                                            fitness_batch_size=4)
+    assert expected_solutions == actual_solutions
+    assert expected_solutions == actual_solutions_fitness
+    assert expected_best_solutions == actual_best_solutions
+
+
+
 
 if __name__ == "__main__":
-    #### Single-objective
+    #### Single Objective
     print()
     test_save_solutions_default_keep()
     print()
-    test_save_solutions_no_keep(save_solutions=True,
-                                save_best_solutions=True)
+    test_save_solutions_no_keep()
     print()
-    test_save_solutions_keep_elitism(save_solutions=True,
-                                     save_best_solutions=True)
+    test_save_solutions_no_keep_save_solutions()
     print()
-    test_save_solutions_keep_parents(save_solutions=True,
-                                     save_best_solutions=True)
+    test_save_solutions_keep_elitism()
     print()
-    test_save_solutions_both_keep(save_solutions=True,
-                                  save_best_solutions=True)
+    test_save_solutions_keep_elitism_save_solutions()
     print()
-    test_save_solutions_no_keep_adaptive_mutation(save_solutions=True,
-                                                  save_best_solutions=True)
+    test_save_solutions_keep_parents()
     print()
-    test_save_solutions_default_adaptive_mutation(save_solutions=True,
-                                                  save_best_solutions=True)
+    test_save_solutions_keep_parents_save_solutions()
     print()
-    test_save_solutions_both_keep_adaptive_mutation(save_solutions=True,
-                                                    save_best_solutions=True)
+    test_save_solutions_both_keep()
     print()
-
-    #### Multi-Objective
+    test_save_solutions_both_keep_save_solutions()
     print()
-    test_save_solutions_no_keep(multi_objective=True,
-                                save_solutions=True,
-                                save_best_solutions=True)
+    test_save_solutions_no_keep_adaptive_mutation()
     print()
-    test_save_solutions_keep_elitism(multi_objective=True,
-                                     save_solutions=True,
-                                     save_best_solutions=True)
+    test_save_solutions_no_keep_adaptive_mutation_save_solutions()
     print()
-    test_save_solutions_keep_parents(multi_objective=True,
-                                     save_solutions=True,
-                                     save_best_solutions=True)
+    test_save_solutions_default_adaptive_mutation()
     print()
-    test_save_solutions_both_keep(multi_objective=True,
-                                  save_solutions=True,
-                                  save_best_solutions=True)
+    test_save_solutions_both_keep_adaptive_mutation()
     print()
-    test_save_solutions_no_keep_adaptive_mutation(multi_objective=True,
-                                                  save_solutions=True,
-                                                  save_best_solutions=True)
-    print()
-    test_save_solutions_default_adaptive_mutation(multi_objective=True,
-                                                  save_solutions=True,
-                                                  save_best_solutions=True)
-    print()
-    test_save_solutions_both_keep_adaptive_mutation(multi_objective=True,
-                                                    save_solutions=True,
-                                                    save_best_solutions=True)
-    print()
-
-    #### Multi-Objective NSGA-II Parent Selection
-    print()
-    test_save_solutions_no_keep(multi_objective=True,
-                                parent_selection_type='nsga2',
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_keep_elitism(multi_objective=True,
-                                     parent_selection_type='nsga2',
-                                     save_solutions=True,
-                                     save_best_solutions=True)
-    print()
-    test_save_solutions_keep_parents(multi_objective=True,
-                                     parent_selection_type='nsga2',
-                                     save_solutions=True,
-                                     save_best_solutions=True)
-    print()
-    test_save_solutions_both_keep(multi_objective=True,
-                                  parent_selection_type='nsga2',
-                                  save_solutions=True,
-                                  save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep_adaptive_mutation(multi_objective=True,
-                                                  parent_selection_type='nsga2',
-                                                  save_solutions=True,
-                                                  save_best_solutions=True)
-    print()
-    test_save_solutions_default_adaptive_mutation(multi_objective=True,
-                                                  parent_selection_type='nsga2',
-                                                  save_solutions=True,
-                                                  save_best_solutions=True)
-    print()
-    test_save_solutions_both_keep_adaptive_mutation(multi_objective=True,
-                                                    parent_selection_type='nsga2',
-                                                    save_solutions=True,
-                                                    save_best_solutions=True)
-    print()
-
-
-    #### Single-objective
-    print()
-    test_save_solutions_no_keep(fitness_batch_size=1,
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep(fitness_batch_size=2,
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep(fitness_batch_size=3,
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep(fitness_batch_size=4,
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep(fitness_batch_size=5,
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep(fitness_batch_size=6,
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep(fitness_batch_size=7,
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep(fitness_batch_size=8,
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep(fitness_batch_size=9,
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep(fitness_batch_size=10,
-                                save_solutions=True,
-                                save_best_solutions=True)
-    print()
-    test_save_solutions_keep_elitism(fitness_batch_size=4,
-                                     save_solutions=True,
-                                     save_best_solutions=True)
-    print()
-    test_save_solutions_keep_parents(fitness_batch_size=4,
-                                     save_solutions=True,
-                                     save_best_solutions=True)
-    print()
-    test_save_solutions_both_keep(fitness_batch_size=4,
-                                  save_solutions=True,
-                                  save_best_solutions=True)
-    print()
-    test_save_solutions_no_keep_adaptive_mutation(fitness_batch_size=4,
-                                                  save_solutions=True,
-                                                  save_best_solutions=True)
-    print()
-    test_save_solutions_default_adaptive_mutation(fitness_batch_size=4,
-                                                  save_solutions=True,
-                                                  save_best_solutions=True)
-    print()
-    test_save_solutions_both_keep_adaptive_mutation(fitness_batch_size=4,
-                                                    save_solutions=True,
-                                                    save_best_solutions=True)
+    test_save_solutions_both_keep_adaptive_mutation_save_solutions()
     print()
 
     #### Multi-Objective
     print()
-    test_save_solutions_no_keep(multi_objective=True,
-                                fitness_batch_size=1,
-                                save_solutions=True,
-                                save_best_solutions=True)
+    test_save_solutions_default_keep_multi_objective()
     print()
-    test_save_solutions_no_keep(multi_objective=True,
-                                fitness_batch_size=4,
-                                save_solutions=True,
-                                save_best_solutions=True)
+    test_save_solutions_no_keep_multi_objective()
     print()
-    test_save_solutions_no_keep(multi_objective=True,
-                                fitness_batch_size=9,
-                                save_solutions=True,
-                                save_best_solutions=True)
+    test_save_solutions_no_keep_save_solutions_multi_objective()
     print()
-    test_save_solutions_no_keep(multi_objective=True,
-                                fitness_batch_size=10,
-                                save_solutions=True,
-                                save_best_solutions=True)
+    test_save_solutions_keep_elitism_multi_objective()
     print()
-    test_save_solutions_keep_elitism(multi_objective=True,
-                                     fitness_batch_size=4,
-                                     save_solutions=True,
-                                     save_best_solutions=True)
+    test_save_solutions_keep_elitism_save_solutions_multi_objective()
     print()
-    test_save_solutions_keep_parents(multi_objective=True,
-                                     fitness_batch_size=4,
-                                     save_solutions=True,
-                                     save_best_solutions=True)
+    test_save_solutions_keep_parents_multi_objective()
     print()
-    test_save_solutions_both_keep(multi_objective=True,
-                                  fitness_batch_size=4,
-                                  save_solutions=True,
-                                  save_best_solutions=True)
+    test_save_solutions_keep_parents_save_solutions_multi_objective()
     print()
-    test_save_solutions_no_keep_adaptive_mutation(multi_objective=True,
-                                                  fitness_batch_size=4,
-                                                  save_solutions=True,
-                                                  save_best_solutions=True)
+    test_save_solutions_both_keep_multi_objective()
     print()
-    test_save_solutions_default_adaptive_mutation(multi_objective=True,
-                                                  fitness_batch_size=4,
-                                                  save_solutions=True,
-                                                  save_best_solutions=True)
+    test_save_solutions_both_keep_save_solutions_multi_objective()
     print()
-    test_save_solutions_both_keep_adaptive_mutation(multi_objective=True,
-                                                    fitness_batch_size=4,
-                                                    save_solutions=True,
-                                                    save_best_solutions=True)
+    test_save_solutions_no_keep_adaptive_mutation_multi_objective()
     print()
+    test_save_solutions_no_keep_adaptive_mutation_save_solutions_multi_objective()
+    print()
+    test_save_solutions_default_adaptive_mutation_multi_objective()
+    print()
+    test_save_solutions_both_keep_adaptive_mutation_multi_objective()
+    print()
+    test_save_solutions_both_keep_adaptive_mutation_save_solutions_multi_objective()
+    print()
+
 
     #### Multi-Objective NSGA-II Parent Selection
     print()
-    test_save_solutions_no_keep(multi_objective=True,
-                                parent_selection_type='nsga2',
-                                fitness_batch_size=1,
-                                save_solutions=True,
-                                save_best_solutions=True)
+    test_save_solutions_default_keep_multi_objective_nsga2()
     print()
-    test_save_solutions_no_keep(multi_objective=True,
-                                parent_selection_type='nsga2',
-                                fitness_batch_size=4,
-                                save_solutions=True,
-                                save_best_solutions=True)
+    test_save_solutions_no_keep_multi_objective_nsga2()
     print()
-    test_save_solutions_no_keep(multi_objective=True,
-                                parent_selection_type='nsga2',
-                                fitness_batch_size=9,
-                                save_solutions=True,
-                                save_best_solutions=True)
+    test_save_solutions_no_keep_save_solutions_multi_objective_nsga2()
     print()
-    test_save_solutions_no_keep(multi_objective=True,
-                                parent_selection_type='nsga2',
-                                fitness_batch_size=10,
-                                save_solutions=True,
-                                save_best_solutions=True)
+    test_save_solutions_keep_elitism_multi_objective_nsga2()
     print()
-    test_save_solutions_keep_elitism(multi_objective=True,
-                                     parent_selection_type='nsga2',
-                                     fitness_batch_size=4,
-                                     save_solutions=True,
-                                     save_best_solutions=True)
+    test_save_solutions_keep_elitism_save_solutions_multi_objective_nsga2()
     print()
-    test_save_solutions_keep_parents(multi_objective=True,
-                                     parent_selection_type='nsga2',
-                                     fitness_batch_size=4,
-                                     save_solutions=True,
-                                     save_best_solutions=True)
+    test_save_solutions_keep_parents_multi_objective_nsga2()
     print()
-    test_save_solutions_both_keep(multi_objective=True,
-                                  parent_selection_type='nsga2',
-                                  fitness_batch_size=4,
-                                  save_solutions=True,
-                                  save_best_solutions=True)
+    test_save_solutions_keep_parents_save_solutions_multi_objective_nsga2()
     print()
-    test_save_solutions_no_keep_adaptive_mutation(multi_objective=True,
-                                                  parent_selection_type='nsga2',
-                                                  fitness_batch_size=4,
-                                                  save_solutions=True,
-                                                  save_best_solutions=True)
+    test_save_solutions_both_keep_multi_objective_nsga2()
     print()
-    test_save_solutions_default_adaptive_mutation(multi_objective=True,
-                                                  parent_selection_type='nsga2',
-                                                  fitness_batch_size=4,
-                                                  save_solutions=True,
-                                                  save_best_solutions=True)
+    test_save_solutions_both_keep_save_solutions_multi_objective_nsga2()
     print()
-    test_save_solutions_both_keep_adaptive_mutation(multi_objective=True,
-                                                    parent_selection_type='nsga2',
-                                                    fitness_batch_size=4,
-                                                    save_solutions=True,
-                                                    save_best_solutions=True)
+    test_save_solutions_no_keep_adaptive_mutation_multi_objective_nsga2()
+    print()
+    test_save_solutions_no_keep_adaptive_mutation_save_solutions_multi_objective_nsga2()
+    print()
+    test_save_solutions_default_adaptive_mutation_multi_objective_nsga2()
+    print()
+    test_save_solutions_both_keep_adaptive_mutation_multi_objective_nsga2()
+    print()
+    test_save_solutions_both_keep_adaptive_mutation_save_solutions_multi_objective_nsga2()
     print()
 
+    ######## Batch Fitness Calculation
+    #### Single Objective
+    print()
+    test_save_solutions_no_keep_batch_1()
+    print()
+    test_save_solutions_no_keep_batch_2()
+    print()
+    test_save_solutions_no_keep_batch_3()
+    print()
+    test_save_solutions_no_keep_batch_4()
+    print()
+    test_save_solutions_no_keep_batch_5()
+    print()
+    test_save_solutions_no_keep_batch_6()
+    print()
+    test_save_solutions_no_keep_batch_7()
+    print()
+    test_save_solutions_no_keep_batch_8()
+    print()
+    test_save_solutions_no_keep_batch_9()
+    print()
+    test_save_solutions_no_keep_batch_10()
+    print()
+    test_save_solutions_no_keep_save_solutions_batch_4()
+    print()
+    test_save_solutions_keep_elitism_batch_4()
+    print()
+    test_save_solutions_keep_elitism_save_solutions_batch_4()
+    print()
+    test_save_solutions_keep_parents_batch_4()
+    print()
+    test_save_solutions_keep_parents_save_solutions_batch_4()
+    print()
+    test_save_solutions_both_keep_batch_4()
+    print()
+    test_save_solutions_both_keep_save_solutions_batch_4()
+    print()
+    test_save_solutions_no_keep_adaptive_mutation_batch_4()
+    print()
+    test_save_solutions_no_keep_adaptive_mutation_save_solutions_batch_4()
+    print()
+    test_save_solutions_default_adaptive_mutation_batch_4()
+    print()
+    test_save_solutions_both_keep_adaptive_mutation_batch_4()
+    print()
+    test_save_solutions_both_keep_adaptive_mutation_save_solutions_batch_4()
+    print()
+
+    #### Multi-Objective
+    print()
+    test_save_solutions_no_keep_multi_objective_batch_1()
+    print()
+    test_save_solutions_no_keep_multi_objective_batch_2()
+    print()
+    test_save_solutions_no_keep_multi_objective_batch_3()
+    print()
+    test_save_solutions_no_keep_multi_objective_batch_4()
+    print()
+    test_save_solutions_no_keep_multi_objective_batch_5()
+    print()
+    test_save_solutions_no_keep_multi_objective_batch_6()
+    print()
+    test_save_solutions_no_keep_multi_objective_batch_7()
+    print()
+    test_save_solutions_no_keep_multi_objective_batch_8()
+    print()
+    test_save_solutions_no_keep_multi_objective_batch_9()
+    print()
+    test_save_solutions_no_keep_multi_objective_batch_10()
+    print()
+    test_save_solutions_no_keep_save_solutions_multi_objective_batch_4()
+    print()
+    test_save_solutions_keep_elitism_multi_objective_batch_4()
+    print()
+    test_save_solutions_keep_elitism_save_solutions_multi_objective_batch_4()
+    print()
+    test_save_solutions_keep_parents_multi_objective_batch_4()
+    print()
+    test_save_solutions_keep_parents_save_solutions_multi_objective_batch_4()
+    print()
+    test_save_solutions_both_keep_multi_objective_batch_4()
+    print()
+    test_save_solutions_both_keep_save_solutions_multi_objective_batch_4()
+    print()
+    test_save_solutions_no_keep_adaptive_mutation_multi_objective_batch_4()
+    print()
+    test_save_solutions_no_keep_adaptive_mutation_save_solutions_multi_objective_batch_4()
+    print()
+    test_save_solutions_default_adaptive_mutation_multi_objective_batch_4()
+    print()
+    test_save_solutions_both_keep_adaptive_mutation_multi_objective_batch_4()
+    print()
+    test_save_solutions_both_keep_adaptive_mutation_save_solutions_multi_objective_batch_4()
+    print()
+
+
+    #### Multi-Objective NSGA-II Parent Selection
+    print()
+    test_save_solutions_no_keep_multi_objective_nsga2_batch_1()
+    print()
+    test_save_solutions_no_keep_multi_objective_nsga2_batch_2()
+    print()
+    test_save_solutions_no_keep_multi_objective_nsga2_batch_3()
+    print()
+    test_save_solutions_no_keep_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_no_keep_multi_objective_nsga2_batch_5()
+    print()
+    test_save_solutions_no_keep_multi_objective_nsga2_batch_6()
+    print()
+    test_save_solutions_no_keep_multi_objective_nsga2_batch_7()
+    print()
+    test_save_solutions_no_keep_multi_objective_nsga2_batch_8()
+    print()
+    test_save_solutions_no_keep_multi_objective_nsga2_batch_9()
+    print()
+    test_save_solutions_no_keep_multi_objective_nsga2_batch_10()
+    print()
+    test_save_solutions_no_keep_save_solutions_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_keep_elitism_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_keep_elitism_save_solutions_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_keep_parents_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_keep_parents_save_solutions_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_both_keep_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_both_keep_save_solutions_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_no_keep_adaptive_mutation_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_no_keep_adaptive_mutation_save_solutions_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_default_adaptive_mutation_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_both_keep_adaptive_mutation_multi_objective_nsga2_batch_4()
+    print()
+    test_save_solutions_both_keep_adaptive_mutation_save_solutions_multi_objective_nsga2_batch_4()
+    print()
