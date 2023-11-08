@@ -114,7 +114,7 @@ class GA(utils.parent_selection.ParentSelection,
         on_generation: Accepts a function/method to be called after each generation. If function, then it must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
         on_stop: Accepts a function/method to be called only once exactly before the genetic algorithm stops or when it completes all the generations. If function, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of fitness values of the last population's solutions. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0. 
 
-        delay_after_gen: Added in PyGAD 2.4.0. It accepts a non-negative number specifying the number of seconds to wait after a generation completes and before going to the next generation. It defaults to 0.0 which means no delay after the generation.
+        delay_after_gen: Added in PyGAD 2.4.0 and deprecated in PyGAD 3.3.0. It accepts a non-negative number specifying the number of seconds to wait after a generation completes and before going to the next generation. It defaults to 0.0 which means no delay after the generation.
 
         save_best_solutions: Added in PyGAD 2.9.0 and its type is bool. If True, then the best solution in each generation is saved into the 'best_solutions' attribute. Use this parameter with caution as it may cause memory overflow when either the number of generations or the number of genes is large.
         save_solutions: Added in PyGAD 2.15.0 and its type is bool. If True, then all solutions in each generation are saved into the 'solutions' attribute. Use this parameter with caution as it may cause memory overflow when either the number of generations, number of genes, or number of solutions in population is large.
@@ -1135,6 +1135,8 @@ class GA(utils.parent_selection.ParentSelection,
 
             # Validate delay_after_gen
             if type(delay_after_gen) in GA.supported_int_float_types:
+                if not self.suppress_warnings:
+                    warnings.warn("The 'delay_after_gen' parameter is deprecated starting from PyGAD 3.3.0. To pause the evolution after each generation, assign a callback function/method to the 'on_generation' parameter to adds some time delay.")
                 if delay_after_gen >= 0.0:
                     self.delay_after_gen = delay_after_gen
                 else:
