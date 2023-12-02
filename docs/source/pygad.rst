@@ -1060,7 +1060,7 @@ optimization problem is single-objective or multi-objective.
    ``pygad.GA`` class.
 
 -  If the fitness function returns a ``list``, ``tuple``, or
-   ``numpy.ndarray``, then the problem is single-objective. Even if
+   ``numpy.ndarray``, then the problem is multi-objective. Even if
    there is only one element, the problem is still considered
    multi-objective. Each element represents the fitness value of its
    corresponding objective.
