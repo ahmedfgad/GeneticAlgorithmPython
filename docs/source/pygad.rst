@@ -1039,7 +1039,7 @@ Let's discuss how to do each of these steps.
 Preparing the ``fitness_func`` Parameter 
 -----------------------------------------
 
-Even there are some steps in the genetic algorithm pipeline that can
+Even though some steps in the genetic algorithm pipeline can
 work the same regardless of the problem being solved, one critical step
 is the calculation of the fitness value. There is no unique way of
 calculating the fitness value and it changes from one problem to
@@ -1066,8 +1066,8 @@ optimization problem is single-objective or multi-objective.
    corresponding objective.
 
 Using a user-defined fitness function allows the user to freely use
-PyGAD to solve any problem by passing the appropriate fitness
-function/method. It is very important to understand the problem well for
+PyGAD solves any problem by passing the appropriate fitness
+function/method. It is very important to understand the problem well before
 creating it.
 
 Let's discuss an example:
