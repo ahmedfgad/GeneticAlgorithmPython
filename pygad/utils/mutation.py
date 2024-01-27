@@ -89,14 +89,40 @@ class Mutation:
                             # The numpy.random.choice() and numpy.random.uniform() functions return a NumPy array as the output even if the array has a single value.
                             # We have to return the output at index 0 to force a numeric value to be returned not an object of type numpy.ndarray. 
                             # If numpy.ndarray is returned, then it will cause an issue later while using the set() function.
+                            # Randomly select a value from a discrete range.
                             value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
                                                                                 stop=curr_gene_space['high'],
                                                                                 step=curr_gene_space['step']),
                                                                    size=1)[0]
                         else:
-                            value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
-                                                                    high=curr_gene_space['high'],
-                                                                    size=1)[0]
+                            # Return the current gene value.
+                            value_from_space = offspring[offspring_idx, gene_idx]
+                            # Generate a random value to be added to the current gene value.
+                            rand_val = numpy.random.uniform(low=range_min,
+                                                            high=range_max,
+                                                            size=1)[0]
+                            # The objective is to have a new gene value that respects the gene_space boundaries.
+                            # The next if-else block checks if adding the random value keeps the new gene value within the gene_space boundaries.
+                            temp_val = value_from_space + rand_val
+                            if temp_val < curr_gene_space['low']:
+                                # Restrict the new value to be > curr_gene_space['low']
+                                # If subtracting the random value makes the new gene value outside the boundaries [low, high), then use the lower boundary the gene value.
+                                if curr_gene_space['low'] <= value_from_space - rand_val < curr_gene_space['high']:
+                                    # Because subtracting the random value keeps the new gene value within the boundaries [low, high), then use such a value as the gene value.
+                                    temp_val = value_from_space - rand_val
+                                else:
+                                    # Because subtracting the random value makes the new gene value outside the boundaries [low, high), then use the lower boundary as the gene value.
+                                    temp_val = curr_gene_space['low']
+                            elif temp_val >= curr_gene_space['high']:
+                                # Restrict the new value to be < curr_gene_space['high']
+                                # If subtracting the random value makes the new gene value outside the boundaries [low, high), then use such a value as the gene value.
+                                if curr_gene_space['low'] <= value_from_space - rand_val < curr_gene_space['high']:
+                                    # Because subtracting the random value keeps the new value within the boundaries [low, high), then use such a value as the gene value.
+                                    temp_val = value_from_space - rand_val
+                                else:
+                                    # Because subtracting the random value makes the new gene value outside the boundaries [low, high), then use the lower boundary as the gene value.
+                                    temp_val = curr_gene_space['low']
+                            value_from_space = temp_val
                     else:
                         # Selecting a value randomly based on the current gene's space in the 'gene_space' attribute.
                         # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
