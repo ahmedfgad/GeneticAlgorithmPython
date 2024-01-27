@@ -920,9 +920,7 @@ It accepts the following parameters:
 -  ``pop_fitness=None``: An optional parameter that accepts a list of
    the fitness values of the solutions in the population. If ``None``,
    then the ``cal_pop_fitness()`` method is called to calculate the
-   fitness values of the ``self.population``. Use 
-   ``ga_instance.last_generation_fitness`` to use latest fitness value
-   and skip recalculation of the population fitness.
+   fitness values of the population.
 
 It returns the following:
 
@@ -1039,11 +1037,10 @@ Let's discuss how to do each of these steps.
 Preparing the ``fitness_func`` Parameter 
 -----------------------------------------
 
-Even there are some steps in the genetic algorithm pipeline that can
-work the same regardless of the problem being solved, one critical step
-is the calculation of the fitness value. There is no unique way of
-calculating the fitness value and it changes from one problem to
-another.
+Even though some steps in the genetic algorithm pipeline can work the
+same regardless of the problem being solved, one critical step is the
+calculation of the fitness value. There is no unique way of calculating
+the fitness value and it changes from one problem to another.
 
 PyGAD has a parameter called ``fitness_func`` that allows the user to
 specify a custom function/method to use when calculating the fitness.
@@ -1060,15 +1057,15 @@ optimization problem is single-objective or multi-objective.
    ``pygad.GA`` class.
 
 -  If the fitness function returns a ``list``, ``tuple``, or
-   ``numpy.ndarray``, then the problem is single-objective. Even if
-   there is only one element, the problem is still considered
-   multi-objective. Each element represents the fitness value of its
-   corresponding objective.
+   ``numpy.ndarray``, then the problem is multi-objective. Even if there
+   is only one element, the problem is still considered multi-objective.
+   Each element represents the fitness value of its corresponding
+   objective.
 
 Using a user-defined fitness function allows the user to freely use
 PyGAD to solve any problem by passing the appropriate fitness
-function/method. It is very important to understand the problem well for
-creating it.
+function/method. It is very important to understand the problem well
+before creating it.
 
 Let's discuss an example:
 

@@ -1020,8 +1020,8 @@ Release Date: 9 September 2022
    generation. Another advantage happens when the instance is loaded and
    the ``run()`` method is called, as the old fitness value are shown on
    the graph alongside with the new fitness values. Read more in this
-   section: `Continue without Loosing
-   Progress <https://pygad.readthedocs.io/en/latest/pygad_more.html#continue-without-loosing-progress>`__
+   section: `Continue without Losing
+   Progress <https://pygad.readthedocs.io/en/latest/pygad_more.html#continue-without-losing-progress>`__
 
 4. Thanks `Prof. Fernando Jiménez
    Barrionuevo <http://webs.um.es/fernan>`__ (Dept. of Information and
@@ -1463,6 +1463,27 @@ Release Date 7 September 2023
 11. The ``plot_result()`` method in the ``pygad.visualize.plot.Plot``
     class is removed. Instead, please use the ``plot_fitness()`` if you
     did not upgrade yet.
+
+.. _pygad-321:
+
+PyGAD 3.2.1
+-----------
+
+Release Date ... 2023
+
+1. Fix a bug when multi-objective optimization is used with batch
+   fitness calculation (e.g. ``fitness_batch_size`` set to a non-zero
+   number).
+
+2. Fix a bug in the ``pygad.py`` script when finding the index of the
+   best solution. It does not work properly with multi-objective
+   optimization where ``self.best_solutions_fitness`` have multiple
+   columns.
+
+   .. code:: python
+
+                  self.best_solution_generation = numpy.where(numpy.array(
+                      self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
 
 PyGAD Projects at GitHub
 ========================
