@@ -1020,8 +1020,8 @@ Release Date: 9 September 2022
    generation. Another advantage happens when the instance is loaded and
    the ``run()`` method is called, as the old fitness value are shown on
    the graph alongside with the new fitness values. Read more in this
-   section: `Continue without Loosing
-   Progress <https://pygad.readthedocs.io/en/latest/pygad_more.html#continue-without-loosing-progress>`__
+   section: `Continue without Losing
+   Progress <https://pygad.readthedocs.io/en/latest/pygad_more.html#continue-without-losing-progress>`__
 
 4. Thanks `Prof. Fernando Jiménez
    Barrionuevo <http://webs.um.es/fernan>`__ (Dept. of Information and

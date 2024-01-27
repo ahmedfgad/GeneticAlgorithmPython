@@ -595,7 +595,7 @@ After running the code again, it will find the same result.
    [ 2.77249188 -4.06570662  0.04196872 -3.47770796 -0.57502138 -3.22775267]
    0.04872203136549972
 
-Continue without Loosing Progress
+Continue without Losing Progress
 =================================
 
 In `PyGAD
@@ -615,7 +615,7 @@ call to the ``run()`` method.
 4. ``self.solutions_fitness``
 
 This helps the user to continue where the last run stopped without
-loosing the values of these 4 attributes.
+losing the values of these 4 attributes.
 
 Now, the user can save the model by calling the ``save()`` method.
 
