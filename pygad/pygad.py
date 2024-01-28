@@ -9,7 +9,6 @@ import logging
 from pygad import utils
 from pygad import helper
 from pygad import visualize
-import sys
 
 # Extend all the classes so that they can be referenced by just the `self` object of the `pygad.GA` class.
 class GA(utils.parent_selection.ParentSelection,
@@ -446,7 +445,7 @@ class GA(utils.parent_selection.ParentSelection,
                 raise TypeError(f"The value assigned to the 'initial_population' parameter is expected to by of type list, tuple, or ndarray but {type(initial_population)} found.")
             elif numpy.array(initial_population).ndim != 2:
                 self.valid_parameters = False
-                raise ValueError(f"A 2D list is expected to the initail_population parameter but a ({numpy.array(initial_population).ndim}-D) list found.")
+                raise ValueError(f"A 2D list is expected to the initial_population parameter but a ({numpy.array(initial_population).ndim}-D) list found.")
             else:
                 # Validate the type of each value in the 'initial_population' parameter.
                 for row_idx in range(len(initial_population)):
@@ -1333,7 +1332,8 @@ class GA(utils.parent_selection.ParentSelection,
             self.pareto_fronts = None
         except Exception as e:
             self.logger.exception(e)
-            sys.exit(-1)
+            # sys.exit(-1)
+            raise e
 
     def round_genes(self, solutions):
         for gene_idx in range(self.num_genes):
@@ -1867,7 +1867,8 @@ class GA(utils.parent_selection.ParentSelection,
             pop_fitness = numpy.array(pop_fitness)
         except Exception as ex:
             self.logger.exception(ex)
-            sys.exit(-1)
+            # sys.exit(-1)
+            raise ex
         return pop_fitness
 
     def run(self):
@@ -2242,7 +2243,8 @@ class GA(utils.parent_selection.ParentSelection,
             # self.solutions = numpy.array(self.solutions)
         except Exception as ex:
             self.logger.exception(ex)
-            sys.exit(-1)
+            # sys.exit(-1)
+            raise ex
 
     def best_solution(self, pop_fitness=None):
         """
@@ -2277,7 +2279,8 @@ class GA(utils.parent_selection.ParentSelection,
             best_solution_fitness = pop_fitness[best_match_idx]
         except Exception as ex:
             self.logger.exception(ex)
-            sys.exit(-1)
+            # sys.exit(-1)
+            raise ex
 
         return best_solution, best_solution_fitness, best_match_idx
 
