@@ -20,9 +20,10 @@ class GA(utils.parent_selection.ParentSelection,
          visualize.plot.Plot):
 
     supported_int_types = [int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,
-                           numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64]
-    supported_float_types = [
-        float, numpy.float16, numpy.float32, numpy.float64]
+                           numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64,
+                           object]
+    supported_float_types = [float, numpy.float16, numpy.float32, numpy.float64,
+                             object]
     supported_int_float_types = supported_int_types + supported_float_types
 
     def __init__(self,
@@ -726,7 +727,7 @@ class GA(utils.parent_selection.ParentSelection,
                                 if self.mutation_probability is None:
                                     if not self.suppress_warnings:
                                         warnings.warn(
-                                            f"The percentage of genes to mutate (mutation_percent_genes={mutation_percent_genes}) resulted in selecting ({mutation_num_genes}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.")
+                                            f"The percentage of genes to mutate (mutation_percent_genes={mutation_percent_genes}) resutled in selecting ({mutation_num_genes}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.")
                                 mutation_num_genes = 1
 
                         elif type(mutation_percent_genes) in GA.supported_int_float_types:
@@ -745,7 +746,7 @@ class GA(utils.parent_selection.ParentSelection,
                                 if mutation_num_genes == 0:
                                     if self.mutation_probability is None:
                                         if not self.suppress_warnings:
-                                            warnings.warn(f"The percentage of genes to mutate (mutation_percent_genes={mutation_percent_genes}) resulted in selecting ({mutation_num_genes}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.")
+                                            warnings.warn(f"The percentage of genes to mutate (mutation_percent_genes={mutation_percent_genes}) resutled in selecting ({mutation_num_genes}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.")
                                     mutation_num_genes = 1
                         else:
                             self.valid_parameters = False
@@ -771,7 +772,7 @@ class GA(utils.parent_selection.ParentSelection,
                                     # Based on the mutation percentage of genes, if the number of selected genes for mutation is less than the least possible value which is 1, then the number will be set to 1.
                                     if mutation_num_genes[idx] == 0:
                                         if not self.suppress_warnings:
-                                            warnings.warn(f"The percentage of genes to mutate ({mutation_percent_genes[idx]}) resulted in selecting ({mutation_num_genes[idx]}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.")
+                                            warnings.warn(f"The percentage of genes to mutate ({mutation_percent_genes[idx]}) resutled in selecting ({mutation_num_genes[idx]}) genes. The number of genes to mutate is set to 1 (mutation_num_genes=1).\nIf you do not want to mutate any gene, please set mutation_type=None.")
                                         mutation_num_genes[idx] = 1
                                 if mutation_percent_genes[0] < mutation_percent_genes[1]:
                                     if not self.suppress_warnings:
