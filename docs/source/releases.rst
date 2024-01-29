@@ -1464,26 +1464,73 @@ Release Date 7 September 2023
     class is removed. Instead, please use the ``plot_fitness()`` if you
     did not upgrade yet.
 
-.. _pygad-321:
+.. _pygad-330:
 
-PyGAD 3.2.1
+PyGAD 3.3.0
 -----------
 
-Release Date ... 2023
+Release Date 29 January 2024
 
-1. Fix a bug when multi-objective optimization is used with batch
-   fitness calculation (e.g. ``fitness_batch_size`` set to a non-zero
-   number).
+1.  Solve bugs when multi-objective optimization is used.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/238
 
-2. Fix a bug in the ``pygad.py`` script when finding the index of the
-   best solution. It does not work properly with multi-objective
-   optimization where ``self.best_solutions_fitness`` have multiple
-   columns.
+2.  When the ``stop_ciiteria`` parameter is used with the ``reach``
+    keyword, then multiple numeric values can be passed when solving a
+    multi-objective problem. For example, if a problem has 3 objective
+    functions, then ``stop_criteria="reach_10_20_30"`` means the GA
+    stops if the fitness of the 3 objectives are at least 10, 20, and
+    30, respectively. The number values must match the number of
+    objective functions. If a single value found (e.g.
+    ``stop_criteria=reach_5``) when solving a multi-objective problem,
+    then it is used across all the objectives.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/238
 
-   .. code:: python
+3.  The ``delay_after_gen`` parameter is now deprecated and will be
+    removed in a future release. If it is necessary to have a time delay
+    after each generation, then assign a callback function/method to the
+    ``on_generation`` parameter to pause the evolution.
 
-                  self.best_solution_generation = numpy.where(numpy.array(
-                      self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
+4.  Parallel processing now supports calculating the fitness during
+    adaptive mutation.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/201
+
+5.  The population size can be changed during runtime by changing all
+    the parameters that would affect the size of any thing used by the
+    GA. For more information, check the `Change Population Size during
+    Runtime <https://pygad.readthedocs.io/en/latest/pygad_more.html#change-population-size-during-runtime>`__
+    section.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/234
+
+6.  When a dictionary exists in the ``gene_space`` parameter without a
+    step, then mutation occurs by adding a random value to the gene
+    value. The random vaue is generated based on the 2 parameters
+    ``random_mutation_min_val`` and ``random_mutation_max_val``. For
+    more information, check the `How Mutation Works with the gene_space
+    Parameter? <https://pygad.readthedocs.io/en/latest/pygad_more.html#how-mutation-works-with-the-gene-space-parameter>`__
+    section.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/229
+
+7.  Add ``object`` as a supported data type for int
+    (GA.supported_int_types) and float (GA.supported_float_types).
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/174
+
+8.  Use the ``raise`` clause instead of the ``sys.exit(-1)`` to
+    terminate the execution.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/213
+
+9.  Fix a bug when multi-objective optimization is used with batch
+    fitness calculation (e.g. ``fitness_batch_size`` set to a non-zero
+    number).
+
+10. Fix a bug in the ``pygad.py`` script when finding the index of the
+    best solution. It does not work properly with multi-objective
+    optimization where ``self.best_solutions_fitness`` have multiple
+    columns.
+
+.. code:: python
+
+               self.best_solution_generation = numpy.where(numpy.array(
+                   self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
 
 PyGAD Projects at GitHub
 ========================

@@ -344,10 +344,13 @@ is applied based on this parameter.
 How Mutation Works with the ``gene_space`` Parameter?
 -----------------------------------------------------
 
-If a gene has its static space defined in the ``gene_space`` parameter,
-then mutation works by replacing the gene value by a value randomly
-selected from the gene space. This happens for both ``int`` and
-``float`` data types.
+Mutation changes based on whether the ``gene_space`` has a continuous
+range or discrete set of values.
+
+If a gene has its **static/discrete space** defined in the
+``gene_space`` parameter, then mutation works by replacing the gene
+value by a value randomly selected from the gene space. This happens for
+both ``int`` and ``float`` data types.
 
 For example, the following ``gene_space`` has the static space
 ``[1, 2, 3]`` defined for the first gene. So, this gene can only have a
@@ -376,6 +379,39 @@ mutation happens for this gene by:
 If its current value is 5 and the random value is ``-0.5``, then the new
 value is 4.5. If the gene type is integer, then the value will be
 rounded.
+
+On the other hand, if a gene has a **continuous space** defined in the
+``gene_space`` parameter, then mutation occurs by adding a random value
+to the current gene value.
+
+For example, the following ``gene_space`` has the continuous space
+defined by the dictionary ``{'low': 1, 'high': 5}``. This applies to all
+genes. So, mutation is applied to one or more selected genes by adding a
+random value to the current gene value.
+
+.. code:: python
+
+   Gene space: {'low': 1, 'high': 5}
+   Solution: [1.5, 3.4]
+
+Assuming ``random_mutation_min_val=-1`` and
+``random_mutation_max_val=1``, then a random value such as ``0.3`` can
+be added to the gene(s) participating in mutation. If only the first
+gene is mutated, then its new value changes from ``1.5`` to
+``1.5+0.3=1.8``. Note that PyGAD verifies that the new value is within
+the range. In the worst scenarios, the value will be set to either
+boundary of the continuous range. For example, if the gene value is 1.5
+and the random value is -0.55, then the new value is 0.95 which smaller
+than the lower boundary 1. Thus, the gene value will be rounded to 1.
+
+If the dictionary has a step like the example below, then it is
+considered a discrete range and mutation occurs by randomly selecting a
+value from the set of values. In other words, no random value is added
+to the gene value.
+
+.. code:: python
+
+   Gene space: {'low': 1, 'high': 5, 'step': 0.5}
 
 Stop at Any Generation
 ======================
@@ -662,6 +698,70 @@ Note that the 2 attributes (``self.best_solutions`` and
 ``save_best_solutions`` parameter is set to ``True``. Also, the 2
 attributes (``self.solutions`` and ``self.solutions_fitness``) only work
 if the ``save_solutions`` parameter is ``True``.
+
+Change Population Size during Runtime
+=====================================
+
+Starting from `PyGAD
+3.3.0 <https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-0>`__,
+the population size can changed during runtime. In other words, the
+number of solutions/chromosomes and number of genes can be changed.
+
+The user has to carefully arrange the list of *parameters* and *instance
+attributes* that have to be changed to keep the GA consistent before and
+after changing the population size. Generally, change everything that
+would be used during the GA evolution.
+
+   CAUTION: If the user failed to change a parameter or an instance
+   attributes necessary to keep the GA running after the population size
+   changed, errors will arise.
+
+These are examples of the parameters that the user should decide whether
+to change. The user should check the `list of
+parameters <https://pygad.readthedocs.io/en/latest/pygad.html#init>`__
+and decide what to change.
+
+1. ``population``: The population. It *must* be changed.
+
+2. ``num_offspring``: The number of offspring to produce out of the
+   crossover and mutation operations. Change this parameter if the
+   number of offspring have to be changed to be consistent with the new
+   population size.
+
+3. ``num_parents_mating``: The number of solutions to select as parents.
+   Change this parameter if the number of parents have to be changed to
+   be consistent with the new population size.
+
+4. ``fitness_func``: If the way of calculating the fitness changes after
+   the new population size, then the fitness function have to be
+   changed.
+
+5. ``sol_per_pop``: The number of solutions per population. It is not
+   critical to change it but it is recommended to keep this number
+   consistent with the number of solutions in the ``population``
+   parameter.
+
+These are examples of the instance attributes that might be changed. The
+user should check the `list of instance
+attributes <https://pygad.readthedocs.io/en/latest/pygad.html#other-instance-attributes-methods>`__
+and decide what to change.
+
+1. All the ``last_generation_*`` parameters
+
+   1. ``last_generation_fitness``: A 1D NumPy array of fitness values of
+      the population.
+
+   2. ``last_generation_parents`` and
+      ``last_generation_parents_indices``: Two NumPy arrays: 2D array
+      representing the parents and 1D array of the parents indices.
+
+   3. ``last_generation_elitism`` and
+      ``last_generation_elitism_indices``: Must be changed if
+      ``keep_elitism != 0``. The default value of ``keep_elitism`` is 1.
+      Two NumPy arrays: 2D array representing the elitism and 1D array
+      of the elitism indices.
+
+2. ``pop_size``: The population size.
 
 Prevent Duplicates in Gene Values
 =================================
