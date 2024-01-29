@@ -9,7 +9,6 @@ import logging
 from pygad import utils
 from pygad import helper
 from pygad import visualize
-import sys
 
 # Extend all the classes so that they can be referenced by just the `self` object of the `pygad.GA` class.
 class GA(utils.parent_selection.ParentSelection,
@@ -20,9 +19,10 @@ class GA(utils.parent_selection.ParentSelection,
          visualize.plot.Plot):
 
     supported_int_types = [int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,
-                           numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64]
-    supported_float_types = [
-        float, numpy.float16, numpy.float32, numpy.float64]
+                           numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64,
+                           object]
+    supported_float_types = [float, numpy.float16, numpy.float32, numpy.float64,
+                             object]
     supported_int_float_types = supported_int_types + supported_float_types
 
     def __init__(self,
@@ -1332,7 +1332,8 @@ class GA(utils.parent_selection.ParentSelection,
             self.pareto_fronts = None
         except Exception as e:
             self.logger.exception(e)
-            sys.exit(-1)
+            # sys.exit(-1)
+            raise e
 
     def round_genes(self, solutions):
         for gene_idx in range(self.num_genes):
@@ -1866,7 +1867,8 @@ class GA(utils.parent_selection.ParentSelection,
             pop_fitness = numpy.array(pop_fitness)
         except Exception as ex:
             self.logger.exception(ex)
-            sys.exit(-1)
+            # sys.exit(-1)
+            raise ex
         return pop_fitness
 
     def run(self):
@@ -2241,7 +2243,8 @@ class GA(utils.parent_selection.ParentSelection,
             # self.solutions = numpy.array(self.solutions)
         except Exception as ex:
             self.logger.exception(ex)
-            sys.exit(-1)
+            # sys.exit(-1)
+            raise ex
 
     def best_solution(self, pop_fitness=None):
         """
@@ -2276,7 +2279,8 @@ class GA(utils.parent_selection.ParentSelection,
             best_solution_fitness = pop_fitness[best_match_idx]
         except Exception as ex:
             self.logger.exception(ex)
-            sys.exit(-1)
+            # sys.exit(-1)
+            raise ex
 
         return best_solution, best_solution_fitness, best_match_idx
 
