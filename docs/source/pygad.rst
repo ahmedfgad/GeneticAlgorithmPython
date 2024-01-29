@@ -1037,10 +1037,11 @@ Let's discuss how to do each of these steps.
 Preparing the ``fitness_func`` Parameter 
 -----------------------------------------
 
-Even though some steps in the genetic algorithm pipeline can work the
-same regardless of the problem being solved, one critical step is the
-calculation of the fitness value. There is no unique way of calculating
-the fitness value and it changes from one problem to another.
+Even though some steps in the genetic algorithm pipeline can
+work the same regardless of the problem being solved, one critical step
+is the calculation of the fitness value. There is no unique way of
+calculating the fitness value and it changes from one problem to
+another.
 
 PyGAD has a parameter called ``fitness_func`` that allows the user to
 specify a custom function/method to use when calculating the fitness.
