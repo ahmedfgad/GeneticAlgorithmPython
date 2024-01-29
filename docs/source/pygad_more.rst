@@ -632,7 +632,6 @@ After running the code again, it will find the same result.
    0.04872203136549972
 
 Continue without Losing Progress
-================================
 
 In `PyGAD
 2.18.0 <https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0>`__,
