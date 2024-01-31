@@ -119,7 +119,7 @@ The ``pygad.GA`` class constructor supports the following parameters:
    function can be passed starting from `PyGAD
    2.16.0 <https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0>`__.
    Check the `User-Defined Crossover, Mutation, and Parent Selection
-   Operators <https://pygad.readthedocs.io/en/latest/pygad_more.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
+   Operators <https://pygad.readthedocs.io/en/latest/utils.html#user-defined-crossover-mutation-and-parent-selection-operators>`__
    section for more details about building a user-defined parent
    selection function.
 
@@ -1037,11 +1037,10 @@ Let's discuss how to do each of these steps.
 Preparing the ``fitness_func`` Parameter 
 -----------------------------------------
 
-Even though some steps in the genetic algorithm pipeline can
-work the same regardless of the problem being solved, one critical step
-is the calculation of the fitness value. There is no unique way of
-calculating the fitness value and it changes from one problem to
-another.
+Even though some steps in the genetic algorithm pipeline can work the
+same regardless of the problem being solved, one critical step is the
+calculation of the fitness value. There is no unique way of calculating
+the fitness value and it changes from one problem to another.
 
 PyGAD has a parameter called ``fitness_func`` that allows the user to
 specify a custom function/method to use when calculating the fitness.
