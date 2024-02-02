@@ -311,13 +311,13 @@ Find the book at these links:
 If you used PyGAD, please consider adding a citation to the following paper about PyGAD:
 
 ```
-@misc{gad2021pygad,
-      title={PyGAD: An Intuitive Genetic Algorithm Python Library}, 
-      author={Ahmed Fawzy Gad},
-      year={2021},
-      eprint={2106.06158},
-      archivePrefix={arXiv},
-      primaryClass={cs.NE}
+@article{gad2023pygad,
+  title={Pygad: An intuitive genetic algorithm python library},
+  author={Gad, Ahmed Fawzy},
+  journal={Multimedia Tools and Applications},
+  pages={1--14},
+  year={2023},
+  publisher={Springer}
 }
 ```
 

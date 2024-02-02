@@ -228,13 +228,13 @@ details:
 
 .. code:: 
 
-   @misc{gad2021pygad,
-         title={PyGAD: An Intuitive Genetic Algorithm Python Library}, 
-         author={Ahmed Fawzy Gad},
-         year={2021},
-         eprint={2106.06158},
-         archivePrefix={arXiv},
-         primaryClass={cs.NE}
+   @article{gad2023pygad,
+     title={Pygad: An intuitive genetic algorithm python library},
+     author={Gad, Ahmed Fawzy},
+     journal={Multimedia Tools and Applications},
+     pages={1--14},
+     year={2023},
+     publisher={Springer}
    }
 
 
