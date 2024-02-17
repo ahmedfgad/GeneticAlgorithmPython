@@ -610,8 +610,12 @@ Other Methods
    from inside the ``run()`` method. Supported in `PyGAD
    3.3.1 <https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1>`__.
 
-   1. ``run_select_parents()``: Select the parents and call the callable
-      ``on_parents()`` if defined.
+   1. ``run_select_parents(call_on_parents=True)``: Select the parents
+      and call the callable ``on_parents()`` if defined. If
+      ``call_on_parents`` is ``True``, then the callable
+      ``on_parents()`` is called. It must be ``False`` when the
+      ``run_select_parents()`` method is called to update the parents at
+      the end of the ``run()`` method.
 
    2. ``run_crossover()``: Apply crossover and call the callable
       ``on_crossover()`` if defined.

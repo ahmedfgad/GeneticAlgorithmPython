@@ -2067,7 +2067,8 @@ class GA(utils.parent_selection.ParentSelection,
 
             # Call the run_select_parents() method to update these 2 attributes according to the 'last_generation_fitness' attribute:
                 # 1) last_generation_parents 2) last_generation_parents_indices
-            self.run_select_parents()
+            # Set 'call_on_parents=False' to avoid calling the callable 'on_parents' because this step is not part of the cycle.
+            self.run_select_parents(call_on_parents=False)
 
             # Save the fitness value of the best solution.
             _, best_solution_fitness, _ = self.best_solution(
@@ -2093,7 +2094,7 @@ class GA(utils.parent_selection.ParentSelection,
             # sys.exit(-1)
             raise ex
 
-    def run_select_parents(self):
+    def run_select_parents(self, call_on_parents=True):
         """
         This method must be only callled from inside the run() method. It is not meant for use by the user.
         Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
@@ -2103,6 +2104,11 @@ class GA(utils.parent_selection.ParentSelection,
             1) last_generation_parents: A NumPy array of the selected parents.
             2) last_generation_parents_indices: A 1D NumPy array of the indices of the selected parents.
 
+        Parameters
+        ----------
+        call_on_parents : bool, optional
+            If True, then the callable 'on_parents()' is called. The default is True.
+    
         Returns
         -------
         None.
@@ -2133,46 +2139,47 @@ class GA(utils.parent_selection.ParentSelection,
         elif len(self.last_generation_parents_indices) != self.num_parents_mating:
             raise ValueError(f"The iterable holding the selected parents indices is expected to have ({self.num_parents_mating}) values but ({len(self.last_generation_parents_indices)}) found.")
 
-        if not (self.on_parents is None):
-            on_parents_output = self.on_parents(self, 
-                                                self.last_generation_parents)
-
-            if on_parents_output is None:
-                pass
-            elif type(on_parents_output) in [list, tuple, numpy.ndarray]:
-                if len(on_parents_output) == 2:
-                    on_parents_selected_parents, on_parents_selected_parents_indices = on_parents_output
-                else:
-                    raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray of length 2 but {type(on_parents_output)} of length {len(on_parents_output)} found.")
-
-                # Validate the parents.
-                if on_parents_selected_parents is None:
-                            raise ValueError("The returned outputs of on_parents() cannot be None but the first output is None.")
-                else:
-                    if type(on_parents_selected_parents) in [tuple, list, numpy.ndarray]:
-                        on_parents_selected_parents = numpy.array(on_parents_selected_parents)
-                        if on_parents_selected_parents.shape == self.last_generation_parents.shape:
-                            self.last_generation_parents = on_parents_selected_parents
-                        else:
-                            raise ValueError(f"Size mismatch between the parents retrned by on_parents() {on_parents_selected_parents.shape} and the expected parents shape {self.last_generation_parents.shape}.")
+        if call_on_parents:
+            if not (self.on_parents is None):
+                on_parents_output = self.on_parents(self, 
+                                                    self.last_generation_parents)
+    
+                if on_parents_output is None:
+                    pass
+                elif type(on_parents_output) in [list, tuple, numpy.ndarray]:
+                    if len(on_parents_output) == 2:
+                        on_parents_selected_parents, on_parents_selected_parents_indices = on_parents_output
                     else:
-                        raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but the first output type is {type(on_parents_selected_parents)}.")
-
-                # Validate the parents indices.
-                if on_parents_selected_parents_indices is None:
-                    raise ValueError("The returned outputs of on_parents() cannot be None but the second output is None.")
-                else:
-                    if type(on_parents_selected_parents_indices) in [tuple, list, numpy.ndarray, range]:
-                        on_parents_selected_parents_indices = numpy.array(on_parents_selected_parents_indices)
-                        if on_parents_selected_parents_indices.shape == self.last_generation_parents_indices.shape:
-                            self.last_generation_parents_indices = on_parents_selected_parents_indices
-                        else:
-                            raise ValueError(f"Size mismatch between the parents indices returned by on_parents() {on_parents_selected_parents_indices.shape} and the expected crossover output {self.last_generation_parents_indices.shape}.")
+                        raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray of length 2 but {type(on_parents_output)} of length {len(on_parents_output)} found.")
+    
+                    # Validate the parents.
+                    if on_parents_selected_parents is None:
+                                raise ValueError("The returned outputs of on_parents() cannot be None but the first output is None.")
                     else:
-                        raise ValueError(f"The output of on_parents() is expected to be tuple/list/range/numpy.ndarray but the second output type is {type(on_parents_selected_parents_indices)}.")
-
-            else:
-                raise TypeError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but {type(on_parents_output)} found.")
+                        if type(on_parents_selected_parents) in [tuple, list, numpy.ndarray]:
+                            on_parents_selected_parents = numpy.array(on_parents_selected_parents)
+                            if on_parents_selected_parents.shape == self.last_generation_parents.shape:
+                                self.last_generation_parents = on_parents_selected_parents
+                            else:
+                                raise ValueError(f"Size mismatch between the parents retrned by on_parents() {on_parents_selected_parents.shape} and the expected parents shape {self.last_generation_parents.shape}.")
+                        else:
+                            raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but the first output type is {type(on_parents_selected_parents)}.")
+    
+                    # Validate the parents indices.
+                    if on_parents_selected_parents_indices is None:
+                        raise ValueError("The returned outputs of on_parents() cannot be None but the second output is None.")
+                    else:
+                        if type(on_parents_selected_parents_indices) in [tuple, list, numpy.ndarray, range]:
+                            on_parents_selected_parents_indices = numpy.array(on_parents_selected_parents_indices)
+                            if on_parents_selected_parents_indices.shape == self.last_generation_parents_indices.shape:
+                                self.last_generation_parents_indices = on_parents_selected_parents_indices
+                            else:
+                                raise ValueError(f"Size mismatch between the parents indices returned by on_parents() {on_parents_selected_parents_indices.shape} and the expected crossover output {self.last_generation_parents_indices.shape}.")
+                        else:
+                            raise ValueError(f"The output of on_parents() is expected to be tuple/list/range/numpy.ndarray but the second output type is {type(on_parents_selected_parents_indices)}.")
+    
+                else:
+                    raise TypeError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but {type(on_parents_output)} found.")
 
     def run_crossover(self):
         """
