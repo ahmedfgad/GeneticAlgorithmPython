@@ -1949,187 +1949,28 @@ class GA(utils.parent_selection.ParentSelection,
 
                     self.solutions_fitness.extend(self.last_generation_fitness)
 
-                # Selecting the best parents in the population for mating.
-                if callable(self.parent_selection_type):
-                    self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness,
-                                                                                                            self.num_parents_mating,
-                                                                                                            self)
-                    if not type(self.last_generation_parents) is numpy.ndarray:
-                        raise TypeError(f"The type of the iterable holding the selected parents is expected to be (numpy.ndarray) but {type(self.last_generation_parents)} found.")
-                    if not type(self.last_generation_parents_indices) is numpy.ndarray:
-                        raise TypeError(f"The type of the iterable holding the selected parents' indices is expected to be (numpy.ndarray) but {type(self.last_generation_parents_indices)} found.")
-                else:
-                    self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness,
-                                                                                                            num_parents=self.num_parents_mating)
+                # Call the 'run_select_parents()' method to select the parents.
+                # It edits these 2 instance attributes:
+                    # 1) last_generation_parents: A NumPy array of the selected parents.
+                    # 2) last_generation_parents_indices: A 1D NumPy array of the indices of the selected parents.
+                self.run_select_parents()
 
-                # Validate the output of the parent selection step: self.select_parents()
-                if self.last_generation_parents.shape != (self.num_parents_mating, self.num_genes):
-                    if self.last_generation_parents.shape[0] != self.num_parents_mating:
-                        raise ValueError(f"Size mismatch between the size of the selected parents {self.last_generation_parents.shape} and the expected size {(self.num_parents_mating, self.num_genes)}. It is expected to select ({self.num_parents_mating}) parents but ({self.last_generation_parents.shape[0]}) selected.")
-                    elif self.last_generation_parents.shape[1] != self.num_genes:
-                        raise ValueError(f"Size mismatch between the size of the selected parents {self.last_generation_parents.shape} and the expected size {(self.num_parents_mating, self.num_genes)}. Parents are expected to have ({self.num_genes}) genes but ({self.last_generation_parents.shape[1]}) produced.")
+                # Call the 'run_crossover()' method to select the offspring.
+                # It edits these 2 instance attributes:
+                    # 1) last_generation_offspring_crossover: A NumPy array of the selected offspring.
+                    # 2) last_generation_elitism: A NumPy array of the current generation elitism. Applicable only if the 'keep_elitism' parameter > 0.
+                self.run_crossover()
 
-                if self.last_generation_parents_indices.ndim != 1:
-                    raise ValueError(f"The iterable holding the selected parents indices is expected to have 1 dimension but ({len(self.last_generation_parents_indices)}) found.")
-                elif len(self.last_generation_parents_indices) != self.num_parents_mating:
-                    raise ValueError(f"The iterable holding the selected parents indices is expected to have ({self.num_parents_mating}) values but ({len(self.last_generation_parents_indices)}) found.")
+                # Call the 'run_mutation()' method to mutate the selected offspring.
+                # It edits this instance attribute:
+                    # 1) last_generation_offspring_mutation: A NumPy array of the mutated offspring.
+                self.run_mutation()
 
-                if not (self.on_parents is None):
-                    on_parents_output = self.on_parents(self, 
-                                                        self.last_generation_parents)
-                    
-                    if on_parents_output is None:
-                        pass
-                    elif type(on_parents_output) in [list, tuple, numpy.ndarray]:
-                        if len(on_parents_output) == 2:
-                            on_parents_selected_parents, on_parents_selected_parents_indices = on_parents_output
-                        else:
-                            raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray of length 2 but {type(on_parents_output)} of length {len(on_parents_output)} found.")
+                # Call the 'run_update_population()' method to update the population after both crossover and mutation operations complete.
+                # It edits this instance attribute:
+                    # 1) population: A NumPy array of the population of solutions/chromosomes.
+                self.run_update_population()
 
-                        # Validate the parents.
-                        if on_parents_selected_parents is None:
-                            raise ValueError("The returned outputs of on_parents() cannot be None but the first output is None.")
-                        else:
-                            if type(on_parents_selected_parents) in [tuple, list, numpy.ndarray]:
-                                on_parents_selected_parents = numpy.array(on_parents_selected_parents)
-                                if on_parents_selected_parents.shape == self.last_generation_parents.shape:
-                                    self.last_generation_parents = on_parents_selected_parents
-                                else:
-                                    raise ValueError(f"Size mismatch between the parents retrned by on_parents() {on_parents_selected_parents.shape} and the expected parents shape {self.last_generation_parents.shape}.")
-                            else:
-                                raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but the first output type is {type(on_parents_selected_parents)}.")
-
-                        # Validate the parents indices.
-                        if on_parents_selected_parents_indices is None:
-                            raise ValueError("The returned outputs of on_parents() cannot be None but the second output is None.")
-                        else:
-                            if type(on_parents_selected_parents_indices) in [tuple, list, numpy.ndarray, range]:
-                                on_parents_selected_parents_indices = numpy.array(on_parents_selected_parents_indices)
-                                if on_parents_selected_parents_indices.shape == self.last_generation_parents_indices.shape:
-                                    self.last_generation_parents_indices = on_parents_selected_parents_indices
-                                else:
-                                    raise ValueError(f"Size mismatch between the parents indices returned by on_parents() {on_parents_selected_parents_indices.shape} and the expected crossover output {self.last_generation_parents_indices.shape}.")
-                            else:
-                                raise ValueError(f"The output of on_parents() is expected to be tuple/list/range/numpy.ndarray but the second output type is {type(on_parents_selected_parents_indices)}.")
-
-                    else:
-                        raise TypeError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but {type(on_parents_output)} found.")
-
-                # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
-                if self.crossover_type is None:
-                    if self.keep_elitism == 0:
-                        num_parents_to_keep = self.num_parents_mating if self.keep_parents == - \
-                            1 else self.keep_parents
-                        if self.num_offspring <= num_parents_to_keep:
-                            self.last_generation_offspring_crossover = self.last_generation_parents[
-                                0:self.num_offspring]
-                        else:
-                            self.last_generation_offspring_crossover = numpy.concatenate(
-                                (self.last_generation_parents, self.population[0:(self.num_offspring - self.last_generation_parents.shape[0])]))
-                    else:
-                        # The steady_state_selection() function is called to select the best solutions (i.e. elitism). The keep_elitism parameter defines the number of these solutions.
-                        # The steady_state_selection() function is still called here even if its output may not be used given that the condition of the next if statement is True. The reason is that it will be used later.
-                        self.last_generation_elitism, _ = self.steady_state_selection(self.last_generation_fitness,
-                                                                                    num_parents=self.keep_elitism)
-                        if self.num_offspring <= self.keep_elitism:
-                            self.last_generation_offspring_crossover = self.last_generation_parents[
-                                0:self.num_offspring]
-                        else:
-                            self.last_generation_offspring_crossover = numpy.concatenate(
-                                (self.last_generation_elitism, self.population[0:(self.num_offspring - self.last_generation_elitism.shape[0])]))
-                else:
-                    # Generating offspring using crossover.
-                    if callable(self.crossover_type):
-                        self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
-                                                                                (self.num_offspring,
-                                                                                self.num_genes),
-                                                                                self)
-                        if not type(self.last_generation_offspring_crossover) is numpy.ndarray:
-                            raise TypeError(f"The output of the crossover step is expected to be of type (numpy.ndarray) but {type(self.last_generation_offspring_crossover)} found.")
-                    else:
-                        self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
-                                                                                offspring_size=(self.num_offspring, self.num_genes))
-                    if self.last_generation_offspring_crossover.shape != (self.num_offspring, self.num_genes):
-                        if self.last_generation_offspring_crossover.shape[0] != self.num_offspring:
-                            raise ValueError(f"Size mismatch between the crossover output {self.last_generation_offspring_crossover.shape} and the expected crossover output {(self.num_offspring, self.num_genes)}. It is expected to produce ({self.num_offspring}) offspring but ({self.last_generation_offspring_crossover.shape[0]}) produced.")
-                        elif self.last_generation_offspring_crossover.shape[1] != self.num_genes:
-                            raise ValueError(f"Size mismatch between the crossover output {self.last_generation_offspring_crossover.shape} and the expected crossover output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_crossover.shape[1]}) produced.")
-
-                # PyGAD 2.18.2 // The on_crossover() callback function is called even if crossover_type is None.
-                if not (self.on_crossover is None):
-                    on_crossover_output = self.on_crossover(self, 
-                                                            self.last_generation_offspring_crossover)
-                    if on_crossover_output is None:
-                        pass
-                    else:
-                        if type(on_crossover_output) in [tuple, list, numpy.ndarray]:
-                            on_crossover_output = numpy.array(on_crossover_output)
-                            if on_crossover_output.shape == self.last_generation_offspring_crossover.shape:
-                                self.last_generation_offspring_crossover = on_crossover_output
-                            else:
-                                raise ValueError(f"Size mismatch between the output of on_crossover() {on_crossover_output.shape} and the expected crossover output {self.last_generation_offspring_crossover.shape}.")
-                        else:
-                            raise ValueError(f"The output of on_crossover() is expected to be tuple/list/numpy.ndarray but {type(on_crossover_output)} found.")
-
-                # If self.mutation_type=None, then no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
-                if self.mutation_type is None:
-                    self.last_generation_offspring_mutation = self.last_generation_offspring_crossover
-                else:
-                    # Adding some variations to the offspring using mutation.
-                    if callable(self.mutation_type):
-                        self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover,
-                                                                                self)
-                        if not type(self.last_generation_offspring_mutation) is numpy.ndarray:
-                            raise TypeError(f"The output of the mutation step is expected to be of type (numpy.ndarray) but {type(self.last_generation_offspring_mutation)} found.")
-                    else:
-                        self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover)
-
-                    if self.last_generation_offspring_mutation.shape != (self.num_offspring, self.num_genes):
-                        if self.last_generation_offspring_mutation.shape[0] != self.num_offspring:
-                            raise ValueError(f"Size mismatch between the mutation output {self.last_generation_offspring_mutation.shape} and the expected mutation output {(self.num_offspring, self.num_genes)}. It is expected to produce ({self.num_offspring}) offspring but ({self.last_generation_offspring_mutation.shape[0]}) produced.")
-                        elif self.last_generation_offspring_mutation.shape[1] != self.num_genes:
-                            raise ValueError(f"Size mismatch between the mutation output {self.last_generation_offspring_mutation.shape} and the expected mutation output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_mutation.shape[1]}) produced.")
-
-                # PyGAD 2.18.2 // The on_mutation() callback function is called even if mutation_type is None.
-                if not (self.on_mutation is None):
-                    on_mutation_output = self.on_mutation(self, 
-                                                          self.last_generation_offspring_mutation)
-
-                    if on_mutation_output is None:
-                        pass
-                    else:
-                        if type(on_mutation_output) in [tuple, list, numpy.ndarray]:
-                            on_mutation_output = numpy.array(on_mutation_output)
-                            if on_mutation_output.shape == self.last_generation_offspring_mutation.shape:
-                                self.last_generation_offspring_mutation = on_mutation_output
-                            else:
-                                raise ValueError(f"Size mismatch between the output of on_mutation() {on_mutation_output.shape} and the expected mutation output {self.last_generation_offspring_mutation.shape}.")
-                        else:
-                            raise ValueError(f"The output of on_mutation() is expected to be tuple/list/numpy.ndarray but {type(on_mutation_output)} found.")
-
-                # Update the population attribute according to the offspring generated.
-                if self.keep_elitism == 0:
-                    # If the keep_elitism parameter is 0, then the keep_parents parameter will be used to decide if the parents are kept in the next generation.
-                    if (self.keep_parents == 0):
-                        self.population = self.last_generation_offspring_mutation
-                    elif (self.keep_parents == -1):
-                        # Creating the new population based on the parents and offspring.
-                        self.population[0:self.last_generation_parents.shape[0],
-                                        :] = self.last_generation_parents
-                        self.population[self.last_generation_parents.shape[0]:, :] = self.last_generation_offspring_mutation
-                    elif (self.keep_parents > 0):
-                        parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness,
-                                                                        num_parents=self.keep_parents)
-                        self.population[0:parents_to_keep.shape[0],
-                                        :] = parents_to_keep
-                        self.population[parents_to_keep.shape[0]:,
-                                        :] = self.last_generation_offspring_mutation
-                else:
-                    self.last_generation_elitism, self.last_generation_elitism_indices = self.steady_state_selection(self.last_generation_fitness,
-                                                                                                                     num_parents=self.keep_elitism)
-                    self.population[0:self.last_generation_elitism.shape[0],
-                                    :] = self.last_generation_elitism
-                    self.population[self.last_generation_elitism.shape[0]:, :] = self.last_generation_offspring_mutation
 
                 # The generations_completed attribute holds the number of the last completed generation.
                 self.generations_completed = generation + 1
@@ -2145,6 +1986,8 @@ class GA(utils.parent_selection.ParentSelection,
                 if self.save_best_solutions:
                     self.best_solutions.append(list(best_solution))
 
+
+                # Note: Any code that has loop-dependant statements (e.g. continue, break, etc) must be kept inside the loop of the 'run()' method. It can be moved to another method to clean the run() method.
                 # If the on_generation attribute is not None, then cal the callback function after the generation.
                 if not (self.on_generation is None):
                     r = self.on_generation(self)
@@ -2222,6 +2065,10 @@ class GA(utils.parent_selection.ParentSelection,
 
                 self.solutions_fitness.extend(self.last_generation_fitness)
 
+            # Call the run_select_parents() method to update these 2 attributes according to the 'last_generation_fitness' attribute:
+                # 1) last_generation_parents 2) last_generation_parents_indices
+            self.run_select_parents()
+
             # Save the fitness value of the best solution.
             _, best_solution_fitness, _ = self.best_solution(
                 pop_fitness=self.last_generation_fitness)
@@ -2245,6 +2092,238 @@ class GA(utils.parent_selection.ParentSelection,
             self.logger.exception(ex)
             # sys.exit(-1)
             raise ex
+
+    def run_select_parents(self):
+        """
+        This method must be only callled from inside the run() method. It is not meant for use by the user.
+        Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
+
+        The objective of the 'run_select_parents()' method is to select the parents and call the callable on_parents() if defined.
+        It does not return any variables. However, it changes these 2 attributes of the pygad.GA class instances:
+            1) last_generation_parents: A NumPy array of the selected parents.
+            2) last_generation_parents_indices: A 1D NumPy array of the indices of the selected parents.
+
+        Returns
+        -------
+        None.
+        """
+
+        # Selecting the best parents in the population for mating.
+        if callable(self.parent_selection_type):
+            self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness,
+                                                                                                     self.num_parents_mating,
+                                                                                                     self)
+            if not type(self.last_generation_parents) is numpy.ndarray:
+                raise TypeError(f"The type of the iterable holding the selected parents is expected to be (numpy.ndarray) but {type(self.last_generation_parents)} found.")
+            if not type(self.last_generation_parents_indices) is numpy.ndarray:
+                raise TypeError(f"The type of the iterable holding the selected parents' indices is expected to be (numpy.ndarray) but {type(self.last_generation_parents_indices)} found.")
+        else:
+            self.last_generation_parents, self.last_generation_parents_indices = self.select_parents(self.last_generation_fitness,
+                                                                                                     num_parents=self.num_parents_mating)
+
+        # Validate the output of the parent selection step: self.select_parents()
+        if self.last_generation_parents.shape != (self.num_parents_mating, self.num_genes):
+            if self.last_generation_parents.shape[0] != self.num_parents_mating:
+                raise ValueError(f"Size mismatch between the size of the selected parents {self.last_generation_parents.shape} and the expected size {(self.num_parents_mating, self.num_genes)}. It is expected to select ({self.num_parents_mating}) parents but ({self.last_generation_parents.shape[0]}) selected.")
+            elif self.last_generation_parents.shape[1] != self.num_genes:
+                raise ValueError(f"Size mismatch between the size of the selected parents {self.last_generation_parents.shape} and the expected size {(self.num_parents_mating, self.num_genes)}. Parents are expected to have ({self.num_genes}) genes but ({self.last_generation_parents.shape[1]}) produced.")
+
+        if self.last_generation_parents_indices.ndim != 1:
+            raise ValueError(f"The iterable holding the selected parents indices is expected to have 1 dimension but ({len(self.last_generation_parents_indices)}) found.")
+        elif len(self.last_generation_parents_indices) != self.num_parents_mating:
+            raise ValueError(f"The iterable holding the selected parents indices is expected to have ({self.num_parents_mating}) values but ({len(self.last_generation_parents_indices)}) found.")
+
+        if not (self.on_parents is None):
+            on_parents_output = self.on_parents(self, 
+                                                self.last_generation_parents)
+
+            if on_parents_output is None:
+                pass
+            elif type(on_parents_output) in [list, tuple, numpy.ndarray]:
+                if len(on_parents_output) == 2:
+                    on_parents_selected_parents, on_parents_selected_parents_indices = on_parents_output
+                else:
+                    raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray of length 2 but {type(on_parents_output)} of length {len(on_parents_output)} found.")
+
+                # Validate the parents.
+                if on_parents_selected_parents is None:
+                            raise ValueError("The returned outputs of on_parents() cannot be None but the first output is None.")
+                else:
+                    if type(on_parents_selected_parents) in [tuple, list, numpy.ndarray]:
+                        on_parents_selected_parents = numpy.array(on_parents_selected_parents)
+                        if on_parents_selected_parents.shape == self.last_generation_parents.shape:
+                            self.last_generation_parents = on_parents_selected_parents
+                        else:
+                            raise ValueError(f"Size mismatch between the parents retrned by on_parents() {on_parents_selected_parents.shape} and the expected parents shape {self.last_generation_parents.shape}.")
+                    else:
+                        raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but the first output type is {type(on_parents_selected_parents)}.")
+
+                # Validate the parents indices.
+                if on_parents_selected_parents_indices is None:
+                    raise ValueError("The returned outputs of on_parents() cannot be None but the second output is None.")
+                else:
+                    if type(on_parents_selected_parents_indices) in [tuple, list, numpy.ndarray, range]:
+                        on_parents_selected_parents_indices = numpy.array(on_parents_selected_parents_indices)
+                        if on_parents_selected_parents_indices.shape == self.last_generation_parents_indices.shape:
+                            self.last_generation_parents_indices = on_parents_selected_parents_indices
+                        else:
+                            raise ValueError(f"Size mismatch between the parents indices returned by on_parents() {on_parents_selected_parents_indices.shape} and the expected crossover output {self.last_generation_parents_indices.shape}.")
+                    else:
+                        raise ValueError(f"The output of on_parents() is expected to be tuple/list/range/numpy.ndarray but the second output type is {type(on_parents_selected_parents_indices)}.")
+
+            else:
+                raise TypeError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but {type(on_parents_output)} found.")
+
+    def run_crossover(self):
+        """
+        This method must be only callled from inside the run() method. It is not meant for use by the user.
+        Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
+
+        The objective of the 'run_crossover()' method is to apply crossover and call the callable on_crossover() if defined.
+        It does not return any variables. However, it changes these 2 attributes of the pygad.GA class instances:
+            1) last_generation_offspring_crossover: A NumPy array of the selected offspring.
+            2) last_generation_elitism: A NumPy array of the current generation elitism. Applicable only if the 'keep_elitism' parameter > 0.
+
+        Returns
+        -------
+        None.
+        """
+
+        # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
+        if self.crossover_type is None:
+            if self.keep_elitism == 0:
+                num_parents_to_keep = self.num_parents_mating if self.keep_parents == - 1 else self.keep_parents
+                if self.num_offspring <= num_parents_to_keep:
+                    self.last_generation_offspring_crossover = self.last_generation_parents[0:self.num_offspring]
+                else:
+                    self.last_generation_offspring_crossover = numpy.concatenate(
+                        (self.last_generation_parents, self.population[0:(self.num_offspring - self.last_generation_parents.shape[0])]))
+            else:
+                # The steady_state_selection() function is called to select the best solutions (i.e. elitism). The keep_elitism parameter defines the number of these solutions.
+                # The steady_state_selection() function is still called here even if its output may not be used given that the condition of the next if statement is True. The reason is that it will be used later.
+                self.last_generation_elitism, _ = self.steady_state_selection(self.last_generation_fitness,
+                                                                              num_parents=self.keep_elitism)
+                if self.num_offspring <= self.keep_elitism:
+                    self.last_generation_offspring_crossover = self.last_generation_parents[0:self.num_offspring]
+                else:
+                    self.last_generation_offspring_crossover = numpy.concatenate(
+                        (self.last_generation_elitism, self.population[0:(self.num_offspring - self.last_generation_elitism.shape[0])]))
+        else:
+            # Generating offspring using crossover.
+            if callable(self.crossover_type):
+                self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
+                                                                          (self.num_offspring, self.num_genes),
+                                                                          self)
+                if not type(self.last_generation_offspring_crossover) is numpy.ndarray:
+                    raise TypeError(f"The output of the crossover step is expected to be of type (numpy.ndarray) but {type(self.last_generation_offspring_crossover)} found.")
+            else:
+                self.last_generation_offspring_crossover = self.crossover(self.last_generation_parents,
+                                                                          offspring_size=(self.num_offspring, self.num_genes))
+            if self.last_generation_offspring_crossover.shape != (self.num_offspring, self.num_genes):
+                if self.last_generation_offspring_crossover.shape[0] != self.num_offspring:
+                    raise ValueError(f"Size mismatch between the crossover output {self.last_generation_offspring_crossover.shape} and the expected crossover output {(self.num_offspring, self.num_genes)}. It is expected to produce ({self.num_offspring}) offspring but ({self.last_generation_offspring_crossover.shape[0]}) produced.")
+                elif self.last_generation_offspring_crossover.shape[1] != self.num_genes:
+                    raise ValueError(f"Size mismatch between the crossover output {self.last_generation_offspring_crossover.shape} and the expected crossover output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_crossover.shape[1]}) produced.")
+
+        # PyGAD 2.18.2 // The on_crossover() callback function is called even if crossover_type is None.
+        if not (self.on_crossover is None):
+            on_crossover_output = self.on_crossover(self, 
+                                                    self.last_generation_offspring_crossover)
+            if on_crossover_output is None:
+                pass
+            else:
+                if type(on_crossover_output) in [tuple, list, numpy.ndarray]:
+                    on_crossover_output = numpy.array(on_crossover_output)
+                    if on_crossover_output.shape == self.last_generation_offspring_crossover.shape:
+                        self.last_generation_offspring_crossover = on_crossover_output
+                    else:
+                        raise ValueError(f"Size mismatch between the output of on_crossover() {on_crossover_output.shape} and the expected crossover output {self.last_generation_offspring_crossover.shape}.")
+                else:
+                    raise ValueError(f"The output of on_crossover() is expected to be tuple/list/numpy.ndarray but {type(on_crossover_output)} found.")
+
+    def run_mutation(self):
+        """
+        This method must be only callled from inside the run() method. It is not meant for use by the user.
+        Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
+
+        The objective of the 'run_mutation()' method is to apply mutation and call the callable on_mutation() if defined.
+        It does not return any variables. However, it changes this attribute of the pygad.GA class instances:
+            1) last_generation_offspring_mutation: A NumPy array of the mutated offspring.
+
+        Returns
+        -------
+        None.
+        """
+
+        # If self.mutation_type=None, then no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
+        if self.mutation_type is None:
+            self.last_generation_offspring_mutation = self.last_generation_offspring_crossover
+        else:
+            # Adding some variations to the offspring using mutation.
+            if callable(self.mutation_type):
+                self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover,
+                                                                        self)
+                if not type(self.last_generation_offspring_mutation) is numpy.ndarray:
+                    raise TypeError(f"The output of the mutation step is expected to be of type (numpy.ndarray) but {type(self.last_generation_offspring_mutation)} found.")
+            else:
+                self.last_generation_offspring_mutation = self.mutation(self.last_generation_offspring_crossover)
+
+            if self.last_generation_offspring_mutation.shape != (self.num_offspring, self.num_genes):
+                if self.last_generation_offspring_mutation.shape[0] != self.num_offspring:
+                    raise ValueError(f"Size mismatch between the mutation output {self.last_generation_offspring_mutation.shape} and the expected mutation output {(self.num_offspring, self.num_genes)}. It is expected to produce ({self.num_offspring}) offspring but ({self.last_generation_offspring_mutation.shape[0]}) produced.")
+                elif self.last_generation_offspring_mutation.shape[1] != self.num_genes:
+                    raise ValueError(f"Size mismatch between the mutation output {self.last_generation_offspring_mutation.shape} and the expected mutation output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_mutation.shape[1]}) produced.")
+
+        # PyGAD 2.18.2 // The on_mutation() callback function is called even if mutation_type is None.
+        if not (self.on_mutation is None):
+            on_mutation_output = self.on_mutation(self, 
+                                                  self.last_generation_offspring_mutation)
+
+            if on_mutation_output is None:
+                pass
+            else:
+                if type(on_mutation_output) in [tuple, list, numpy.ndarray]:
+                    on_mutation_output = numpy.array(on_mutation_output)
+                    if on_mutation_output.shape == self.last_generation_offspring_mutation.shape:
+                        self.last_generation_offspring_mutation = on_mutation_output
+                    else:
+                        raise ValueError(f"Size mismatch between the output of on_mutation() {on_mutation_output.shape} and the expected mutation output {self.last_generation_offspring_mutation.shape}.")
+                else:
+                    raise ValueError(f"The output of on_mutation() is expected to be tuple/list/numpy.ndarray but {type(on_mutation_output)} found.")
+
+    def run_update_population(self):
+        """
+        This method must be only callled from inside the run() method. It is not meant for use by the user.
+        Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
+
+        The objective of the 'run_update_population()' method is to update the 'population' attribute after completing the processes of crossover and mutation.
+        It does not return any variables. However, it changes this attribute of the pygad.GA class instances:
+            1) population: A NumPy array of the population of solutions/chromosomes.
+
+        Returns
+        -------
+        None.
+        """
+
+        # Update the population attribute according to the offspring generated.
+        if self.keep_elitism == 0:
+            # If the keep_elitism parameter is 0, then the keep_parents parameter will be used to decide if the parents are kept in the next generation.
+            if (self.keep_parents == 0):
+                self.population = self.last_generation_offspring_mutation
+            elif (self.keep_parents == -1):
+                # Creating the new population based on the parents and offspring.
+                self.population[0:self.last_generation_parents.shape[0],:] = self.last_generation_parents
+                self.population[self.last_generation_parents.shape[0]:, :] = self.last_generation_offspring_mutation
+            elif (self.keep_parents > 0):
+                parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness,
+                                                                 num_parents=self.keep_parents)
+                self.population[0:parents_to_keep.shape[0],:] = parents_to_keep
+                self.population[parents_to_keep.shape[0]:,:] = self.last_generation_offspring_mutation
+        else:
+            self.last_generation_elitism, self.last_generation_elitism_indices = self.steady_state_selection(self.last_generation_fitness,
+                                                                                                             num_parents=self.keep_elitism)
+            self.population[0:self.last_generation_elitism.shape[0],:] = self.last_generation_elitism
+            self.population[self.last_generation_elitism.shape[0]:, :] = self.last_generation_offspring_mutation
 
     def best_solution(self, pop_fitness=None):
         """

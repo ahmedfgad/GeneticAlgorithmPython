@@ -603,6 +603,25 @@ Other Methods
    Summary <https://pygad.readthedocs.io/en/latest/pygad_more.html#print-lifecycle-summary>`__
    section for more details and examples.
 
+-  4 methods with names starting with ``run_``. Their purpose is to keep
+   the main loop inside the ``run()`` method clean. The details inside
+   the loop are moved to 4 individual methods. Generally, any method
+   with a name starting with ``run_`` is meant to be called by PyGAD
+   from inside the ``run()`` method. Supported in `PyGAD
+   3.3.1 <https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1>`__.
+
+   1. ``run_select_parents()``: Select the parents and call the callable
+      ``on_parents()`` if defined.
+
+   2. ``run_crossover()``: Apply crossover and call the callable
+      ``on_crossover()`` if defined.
+
+   3. ``run_mutation()``: Apply mutation and call the callable
+      ``on_mutation()`` if defined.
+
+   4. ``run_update_population()``: Update the ``population`` attribute
+      after completing the processes of crossover and mutation.
+
 The next sections discuss the methods available in the ``pygad.GA``
 class.
 
