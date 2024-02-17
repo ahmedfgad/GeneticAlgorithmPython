@@ -1532,6 +1532,25 @@ Release Date 29 January 2024
                self.best_solution_generation = numpy.where(numpy.array(
                    self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
 
+.. _pygad-331:
+
+PyGAD 3.3.1
+-----------
+
+Release Date 17 February 2024
+
+1. After the last generation and before the ``run()`` method completes,
+   update the 2 instance attributes: 1) ``last_generation_parents`` 2)
+   ``last_generation_parents_indices``. This is to keep the list of
+   parents up-to-date with the latest population fitness
+   ``last_generation_fitness``.
+   https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/275
+
+2. 4 methods with names starting with ``run_``. Their purpose is to keep
+   the main loop inside the ``run()`` method clean. Check the `Other
+   Methods <https://pygad.readthedocs.io/en/latest/pygad.html#other-methods>`__
+   section for more information.
+
 PyGAD Projects at GitHub
 ========================
 
