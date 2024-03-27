@@ -1135,8 +1135,9 @@ class GA(utils.parent_selection.ParentSelection,
 
             # Validate delay_after_gen
             if type(delay_after_gen) in GA.supported_int_float_types:
-                if not self.suppress_warnings:
-                    warnings.warn("The 'delay_after_gen' parameter is deprecated starting from PyGAD 3.3.0. To delay or pause the evolution after each generation, assign a callback function/method to the 'on_generation' parameter to adds some time delay.")
+                if delay_after_gen != 0.0:
+                    if not self.suppress_warnings:
+                        warnings.warn("The 'delay_after_gen' parameter is deprecated starting from PyGAD 3.3.0. To delay or pause the evolution after each generation, assign a callback function/method to the 'on_generation' parameter to adds some time delay.")
                 if delay_after_gen >= 0.0:
                     self.delay_after_gen = delay_after_gen
                 else:
