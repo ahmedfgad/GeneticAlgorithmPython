@@ -26,16 +26,18 @@ class Crossover:
             offspring = numpy.empty(offspring_size, dtype=object)
 
         # Randomly generate all the K points at which crossover takes place between each two parents. The point does not have to be always at the center of the solutions.
+        # This saves time by calling the numpy.random.randint() function only once.
         crossover_points = numpy.random.randint(low=0, 
                                                 high=parents.shape[1], 
                                                 size=offspring_size[0])
+
         for k in range(offspring_size[0]):
             # Check if the crossover_probability parameter is used.
             if not (self.crossover_probability is None):
                 probs = numpy.random.random(size=parents.shape[0])
-                indices = numpy.where(probs <= self.crossover_probability)[0]
+                indices = list(set(numpy.where(probs <= self.crossover_probability)[0]))
 
-                # If no parent satisfied the probability, no crossover is applied and a parent is selected.
+                # If no parent satisfied the probability, no crossover is applied and a parent is selected as is.
                 if len(indices) == 0:
                     offspring[k, :] = parents[k % parents.shape[0], :]
                     continue
@@ -43,7 +45,7 @@ class Crossover:
                     parent1_idx = indices[0]
                     parent2_idx = parent1_idx
                 else:
-                    indices = random.sample(list(set(indices)), 2)
+                    indices = random.sample(indices, 2)
                     parent1_idx = indices[0]
                     parent2_idx = indices[1]
             else:
@@ -88,17 +90,23 @@ class Crossover:
         else:
             offspring = numpy.empty(offspring_size, dtype=object)
 
+        # Randomly generate all the first K points at which crossover takes place between each two parents. 
+        # This saves time by calling the numpy.random.randint() function only once.
+        if (parents.shape[1] == 1): # If the chromosome has only a single gene. In this case, this gene is copied from the second parent.
+            crossover_points_1 = numpy.zeros(offspring_size[0])
+        else:
+            crossover_points_1 = numpy.random.randint(low=0, 
+                                                      high=numpy.ceil(parents.shape[1]/2 + 1), 
+                                                      size=offspring_size[0])
+
+        # The second point must always be greater than the first point.
+        crossover_points_2 = crossover_points_1 + int(parents.shape[1]/2) 
+
         for k in range(offspring_size[0]):
-            if (parents.shape[1] == 1): # If the chromosome has only a single gene. In this case, this gene is copied from the second parent.
-                crossover_point1 = 0
-            else:
-                crossover_point1 = numpy.random.randint(low=0, high=numpy.ceil(parents.shape[1]/2 + 1), size=1)[0]
-    
-            crossover_point2 = crossover_point1 + int(parents.shape[1]/2) # The second point must always be greater than the first point.
 
             if not (self.crossover_probability is None):
                 probs = numpy.random.random(size=parents.shape[0])
-                indices = numpy.where(probs <= self.crossover_probability)[0]
+                indices = list(set(numpy.where(probs <= self.crossover_probability)[0]))
 
                 # If no parent satisfied the probability, no crossover is applied and a parent is selected.
                 if len(indices) == 0:
@@ -108,7 +116,7 @@ class Crossover:
                     parent1_idx = indices[0]
                     parent2_idx = parent1_idx
                 else:
-                    indices = random.sample(list(set(indices)), 2)
+                    indices = random.sample(indices, 2)
                     parent1_idx = indices[0]
                     parent2_idx = indices[1]
             else:
@@ -118,11 +126,11 @@ class Crossover:
                 parent2_idx = (k+1) % parents.shape[0]
 
             # The genes from the beginning of the chromosome up to the first point are copied from the first parent.
-            offspring[k, 0:crossover_point1] = parents[parent1_idx, 0:crossover_point1]
+            offspring[k, 0:crossover_points_1[k]] = parents[parent1_idx, 0:crossover_points_1[k]]
             # The genes from the second point up to the end of the chromosome are copied from the first parent.
-            offspring[k, crossover_point2:] = parents[parent1_idx, crossover_point2:]
+            offspring[k, crossover_points_2[k]:] = parents[parent1_idx, crossover_points_2[k]:]
             # The genes between the 2 points are copied from the second parent.
-            offspring[k, crossover_point1:crossover_point2] = parents[parent2_idx, crossover_point1:crossover_point2]
+            offspring[k, crossover_points_1[k]:crossover_points_2[k]] = parents[parent2_idx, crossover_points_1[k]:crossover_points_2[k]]
 
             if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
@@ -153,10 +161,18 @@ class Crossover:
         else:
             offspring = numpy.empty(offspring_size, dtype=object)
 
+        # Randomly generate all the genes sources at which crossover takes place between each two parents. 
+        # This saves time by calling the numpy.random.randint() function only once.
+        # There is a list of 0 and 1 for each offspring.
+        # [0, 1, 0, 0, 1, 1]: If the value is 0, then take the gene from the first parent. If 1, take it from the second parent.
+        genes_sources = numpy.random.randint(low=0, 
+                                             high=2, 
+                                             size=offspring_size)
+
         for k in range(offspring_size[0]):
             if not (self.crossover_probability is None):
                 probs = numpy.random.random(size=parents.shape[0])
-                indices = numpy.where(probs <= self.crossover_probability)[0]
+                indices = list(set(numpy.where(probs <= self.crossover_probability)[0]))
 
                 # If no parent satisfied the probability, no crossover is applied and a parent is selected.
                 if len(indices) == 0:
@@ -166,7 +182,7 @@ class Crossover:
                     parent1_idx = indices[0]
                     parent2_idx = parent1_idx
                 else:
-                    indices = random.sample(list(set(indices)), 2)
+                    indices = random.sample(indices, 2)
                     parent1_idx = indices[0]
                     parent2_idx = indices[1]
             else:
@@ -175,12 +191,11 @@ class Crossover:
                 # Index of the second parent to mate.
                 parent2_idx = (k+1) % parents.shape[0]
 
-            genes_source = numpy.random.randint(low=0, high=2, size=offspring_size[1])
             for gene_idx in range(offspring_size[1]):
-                if (genes_source[gene_idx] == 0):
+                if (genes_sources[k, gene_idx] == 0):
                     # The gene will be copied from the first parent if the current gene index is 0.
                     offspring[k, gene_idx] = parents[parent1_idx, gene_idx]
-                elif (genes_source[gene_idx] == 1):
+                elif (genes_sources[k, gene_idx] == 1):
                     # The gene will be copied from the second parent if the current gene index is 1.
                     offspring[k, gene_idx] = parents[parent2_idx, gene_idx]
 
@@ -214,10 +229,18 @@ class Crossover:
         else:
             offspring = numpy.empty(offspring_size, dtype=object)
 
+        # Randomly generate all the genes sources at which crossover takes place between each two parents. 
+        # This saves time by calling the numpy.random.randint() function only once.
+        # There is a list of 0 and 1 for each offspring.
+        # [0, 1, 0, 0, 1, 1]: If the value is 0, then take the gene from the first parent. If 1, take it from the second parent.
+        genes_sources = numpy.random.randint(low=0, 
+                                             high=2, 
+                                             size=offspring_size)
+
         for k in range(offspring_size[0]):
             if not (self.crossover_probability is None):
                 probs = numpy.random.random(size=parents.shape[0])
-                indices = numpy.where(probs <= self.crossover_probability)[0]
+                indices = list(set(numpy.where(probs <= self.crossover_probability)[0]))
 
                 # If no parent satisfied the probability, no crossover is applied and a parent is selected.
                 if len(indices) == 0:
@@ -227,7 +250,7 @@ class Crossover:
                     parent1_idx = indices[0]
                     parent2_idx = parent1_idx
                 else:
-                    indices = random.sample(list(set(indices)), 2)
+                    indices = random.sample(indices, 2)
                     parent1_idx = indices[0]
                     parent2_idx = indices[1]
             else:
@@ -236,9 +259,9 @@ class Crossover:
                 # Index of the second parent to mate.
                 parent2_idx = (k+1) % parents.shape[0]
 
-            # A 0/1 vector where 0 means the gene is taken from the first parent and 1 means the gene is taken from the second parent.
-            gene_sources = numpy.random.randint(0, 2, size=self.num_genes)
-            offspring[k, :] = numpy.where(gene_sources == 0, parents[parent1_idx, :], parents[parent2_idx, :])
+            offspring[k, :] = numpy.where(genes_sources[k] == 0, 
+                                          parents[parent1_idx, :], 
+                                          parents[parent2_idx, :])
 
             if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
