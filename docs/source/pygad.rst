@@ -927,8 +927,10 @@ shuffles their order randomly.
 ``adaptive_mutation()``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Applies the adaptive mutation which selects a subset of genes and
-shuffles their order randomly.
+Applies the adaptive mutation which selects the number/percentage of
+genes to mutate based on the solution's fitness. If the fitness is high
+(i.e. solution quality is high), then small number/percentage of genes
+is mutated compared to a solution with a low fitness.
 
 .. _bestsolution:
 
