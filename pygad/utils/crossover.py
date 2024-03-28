@@ -25,10 +25,12 @@ class Crossover:
         else:
             offspring = numpy.empty(offspring_size, dtype=object)
 
+        # Randomly generate all the K points at which crossover takes place between each two parents. The point does not have to be always at the center of the solutions.
+        crossover_points = numpy.random.randint(low=0, 
+                                                high=parents.shape[1], 
+                                                size=offspring_size[0])
         for k in range(offspring_size[0]):
-            # The point at which crossover takes place between two parents. Usually, it is at the center.
-            crossover_point = numpy.random.randint(low=0, high=parents.shape[1], size=1)[0]
-
+            # Check if the crossover_probability parameter is used.
             if not (self.crossover_probability is None):
                 probs = numpy.random.random(size=parents.shape[0])
                 indices = numpy.where(probs <= self.crossover_probability)[0]
@@ -51,9 +53,9 @@ class Crossover:
                 parent2_idx = (k+1) % parents.shape[0]
 
             # The new offspring has its first half of its genes from the first parent.
-            offspring[k, 0:crossover_point] = parents[parent1_idx, 0:crossover_point]
+            offspring[k, 0:crossover_points[k]] = parents[parent1_idx, 0:crossover_points[k]]
             # The new offspring has its second half of its genes from the second parent.
-            offspring[k, crossover_point:] = parents[parent2_idx, crossover_point:]
+            offspring[k, crossover_points[k]:] = parents[parent2_idx, crossover_points[k]:]
 
             if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
