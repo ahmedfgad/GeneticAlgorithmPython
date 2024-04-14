@@ -3,4 +3,4 @@ from pygad.utils import crossover
 from pygad.utils import mutation
 from pygad.utils import nsga2
 
-__version__ = "1.1.1"
+__version__ = "1.2.1"
