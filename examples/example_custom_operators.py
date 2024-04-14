@@ -41,7 +41,7 @@ def crossover_func(parents, offspring_size, ga_instance):
         parent1 = parents[idx % parents.shape[0], :].copy()
         parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
 
-        random_split_point = numpy.random.choice(range(offspring_size[0]))
+        random_split_point = numpy.random.choice(range(offspring_size[1]))
 
         parent1[random_split_point:] = parent2[random_split_point:]
 
