@@ -58,7 +58,7 @@ class GA(utils.parent_selection.ParentSelection,
                  on_mutation=None,
                  on_generation=None,
                  on_stop=None,
-                 delay_after_gen=0.0,
+                 delay_after_gen=None,
                  save_best_solutions=False,
                  save_solutions=False,
                  suppress_warnings=False,
@@ -1134,18 +1134,21 @@ class GA(utils.parent_selection.ParentSelection,
                 self.on_stop = None
 
             # Validate delay_after_gen
-            if type(delay_after_gen) in GA.supported_int_float_types:
-                if delay_after_gen != 0.0:
-                    if not self.suppress_warnings:
-                        warnings.warn("The 'delay_after_gen' parameter is deprecated starting from PyGAD 3.3.0. To delay or pause the evolution after each generation, assign a callback function/method to the 'on_generation' parameter to adds some time delay.")
-                if delay_after_gen >= 0.0:
-                    self.delay_after_gen = delay_after_gen
+            if delay_after_gen is None:
+                self.delay_after_gen = None
+            else:
+                if type(delay_after_gen) in GA.supported_int_float_types:
+                    if delay_after_gen != 0.0:
+                        if not self.suppress_warnings:
+                            warnings.warn("The 'delay_after_gen' parameter is deprecated starting from PyGAD 3.3.0. To delay or pause the evolution after each generation, assign a callback function/method to the 'on_generation' parameter to adds some time delay.")
+                    if delay_after_gen >= 0.0:
+                        self.delay_after_gen = delay_after_gen
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError(f"The value passed to the 'delay_after_gen' parameter must be a non-negative number. The value passed is ({delay_after_gen}) of type {type(delay_after_gen)}.")
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"The value passed to the 'delay_after_gen' parameter must be a non-negative number. The value passed is ({delay_after_gen}) of type {type(delay_after_gen)}.")
-            else:
-                self.valid_parameters = False
-                raise TypeError(f"The value passed to the 'delay_after_gen' parameter must be of type int or float but {type(delay_after_gen)} found.")
+                    raise TypeError(f"The value passed to the 'delay_after_gen' parameter must be of type int or float but {type(delay_after_gen)} found.")
 
             # Validate save_best_solutions
             if type(save_best_solutions) is bool:
@@ -2054,8 +2057,8 @@ class GA(utils.parent_selection.ParentSelection,
 
                 if stop_run:
                     break
-
-                time.sleep(self.delay_after_gen)
+                if self.delay_after_gen is not None:
+                    time.sleep(self.delay_after_gen)
 
             # Save the fitness of the last generation.
             if self.save_solutions:
