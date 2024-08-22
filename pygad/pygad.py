@@ -1135,9 +1135,8 @@ class GA(utils.parent_selection.ParentSelection,
 
             # Validate delay_after_gen
             if type(delay_after_gen) in GA.supported_int_float_types:
-                if delay_after_gen != 0.0:
-                    if not self.suppress_warnings:
-                        warnings.warn("The 'delay_after_gen' parameter is deprecated starting from PyGAD 3.3.0. To delay or pause the evolution after each generation, assign a callback function/method to the 'on_generation' parameter to adds some time delay.")
+                if not self.suppress_warnings:
+                    warnings.warn("The 'delay_after_gen' parameter is deprecated starting from PyGAD 3.3.0. To delay or pause the evolution after each generation, assign a callback function/method to the 'on_generation' parameter to adds some time delay.")
                 if delay_after_gen >= 0.0:
                     self.delay_after_gen = delay_after_gen
                 else:
@@ -1913,6 +1912,16 @@ class GA(utils.parent_selection.ParentSelection,
 
             # Measuring the fitness of each chromosome in the population. Save the fitness in the last_generation_fitness attribute.
             self.last_generation_fitness = self.cal_pop_fitness()
+
+            # Know whether the problem is SOO or MOO.
+            if type(self.last_generation_fitness[0]) in GA.supported_int_float_types:
+                # Single-objective problem.
+                # If the problem is SOO, the parent selection type cannot be nsga2 or tournament_nsga2.
+                if self.parent_selection_type in ['nsga2', 'tournament_nsga2']:
+                    raise TypeError(f"Incorrect parent selection type. The fitness function returned a single numeric fitness value which means the problem is single-objective. But the parent selection type {self.parent_selection_type} is used which only works for multi-objective optimization problems.")
+            elif type(self.last_generation_fitness[0]) in [list, tuple, numpy.ndarray]:
+                # Multi-objective problem.
+                pass                
 
             best_solution, best_solution_fitness, best_match_idx = self.best_solution(pop_fitness=self.last_generation_fitness)
 
