@@ -632,6 +632,7 @@ After running the code again, it will find the same result.
    0.04872203136549972
 
 Continue without Losing Progress
+================================
 
 In `PyGAD
 2.18.0 <https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0>`__,
@@ -2000,7 +2001,7 @@ future. These instances attributes can save the solutions:
 To configure PyGAD for non-deterministic problems, we have to disable
 saving the previous solutions. This is by setting these parameters:
 
-1. ``keep_elisitm=0``
+1. ``keep_elitism=0``
 
 2. ``keep_parents=0``
 
