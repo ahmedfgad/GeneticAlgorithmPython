@@ -16,23 +16,24 @@ class Unique:
                                        mutation_by_replacement, 
                                        gene_type, 
                                        num_trials=10):
-    
             """
-            Solves the duplicates in a solution by randomly selecting new values for the duplicating genes.
+            Resolves duplicates in a solution by randomly selecting new values for the duplicate genes.
 
-            solution: A solution with duplicate values.
-            min_val: Minimum value of the range to sample a number randomly.
-            max_val: Maximum value of the range to sample a number randomly.
-            mutation_by_replacement: Identical to the self.mutation_by_replacement attribute.
-            gene_type: Exactly the same as the self.gene_type attribute.
-            num_trials: Maximum number of trials to change the gene value to solve the duplicates.
+            Args:
+                solution (list): A solution containing genes, potentially with duplicate values.
+                min_val (int): The minimum value of the range to sample a number randomly.
+                max_val (int): The maximum value of the range to sample a number randomly.
+                mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
+                gene_type (type): The data type of the gene (e.g., int, float).
+                num_trials (int): The maximum number of attempts to resolve duplicates by changing the gene values.
 
             Returns:
-                new_solution: Solution after trying to solve its duplicates. If no duplicates solved, then it is identical to the passed solution parameter.
-                not_unique_indices: Indices of the genes with duplicate values.
-                num_unsolved_duplicates: Number of unsolved duplicates.
+                tuple:
+                    list: The updated solution after attempting to resolve duplicates. If no duplicates are resolved, the solution remains unchanged.
+                    list: The indices of genes that still have duplicate values.
+                    int: The number of duplicates that could not be resolved.
             """
-    
+
             new_solution = solution.copy()
     
             _, unique_gene_indices = numpy.unique(solution, return_index=True)
@@ -113,17 +114,20 @@ class Unique:
                                        build_initial_pop=False):
     
             """
-            Solves the duplicates in a solution by selecting values for the duplicating genes from the gene space.
-    
-            solution: A solution with duplicate values.
-            gene_type: Exactly the same as the self.gene_type attribute.
-            num_trials: Maximum number of trials to change the gene value to solve the duplicates.
-    
+            Resolves duplicates in a solution by selecting new values for the duplicate genes from the gene space.
+
+            Args:
+                solution (list): A solution containing genes, potentially with duplicate values.
+                gene_type (type): The data type of the gene (e.g., int, float).
+                num_trials (int): The maximum number of attempts to resolve duplicates by selecting values from the gene space.
+
             Returns:
-                new_solution: Solution after trying to solve its duplicates. If no duplicates solved, then it is identical to the passed solution parameter.
-                not_unique_indices: Indices of the genes with duplicate values.
-                num_unsolved_duplicates: Number of unsolved duplicates.
+                tuple:
+                    list: The updated solution after attempting to resolve duplicates. If no duplicates are resolved, the solution remains unchanged.
+                    list: The indices of genes that still have duplicate values.
+                    int: The number of duplicates that could not be resolved.
             """
+
             new_solution = solution.copy()
 
             _, unique_gene_indices = numpy.unique(solution, return_index=True)
@@ -236,18 +240,20 @@ class Unique:
                               build_initial_pop=False):
 
         """
-        Loops through all the duplicating genes to find unique values that from their gene spaces to solve the duplicates.
-        For each duplicating gene, a call to the unique_gene_by_space() function is made.
-    
-        new_solution: A solution with duplicate values.
-        gene_type: Exactly the same as the self.gene_type attribute.
-        not_unique_indices: Indices with duplicating values.
-        num_trials: Maximum number of trials to change the gene value to solve the duplicates.
-    
+        Iterates through all duplicate genes to find unique values from their gene spaces and resolve duplicates.
+        For each duplicate gene, a call is made to the `unique_gene_by_space()` function.
+
+        Args:
+            new_solution (list): A solution containing genes with duplicate values.
+            gene_type (type): The data type of the gene (e.g., int, float).
+            not_unique_indices (list): The indices of genes with duplicate values.
+            num_trials (int): The maximum number of attempts to resolve duplicates for each gene.
+
         Returns:
-            new_solution: Solution after trying to solve all of its duplicates. If no duplicates solved, then it is identical to the passed solution parameter.
-            not_unique_indices: Indices of the genes with duplicate values.
-            num_unsolved_duplicates: Number of unsolved duplicates.
+            tuple:
+                list: The updated solution after attempting to resolve all duplicates. If no duplicates are resolved, the solution remains unchanged.
+                list: The indices of genes that still have duplicate values.
+                int: The number of duplicates that could not be resolved.
         """
 
         num_unsolved_duplicates = 0
@@ -283,15 +289,15 @@ class Unique:
                              build_initial_pop=False):
     
             """
-            Returns a unique gene value for a single gene based on its value space to solve the duplicates.
-    
-            solution: A solution with duplicate values.
-            gene_idx: The index of the gene that duplicates its value with another gene.
-            gene_type: Exactly the same as the self.gene_type attribute.
-    
+            Returns a unique value for a specific gene based on its value space to resolve duplicates.
+
+            Args:
+                solution (list): A solution containing genes with duplicate values.
+                gene_idx (int): The index of the gene that has a duplicate value.
+                gene_type (type): The data type of the gene (e.g., int, float).
+
             Returns:
-                A unique value, if exists, for the gene.
-            """
+                Any: A unique value for the gene, if one exists; otherwise, the original gene value.            """
 
             if self.gene_space_nested:
                 if type(self.gene_space[gene_idx]) in [numpy.ndarray, list, tuple]:
@@ -572,11 +578,14 @@ class Unique:
                             solution,
                             gene_space_unpacked):
         """
-        Returns the first occurrence of duplicate genes.
-        It returns:
-            The index of a gene with a duplicate value.
-            The value of the gene.
+        Identifies the first occurrence of a duplicate gene in the solution.
+
+        Returns:
+            tuple:
+                int: The index of the first gene with a duplicate value.
+                Any: The value of the duplicate gene.
         """
+
         for gene in set(solution):
             gene_indices = numpy.where(numpy.array(solution) == gene)[0]
             if len(gene_indices) == 1:
@@ -594,13 +603,15 @@ class Unique:
                           range_max,
                           num_values_from_inf_range=100):
         """
-        Unpack the gene_space for the purpose of selecting a value that solves the duplicates.
-        This is by replacing each range by a list of values.
-        It accepts:
-            range_min: The range minimum value.
-            range_min: The range maximum value.
-            num_values_from_inf_range: For infinite range of float values, a fixed number of values equal to num_values_from_inf_range is selected using the numpy.linspace() function.
-        It returns the unpacked gene space.
+        Unpacks the gene space for selecting a value to resolve duplicates by converting ranges into lists of values.
+
+        Args:
+            range_min (float or int): The minimum value of the range.
+            range_max (float or int): The maximum value of the range.
+            num_values_from_inf_range (int): The number of values to generate for an infinite range of float values using `numpy.linspace()`.
+
+        Returns:
+            list: A list representing the unpacked gene space.
         """
 
         # Copy the gene_space to keep it isolated form the changes.
@@ -740,8 +751,15 @@ class Unique:
         """
         Sometimes it is impossible to solve the duplicate genes by simply selecting another value for either genes.
         This function solve the duplicates between 2 genes by searching for a third gene that can make assist in the solution.
-        It returns:
-            The solution after solving the duplicates or the None if duplicates cannot be solved.
+
+        Args:
+            solution (list): The current solution containing genes, potentially with duplicates.
+            gene_idx1 (int): The index of the first gene involved in the duplication.
+            gene_idx2 (int): The index of the second gene involved in the duplication.
+            assist_gene_idx (int): The index of the third gene used to assist in resolving the duplication.
+
+        Returns:
+            list or None: The updated solution with duplicates resolved, or `None` if the duplicates cannot be resolved.
         """
 
         # gene_space_unpacked = self.unpack_gene_space()
