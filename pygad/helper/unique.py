@@ -174,18 +174,19 @@ class Unique:
                                    step=1):
 
             """
-            Finds a unique integer value for the gene.
-    
-            solution: A solution with duplicate values.
-            gene_index: Index of the gene to find a unique value.
-            min_val: Minimum value of the range to sample a number randomly.
-            max_val: Maximum value of the range to sample a number randomly.
-            mutation_by_replacement: Identical to the self.mutation_by_replacement attribute.
-            gene_type: Exactly the same as the self.gene_type attribute.
-            step: Defaults to 1.
+            Finds a unique integer value for a specific gene in a solution.
+
+            Args:
+                solution (list): A solution containing genes, potentially with duplicate values.
+                gene_index (int): The index of the gene for which to find a unique value.
+                min_val (int): The minimum value of the range to sample a number randomly.
+                max_val (int): The maximum value of the range to sample a number randomly.
+                mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
+                gene_type (type): The data type of the gene (e.g., int, float).
+                step (int, optional): The step size for generating candidate values. Defaults to 1.
 
             Returns:
-                selected_value: The new value of the gene. It may be identical to the original gene value in case there are no possible unique values for the gene.
+                int: The new value of the gene. If no unique value can be found, the original gene value is returned.
             """
 
             # The gene_type is of the form [type, precision]
