@@ -556,7 +556,7 @@ class Unique:
                     if self.gene_type_single == True:
                         dtype = self.gene_type
                     else:
-                        dtype = self.gene_type[gene_idx]
+                        dtype = self.gene_type[space_idx]
 
                     if dtype[0] in pygad.GA.supported_int_types:
                         if 'step' in space.keys():
@@ -594,7 +594,7 @@ class Unique:
                 if self.gene_type_single == True:
                     dtype = self.gene_type
                 else:
-                    dtype = self.gene_type[gene_idx]
+                    dtype = self.gene_type[space_idx]
 
                 # Change the data type.
                 gene_space_unpacked[space_idx] = numpy.array(gene_space_unpacked[space_idx],
