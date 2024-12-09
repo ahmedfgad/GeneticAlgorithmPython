@@ -44,9 +44,10 @@ def predict(model, solution, data):
     _model = copy.deepcopy(model)
     _model.load_state_dict(model_weights_dict)
 
-    predictions = _model(data)
+    with torch.no_grad():
+        predictions = _model(data)
 
-    return predictions
+        return predictions
 
 class TorchGA:
 
