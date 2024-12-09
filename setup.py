@@ -1,10 +1,15 @@
 import setuptools  
+import os
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+# Dynamically read requirements.txt
+this_dir = os.path.abspath(os.path.dirname(__file__))
+requirements_path = os.path.join(this_dir, "requirements.txt")
+
 # Read the requirements from the requirements.txt file
-with open("requirements.txt", "r") as f:
+with open(requirements_path, "r") as f:
     requirements = f.read().splitlines()
 
 setuptools.setup(  
