@@ -282,7 +282,7 @@ class Unique:
 
         Args:
             new_solution (list): A solution containing genes with duplicate values.
-            gene_type (type): The data type of the gene (e.g., int, float).
+            gene_type (type): The data type of the all the genes (e.g., int, float).
             not_unique_indices (list): The indices of genes with duplicate values.
             num_trials (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
 
@@ -417,7 +417,7 @@ class Unique:
                             value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
                                                                                 stop=curr_gene_space['high'],
                                                                                 step=curr_gene_space['step']),
-                                                                   size=1)
+                                                                   size=1)[0]
                         else:
                             value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
                                                                     high=curr_gene_space['high'],
@@ -479,7 +479,7 @@ class Unique:
                             value_from_space = numpy.random.choice(numpy.arange(start=self.gene_space['low'],
                                                                                 stop=self.gene_space['high'],
                                                                                 step=self.gene_space['step']),
-                                                                   size=1)
+                                                                   size=1)[0]
                         else:
                             value_from_space = numpy.random.uniform(low=self.gene_space['low'],
                                                                     high=self.gene_space['high'],
