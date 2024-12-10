@@ -13,11 +13,15 @@ class Crossover:
     def single_point_crossover(self, parents, offspring_size):
 
         """
-        Applies the single-point crossover. It selects a point randomly at which crossover takes place between the pairs of parents.
-        It accepts 2 parameters:
-            -parents: The parents to mate for producing the offspring.
-            -offspring_size: The size of the offspring to produce.
-        It returns an array the produced offspring.
+        Applies single-point crossover between pairs of parents.
+        This function selects a random point at which crossover occurs between the parents, generating offspring.
+
+        Parameters:
+            parents (array-like): The parents to mate for producing the offspring.
+            offspring_size (int): The number of offspring to produce.
+
+        Returns:
+            array-like: An array containing the produced offspring.
         """
 
         if self.gene_type_single == True:
