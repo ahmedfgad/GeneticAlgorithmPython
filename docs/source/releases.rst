@@ -1,8 +1,7 @@
 Release History
 ===============
 
-.. image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
-   :alt: 
+|image1|
 
 .. _pygad-1017:
 
@@ -1551,6 +1550,81 @@ Release Date 17 February 2024
    Methods <https://pygad.readthedocs.io/en/latest/pygad.html#other-methods>`__
    section for more information.
 
+.. _pygad-340:
+
+PyGAD 3.4.0
+-----------
+
+Release Date 07 January 2025
+
+1.  The ``delay_after_gen`` parameter is removed from the ``pygad.GA``
+    class constructor. As a result, it is no longer an attribute of the
+    ``pygad.GA`` class instances. To add a delay after each generation,
+    apply it inside the ``on_generation`` callback.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/283
+
+2.  In the ``single_point_crossover()`` method of the
+    ``pygad.utils.crossover.Crossover`` class, all the random crossover
+    points are returned before the ``for`` loop. This is by calling the
+    ``numpy.random.randint()`` function only once before the loop to
+    generate all the K points (where K is the offspring size). This is
+    compared to calling the ``numpy.random.randint()`` function inside
+    the ``for`` loop K times, once for each individual offspring.
+
+3.  Bug fix in the ``examples/example_custom_operators.py`` script.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/285
+
+4.  While making prediction using the ``pygad.torchga.predict()``
+    function, no gradients are calculated.
+
+5.  The ``gene_type`` parameter of the
+    ``pygad.helper.unique.Unique.unique_int_gene_from_range()`` method
+    accepts the type of the current gene only instead of the full
+    gene_type list.
+
+6.  Created a new method called ``unique_float_gene_from_range()``
+    inside the ``pygad.helper.unique.Unique`` class to find a unique
+    floating-point number from a range.
+
+7.  Fix a bug in the
+    ``pygad.helper.unique.Unique.unique_gene_by_space()`` method to
+    return the numeric value only instead of a NumPy array.
+
+8.  Refactoring the ``pygad/helper/unique.py`` script to remove
+    duplicate codes and reformatting the docstrings.
+
+9.  The plot_pareto_front_curve() method added to the
+    pygad.visualize.plot.Plot class to visualize the Pareto front for
+    multi-objective problems. It only supports 2 objectives.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/279
+
+10. Fix a bug converting a nested NumPy array to a nested list.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/300
+
+11. The ``Matplotlib`` library is only imported when a method inside the
+    ``pygad/visualize/plot.py`` script is used. This is more efficient
+    than using ``import matplotlib.pyplot`` at the module level as this
+    causes it to be imported when ``pygad`` is imported even when it is
+    not needed.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/292
+
+12. Fix a bug when minus sign (-) is used inside the ``stop_criteria``
+    parameter (e.g. ``stop_criteria=["saturate_10", "reach_-0.5"]``).
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/296
+
+13. Make sure ``self.best_solutions`` is a list of lists inside the
+    ``cal_pop_fitness`` method.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/293
+
+14. Fix a bug where the ``cal_pop_fitness()`` method was using the
+    ``previous_generation_fitness`` attribute to return the parents
+    fitness. This instance attribute was not using the fitness of the
+    latest population, instead the fitness of the population before the
+    last one. The issue is solved by updating the
+    ``previous_generation_fitness`` attribute to the latest population
+    fitness before the GA completes.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/291
+
 PyGAD Projects at GitHub
 ========================
 
@@ -1721,11 +1795,11 @@ section for more contact details.
 
 Within your message, please send the following details:
 
--  Project title
+- Project title
 
--  Brief description
+- Brief description
 
--  Preferably, a link that directs the readers to your project
+- Preferably, a link that directs the readers to your project
 
 Tutorials about PyGAD
 =====================
@@ -1851,7 +1925,7 @@ discussion includes building Keras models using either the Sequential
 Model or the Functional API, building an initial population of Keras
 model parameters, creating an appropriate fitness function, and more.
 
-|image1|
+|image2|
 
 `Train PyTorch Models Using Genetic Algorithm with PyGAD <https://neptune.ai/blog/train-pytorch-models-using-genetic-algorithm-with-pygad>`__
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -1871,7 +1945,7 @@ PyTorch models. It’s very easy to use, but there are a few tricky steps.
 So, in this tutorial, we’ll explore how to use PyGAD to train PyTorch
 models.
 
-|image2|
+|image3|
 
 `A Guide to Genetic ‘Learning’ Algorithms for Optimization <https://towardsdatascience.com/a-guide-to-genetic-learning-algorithms-for-optimization-e1067cdc77e7>`__
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1896,7 +1970,7 @@ simple pour résoudre le OpenAI CartPole Jeu. Dans cet article, nous
 allons former un simple réseau de neurones pour résoudre le OpenAI
 CartPole . J'utiliserai PyTorch et PyGAD .
 
-|image3|
+|image4|
 
 Spanish
 -------
@@ -1914,7 +1988,7 @@ resolver el Juego OpenAI CartPole. En este articulo, entrenaremos una
 red neuronal simple para resolver el OpenAI CartPole . Usare PyTorch y
 PyGAD .
 
-|image4|
+|image5|
 
 Korean
 ------
@@ -1922,7 +1996,7 @@ Korean
 `[PyGAD] Python 에서 Genetic Algorithm 을 사용해보기 <https://data-newbie.tistory.com/m/685>`__
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-|image5|
+|image6|
 
 파이썬에서 genetic algorithm을 사용하는 패키지들을 다 사용해보진
 않았지만, 확장성이 있어보이고, 시도할 일이 있어서 살펴봤다.
@@ -1971,7 +2045,7 @@ Keras modellerini oluşturmayı, Keras model parametrelerinin ilk
 popülasyonunu oluşturmayı, uygun bir uygunluk işlevi oluşturmayı ve daha
 fazlasını içerir.
 
-|image6|
+|image7|
 
 Hungarian
 ---------
@@ -2003,7 +2077,7 @@ hálózatunk 386 állítható paraméterrel rendelkezik, ezért a DNS-ünk itt
 populációnk egy 10x386 elemű mátrix lesz. Ezt adjuk át az 51. sorban az
 initial_population paraméterben.
 
-|image7|
+|image8|
 
 Russian
 -------
@@ -2032,77 +2106,75 @@ PyGAD разрабатывали на Python 3.7.3. Зависимости вк�
 из изкейсов использования инструмента — оптимизация весов, которые
 удовлетворяют заданной функции.
 
-|image8|
+|image9|
 
 Research Papers using PyGAD
 ===========================
 
 A number of research papers used PyGAD and here are some of them:
 
--  Alberto Meola, Manuel Winkler, Sören Weinrich, Metaheuristic
-   optimization of data preparation and machine learning hyperparameters
-   for prediction of dynamic methane production, Bioresource Technology,
-   Volume 372, 2023, 128604, ISSN 0960-8524.
+- Alberto Meola, Manuel Winkler, Sören Weinrich, Metaheuristic
+  optimization of data preparation and machine learning hyperparameters
+  for prediction of dynamic methane production, Bioresource Technology,
+  Volume 372, 2023, 128604, ISSN 0960-8524.
 
--  Jaros, Marta, and Jiri Jaros. "Performance-Cost Optimization of
-   Moldable Scientific Workflows."
+- Jaros, Marta, and Jiri Jaros. "Performance-Cost Optimization of
+  Moldable Scientific Workflows."
 
--  Thorat, Divya. "Enhanced genetic algorithm to reduce makespan of
-   multiple jobs in map-reduce application on serverless platform".
-   Diss. Dublin, National College of Ireland, 2020.
+- Thorat, Divya. "Enhanced genetic algorithm to reduce makespan of
+  multiple jobs in map-reduce application on serverless platform". Diss.
+  Dublin, National College of Ireland, 2020.
 
--  Koch, Chris, and Edgar Dobriban. "AttenGen: Generating Live
-   Attenuated Vaccine Candidates using Machine Learning." (2021).
+- Koch, Chris, and Edgar Dobriban. "AttenGen: Generating Live Attenuated
+  Vaccine Candidates using Machine Learning." (2021).
 
--  Bhardwaj, Bhavya, et al. "Windfarm optimization using Nelder-Mead and
-   Particle Swarm optimization." *2021 7th International Conference on
-   Electrical Energy Systems (ICEES)*. IEEE, 2021.
+- Bhardwaj, Bhavya, et al. "Windfarm optimization using Nelder-Mead and
+  Particle Swarm optimization." *2021 7th International Conference on
+  Electrical Energy Systems (ICEES)*. IEEE, 2021.
 
--  Bernardo, Reginald Christian S. and J. Said. “Towards a
-   model-independent reconstruction approach for late-time Hubble data.”
-   (2021).
+- Bernardo, Reginald Christian S. and J. Said. “Towards a
+  model-independent reconstruction approach for late-time Hubble data.”
+  (2021).
 
--  Duong, Tri Dung, Qian Li, and Guandong Xu. "Prototype-based
-   Counterfactual Explanation for Causal Classification." *arXiv
-   preprint arXiv:2105.00703* (2021).
+- Duong, Tri Dung, Qian Li, and Guandong Xu. "Prototype-based
+  Counterfactual Explanation for Causal Classification." *arXiv preprint
+  arXiv:2105.00703* (2021).
 
--  Farrag, Tamer Ahmed, and Ehab E. Elattar. "Optimized Deep Stacked
-   Long Short-Term Memory Network for Long-Term Load Forecasting." *IEEE
-   Access* 9 (2021): 68511-68522.
+- Farrag, Tamer Ahmed, and Ehab E. Elattar. "Optimized Deep Stacked Long
+  Short-Term Memory Network for Long-Term Load Forecasting." *IEEE
+  Access* 9 (2021): 68511-68522.
 
--  Antunes, E. D. O., Caetano, M. F., Marotta, M. A., Araujo, A.,
-   Bondan, L., Meneguette, R. I., & Rocha Filho, G. P. (2021, August).
-   Soluções Otimizadas para o Problema de Localização de Máxima
-   Cobertura em Redes Militarizadas 4G/LTE. In *Anais do XXVI Workshop
-   de Gerência e Operação de Redes e Serviços* (pp. 152-165). SBC.
+- Antunes, E. D. O., Caetano, M. F., Marotta, M. A., Araujo, A., Bondan,
+  L., Meneguette, R. I., & Rocha Filho, G. P. (2021, August). Soluções
+  Otimizadas para o Problema de Localização de Máxima Cobertura em Redes
+  Militarizadas 4G/LTE. In *Anais do XXVI Workshop de Gerência e
+  Operação de Redes e Serviços* (pp. 152-165). SBC.
 
--  M. Yani, F. Ardilla, A. A. Saputra and N. Kubota, "Gradient-Free Deep
-   Q-Networks Reinforcement learning: Benchmark and Evaluation," *2021
-   IEEE Symposium Series on Computational Intelligence (SSCI)*, 2021,
-   pp. 1-5, doi: 10.1109/SSCI50451.2021.9659941.
+- M. Yani, F. Ardilla, A. A. Saputra and N. Kubota, "Gradient-Free Deep
+  Q-Networks Reinforcement learning: Benchmark and Evaluation," *2021
+  IEEE Symposium Series on Computational Intelligence (SSCI)*, 2021, pp.
+  1-5, doi: 10.1109/SSCI50451.2021.9659941.
 
--  Yani, Mohamad, and Naoyuki Kubota. "Deep Convolutional Networks with
-   Genetic Algorithm for Reinforcement Learning Problem."
+- Yani, Mohamad, and Naoyuki Kubota. "Deep Convolutional Networks with
+  Genetic Algorithm for Reinforcement Learning Problem."
 
--  Mahendra, Muhammad Ihza, and Isman Kurniawan. "Optimizing
-   Convolutional Neural Network by Using Genetic Algorithm for COVID-19
-   Detection in Chest X-Ray Image." *2021 International Conference on
-   Data Science and Its Applications (ICoDSA)*. IEEE, 2021.
+- Mahendra, Muhammad Ihza, and Isman Kurniawan. "Optimizing
+  Convolutional Neural Network by Using Genetic Algorithm for COVID-19
+  Detection in Chest X-Ray Image." *2021 International Conference on
+  Data Science and Its Applications (ICoDSA)*. IEEE, 2021.
 
--  Glibota, Vjeko. *Umjeravanje mikroskopskog prometnog modela primjenom
-   genetskog algoritma*. Diss. University of Zagreb. Faculty of
-   Transport and Traffic Sciences. Division of Intelligent Transport
-   Systems and Logistics. Department of Intelligent Transport Systems,
-   2021.
+- Glibota, Vjeko. *Umjeravanje mikroskopskog prometnog modela primjenom
+  genetskog algoritma*. Diss. University of Zagreb. Faculty of Transport
+  and Traffic Sciences. Division of Intelligent Transport Systems and
+  Logistics. Department of Intelligent Transport Systems, 2021.
 
--  Zhu, Mingda. *Genetic Algorithm-based Parameter Identification for
-   Ship Manoeuvring Model under Wind Disturbance*. MS thesis. NTNU,
-   2021.
+- Zhu, Mingda. *Genetic Algorithm-based Parameter Identification for
+  Ship Manoeuvring Model under Wind Disturbance*. MS thesis. NTNU, 2021.
 
--  Abdalrahman, Ahmed, and Weihua Zhuang. "Dynamic pricing for
-   differentiated pev charging services using deep reinforcement
-   learning." *IEEE Transactions on Intelligent Transportation Systems*
-   (2020).
+- Abdalrahman, Ahmed, and Weihua Zhuang. "Dynamic pricing for
+  differentiated pev charging services using deep reinforcement
+  learning." *IEEE Transactions on Intelligent Transportation Systems*
+  (2020).
 
 More Links
 ==========
@@ -2125,19 +2197,19 @@ titled `Genetic Algorithm Implementation in
 Python <https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad>`__
 available at these links:
 
--  `LinkedIn <https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad>`__
+- `LinkedIn <https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad>`__
 
--  `Towards Data
-   Science <https://towardsdatascience.com/genetic-algorithm-implementation-in-python-5ab67bb124a6>`__
+- `Towards Data
+  Science <https://towardsdatascience.com/genetic-algorithm-implementation-in-python-5ab67bb124a6>`__
 
--  `KDnuggets <https://www.kdnuggets.com/2018/07/genetic-algorithm-implementation-python.html>`__
+- `KDnuggets <https://www.kdnuggets.com/2018/07/genetic-algorithm-implementation-python.html>`__
 
 `This
 tutorial <https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad>`__
 is prepared based on a previous version of the project but it still a
 good resource to start with coding the genetic algorithm.
 
-|image9|
+|image10|
 
 Tutorial: Introduction to Genetic Algorithm
 -------------------------------------------
@@ -2147,14 +2219,14 @@ Get started with the genetic algorithm by reading the tutorial titled
 Algorithm <https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad>`__
 which is available at these links:
 
--  `LinkedIn <https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad>`__
+- `LinkedIn <https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad>`__
 
--  `Towards Data
-   Science <https://www.kdnuggets.com/2018/03/introduction-optimization-with-genetic-algorithm.html>`__
+- `Towards Data
+  Science <https://www.kdnuggets.com/2018/03/introduction-optimization-with-genetic-algorithm.html>`__
 
--  `KDnuggets <https://towardsdatascience.com/introduction-to-optimization-with-genetic-algorithm-2f5001d9964b>`__
+- `KDnuggets <https://towardsdatascience.com/introduction-to-optimization-with-genetic-algorithm-2f5001d9964b>`__
 
-|image10|
+|image11|
 
 Tutorial: Build Neural Networks in Python
 -----------------------------------------
@@ -2165,14 +2237,14 @@ Classification of the Fruits360 Image
 Dataset <https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad>`__
 available at these links:
 
--  `LinkedIn <https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad>`__
+- `LinkedIn <https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad>`__
 
--  `Towards Data
-   Science <https://towardsdatascience.com/artificial-neural-network-implementation-using-numpy-and-classification-of-the-fruits360-image-3c56affa4491>`__
+- `Towards Data
+  Science <https://towardsdatascience.com/artificial-neural-network-implementation-using-numpy-and-classification-of-the-fruits360-image-3c56affa4491>`__
 
--  `KDnuggets <https://www.kdnuggets.com/2019/02/artificial-neural-network-implementation-using-numpy-and-image-classification.html>`__
+- `KDnuggets <https://www.kdnuggets.com/2019/02/artificial-neural-network-implementation-using-numpy-and-image-classification.html>`__
 
-|image11|
+|image12|
 
 Tutorial: Optimize Neural Networks with Genetic Algorithm
 ---------------------------------------------------------
@@ -2183,14 +2255,14 @@ Genetic Algorithm with
 Python <https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad>`__
 available at these links:
 
--  `LinkedIn <https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad>`__
+- `LinkedIn <https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad>`__
 
--  `Towards Data
-   Science <https://towardsdatascience.com/artificial-neural-networks-optimization-using-genetic-algorithm-with-python-1fe8ed17733e>`__
+- `Towards Data
+  Science <https://towardsdatascience.com/artificial-neural-networks-optimization-using-genetic-algorithm-with-python-1fe8ed17733e>`__
 
--  `KDnuggets <https://www.kdnuggets.com/2019/03/artificial-neural-networks-optimization-genetic-algorithm-python.html>`__
+- `KDnuggets <https://www.kdnuggets.com/2019/03/artificial-neural-networks-optimization-genetic-algorithm-python.html>`__
 
-|image12|
+|image13|
 
 Tutorial: Building CNN in Python
 --------------------------------
@@ -2200,21 +2272,21 @@ titled `Building Convolutional Neural Network using NumPy from
 Scratch <https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad>`__
 available at these links:
 
--  `LinkedIn <https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad>`__
+- `LinkedIn <https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad>`__
 
--  `Towards Data
-   Science <https://towardsdatascience.com/building-convolutional-neural-network-using-numpy-from-scratch-b30aac50e50a>`__
+- `Towards Data
+  Science <https://towardsdatascience.com/building-convolutional-neural-network-using-numpy-from-scratch-b30aac50e50a>`__
 
--  `KDnuggets <https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html>`__
+- `KDnuggets <https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html>`__
 
--  `Chinese Translation <http://m.aliyun.com/yunqi/articles/585741>`__
+- `Chinese Translation <http://m.aliyun.com/yunqi/articles/585741>`__
 
 `This
 tutorial <https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad>`__)
 is prepared based on a previous version of the project but it still a
 good resource to start with coding CNNs.
 
-|image13|
+|image14|
 
 Tutorial: Derivation of CNN from FCNN
 -------------------------------------
@@ -2224,14 +2296,14 @@ Get started with the genetic algorithm by reading the tutorial titled
 Step-By-Step <https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad>`__
 which is available at these links:
 
--  `LinkedIn <https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad>`__
+- `LinkedIn <https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad>`__
 
--  `Towards Data
-   Science <https://towardsdatascience.com/derivation-of-convolutional-neural-network-from-fully-connected-network-step-by-step-b42ebafa5275>`__
+- `Towards Data
+  Science <https://towardsdatascience.com/derivation-of-convolutional-neural-network-from-fully-connected-network-step-by-step-b42ebafa5275>`__
 
--  `KDnuggets <https://www.kdnuggets.com/2018/04/derivation-convolutional-neural-network-fully-connected-step-by-step.html>`__
+- `KDnuggets <https://www.kdnuggets.com/2018/04/derivation-convolutional-neural-network-fully-connected-step-by-step.html>`__
 
-|image14|
+|image15|
 
 Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 --------------------------------------------------------------------------
@@ -2244,69 +2316,70 @@ learning, genetic algorithm, and more.
 
 Find the book at these links:
 
--  `Amazon <https://www.amazon.com/Practical-Computer-Vision-Applications-Learning/dp/1484241665>`__
+- `Amazon <https://www.amazon.com/Practical-Computer-Vision-Applications-Learning/dp/1484241665>`__
 
--  `Springer <https://link.springer.com/book/10.1007/978-1-4842-4167-7>`__
+- `Springer <https://link.springer.com/book/10.1007/978-1-4842-4167-7>`__
 
--  `Apress <https://www.apress.com/gp/book/9781484241660>`__
+- `Apress <https://www.apress.com/gp/book/9781484241660>`__
 
--  `O'Reilly <https://www.oreilly.com/library/view/practical-computer-vision/9781484241677>`__
+- `O'Reilly <https://www.oreilly.com/library/view/practical-computer-vision/9781484241677>`__
 
--  `Google Books <https://books.google.com.eg/books?id=xLd9DwAAQBAJ>`__
+- `Google Books <https://books.google.com.eg/books?id=xLd9DwAAQBAJ>`__
 
-.. image:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
-   :alt: 
+|image16|
 
 Contact Us
 ==========
 
--  E-mail: ahmed.f.gad@gmail.com
+- E-mail: ahmed.f.gad@gmail.com
 
--  `LinkedIn <https://www.linkedin.com/in/ahmedfgad>`__
+- `LinkedIn <https://www.linkedin.com/in/ahmedfgad>`__
 
--  `Amazon Author Page <https://amazon.com/author/ahmedgad>`__
+- `Amazon Author Page <https://amazon.com/author/ahmedgad>`__
 
--  `Heartbeat <https://heartbeat.fritz.ai/@ahmedfgad>`__
+- `Heartbeat <https://heartbeat.fritz.ai/@ahmedfgad>`__
 
--  `Paperspace <https://blog.paperspace.com/author/ahmed>`__
+- `Paperspace <https://blog.paperspace.com/author/ahmed>`__
 
--  `KDnuggets <https://kdnuggets.com/author/ahmed-gad>`__
+- `KDnuggets <https://kdnuggets.com/author/ahmed-gad>`__
 
--  `TowardsDataScience <https://towardsdatascience.com/@ahmedfgad>`__
+- `TowardsDataScience <https://towardsdatascience.com/@ahmedfgad>`__
 
--  `GitHub <https://github.com/ahmedfgad>`__
+- `GitHub <https://github.com/ahmedfgad>`__
 
-.. image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
-   :alt: 
+|image17|
 
 Thank you for using
 `PyGAD <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ :)
 
-.. |image1| image:: https://user-images.githubusercontent.com/16560492/111009628-2b372500-8362-11eb-90cf-01b47d831624.png
+.. |image1| image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
+.. |image2| image:: https://user-images.githubusercontent.com/16560492/111009628-2b372500-8362-11eb-90cf-01b47d831624.png
    :target: https://blog.paperspace.com/train-keras-models-using-genetic-algorithm-with-pygad
-.. |image2| image:: https://user-images.githubusercontent.com/16560492/111009678-5457b580-8362-11eb-899a-39e2f96984df.png
+.. |image3| image:: https://user-images.githubusercontent.com/16560492/111009678-5457b580-8362-11eb-899a-39e2f96984df.png
    :target: https://neptune.ai/blog/train-pytorch-models-using-genetic-algorithm-with-pygad
-.. |image3| image:: https://user-images.githubusercontent.com/16560492/111009275-3178d180-8361-11eb-9e86-7fb1519acde7.png
+.. |image4| image:: https://user-images.githubusercontent.com/16560492/111009275-3178d180-8361-11eb-9e86-7fb1519acde7.png
    :target: https://www.hebergementwebs.com/nouvelles/comment-les-algorithmes-genetiques-peuvent-rivaliser-avec-la-descente-de-gradient-et-le-backprop
-.. |image4| image:: https://user-images.githubusercontent.com/16560492/111009257-232ab580-8361-11eb-99a5-7226efbc3065.png
+.. |image5| image:: https://user-images.githubusercontent.com/16560492/111009257-232ab580-8361-11eb-99a5-7226efbc3065.png
    :target: https://www.hebergementwebs.com/noticias/como-los-algoritmos-geneticos-pueden-competir-con-el-descenso-de-gradiente-y-el-backprop
-.. |image5| image:: https://user-images.githubusercontent.com/16560492/108586306-85bd0280-731b-11eb-874c-7ac4ce1326cd.jpg
+.. |image6| image:: https://user-images.githubusercontent.com/16560492/108586306-85bd0280-731b-11eb-874c-7ac4ce1326cd.jpg
    :target: https://data-newbie.tistory.com/m/685
-.. |image6| image:: https://user-images.githubusercontent.com/16560492/108586601-85be0200-731d-11eb-98a4-161c75a1f099.jpg
+.. |image7| image:: https://user-images.githubusercontent.com/16560492/108586601-85be0200-731d-11eb-98a4-161c75a1f099.jpg
    :target: https://erencan34.medium.com/pygad-ile-genetik-algoritmay%C4%B1-kullanarak-keras-modelleri-nas%C4%B1l-e%C4%9Fitilir-cf92639a478c
-.. |image7| image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
-   :target: https://thebojda.medium.com/tensorflow-alapoz%C3%B3-10-24f7767d4a2c
 .. |image8| image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
+   :target: https://thebojda.medium.com/tensorflow-alapoz%C3%B3-10-24f7767d4a2c
+.. |image9| image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
    :target: https://neurohive.io/ru/frameworki/pygad-biblioteka-dlya-implementacii-geneticheskogo-algoritma
-.. |image9| image:: https://user-images.githubusercontent.com/16560492/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png
+.. |image10| image:: https://user-images.githubusercontent.com/16560492/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png
    :target: https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad
-.. |image10| image:: https://user-images.githubusercontent.com/16560492/82078259-26252d00-96e1-11ea-9a02-52a99e1054b9.jpg
+.. |image11| image:: https://user-images.githubusercontent.com/16560492/82078259-26252d00-96e1-11ea-9a02-52a99e1054b9.jpg
    :target: https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad
-.. |image11| image:: https://user-images.githubusercontent.com/16560492/82078281-30472b80-96e1-11ea-8017-6a1f4383d602.jpg
+.. |image12| image:: https://user-images.githubusercontent.com/16560492/82078281-30472b80-96e1-11ea-8017-6a1f4383d602.jpg
    :target: https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad
-.. |image12| image:: https://user-images.githubusercontent.com/16560492/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg
+.. |image13| image:: https://user-images.githubusercontent.com/16560492/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg
    :target: https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad
-.. |image13| image:: https://user-images.githubusercontent.com/16560492/82431022-6c3a1200-9a8e-11ea-8f1b-b055196d76e3.png
+.. |image14| image:: https://user-images.githubusercontent.com/16560492/82431022-6c3a1200-9a8e-11ea-8f1b-b055196d76e3.png
    :target: https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad
-.. |image14| image:: https://user-images.githubusercontent.com/16560492/82431369-db176b00-9a8e-11ea-99bd-e845192873fc.png
+.. |image15| image:: https://user-images.githubusercontent.com/16560492/82431369-db176b00-9a8e-11ea-99bd-e845192873fc.png
    :target: https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad
+.. |image16| image:: https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg
+.. |image17| image:: https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png
