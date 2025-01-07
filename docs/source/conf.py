@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'PyGAD'
-copyright = '2024, Ahmed Fawzy Gad'
+copyright = '2025, Ahmed Fawzy Gad'
 author = 'Ahmed Fawzy Gad'
 
 # The full version, including alpha/beta/rc tags
-release = '3.3.1'
+release = '3.4.0'
 
 master_doc = 'index'
 
