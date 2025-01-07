@@ -10,11 +10,15 @@ visualization in PyGAD.
 This section discusses the different options to visualize the results in
 PyGAD through these methods:
 
-1. ``plot_fitness()``: Create plots for the fitness.
+1. ``plot_fitness()``: Creates plots for the fitness.
 
-2. ``plot_genes()``: Create plots for the genes.
+2. ``plot_genes()``: Creates plots for the genes.
 
-3. ``plot_new_solution_rate()``: Create plots for the new solution rate.
+3. ``plot_new_solution_rate()``: Creates plots for the new solution
+   rate.
+
+4. ``plot_pareto_front_curve()``: Creates plots for the pareto front for
+   multi-objective problems.
 
 In the following code, the ``save_solutions`` flag is set to ``True``
 which means all solutions are saved in the ``solutions`` attribute. The
@@ -87,7 +91,7 @@ This method accepts the following parameters:
 
 9. ``save_dir``: Directory to save the figure.
 
-.. _plottypeplot:
+.. _plottype=plot:
 
 ``plot_type="plot"``
 ~~~~~~~~~~~~~~~~~~~~
@@ -101,10 +105,9 @@ line connecting the fitness values across all generations:
    ga_instance.plot_fitness()
    # ga_instance.plot_fitness(plot_type="plot")
 
-.. image:: https://user-images.githubusercontent.com/16560492/122472609-d02f5280-cf8e-11eb-88a7-f9366ff6e7c6.png
-   :alt: 
+|image1|
 
-.. _plottypescatter:
+.. _plottype=scatter:
 
 ``plot_type="scatter"``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,10 +120,9 @@ these dots can be changed using the ``linewidth`` parameter.
 
    ga_instance.plot_fitness(plot_type="scatter")
 
-.. image:: https://user-images.githubusercontent.com/16560492/122473159-75e2c180-cf8f-11eb-942d-31279b286dbd.png
-   :alt: 
+|image2|
 
-.. _plottypebar:
+.. _plottype=bar:
 
 ``plot_type="bar"``
 ~~~~~~~~~~~~~~~~~~~
@@ -132,8 +134,7 @@ bar graph with each individual fitness represented as a bar.
 
    ga_instance.plot_fitness(plot_type="bar")
 
-.. image:: https://user-images.githubusercontent.com/16560492/122473340-b7736c80-cf8f-11eb-89c5-4f7db3b653cc.png
-   :alt: 
+|image3|
 
 New Solution Rate
 =================
@@ -174,7 +175,7 @@ in the ``plot_fitness()`` method (it also have 3 possible values for
 
 8. ``save_dir``: Directory to save the figure.
 
-.. _plottypeplot-2:
+.. _plottype=plot-2:
 
 ``plot_type="plot"``
 ~~~~~~~~~~~~~~~~~~~~
@@ -192,10 +193,9 @@ first generation is always equal to the number of solutions in the
 population (i.e. the value assigned to the ``sol_per_pop`` parameter in
 the constructor of the ``pygad.GA`` class) which is 10 in this example.
 
-.. image:: https://user-images.githubusercontent.com/16560492/122475815-3322e880-cf93-11eb-9648-bf66f823234b.png
-   :alt: 
+|image4|
 
-.. _plottypescatter-2:
+.. _plottype=scatter-2:
 
 ``plot_type="scatter"``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -207,10 +207,9 @@ The previous graph can be represented as scattered points by setting
 
    ga_instance.plot_new_solution_rate(plot_type="scatter")
 
-.. image:: https://user-images.githubusercontent.com/16560492/122476108-adec0380-cf93-11eb-80ac-7588bf90492f.png
-   :alt: 
+|image5|
 
-.. _plottypebar-2:
+.. _plottype=bar-2:
 
 ``plot_type="bar"``
 ~~~~~~~~~~~~~~~~~~~
@@ -222,8 +221,7 @@ vertical bar.
 
    ga_instance.plot_new_solution_rate(plot_type="bar")
 
-.. image:: https://user-images.githubusercontent.com/16560492/122476173-c2c89700-cf93-11eb-9e77-d39737cd3a96.png
-   :alt: 
+|image6|
 
 Genes
 =====
@@ -307,13 +305,13 @@ solutions in the population or from just the best solutions.
 
 An exception is raised if:
 
--  ``solutions="all"`` while ``save_solutions=False`` in the constructor
-   of the ``pygad.GA`` class. .
+- ``solutions="all"`` while ``save_solutions=False`` in the constructor
+  of the ``pygad.GA`` class. .
 
--  ``solutions="best"`` while ``save_best_solutions=False`` in the
-   constructor of the ``pygad.GA`` class. .
+- ``solutions="best"`` while ``save_best_solutions=False`` in the
+  constructor of the ``pygad.GA`` class. .
 
-.. _graphtypeplot:
+.. _graphtype=plot:
 
 ``graph_type="plot"``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -322,7 +320,7 @@ When ``graph_type="plot"``, then the figure creates a normal graph where
 the relationship between the gene values and the generation numbers is
 represented as a continuous plot, scattered points, or bars.
 
-.. _plottypeplot-3:
+.. _plottype=plot-3:
 
 ``plot_type="plot"``
 ^^^^^^^^^^^^^^^^^^^^
@@ -345,8 +343,7 @@ of the next graph) lasted for 83 generations.
    ga_instance.plot_genes(graph_type="plot", 
                           plot_type="plot")
 
-.. image:: https://user-images.githubusercontent.com/16560492/122477158-4a62d580-cf95-11eb-8c93-9b6e74cb814c.png
-   :alt: 
+|image7|
 
 As the default value for the ``solutions`` parameter is ``"all"``, then
 the following method calls generate the same plot.
@@ -365,7 +362,7 @@ the following method calls generate the same plot.
                           plot_type="plot",
                           solutions="all")
 
-.. _plottypescatter-3:
+.. _plottype=scatter-3:
 
 ``plot_type="scatter"``
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -381,10 +378,9 @@ scatter plot.
                           plot_type="scatter", 
                           solutions='all')
 
-.. image:: https://user-images.githubusercontent.com/16560492/122477273-73836600-cf95-11eb-828f-f357c7b0f815.png
-   :alt: 
+|image8|
 
-.. _plottypebar-3:
+.. _plottype=bar-3:
 
 ``plot_type="bar"``
 ^^^^^^^^^^^^^^^^^^^
@@ -397,10 +393,9 @@ scatter plot.
                           plot_type="bar", 
                           solutions='all')
 
-.. image:: https://user-images.githubusercontent.com/16560492/122477370-99106f80-cf95-11eb-8643-865b55e6b844.png
-   :alt: 
+|image9|
 
-.. _graphtypeboxplot:
+.. _graphtype=boxplot:
 
 ``graph_type="boxplot"``
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -419,10 +414,9 @@ figure as the default value for the ``solutions`` parameter is
    ga_instance.plot_genes(graph_type="boxplot", 
                           solutions='all')
 
-.. image:: https://user-images.githubusercontent.com/16560492/122479260-beeb4380-cf98-11eb-8f08-23707929b12c.png
-   :alt: 
+|image10|
 
-.. _graphtypehistogram:
+.. _graphtype=histogram:
 
 ``graph_type="histogram"``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -442,8 +436,74 @@ figure as the default value for the ``solutions`` parameter is
    ga_instance.plot_genes(graph_type="histogram", 
                           solutions='all')
 
-.. image:: https://user-images.githubusercontent.com/16560492/122477314-8007be80-cf95-11eb-9c95-da3f49204151.png
-   :alt: 
+|image11|
 
 All the previous figures can be created for only the best solutions by
 setting ``solutions="best"``.
+
+Pareto Front
+============
+
+.. _plotparetofrontcurve:
+
+``plot_pareto_front_curve()``
+-----------------------------
+
+The ``plot_pareto_front_curve()`` method creates the Pareto front curve
+for multi-objective optimization problems. It creates, shows, and
+returns a figure that shows the Pareto front curve and points
+representing the fitness. It only works when 2 objectives are used.
+
+It works only after completing at least 1 generation. If no generation
+is completed (at least 1), an exception is raised.
+
+This method accepts the following parameters:
+
+1.  ``title``: Title of the figure.
+
+2.  ``xlabel``: X-axis label.
+
+3.  ``ylabel``: Y-axis label.
+
+4.  ``linewidth``: Line width of the plot. Defaults to ``3``.
+
+5.  ``font_size``: Font size for the labels and title. Defaults to
+    ``14``.
+
+6.  ``label``: The label used for the legend.
+
+7.  ``color``: Color of the plot which defaults to the royal blue color
+    ``#FF6347``.
+
+8.  ``color_fitness``: Color of the fitness points which defaults to the
+    tomato red color ``#4169E1``.
+
+9.  ``grid``: Either ``True`` or ``False`` to control the visibility of
+    the grid.
+
+10. ``alpha``: The transparency of the pareto front curve.
+
+11. ``marker``: The marker of the fitness points.
+
+12. ``save_dir``: Directory to save the figure.
+
+This is an example of calling the ``plot_pareto_front_curve()`` method.
+
+.. code:: python
+
+   ga_instance.plot_pareto_front_curve()
+
+|image12|
+
+.. |image1| image:: https://user-images.githubusercontent.com/16560492/122472609-d02f5280-cf8e-11eb-88a7-f9366ff6e7c6.png
+.. |image2| image:: https://user-images.githubusercontent.com/16560492/122473159-75e2c180-cf8f-11eb-942d-31279b286dbd.png
+.. |image3| image:: https://user-images.githubusercontent.com/16560492/122473340-b7736c80-cf8f-11eb-89c5-4f7db3b653cc.png
+.. |image4| image:: https://user-images.githubusercontent.com/16560492/122475815-3322e880-cf93-11eb-9648-bf66f823234b.png
+.. |image5| image:: https://user-images.githubusercontent.com/16560492/122476108-adec0380-cf93-11eb-80ac-7588bf90492f.png
+.. |image6| image:: https://user-images.githubusercontent.com/16560492/122476173-c2c89700-cf93-11eb-9e77-d39737cd3a96.png
+.. |image7| image:: https://user-images.githubusercontent.com/16560492/122477158-4a62d580-cf95-11eb-8c93-9b6e74cb814c.png
+.. |image8| image:: https://user-images.githubusercontent.com/16560492/122477273-73836600-cf95-11eb-828f-f357c7b0f815.png
+.. |image9| image:: https://user-images.githubusercontent.com/16560492/122477370-99106f80-cf95-11eb-8643-865b55e6b844.png
+.. |image10| image:: https://user-images.githubusercontent.com/16560492/122479260-beeb4380-cf98-11eb-8f08-23707929b12c.png
+.. |image11| image:: https://user-images.githubusercontent.com/16560492/122477314-8007be80-cf95-11eb-9c95-da3f49204151.png
+.. |image12| image:: https://github.com/user-attachments/assets/606d853c-7370-41a0-8ddb-857a4c6c7fb9
