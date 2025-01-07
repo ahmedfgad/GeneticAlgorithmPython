@@ -3,8 +3,17 @@ The pygad.visualize.plot module has methods to create plots.
 """
 
 import numpy
-import matplotlib.pyplot
+# import matplotlib.pyplot
 import pygad
+
+def get_matplotlib():
+    # Importing matplotlib.pyplot at the module scope causes performance issues.
+    # This causes matplotlib.pyplot to be imported once pygad is imported.
+    # An efficient approach is to import matplotlib.pyplot only when needed.
+    # Inside each function, call get_matplotlib() to return the library object.
+    # If a function called get_matplotlib() once, then the library object is reused.
+    import matplotlib.pyplot as matplt
+    return matplt
 
 class Plot:
 
@@ -43,7 +52,9 @@ class Plot:
             self.logger.error("The plot_fitness() (i.e. plot_result()) method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
             raise RuntimeError("The plot_fitness() (i.e. plot_result()) method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
 
-        fig = matplotlib.pyplot.figure()
+        matplt = get_matplotlib()
+
+        fig = matplt.figure()
         if type(self.best_solutions_fitness[0]) in [list, tuple, numpy.ndarray] and len(self.best_solutions_fitness[0]) > 1:
             # Multi-objective optimization problem.
             if type(linewidth) in pygad.GA.supported_int_float_types:
@@ -70,18 +81,18 @@ class Plot:
                 # Return the fitness values for the current objective function across all best solutions acorss all generations.
                 fitness = numpy.array(self.best_solutions_fitness)[:, objective_idx]
                 if plot_type == "plot":
-                    matplotlib.pyplot.plot(fitness, 
+                    matplt.plot(fitness, 
                                            linewidth=current_linewidth, 
                                            color=current_color,
                                            label=current_label)
                 elif plot_type == "scatter":
-                    matplotlib.pyplot.scatter(range(len(fitness)), 
+                    matplt.scatter(range(len(fitness)), 
                                               fitness, 
                                               linewidth=current_linewidth, 
                                               color=current_color,
                                               label=current_label)
                 elif plot_type == "bar":
-                    matplotlib.pyplot.bar(range(len(fitness)), 
+                    matplt.bar(range(len(fitness)), 
                                           fitness, 
                                           linewidth=current_linewidth, 
                                           color=current_color,
@@ -89,29 +100,29 @@ class Plot:
         else:
             # Single-objective optimization problem.
             if plot_type == "plot":
-                matplotlib.pyplot.plot(self.best_solutions_fitness, 
+                matplt.plot(self.best_solutions_fitness, 
                                        linewidth=linewidth, 
                                        color=color)
             elif plot_type == "scatter":
-                matplotlib.pyplot.scatter(range(len(self.best_solutions_fitness)), 
+                matplt.scatter(range(len(self.best_solutions_fitness)), 
                                           self.best_solutions_fitness, 
                                           linewidth=linewidth, 
                                           color=color)
             elif plot_type == "bar":
-                matplotlib.pyplot.bar(range(len(self.best_solutions_fitness)), 
+                matplt.bar(range(len(self.best_solutions_fitness)), 
                                       self.best_solutions_fitness, 
                                       linewidth=linewidth, 
                                       color=color)
-        matplotlib.pyplot.title(title, fontsize=font_size)
-        matplotlib.pyplot.xlabel(xlabel, fontsize=font_size)
-        matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
+        matplt.title(title, fontsize=font_size)
+        matplt.xlabel(xlabel, fontsize=font_size)
+        matplt.ylabel(ylabel, fontsize=font_size)
         # Create a legend out of the labels.
-        matplotlib.pyplot.legend()
+        matplt.legend()
 
         if not save_dir is None:
-            matplotlib.pyplot.savefig(fname=save_dir, 
+            matplt.savefig(fname=save_dir, 
                                       bbox_inches='tight')
-        matplotlib.pyplot.show()
+        matplt.show()
 
         return fig
 
@@ -166,21 +177,23 @@ class Plot:
             generation_num_unique_solutions = len_after - len_before
             num_unique_solutions_per_generation.append(generation_num_unique_solutions)
 
-        fig = matplotlib.pyplot.figure()
+        matplt = get_matplotlib()
+
+        fig = matplt.figure()
         if plot_type == "plot":
-            matplotlib.pyplot.plot(num_unique_solutions_per_generation, linewidth=linewidth, color=color)
+            matplt.plot(num_unique_solutions_per_generation, linewidth=linewidth, color=color)
         elif plot_type == "scatter":
-            matplotlib.pyplot.scatter(range(self.generations_completed), num_unique_solutions_per_generation, linewidth=linewidth, color=color)
+            matplt.scatter(range(self.generations_completed), num_unique_solutions_per_generation, linewidth=linewidth, color=color)
         elif plot_type == "bar":
-            matplotlib.pyplot.bar(range(self.generations_completed), num_unique_solutions_per_generation, linewidth=linewidth, color=color)
-        matplotlib.pyplot.title(title, fontsize=font_size)
-        matplotlib.pyplot.xlabel(xlabel, fontsize=font_size)
-        matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
+            matplt.bar(range(self.generations_completed), num_unique_solutions_per_generation, linewidth=linewidth, color=color)
+        matplt.title(title, fontsize=font_size)
+        matplt.xlabel(xlabel, fontsize=font_size)
+        matplt.ylabel(ylabel, fontsize=font_size)
 
         if not save_dir is None:
-            matplotlib.pyplot.savefig(fname=save_dir, 
+            matplt.savefig(fname=save_dir, 
                                       bbox_inches='tight')
-        matplotlib.pyplot.show()
+        matplt.show()
 
         return fig
 
@@ -251,7 +264,7 @@ class Plot:
             if num_cols == 0:
                 figsize = (10, 8)
                 # There is only a single gene
-                fig, ax = matplotlib.pyplot.subplots(num_rows, figsize=figsize)
+                fig, ax = matplt.subplots(num_rows, figsize=figsize)
                 if plot_type == "plot":
                     ax.plot(solutions_to_plot[:, 0], linewidth=linewidth, color=fill_color)
                 elif plot_type == "scatter":
@@ -260,7 +273,7 @@ class Plot:
                     ax.bar(range(self.generations_completed + 1), solutions_to_plot[:, 0], linewidth=linewidth, color=fill_color)
                 ax.set_xlabel(0, fontsize=font_size)
             else:
-                fig, axs = matplotlib.pyplot.subplots(num_rows, num_cols)
+                fig, axs = matplt.subplots(num_rows, num_cols)
     
                 if num_cols == 1 and num_rows == 1:
                     fig.set_figwidth(5 * num_cols)
@@ -297,10 +310,10 @@ class Plot:
                             gene_idx += 1
     
             fig.suptitle(title, fontsize=font_size, y=1.001)
-            matplotlib.pyplot.tight_layout()
+            matplt.tight_layout()
 
         elif graph_type == "boxplot":
-            fig = matplotlib.pyplot.figure(1, figsize=(0.7*self.num_genes, 6))
+            fig = matplt.figure(1, figsize=(0.7*self.num_genes, 6))
 
             # Create an axes instance
             ax = fig.add_subplot(111)
@@ -323,10 +336,10 @@ class Plot:
             for cap in boxeplots['caps']:
                 cap.set(color=color, linewidth=linewidth)
     
-            matplotlib.pyplot.title(title, fontsize=font_size)
-            matplotlib.pyplot.xlabel(xlabel, fontsize=font_size)
-            matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
-            matplotlib.pyplot.tight_layout()
+            matplt.title(title, fontsize=font_size)
+            matplt.xlabel(xlabel, fontsize=font_size)
+            matplt.ylabel(ylabel, fontsize=font_size)
+            matplt.tight_layout()
 
         elif graph_type == "histogram":
             # num_rows will always be >= 1
@@ -337,12 +350,12 @@ class Plot:
             if num_cols == 0:
                 figsize = (10, 8)
                 # There is only a single gene
-                fig, ax = matplotlib.pyplot.subplots(num_rows, 
+                fig, ax = matplt.subplots(num_rows, 
                                                      figsize=figsize)
                 ax.hist(solutions_to_plot[:, 0], color=fill_color)
                 ax.set_xlabel(0, fontsize=font_size)
             else:
-                fig, axs = matplotlib.pyplot.subplots(num_rows, num_cols)
+                fig, axs = matplt.subplots(num_rows, num_cols)
     
                 if num_cols == 1 and num_rows == 1:
                     fig.set_figwidth(4 * num_cols)
@@ -375,13 +388,13 @@ class Plot:
                             gene_idx += 1
     
             fig.suptitle(title, fontsize=font_size, y=1.001)
-            matplotlib.pyplot.tight_layout()
+            matplt.tight_layout()
 
         if not save_dir is None:
-            matplotlib.pyplot.savefig(fname=save_dir, 
+            matplt.savefig(fname=save_dir, 
                                       bbox_inches='tight')
 
-        matplotlib.pyplot.show()
+        matplt.show()
 
         return fig
 
@@ -449,12 +462,14 @@ class Plot:
         # Sort the Pareto front solutions (optional but can make the plot cleaner)
         sorted_pareto_front = sorted(zip(pareto_front_x, pareto_front_y))
 
+        matplt = get_matplotlib()
+
         # Plotting
-        fig = matplotlib.pyplot.figure()
+        fig = matplt.figure()
         # First, plot the scatter of all points (population)
         all_points_x = [self.last_generation_fitness[i][0] for i in range(self.sol_per_pop)]
         all_points_y = [self.last_generation_fitness[i][1] for i in range(self.sol_per_pop)]
-        matplotlib.pyplot.scatter(all_points_x, 
+        matplt.scatter(all_points_x, 
                                   all_points_y, 
                                   marker=marker,
                                   color=color_fitness, 
@@ -463,7 +478,7 @@ class Plot:
 
         # Then, plot the Pareto front as a curve
         pareto_front_x_sorted, pareto_front_y_sorted = zip(*sorted_pareto_front)
-        matplotlib.pyplot.plot(pareto_front_x_sorted, 
+        matplt.plot(pareto_front_x_sorted, 
                                pareto_front_y_sorted, 
                                marker=marker, 
                                label=label, 
@@ -471,17 +486,17 @@ class Plot:
                                color=color, 
                                linewidth=linewidth)
 
-        matplotlib.pyplot.title(title, fontsize=font_size)
-        matplotlib.pyplot.xlabel(xlabel, fontsize=font_size)
-        matplotlib.pyplot.ylabel(ylabel, fontsize=font_size)
-        matplotlib.pyplot.legend()
+        matplt.title(title, fontsize=font_size)
+        matplt.xlabel(xlabel, fontsize=font_size)
+        matplt.ylabel(ylabel, fontsize=font_size)
+        matplt.legend()
 
-        matplotlib.pyplot.grid(grid)
+        matplt.grid(grid)
 
         if not save_dir is None:
-            matplotlib.pyplot.savefig(fname=save_dir, 
+            matplt.savefig(fname=save_dir, 
                                       bbox_inches='tight')
 
-        matplotlib.pyplot.show()
+        matplt.show()
 
         return fig

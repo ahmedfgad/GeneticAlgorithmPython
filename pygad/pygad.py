@@ -1211,7 +1211,7 @@ class GA(utils.parent_selection.ParentSelection,
                                 self.valid_parameters = False
                                 raise ValueError(f"In the 'stop_criteria' parameter, the supported stop words are {self.supported_stop_words} but '{stop_word}' found.")
 
-                            if number.replace(".", "").isnumeric():
+                            if number.replace(".", "").replace("-", "").isnumeric():
                                 number = float(number)
                             else:
                                 self.valid_parameters = False
@@ -1306,6 +1306,8 @@ class GA(utils.parent_selection.ParentSelection,
             # A list holding the offspring after applying mutation in the last generation.
             self.last_generation_offspring_mutation = None
             # Holds the fitness values of one generation before the fitness values saved in the last_generation_fitness attribute. Added in PyGAD 2.16.2.
+            # They are used inside the cal_pop_fitness() method to fetch the fitness of the parents in one generation before the latest generation.
+            # This is to avoid re-calculating the fitness for such parents again.
             self.previous_generation_fitness = None
             # Added in PyGAD 2.18.0. A NumPy array holding the elitism of the current generation according to the value passed in the 'keep_elitism' parameter. It works only if the 'keep_elitism' parameter has a non-zero value.
             self.last_generation_elitism = None
@@ -1640,14 +1642,12 @@ class GA(utils.parent_selection.ParentSelection,
             # 'last_generation_parents_as_list' is the list version of 'self.last_generation_parents'
             # It is used to return the parent index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
             if self.last_generation_parents is not None:
-                last_generation_parents_as_list = [
-                    list(gen_parent) for gen_parent in self.last_generation_parents]
+                last_generation_parents_as_list = self.last_generation_parents.tolist()
 
             # 'last_generation_elitism_as_list' is the list version of 'self.last_generation_elitism'
             # It is used to return the elitism index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
             if self.last_generation_elitism is not None:
-                last_generation_elitism_as_list = [
-                    list(gen_elitism) for gen_elitism in self.last_generation_elitism]
+                last_generation_elitism_as_list = self.last_generation_elitism.tolist()
 
             pop_fitness = ["undefined"] * len(self.population)
             if self.parallel_processing is None:
@@ -1659,6 +1659,12 @@ class GA(utils.parent_selection.ParentSelection,
                     # Make sure that both the solution and 'self.solutions' are of type 'list' not 'numpy.ndarray'.
                     # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(self.solutions == numpy.array(sol), axis=1)))
                     # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(numpy.equal(self.solutions, numpy.array(sol)), axis=1)))
+
+                    # Make sure self.best_solutions is a list of lists before proceeding.
+                    # Because the second condition expects that best_solutions is a list of lists.
+                    if type(self.best_solutions) is numpy.ndarray:
+                        self.best_solutions = self.best_solutions.tolist()
+
                     if (self.save_solutions) and (len(self.solutions) > 0) and (list(sol) in self.solutions):
                         solution_idx = self.solutions.index(list(sol))
                         fitness = self.solutions_fitness[solution_idx]
@@ -1867,13 +1873,13 @@ class GA(utils.parent_selection.ParentSelection,
 
             # self.best_solutions: Holds the best solution in each generation.
             if type(self.best_solutions) is numpy.ndarray:
-                self.best_solutions = list(self.best_solutions)
+                self.best_solutions = self.best_solutions.tolist()
             # self.best_solutions_fitness: A list holding the fitness value of the best solution for each generation.
             if type(self.best_solutions_fitness) is numpy.ndarray:
                 self.best_solutions_fitness = list(self.best_solutions_fitness)
             # self.solutions: Holds the solutions in each generation.
             if type(self.solutions) is numpy.ndarray:
-                self.solutions = list(self.solutions)
+                self.solutions = self.solutions.tolist()
             # self.solutions_fitness: Holds the fitness of the solutions in each generation.
             if type(self.solutions_fitness) is numpy.ndarray:
                 self.solutions_fitness = list(self.solutions_fitness)
@@ -1913,34 +1919,8 @@ class GA(utils.parent_selection.ParentSelection,
                 self.best_solutions.append(list(best_solution))
 
             for generation in range(generation_first_idx, generation_last_idx):
-                if not (self.on_fitness is None):
-                    on_fitness_output = self.on_fitness(self, 
-                                                        self.last_generation_fitness)
 
-                    if on_fitness_output is None:
-                        pass
-                    else:
-                        if type(on_fitness_output) in [tuple, list, numpy.ndarray, range]:
-                            on_fitness_output = numpy.array(on_fitness_output)
-                            if on_fitness_output.shape == self.last_generation_fitness.shape:
-                                self.last_generation_fitness = on_fitness_output
-                            else:
-                                raise ValueError(f"Size mismatch between the output of on_fitness() {on_fitness_output.shape} and the expected fitness output {self.last_generation_fitness.shape}.")
-                        else:
-                            raise ValueError(f"The output of on_fitness() is expected to be tuple/list/range/numpy.ndarray but {type(on_fitness_output)} found.")
-
-                # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
-                self.best_solutions_fitness.append(best_solution_fitness)
-
-                # Appending the solutions in the current generation to the solutions list.
-                if self.save_solutions:
-                    # self.solutions.extend(self.population.copy())
-                    population_as_list = self.population.copy()
-                    population_as_list = [list(item)
-                                        for item in population_as_list]
-                    self.solutions.extend(population_as_list)
-
-                    self.solutions_fitness.extend(self.last_generation_fitness)
+                self.run_loop_head(best_solution_fitness)
 
                 # Call the 'run_select_parents()' method to select the parents.
                 # It edits these 2 instance attributes:
@@ -1963,7 +1943,6 @@ class GA(utils.parent_selection.ParentSelection,
                 # It edits this instance attribute:
                     # 1) population: A NumPy array of the population of solutions/chromosomes.
                 self.run_update_population()
-
 
                 # The generations_completed attribute holds the number of the last completed generation.
                 self.generations_completed = generation + 1
@@ -2078,12 +2057,44 @@ class GA(utils.parent_selection.ParentSelection,
             # Converting the 'best_solutions' list into a NumPy array.
             self.best_solutions = numpy.array(self.best_solutions)
 
+            # Update previous_generation_fitness because it is used to get the fitness of the parents.
+            self.previous_generation_fitness = self.last_generation_fitness.copy()
+
             # Converting the 'solutions' list into a NumPy array.
             # self.solutions = numpy.array(self.solutions)
         except Exception as ex:
             self.logger.exception(ex)
             # sys.exit(-1)
             raise ex
+
+    def run_loop_head(self, best_solution_fitness):
+        if not (self.on_fitness is None):
+            on_fitness_output = self.on_fitness(self, 
+                                                self.last_generation_fitness)
+
+            if on_fitness_output is None:
+                pass
+            else:
+                if type(on_fitness_output) in [tuple, list, numpy.ndarray, range]:
+                    on_fitness_output = numpy.array(on_fitness_output)
+                    if on_fitness_output.shape == self.last_generation_fitness.shape:
+                        self.last_generation_fitness = on_fitness_output
+                    else:
+                        raise ValueError(f"Size mismatch between the output of on_fitness() {on_fitness_output.shape} and the expected fitness output {self.last_generation_fitness.shape}.")
+                else:
+                    raise ValueError(f"The output of on_fitness() is expected to be tuple/list/range/numpy.ndarray but {type(on_fitness_output)} found.")
+
+        # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
+        self.best_solutions_fitness.append(best_solution_fitness)
+
+        # Appending the solutions in the current generation to the solutions list.
+        if self.save_solutions:
+            # self.solutions.extend(self.population.copy())
+            population_as_list = self.population.copy()
+            population_as_list = [list(item) for item in population_as_list]
+            self.solutions.extend(population_as_list)
+
+            self.solutions_fitness.extend(self.last_generation_fitness)
 
     def run_select_parents(self, call_on_parents=True):
         """
@@ -2333,6 +2344,7 @@ class GA(utils.parent_selection.ParentSelection,
             -best_solution_fitness: Fitness value of the best solution.
             -best_match_idx: Index of the best solution in the current population.
         """
+
         try:
             if pop_fitness is None:
                 # If the 'pop_fitness' parameter is not passed, then we have to call the 'cal_pop_fitness()' method to calculate the fitness of all solutions in the lastest population.
