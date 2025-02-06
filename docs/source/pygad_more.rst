@@ -144,8 +144,7 @@ This is the figure created by the ``plot_fitness()`` method. The fitness
 of the first objective has the green color. The blue color is used for
 the second objective fitness.
 
-.. image:: https://github.com/ahmedfgad/GeneticAlgorithmPython/assets/16560492/7896f8d8-01c5-4ff9-8d15-52191c309b63
-   :alt: 
+|image1|
 
 .. _limit-the-gene-value-range-using-the-genespace-parameter:
 
@@ -477,28 +476,65 @@ reached ``127.4`` or if the fitness saturates for ``15`` generations.
 
 .. code:: python
 
-   import pygad
-   import numpy
-
-   equation_inputs = [4, -2, 3.5, 8, 9, 4]
-   desired_output = 44
-
-   def fitness_func(ga_instance, solution, solution_idx):
-       output = numpy.sum(solution * equation_inputs)
-
-       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
-
-       return fitness
-
-   ga_instance = pygad.GA(num_generations=200,
-                          sol_per_pop=10,
-                          num_parents_mating=4,
-                          num_genes=len(equation_inputs),
-                          fitness_func=fitness_func,
-                          stop_criteria=["reach_127.4", "saturate_15"])
-
-   ga_instance.run()
+   import pygad
+   import numpy
+   
+   equation_inputs = [4, -2, 3.5, 8, 9, 4]
+   desired_output = 44
+   
+   def fitness_func(ga_instance, solution, solution_idx):
+       output = numpy.sum(solution * equation_inputs)
+   
+       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
+   
+       return fitness
+   
+   ga_instance = pygad.GA(num_generations=200,
+                          sol_per_pop=10,
+                          num_parents_mating=4,
+                          num_genes=len(equation_inputs),
+                          fitness_func=fitness_func,
+                          stop_criteria=["reach_127.4", "saturate_15"])
+   
+   ga_instance.run()
    print(f"Number of generations passed is {ga_instance.generations_completed}")
+
+Multi-Objective Stop Criteria
+-----------------------------
+
+When multi-objective is used, then there are 2 options to use the
+``stop_criteria`` parameter with the ``reach`` keyword:
+
+1. Pass a single value to use along the ``reach`` keyword to use across
+   all the objectives.
+
+2. Pass multiple values along the ``reach`` keyword. But the number of
+   values must equal the number of objectives.
+
+For the ``saturate`` keyword, it is independent to the number of
+objectives.
+
+Suppose there are 3 objectives, this is a working example. It stops when
+the fitness value of the 3 objectives reach or exceed 10, 20, and 30,
+respectively.
+
+.. code:: python
+
+   stop_criteria='reach_10_20_30'
+
+More than one criterion can be used together. In this case, pass the
+``stop_criteria`` parameter as an iterable. This is an example. It stops
+when either of these 2 conditions hold:
+
+1. The fitness values of the 3 objectives reach or exceed 10, 20, and
+   30, respectively.
+
+2. The fitness values of the 3 objectives reach or exceed 90, -5.7, and
+   10, respectively.
+
+.. code:: python
+
+   stop_criteria=['reach_10_20_30', 'reach_90_-5.7_10']
 
 Elitism Selection
 =================
@@ -560,8 +596,7 @@ offspring will be created.
 
    ga_instance.run()
 
-.. image:: https://user-images.githubusercontent.com/16560492/189273225-67ffad41-97ab-45e1-9324-429705e17b20.png
-   :alt: 
+|image2|
 
 Note that if the ``keep_elitism`` parameter is effective (i.e. is
 assigned a positive integer, not zero), then the ``keep_parents``
@@ -962,11 +997,11 @@ room to solve the duplicates between the 2 genes.
 In our example, duplicates between the second and third genes can be
 solved by, for example,:
 
--  Changing the first gene from 3 to 2 then changing the second gene
-   from 4 to 3.
+- Changing the first gene from 3 to 2 then changing the second gene from
+  4 to 3.
 
--  Or changing the fourth gene from 5 to 6 then changing the third gene
-   from 4 to 5.
+- Or changing the fourth gene from 5 to 6 then changing the third gene
+  from 4 to 5.
 
 Generally, this is how to solve such duplicates:
 
@@ -1027,11 +1062,11 @@ Example 2:
 
 The quick summary is:
 
--  Change the value of the first gene from 1 to 0. The solution becomes
-   [0, 2, 2, 3].
+- Change the value of the first gene from 1 to 0. The solution becomes
+  [0, 2, 2, 3].
 
--  Change the value of the second gene from 2 to 1. The solution becomes
-   [0, 1, 2, 3]. The duplicate is solved.
+- Change the value of the second gene from 2 to 1. The solution becomes
+  [0, 1, 2, 3]. The duplicate is solved.
 
 .. _more-about-the-genetype-parameter:
 
@@ -1391,19 +1426,19 @@ These are 3 possible values for the ``parallel_processing`` parameter:
 These are examples of the values assigned to the ``parallel_processing``
 parameter:
 
--  ``parallel_processing=4``: Because the parameter is assigned a
-   positive integer, this means parallel processing is activated where 4
-   threads are used.
+- ``parallel_processing=4``: Because the parameter is assigned a
+  positive integer, this means parallel processing is activated where 4
+  threads are used.
 
--  ``parallel_processing=["thread", 5]``: Use parallel processing with 5
-   threads. This is identical to ``parallel_processing=5``.
+- ``parallel_processing=["thread", 5]``: Use parallel processing with 5
+  threads. This is identical to ``parallel_processing=5``.
 
--  ``parallel_processing=["process", 8]``: Use parallel processing with
-   8 processes.
+- ``parallel_processing=["process", 8]``: Use parallel processing with 8
+  processes.
 
--  ``parallel_processing=["process", 0]``: As the second element is
-   given the value 0, this means do not use parallel processing. This is
-   identical to ``parallel_processing=None``.
+- ``parallel_processing=["process", 0]``: As the second element is given
+  the value 0, this means do not use parallel processing. This is
+  identical to ``parallel_processing=None``.
 
 Examples
 --------
@@ -1554,28 +1589,27 @@ parameters, etc.
 
 This method accepts the following parameters:
 
--  ``line_length=70``: An integer representing the length of the single
-   line in characters.
+- ``line_length=70``: An integer representing the length of the single
+  line in characters.
 
--  ``fill_character=" "``: A character to fill the lines.
+- ``fill_character=" "``: A character to fill the lines.
 
--  ``line_character="-"``: A character for creating a line separator.
+- ``line_character="-"``: A character for creating a line separator.
 
--  ``line_character2="="``: A secondary character to create a line
-   separator.
+- ``line_character2="="``: A secondary character to create a line
+  separator.
 
--  ``columns_equal_len=False``: The table rows are split into
-   equal-sized columns or split subjective to the width needed.
+- ``columns_equal_len=False``: The table rows are split into equal-sized
+  columns or split subjective to the width needed.
 
--  ``print_step_parameters=True``: Whether to print extra parameters
-   about each step inside the step. If ``print_step_parameters=False``
-   and ``print_parameters_summary=True``, then the parameters of each
-   step are printed at the end of the table.
+- ``print_step_parameters=True``: Whether to print extra parameters
+  about each step inside the step. If ``print_step_parameters=False``
+  and ``print_parameters_summary=True``, then the parameters of each
+  step are printed at the end of the table.
 
--  ``print_parameters_summary=True``: Whether to print parameters
-   summary at the end of the table. If ``print_step_parameters=False``,
-   then the parameters of each step are printed at the end of the table
-   too.
+- ``print_parameters_summary=True``: Whether to print parameters summary
+  at the end of the table. If ``print_step_parameters=False``, then the
+  parameters of each step are printed at the end of the table too.
 
 This is a quick example to create a PyGAD example.
 
@@ -2133,19 +2167,19 @@ Qiu <https://github.com/linanqiu>`__ for opening the `GitHub issue
 
 Its values can be:
 
--  ``1`` or ``None``: If the ``fitness_batch_size`` parameter is
-   assigned the value ``1`` or ``None`` (default), then the normal flow
-   is used where the fitness function is called for each individual
-   solution. That is if there are 15 solutions, then the fitness
-   function is called 15 times.
+- ``1`` or ``None``: If the ``fitness_batch_size`` parameter is assigned
+  the value ``1`` or ``None`` (default), then the normal flow is used
+  where the fitness function is called for each individual solution.
+  That is if there are 15 solutions, then the fitness function is called
+  15 times.
 
--  ``1 < fitness_batch_size <= sol_per_pop``: If the
-   ``fitness_batch_size`` parameter is assigned a value satisfying this
-   condition ``1 < fitness_batch_size <= sol_per_pop``, then the
-   solutions are grouped into batches of size ``fitness_batch_size`` and
-   the fitness function is called once for each batch. In this case, the
-   fitness function must return a list/tuple/numpy.ndarray with a length
-   equal to the number of solutions passed.
+- ``1 < fitness_batch_size <= sol_per_pop``: If the
+  ``fitness_batch_size`` parameter is assigned a value satisfying this
+  condition ``1 < fitness_batch_size <= sol_per_pop``, then the
+  solutions are grouped into batches of size ``fitness_batch_size`` and
+  the fitness function is called once for each batch. In this case, the
+  fitness function must return a list/tuple/numpy.ndarray with a length
+  equal to the number of solutions passed.
 
 .. _example-without-fitnessbatchsize-parameter:
 
@@ -2415,3 +2449,6 @@ the ``pygad.GA`` class as the last parameter.
                           fitness_func=Test().fitness_func)
        
    ga_instance.run()
+
+.. |image1| image:: https://github.com/ahmedfgad/GeneticAlgorithmPython/assets/16560492/7896f8d8-01c5-4ff9-8d15-52191c309b63
+.. |image2| image:: https://user-images.githubusercontent.com/16560492/189273225-67ffad41-97ab-45e1-9324-429705e17b20.png
