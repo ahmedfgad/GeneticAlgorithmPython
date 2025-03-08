@@ -1147,6 +1147,21 @@ class GA(utils.parent_selection.ParentSelection,
                 self.valid_parameters = False
                 raise TypeError(f"The value passed to the 'save_solutions' parameter must be of type bool but {type(save_solutions)} found.")
 
+            def validate_multi_stop_criteria(self, stop_word, number):
+                if stop_word == 'reach':
+                    pass
+                else:
+                    self.valid_parameters = False
+                    raise ValueError(f"Passing multiple numbers following the keyword in the 'stop_criteria' parameter is expected only with the 'reach' keyword but the keyword ({stop_word}) found.")
+
+                for idx, num in enumerate(number):
+                    if num.replace(".", "").replace("-", "").isnumeric():
+                        number[idx] = float(num)
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError(f"The value(s) following the stop word in the 'stop_criteria' parameter must be numeric but the value ({num}) of type {type(num)} found.")
+                return number
+
             self.stop_criteria = []
             self.supported_stop_words = ["reach", "saturate"]
             if stop_criteria is None:
@@ -1168,7 +1183,7 @@ class GA(utils.parent_selection.ParentSelection,
                 if len(criterion) == 2:
                     # There is only a single number.
                     number = number[0]
-                    if number.replace(".", "").isnumeric():
+                    if number.replace(".", "").replace("-", "").isnumeric():
                         number = float(number)
                     else:
                         self.valid_parameters = False
@@ -1176,21 +1191,8 @@ class GA(utils.parent_selection.ParentSelection,
 
                     self.stop_criteria.append([stop_word, number])
                 elif len(criterion) > 2:
-                    if stop_word == 'reach':
-                        pass
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError(f"Passing multiple numbers following the keyword in the 'stop_criteria' parameter is expected only with the 'reach' keyword but the keyword ({stop_word}) found.")
-
-                    for idx, num in enumerate(number):
-                        if num.replace(".", "").isnumeric():
-                            number[idx] = float(num)
-                        else:
-                            self.valid_parameters = False
-                            raise ValueError(f"The value(s) following the stop word in the 'stop_criteria' parameter must be numeric but the value ({num}) of type {type(num)} found.")
-
+                    number = validate_multi_stop_criteria(self, stop_word, number)
                     self.stop_criteria.append([stop_word] + number)
-
                 else:
                     self.valid_parameters = False
                     raise ValueError(f"For format of a single criterion in the 'stop_criteria' parameter is 'word_number' but '{stop_criteria}' found.")
@@ -1201,10 +1203,11 @@ class GA(utils.parent_selection.ParentSelection,
                 for idx, val in enumerate(stop_criteria):
                     if type(val) is str:
                         criterion = val.split("_")
+                        stop_word = criterion[0]
+                        number = criterion[1:]
                         if len(criterion) == 2:
-                            stop_word = criterion[0]
-                            number = criterion[1]
-
+                            # There is only a single number.
+                            number = number[0]
                             if stop_word in self.supported_stop_words:
                                 pass
                             else:
@@ -1218,7 +1221,9 @@ class GA(utils.parent_selection.ParentSelection,
                                 raise ValueError(f"The value following the stop word in the 'stop_criteria' parameter must be a number but the value ({number}) of type {type(number)} found.")
 
                             self.stop_criteria.append([stop_word, number])
-
+                        elif len(criterion) > 2:
+                            number = validate_multi_stop_criteria(self, stop_word, number)
+                            self.stop_criteria.append([stop_word] + number)
                         else:
                             self.valid_parameters = False
                             raise ValueError(f"The format of a single criterion in the 'stop_criteria' parameter is 'word_number' but {criterion} found.")

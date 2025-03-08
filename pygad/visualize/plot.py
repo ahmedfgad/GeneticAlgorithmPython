@@ -235,6 +235,8 @@ class Plot:
             self.logger.error("The plot_genes() method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
             raise RuntimeError("The plot_genes() method can only be called after completing at least 1 generation but ({self.generations_completed}) is completed.")
 
+        matplt = get_matplotlib()
+
         if type(solutions) is str:
             if solutions == 'all':
                 if self.save_solutions:

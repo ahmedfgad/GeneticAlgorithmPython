@@ -2,6 +2,8 @@
 
 [PyGAD](https://pypi.org/project/pygad) is an open-source easy-to-use Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. It supports Keras and PyTorch. PyGAD supports optimizing both single-objective and multi-objective problems.
 
+> Try the [Optimization Gadget](https://optimgadget.com), a free cloud-based tool powered by PyGAD. It simplifies optimization by reducing or eliminating the need for coding while providing insightful visualizations.
+
 Check documentation of the [PyGAD](https://pygad.readthedocs.io/en/latest).
 
 [![PyPI Downloads](https://pepy.tech/badge/pygad)](https://pepy.tech/project/pygad) [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/pygad.svg?label=Conda%20Downloads)](

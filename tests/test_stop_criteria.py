@@ -144,6 +144,43 @@ def test_number_calls_fitness_function_parallel_processing_process_5_patch_4_mul
                             fitness_batch_size=4,
                             parallel_processing=['process', 5])
 
+# Stop Criteria
+def test_number_calls_fitness_function_multi_objective_stop_criteria_str_single_value():
+    multi_objective_problem(multi_objective=True,
+                            stop_criteria='reach_10')
+
+def test_number_calls_fitness_function_multi_objective_stop_criteria_str():
+    multi_objective_problem(multi_objective=True,
+                            stop_criteria='reach_10_20')
+
+def test_number_calls_fitness_function_multi_objective_stop_criteria_str_decimal():
+    multi_objective_problem(multi_objective=True,
+                            stop_criteria='reach_-1.0_0.5')
+
+def test_number_calls_fitness_function_multi_objective_stop_criteria_list():
+    multi_objective_problem(multi_objective=True,
+                            stop_criteria=['reach_10_20', 'reach_5_2'])
+
+def test_number_calls_fitness_function_multi_objective_stop_criteria_list_decimal():
+    multi_objective_problem(multi_objective=True,
+                            stop_criteria=['reach_-1.0_0.5', 'reach_5_-2.8'])
+
+def test_number_calls_fitness_function_single_objective_stop_criteria_str():
+    multi_objective_problem(multi_objective=True,
+                            stop_criteria='reach_10')
+
+def test_number_calls_fitness_function_single_objective_stop_criteria_str_decimal():
+    multi_objective_problem(multi_objective=True,
+                            stop_criteria='reach_-1.7')
+
+def test_number_calls_fitness_function_single_objective_stop_criteria_list():
+    multi_objective_problem(multi_objective=True,
+                            stop_criteria=['reach_10', 'reach_5'])
+
+def test_number_calls_fitness_function_single_objective_stop_criteria_list_decimal():
+    multi_objective_problem(multi_objective=True,
+                            stop_criteria=['reach_-1.5', 'reach_-2.8'])
+
 if __name__ == "__main__":
     print()
     test_number_calls_fitness_function_no_parallel_processing()
@@ -172,3 +209,26 @@ if __name__ == "__main__":
     print()
     test_number_calls_fitness_function_parallel_processing_process_5_patch_4_multi_objective()
     print()
+
+    #### Multi-Objective Stop Criteria
+    test_number_calls_fitness_function_multi_objective_stop_criteria_str_single_value()
+    print()
+    test_number_calls_fitness_function_multi_objective_stop_criteria_str()
+    print()
+    test_number_calls_fitness_function_multi_objective_stop_criteria_str_decimal()
+    print()
+    test_number_calls_fitness_function_multi_objective_stop_criteria_list()
+    print()
+    test_number_calls_fitness_function_multi_objective_stop_criteria_list_decimal()
+    print()
+
+    #### Single-Objective Stop Criteria
+    test_number_calls_fitness_function_single_objective_stop_criteria_str()
+    print()
+    test_number_calls_fitness_function_single_objective_stop_criteria_str_decimal()
+    print()
+    test_number_calls_fitness_function_single_objective_stop_criteria_list()
+    print()
+    test_number_calls_fitness_function_single_objective_stop_criteria_list_decimal()
+    print()
+
