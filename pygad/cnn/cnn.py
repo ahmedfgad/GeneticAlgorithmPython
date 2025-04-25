@@ -143,7 +143,7 @@ def layers_weights_as_matrix(model, vector_weights):
     # Currently, the weights of the layers are in the reverse order. In other words, the weights of the first layer are at the last index of the 'network_weights' list while the weights of the last layer are at the first index.
     # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appears at index 0 of the list).
     network_weights.reverse()
-    return numpy.array(network_weights)
+    return numpy.array(network_weights, dtype=object)  # NEP 34: https://numpy.org/neps/nep-0034-infer-dtype-is-object.html
 
 def layers_weights_as_vector(model, initial=True):
 
