@@ -263,7 +263,7 @@ class Unique:
             selected_gene: The new (hopefully unique) value of the gene. If no unique value can be found, the original gene value is returned.
         """
 
-        values_to_select_from = list(set(list(some_gene_values)) - set(solution))
+        values_to_select_from = list(set(list(gene_values)) - set(solution))
     
         if len(values_to_select_from) == 0:
             # If there are no values, then keep the current gene value.
