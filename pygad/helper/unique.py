@@ -184,13 +184,9 @@ class Unique:
             all_gene_values = numpy.asarray(all_gene_values, 
                                             dtype[0])
 
-        values_to_select_from = list(set(list(all_gene_values)) - set(solution))
-    
-        if len(values_to_select_from) == 0:
-            # If there are no values, then keep the current gene value.
-            selected_value = solution[gene_index]
-        else:
-            selected_value = random.choice(values_to_select_from)
+        selected_value = self.select_unique_value(gene_values=all_gene_values, 
+                                                  solution=solution, 
+                                                  gene_index=gene_index)
 
         selected_value = dtype[0](selected_value)
     
@@ -224,39 +220,57 @@ class Unique:
         # The gene_type is of the form [type, precision]
         dtype = gene_type
 
-        for trial_index in range(num_trials):
-            temp_val = numpy.random.uniform(low=min_val,
-                                            high=max_val,
-                                            size=1)[0]
+        # We cannot have a list of all values out of a continous range.
+        # Solution is to create a subset (e.g. 100) of all the values.
+        some_gene_values = numpy.random.uniform(low=min_val,
+                                                high=max_val,
+                                                size=100)
 
-            # If mutation is by replacement, do not add the current gene value into the list.
-            # This is to avoid replacing the value by itself again. We are doing nothing in this case.
-            if mutation_by_replacement:
-                pass
-            else:
-                temp_val = temp_val + solution[gene_index]
+        # If mutation is by replacement, do not add the current gene value into the list.
+        # This is to avoid replacing the value by itself again. We are doing nothing in this case.
+        if mutation_by_replacement:
+            pass
+        else:
+            some_gene_values = some_gene_values + solution[gene_index]
 
-            if not dtype[1] is None:
-                # Precision is available and we have to round the number.
-                # Convert the data type and round the number.
-                temp_val = numpy.round(dtype[0](temp_val),
-                                       dtype[1])
-            else:
-                # There is no precision and rounding the number is not needed. The type is [type, None]
-                # Just convert the data type.
-                temp_val = dtype[0](temp_val)
+        if not dtype[1] is None:
+            # Precision is available and we have to round the number.
+            # Convert the data type and round the number.
+            some_gene_values = numpy.round(numpy.asarray(some_gene_values, 
+                                                         dtype[0]),
+                                           dtype[1])
+        else:
+            # There is no precision and rounding the number is not needed. The type is [type, None]
+            # Just convert the data type.
+            some_gene_values = numpy.asarray(some_gene_values, 
+                                             dtype[0])
 
-            if temp_val in solution and trial_index == (num_trials - 1):
-                # If there are no values, then keep the current gene value.
-                if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but cannot find a value to prevent duplicates.")
-                selected_value = solution[gene_index]
-            elif temp_val in solution:
-                # Keep trying in the other remaining trials.
-                continue
-            else:
-                # Unique gene value found.
-                selected_value = temp_val
-                break
+        selected_value = self.select_unique_value(gene_values=some_gene_values, 
+                                                  solution=solution, 
+                                                  gene_index=gene_index)
+        return selected_value
+
+    def select_unique_value(self, gene_values, solution, gene_index):
+
+        """
+        Select a unique value (if possible) from a list of gene values.
+
+        Args:
+            gene_values (NumPy Array): An array of values from which a unique value should be selected.
+            solution (list): A solution containing genes, potentially with duplicate values.
+
+        Returns:
+            selected_gene: The new (hopefully unique) value of the gene. If no unique value can be found, the original gene value is returned.
+        """
+
+        values_to_select_from = list(set(list(some_gene_values)) - set(solution))
+    
+        if len(values_to_select_from) == 0:
+            # If there are no values, then keep the current gene value.
+            if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but cannot find a value to prevent duplicates.")
+            selected_value = solution[gene_index]
+        else:
+            selected_value = random.choice(values_to_select_from)
 
         return selected_value
 
