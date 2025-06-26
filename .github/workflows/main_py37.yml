@@ -8,7 +8,7 @@ on:
 
 jobs:
   job_id_1:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     name: PyTest Workflow Job
 
     steps:
