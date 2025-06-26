@@ -352,7 +352,7 @@ class Mutation:
         Applies the random mutation the mutation probability. For each gene, if its probability is <= that mutation probability, then it will be mutated randomly.
         It accepts a single parameter:
             -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        It returns an array of the mutated offspring
         """
 
         # Random mutation changes one or more genes in each offspring randomly.

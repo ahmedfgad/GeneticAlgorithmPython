@@ -569,7 +569,7 @@ class GA(utils.parent_selection.ParentSelection,
                         if item and callable(item):
                             if item.__code__.co_argcount == 1:
                                 # Every callable is valid if it receives a single argument.
-                                # This argument represents the solution.
+                                # This argument represents the solution
                                 pass
                             else:
                                 self.valid_parameters = False
