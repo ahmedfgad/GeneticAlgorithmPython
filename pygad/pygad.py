@@ -49,6 +49,7 @@ class GA(utils.parent_selection.ParentSelection,
                  random_mutation_min_val=-1.0,
                  random_mutation_max_val=1.0,
                  gene_space=None,
+                 gene_constraint=None,
                  allow_duplicate_genes=True,
                  on_start=None,
                  on_fitness=None,
@@ -103,6 +104,8 @@ class GA(utils.parent_selection.ParentSelection,
         random_mutation_max_val: The maximum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to 1.0.
 
         gene_space: It accepts a list of all possible values of the gene. This list is used in the mutation step. Should be used only if the gene space is a set of discrete values. No need for the 2 parameters (random_mutation_min_val and random_mutation_max_val) if the parameter gene_space exists. Added in PyGAD 2.5.0. In PyGAD 2.11.0, the gene_space can be assigned a dict.
+
+        gene_constraint: It accepts a list of constraints for the genes. Each constraint is a Python function. Added in PyGAD 3.5.0.
 
         on_start: Accepts a function/method to be called only once before the genetic algorithm starts its evolution. If function, then it must accept a single parameter representing the instance of the genetic algorithm. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
         on_fitness: Accepts a function/method to be called after calculating the fitness values of all solutions in the population. If function, then it must accept 2 parameters: 1) a list of all solutions' fitness values 2) the instance of the genetic algorithm. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
@@ -558,13 +561,38 @@ class GA(utils.parent_selection.ParentSelection,
             self.random_mutation_min_val = random_mutation_min_val
             self.random_mutation_max_val = random_mutation_max_val
 
+            # Validate that gene_constraint is a list or tuple and every element inside it is either None or callable.
+            if gene_constraint:
+                if type(gene_constraint) in [list, tuple]:
+                    for constraint_idx, item in enumerate(gene_constraint):
+                        # Check whether the element is None or a callable.
+                        if item and callable(item):
+                            if item.__code__.co_argcount == 1:
+                                # Every callable is valid if it receives a single argument.
+                                # This argument represents the solution.
+                                pass
+                            else:
+                                self.valid_parameters = False
+                                raise ValueError(f"Every callable inside the gene_constraint parameter must accept a single argument representing the solution/chromosome. But the callable at index {constraint_idx} named '{item.__code__.co_name}' accepts {item.__code__.co_argcount} argument(s).")
+                        else:
+                            self.valid_parameters = False
+                            raise TypeError(f"The expected type of an element in the 'gene_constraint' parameter is None or a callable (e.g. function). But {item} at index {constraint_idx} of type {type(item)} found.")
+                else:
+                    self.valid_parameters = False
+                    raise TypeError(f"The expected type of the 'gene_constraint' parameter is either list or tuple. But the value {gene_constraint} of type {type(gene_constraint)} found.")
+            else:
+                # It is None.
+                pass
+
+            self.gene_constraint = gene_constraint
+
             # Validating the number of parents to be selected for mating (num_parents_mating)
             if num_parents_mating <= 0:
                 self.valid_parameters = False
                 raise ValueError(f"The number of parents mating (num_parents_mating) parameter must be > 0 but ({num_parents_mating}) found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n")
 
             # Validating the number of parents to be selected for mating: num_parents_mating
-            if (num_parents_mating > self.sol_per_pop):
+            if num_parents_mating > self.sol_per_pop:
                 self.valid_parameters = False
                 raise ValueError(f"The number of parents to select for mating ({num_parents_mating}) cannot be greater than the number of solutions in the population ({self.sol_per_pop}) (i.e., num_parents_mating must always be <= sol_per_pop).\n")
 
@@ -572,11 +600,11 @@ class GA(utils.parent_selection.ParentSelection,
 
             # crossover: Refers to the method that applies the crossover operator based on the selected type of crossover in the crossover_type property.
             # Validating the crossover type: crossover_type
-            if (crossover_type is None):
+            if crossover_type is None:
                 self.crossover = None
             elif inspect.ismethod(crossover_type):
                 # Check if the crossover_type is a method that accepts 4 paramaters.
-                if (crossover_type.__code__.co_argcount == 4):
+                if crossover_type.__code__.co_argcount == 4:
                     # The crossover method assigned to the crossover_type parameter is validated.
                     self.crossover = crossover_type
                 else:
@@ -584,7 +612,7 @@ class GA(utils.parent_selection.ParentSelection,
                     raise ValueError(f"When 'crossover_type' is assigned to a method, then this crossover method must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The selected parents.\n3) The size of the offspring to be produced.\n4) The instance from the pygad.GA class.\n\nThe passed crossover method named '{crossover_type.__code__.co_name}' accepts {crossover_type.__code__.co_argcount} parameter(s).")
             elif callable(crossover_type):
                 # Check if the crossover_type is a function that accepts 2 paramaters.
-                if (crossover_type.__code__.co_argcount == 3):
+                if crossover_type.__code__.co_argcount == 3:
                     # The crossover function assigned to the crossover_type parameter is validated.
                     self.crossover = crossover_type
                 else:
