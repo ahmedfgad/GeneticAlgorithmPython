@@ -5,6 +5,8 @@ on:
     branches:
       - github-actions
       # - master
+  # Manually trigger the workflow.
+  workflow_dispatch:
 
 jobs:
   job_id_1:
