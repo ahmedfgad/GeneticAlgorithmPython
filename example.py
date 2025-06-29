@@ -17,6 +17,8 @@ ga_instance = pygad.GA(num_generations=100,
                        num_genes=num_genes,
                        mutation_num_genes=6,
                        fitness_func=fitness_func,
+                       init_range_low=4,
+                       init_range_high=10,
                        # suppress_warnings=True,
                        random_mutation_min_val=4,
                        random_mutation_max_val=10,
@@ -25,4 +27,4 @@ ga_instance = pygad.GA(num_generations=100,
                        # mutation_probability=0.4,
                        gene_constraint=[lambda x: x[0]>=8,None,None,None,None,None])
 
-ga_instance.run()
+# ga_instance.run()

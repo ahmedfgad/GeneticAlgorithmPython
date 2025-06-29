@@ -15,6 +15,7 @@ class GA(utils.parent_selection.ParentSelection,
          utils.mutation.Mutation,
          utils.nsga2.NSGA2,
          helper.unique.Unique,
+         helper.misc.Helper,
          visualize.plot.Plot):
 
     supported_int_types = [int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,
@@ -435,7 +436,8 @@ class GA(utils.parent_selection.ParentSelection,
                                                high=self.init_range_high,
                                                allow_duplicate_genes=allow_duplicate_genes,
                                                mutation_by_replacement=True,
-                                               gene_type=self.gene_type)
+                                               gene_type=self.gene_type,
+                                               gene_constraint=gene_constraint)
                 else:
                     self.valid_parameters = False
                     raise TypeError(f"The expected type of both the sol_per_pop and num_genes parameters is int but {type(sol_per_pop)} and {type(num_genes)} found.")
@@ -1377,12 +1379,18 @@ class GA(utils.parent_selection.ParentSelection,
                               high,
                               allow_duplicate_genes,
                               mutation_by_replacement,
-                              gene_type):
+                              gene_type,
+                              gene_constraint):
         """
         Creates an initial population randomly as a NumPy array. The array is saved in the instance attribute named 'population'.
 
-        low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
-        high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
+        It accepts:
+            -low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
+            -high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
+            -allow_duplicate_genes: Whether duplicate genes are allowed or not.
+            -mutation_by_replacement: Whether mutation by replacement is enabled or not.
+            -gene_type: The data type of the genes.
+            -gene_constraint: The constraints of the genes.
 
         This method assigns the values of the following 3 instance attributes:
             1. pop_size: Size of the population.
@@ -1397,10 +1405,11 @@ class GA(utils.parent_selection.ParentSelection,
         if self.gene_space is None:
             # Creating the initial population randomly.
             if self.gene_type_single == True:
+                # A NumPy array holding the initial population.
                 self.population = numpy.asarray(numpy.random.uniform(low=low,
                                                                      high=high,
                                                                      size=self.pop_size),
-                                                dtype=self.gene_type[0])  # A NumPy array holding the initial population.
+                                                dtype=self.gene_type[0])
             else:
                 # Create an empty population of dtype=object to support storing mixed data types within the same array.
                 self.population = numpy.zeros(
@@ -1408,12 +1417,7 @@ class GA(utils.parent_selection.ParentSelection,
                 # Loop through the genes, randomly generate the values of a single gene across the entire population, and add the values of each gene to the population.
                 for gene_idx in range(self.num_genes):
 
-                    if type(self.init_range_low) in self.supported_int_float_types:
-                        range_min = self.init_range_low
-                        range_max = self.init_range_high
-                    else:
-                        range_min = self.init_range_low[gene_idx]
-                        range_max = self.init_range_high[gene_idx]
+                    range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
 
                     # A vector of all values of this single gene across all solutions in the population.
                     gene_values = numpy.asarray(numpy.random.uniform(low=range_min,
@@ -1422,6 +1426,30 @@ class GA(utils.parent_selection.ParentSelection,
                                                 dtype=self.gene_type[gene_idx][0])
                     # Adding the current gene values to the population.
                     self.population[:, gene_idx] = gene_values
+
+            # Enforce the gene constraints as much as possible.
+            if gene_constraint is None:
+                pass
+            else:
+                # Note that gene_constraint is not validated yet.
+                # We have to set it as a propery of the pygad.GA instance to retrieve without passing it as an additional parameter.
+                self.gene_constraint = gene_constraint
+                for solution in self.population:
+                    for gene_idx in range(self.num_genes):
+                        # Check that a constraint is available for the gene and that the current value does not satisfy that constraint
+                        if self.gene_constraint[gene_idx]:
+                            print(gene_idx, solution[gene_idx])
+                            if not self.gene_constraint[gene_idx](solution):
+                                range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
+                                # While initializing the population, we follow a mutation by replacement approach. So, the gene value is not needed.
+                                random_values_filtered = self.get_valid_gene_constraint_values(range_min=range_min,
+                                                                                               range_max=range_max,
+                                                                                               gene_value=None,
+                                                                                               gene_idx=gene_idx,
+                                                                                               mutation_by_replacement=True,
+                                                                                               solution=solution,
+                                                                                               num_values=100)
+                                print(gene_idx, random_values_filtered)
 
             if allow_duplicate_genes == False:
                 for solution_idx in range(self.population.shape[0]):
@@ -1444,12 +1472,7 @@ class GA(utils.parent_selection.ParentSelection,
                 for sol_idx in range(self.sol_per_pop):
                     for gene_idx in range(self.num_genes):
 
-                        if type(self.init_range_low) in self.supported_int_float_types:
-                            range_min = self.init_range_low
-                            range_max = self.init_range_high
-                        else:
-                            range_min = self.init_range_low[gene_idx]
-                            range_max = self.init_range_high[gene_idx]
+                        range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
 
                         if self.gene_space[gene_idx] is None:
 
@@ -1524,12 +1547,7 @@ class GA(utils.parent_selection.ParentSelection,
                 for sol_idx in range(self.sol_per_pop):
                     for gene_idx in range(self.num_genes):
 
-                        if type(self.init_range_low) in self.supported_int_float_types:
-                            range_min = self.init_range_low
-                            range_max = self.init_range_high
-                        else:
-                            range_min = self.init_range_low[gene_idx]
-                            range_max = self.init_range_high[gene_idx]
+                        range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
 
                         if type(self.gene_space[gene_idx]) in [numpy.ndarray, list, tuple, range]:
                             # Convert to list because tuple and range do not have copy().
@@ -1584,12 +1602,7 @@ class GA(utils.parent_selection.ParentSelection,
                 # Replace all the None values with random values using the init_range_low, init_range_high, and gene_type attributes.
                 for gene_idx, curr_gene_space in enumerate(self.gene_space):
 
-                    if type(self.init_range_low) in self.supported_int_float_types:
-                        range_min = self.init_range_low
-                        range_max = self.init_range_high
-                    else:
-                        range_min = self.init_range_low[gene_idx]
-                        range_max = self.init_range_high[gene_idx]
+                    range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
 
                     if curr_gene_space is None:
                         self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=range_min,

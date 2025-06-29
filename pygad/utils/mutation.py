@@ -45,24 +45,6 @@ class Mutation:
 
         return offspring
 
-    def get_random_mutation_range(self, gene_index):
-
-        """
-        Returns the minimum and maximum values of the mutation range.
-        It accepts a single parameter:
-            -gene_index: The index of the gene to mutate. Only used if the gene has a specific mutation range
-        It returns the minimum and maximum values of the mutation range.
-        """
-
-        # We can use either random_mutation_min_val or random_mutation_max_val.
-        if type(self.random_mutation_min_val) in self.supported_int_float_types:
-            range_min = self.random_mutation_min_val
-            range_max = self.random_mutation_max_val
-        else:
-            range_min = self.random_mutation_min_val[gene_index]
-            range_max = self.random_mutation_max_val[gene_index]
-        return range_min, range_max
-
     def mutation_by_space(self, offspring):
 
         """
@@ -302,23 +284,23 @@ class Mutation:
                                                                                              num_trials=10)
         return offspring
 
-
     def change_random_mutation_value_dtype(self, 
                                            random_value, 
                                            gene_index, 
-                                           gene_value):
-        # TODO Instead of passing offspring and offspring_idx, only pass offspring[offspring_idx, gene_index]
+                                           gene_value,
+                                           mutation_by_replacement):
         """
         Change the data type of the random value used to apply mutation.
         It accepts 2 parameters:
             -random_value: The random value to change its data type.
             -gene_index: The index of the target gene.
-            -gene_value: The gene value before mutation.
+            -gene_value: The gene value before mutation. Only used if mutation_by_replacement=False and gene_type_single=False.
+            -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
         It returns the new value after changing the data type.
         """
 
         # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
-        if self.mutation_by_replacement:
+        if mutation_by_replacement:
             if self.gene_type_single == True:
                 random_value = self.gene_type[0](random_value)
             else:
@@ -351,47 +333,6 @@ class Mutation:
         else:
             if not self.gene_type[gene_index][1] is None:
                 random_value = numpy.round(random_value, self.gene_type[gene_index][1])
-        return random_value
-
-    def mutation_generate_random_value(self,
-                                       range_min, 
-                                       range_max, 
-                                       gene_value,
-                                       gene_idx, 
-                                       num_values=1):
-        """
-        Randomly generate values to use for applying mutation.
-        It accepts:
-            -range_min: The minimum value in the range from which a value is selected.
-            -range_max: The maximum value in the range from which a value is selected.
-            -gene_value: The original gene value before applying mutation.
-            -gene_idx: The index of the gene in the solution.
-            -num_values: The number of random valus to generate.
-        If num_values=1, it returns a single numeric value. If num_values>1, it returns an array with number of values equal to num_values.
-        """
-
-        # Generating a random value.
-        random_value = numpy.random.uniform(low=range_min, 
-                                            high=range_max, 
-                                            size=num_values)
-
-        # Change the random mutation value data type.
-        for idx, val in enumerate(random_value):
-            random_value[idx] = self.change_random_mutation_value_dtype(random_value[idx], 
-                                                                        gene_idx, 
-                                                                        gene_value)
-
-            # Round the gene.
-            random_value[idx] = self.round_random_mutation_value(random_value[idx], gene_idx)
-
-        # Rounding different values could return the same value multiple times.
-        # For example, 2.8 and 2.7 will be 3.0.
-        # Use the unique() function to avoid any duplicates.
-        random_value = numpy.unique(random_value)
-
-        if num_values == 1:
-            random_value = random_value[0]
-
         return random_value
 
     def mutation_filter_values_by_constraint(self,
@@ -427,7 +368,7 @@ class Mutation:
         else:
             # No value found for the current gene that satisfies the constraint.
             if not self.suppress_warnings:
-                warnings.warn(f"No value found for the gene at index {gene_idx} at generation {self.generations_completed+1} that satisfies its gene constraint.")
+                warnings.warn(f"No value found for the gene at index {gene_idx} that satisfies its gene constraint.")
             return None
 
         filtered_values = random_values[filtered_values_indices]
@@ -453,11 +394,12 @@ class Mutation:
         # Check if the gene has a constraint.
         if self.gene_constraint and self.gene_constraint[gene_idx]:
             # Generate random values to use for mutation.
-            random_values = self.mutation_generate_random_value(range_min=range_min, 
-                                                                range_max=range_max, 
-                                                                gene_value=solution[gene_idx],
-                                                                gene_idx=gene_idx,
-                                                                num_values=100)
+            random_values = self.generate_gene_random_value(range_min=range_min, 
+                                                            range_max=range_max, 
+                                                            gene_value=solution[gene_idx],
+                                                            gene_idx=gene_idx,
+                                                            mutation_by_replacement=self.mutation_by_replacement,
+                                                            num_values=100)
             # Filter the values that satisfy the constraint.
             random_values_filtered = self.mutation_filter_values_by_constraint(random_values=random_values,
                                                                                solution=solution,
@@ -471,11 +413,12 @@ class Mutation:
                 random_value = numpy.random.choice(random_values_filtered, size=1)[0]
         # The gene does not have a constraint.
         else:
-            random_value = self.mutation_generate_random_value(range_min=range_min, 
-                                                               range_max=range_max, 
-                                                               gene_value=solution[gene_idx],
-                                                               gene_idx=gene_idx,
-                                                               num_values=1)
+            random_value = self.generate_gene_random_value(range_min=range_min, 
+                                                           range_max=range_max, 
+                                                           gene_value=solution[gene_idx],
+                                                           gene_idx=gene_idx,
+                                                           mutation_by_replacement=self.mutation_by_replacement,
+                                                           num_values=1)
         # Even that its name is singular, it might have a multiple values.
         return random_value
 
