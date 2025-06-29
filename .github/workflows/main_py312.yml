@@ -1,12 +1,5 @@
 name: PyGAD PyTest / Python 3.12
 
-# Cannot install packages in Python 3.12.
-# The reason is that we use pip for installing packages.
-# pip uses setuptools for the installation.
-# setuptools depends on distutils.
-# But Python 3.12 does not support distutils.
-# Let's wait until setuptools changes its dependencies.
-
 on:
   push:
     branches:
