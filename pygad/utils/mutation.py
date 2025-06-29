@@ -8,6 +8,8 @@ import random
 import pygad
 import concurrent.futures
 
+import warnings
+
 class Mutation:
 
     def __init__(self):
@@ -43,7 +45,7 @@ class Mutation:
 
         return offspring
 
-    def get_mutation_range(self, gene_index):
+    def get_random_mutation_range(self, gene_index):
 
         """
         Returns the minimum and maximum values of the mutation range.
@@ -75,7 +77,7 @@ class Mutation:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
             for gene_idx in mutation_indices:
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
                 if self.gene_space_nested:
                     # Returning the current gene space from the 'gene_space' attribute.
@@ -214,7 +216,7 @@ class Mutation:
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
                 if probs[gene_idx] <= self.mutation_probability:
                     if self.gene_space_nested:
@@ -301,12 +303,17 @@ class Mutation:
         return offspring
 
 
-    def change_random_mutation_value_dtype(self, random_value, gene_index):
+    def change_random_mutation_value_dtype(self, 
+                                           random_value, 
+                                           gene_index, 
+                                           gene_value):
+        # TODO Instead of passing offspring and offspring_idx, only pass offspring[offspring_idx, gene_index]
         """
         Change the data type of the random value used to apply mutation.
         It accepts 2 parameters:
             -random_value: The random value to change its data type.
             -gene_index: The index of the target gene.
+            -gene_value: The gene value before mutation.
         It returns the new value after changing the data type.
         """
 
@@ -321,9 +328,9 @@ class Mutation:
         # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
         else:
             if self.gene_type_single == True:
-                random_value = self.gene_type[0](offspring[offspring_idx, gene_index] + random_value)
+                random_value = self.gene_type[0](gene_value + random_value)
             else:
-                random_value = self.gene_type[gene_index][0](offspring[offspring_idx, gene_index] + random_value)
+                random_value = self.gene_type[gene_index][0](gene_value + random_value)
                 if type(random_value) is numpy.ndarray:
                     random_value = random_value[0]
         return random_value
@@ -346,6 +353,132 @@ class Mutation:
                 random_value = numpy.round(random_value, self.gene_type[gene_index][1])
         return random_value
 
+    def mutation_generate_random_value(self,
+                                       range_min, 
+                                       range_max, 
+                                       gene_value,
+                                       gene_idx, 
+                                       num_values=1):
+        """
+        Randomly generate values to use for applying mutation.
+        It accepts:
+            -range_min: The minimum value in the range from which a value is selected.
+            -range_max: The maximum value in the range from which a value is selected.
+            -gene_value: The original gene value before applying mutation.
+            -gene_idx: The index of the gene in the solution.
+            -num_values: The number of random valus to generate.
+        If num_values=1, it returns a single numeric value. If num_values>1, it returns an array with number of values equal to num_values.
+        """
+
+        # Generating a random value.
+        random_value = numpy.random.uniform(low=range_min, 
+                                            high=range_max, 
+                                            size=num_values)
+
+        # Change the random mutation value data type.
+        for idx, val in enumerate(random_value):
+            random_value[idx] = self.change_random_mutation_value_dtype(random_value[idx], 
+                                                                        gene_idx, 
+                                                                        gene_value)
+
+            # Round the gene.
+            random_value[idx] = self.round_random_mutation_value(random_value[idx], gene_idx)
+
+        # Rounding different values could return the same value multiple times.
+        # For example, 2.8 and 2.7 will be 3.0.
+        # Use the unique() function to avoid any duplicates.
+        random_value = numpy.unique(random_value)
+
+        if num_values == 1:
+            random_value = random_value[0]
+
+        return random_value
+
+    def mutation_filter_values_by_constraint(self,
+                                             random_values,
+                                             solution,
+                                             gene_idx):
+
+        """
+        Filter the random values generated for mutation based on whether they meet the gene constraint in the gene_constraint parameter.
+        It accepts:
+            -random_values: The random values to filter.
+            -solution: The solution containing the target gene.
+            -gene_idx: The index of the gene in the solution.
+        It returns None if no values satisfy the constraint. Otherwise, an array of values that satisfy the constraint is returned.
+        """
+
+        # A list of the indices where the random values satisfy the constraint.
+        filtered_values_indices = []
+        # A temporary solution to avoid changing the original solution.
+        solution_tmp = solution.copy()
+        # Loop through the random values to filter the ones satisfying the constraint.
+        for value_idx, random_value in enumerate(random_values):
+            solution_tmp[gene_idx] = random_value
+            # Check if the constraint is satisfied.
+            if self.gene_constraint[gene_idx](solution_tmp):
+                # The current value satisfies the constraint. 
+                filtered_values_indices.append(value_idx)
+
+        # After going through all the values, check if any value satisfies the constraint.
+        if len(filtered_values_indices) > 0:
+            # At least one value was found that meets the gene constraint.
+            pass
+        else:
+            # No value found for the current gene that satisfies the constraint.
+            if not self.suppress_warnings:
+                warnings.warn(f"No value found for the gene at index {gene_idx} at generation {self.generations_completed+1} that satisfies its gene constraint.")
+            return None
+
+        filtered_values = random_values[filtered_values_indices]
+
+        return filtered_values
+
+    def mutation_process_random_value(self,
+                                      range_min, 
+                                      range_max, 
+                                      solution,
+                                      gene_idx):
+
+        """
+        Randomly generate constrained values to use for applying mutation.
+        It accepts:
+            -range_min: The minimum value in the range from which a value is selected.
+            -range_max: The maximum value in the range from which a value is selected.
+            -solution: The solution where the target gene exists.
+            -gene_idx: The index of the gene in the solution.
+        It returns either a single numeric value or multiple values based on whether a gene constraint exists in the gene_constraint parameter. 
+        """
+
+        # Check if the gene has a constraint.
+        if self.gene_constraint and self.gene_constraint[gene_idx]:
+            # Generate random values to use for mutation.
+            random_values = self.mutation_generate_random_value(range_min=range_min, 
+                                                                range_max=range_max, 
+                                                                gene_value=solution[gene_idx],
+                                                                gene_idx=gene_idx,
+                                                                num_values=100)
+            # Filter the values that satisfy the constraint.
+            random_values_filtered = self.mutation_filter_values_by_constraint(random_values=random_values,
+                                                                               solution=solution,
+                                                                               gene_idx=gene_idx)
+            if random_values_filtered is None:
+                # No value found that satisfy the constraint.
+                # Keep the old value.
+                random_value = solution[gene_idx]
+            else:
+                # Select a value randomly from the list of values satisfying the constraint.
+                random_value = numpy.random.choice(random_values_filtered, size=1)[0]
+        # The gene does not have a constraint.
+        else:
+            random_value = self.mutation_generate_random_value(range_min=range_min, 
+                                                               range_max=range_max, 
+                                                               gene_value=solution[gene_idx],
+                                                               gene_idx=gene_idx,
+                                                               num_values=1)
+        # Even that its name is singular, it might have a multiple values.
+        return random_value
+
     def mutation_randomly(self, offspring):
 
         """
@@ -357,20 +490,18 @@ class Mutation:
 
         # Random mutation changes one or more genes in each offspring randomly.
         for offspring_idx in range(offspring.shape[0]):
-            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
+            # Return the indices of the genes to mutate.
+            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), 
+                                                         self.mutation_num_genes))
             for gene_idx in mutation_indices:
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
-                # Generating a random value.
-                random_value = numpy.random.uniform(low=range_min, 
-                                                    high=range_max, 
-                                                    size=1)[0]
-                # Change the random mutation value data type.
-                random_value = self.change_random_mutation_value_dtype(random_value, gene_idx)
-
-                # Round the gene.
-                random_value = self.round_random_mutation_value(random_value, gene_idx)
+                # Generate one or more random values that meet the gene constraint if exists.
+                random_value = self.mutation_process_random_value(range_min=range_min, 
+                                                                  range_max=range_max, 
+                                                                  solution=offspring[offspring_idx],
+                                                                  gene_idx=gene_idx)
 
                 offspring[offspring_idx, gene_idx] = random_value
 
@@ -395,21 +526,20 @@ class Mutation:
 
         # Random mutation changes one or more genes in each offspring randomly.
         for offspring_idx in range(offspring.shape[0]):
+            # The mutation probabilities for the current offspring.
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
+                # A gene is mutated only if its mutation probability is less than or equal to the threshold.
                 if probs[gene_idx] <= self.mutation_probability:
-                    # Generating a random value.
-                    random_value = numpy.random.uniform(low=range_min, 
-                                                        high=range_max, 
-                                                        size=1)[0]
-                    # Change the random mutation value data type.
-                    random_value = self.change_random_mutation_value_dtype(random_value, gene_idx)
 
-                    # Round the gene.
-                    random_value = self.round_random_mutation_value(random_value, gene_idx)
+                    # Generate one or more random values that meet the gene constraint if exists.
+                    random_value = self.mutation_process_random_value(range_min=range_min, 
+                                                                      range_max=range_max, 
+                                                                      solution=offspring[offspring_idx],
+                                                                      gene_idx=gene_idx)
 
                     offspring[offspring_idx, gene_idx] = random_value
 
@@ -707,7 +837,7 @@ class Mutation:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
             for gene_idx in mutation_indices:
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
                 if self.gene_space_nested:
                     # Returning the current gene space from the 'gene_space' attribute.
@@ -845,14 +975,16 @@ class Mutation:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
             for gene_idx in mutation_indices:
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
                 # Generating a random value.
                 random_value = numpy.random.uniform(low=range_min, 
                                                     high=range_max, 
                                                     size=1)[0]
                 # Change the random mutation value data type.
-                random_value = self.change_random_mutation_value_dtype(random_value, gene_idx)
+                random_value = self.change_random_mutation_value_dtype(random_value, 
+                                                                       gene_idx, 
+                                                                       offspring[offspring_idx, gene_idx])
 
                 # Round the gene.
                 random_value = self.round_random_mutation_value(random_value, gene_idx)
@@ -914,7 +1046,7 @@ class Mutation:
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
                 if probs[gene_idx] <= adaptive_mutation_probability:
                     if self.gene_space_nested:
@@ -1052,7 +1184,7 @@ class Mutation:
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
                 if probs[gene_idx] <= adaptive_mutation_probability:
                     # Generating a random value.
@@ -1060,7 +1192,9 @@ class Mutation:
                                                         high=range_max, 
                                                         size=1)[0]
                     # Change the random mutation value data type.
-                    random_value = self.change_random_mutation_value_dtype(random_value, gene_idx)
+                    random_value = self.change_random_mutation_value_dtype(random_value, 
+                                                                           gene_idx, 
+                                                                           offspring[offspring_idx, gene_idx])
 
                     # Round the gene.
                     random_value = self.round_random_mutation_value(random_value, gene_idx)

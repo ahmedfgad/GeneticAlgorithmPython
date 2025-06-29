@@ -564,24 +564,30 @@ class GA(utils.parent_selection.ParentSelection,
             # Validate that gene_constraint is a list or tuple and every element inside it is either None or callable.
             if gene_constraint:
                 if type(gene_constraint) in [list, tuple]:
-                    for constraint_idx, item in enumerate(gene_constraint):
-                        # Check whether the element is None or a callable.
-                        if item and callable(item):
-                            if item.__code__.co_argcount == 1:
-                                # Every callable is valid if it receives a single argument.
-                                # This argument represents the solution.
+                    if len(gene_constraint) == self.num_genes:
+                        for constraint_idx, item in enumerate(gene_constraint):
+                            # Check whether the element is None or a callable.
+                            if item is None:
                                 pass
+                            elif item and callable(item):
+                                if item.__code__.co_argcount == 1:
+                                    # Every callable is valid if it receives a single argument.
+                                    # This argument represents the solution.
+                                    pass
+                                else:
+                                    self.valid_parameters = False
+                                    raise ValueError(f"Every callable inside the gene_constraint parameter must accept a single argument representing the solution/chromosome. But the callable at index {constraint_idx} named '{item.__code__.co_name}' accepts {item.__code__.co_argcount} argument(s).")
                             else:
                                 self.valid_parameters = False
-                                raise ValueError(f"Every callable inside the gene_constraint parameter must accept a single argument representing the solution/chromosome. But the callable at index {constraint_idx} named '{item.__code__.co_name}' accepts {item.__code__.co_argcount} argument(s).")
-                        else:
-                            self.valid_parameters = False
-                            raise TypeError(f"The expected type of an element in the 'gene_constraint' parameter is None or a callable (e.g. function). But {item} at index {constraint_idx} of type {type(item)} found.")
+                                raise TypeError(f"The expected type of an element in the 'gene_constraint' parameter is None or a callable (e.g. function). But {item} at index {constraint_idx} of type {type(item)} found.")
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError(f"The number of constrains ({len(gene_constraint)}) in the 'gene_constraint' parameter must be equal to the number of genes ({self.num_genes}).")
                 else:
                     self.valid_parameters = False
-                    raise TypeError(f"The expected type of the 'gene_constraint' parameter is either list or tuple. But the value {gene_constraint} of type {type(gene_constraint)} found.")
+                    raise TypeError(f"The expected type of the 'gene_constraint' parameter is either a list or tuple. But the value {gene_constraint} of type {type(gene_constraint)} found.")
             else:
-                # It is None.
+                # gene_constraint is None and not used.
                 pass
 
             self.gene_constraint = gene_constraint

@@ -316,7 +316,6 @@ class Unique:
         # Update the list of duplicate indices after each iteration.
         _, unique_gene_indices = numpy.unique(new_solution, return_index=True)
         not_unique_indices = set(range(len(new_solution))) - set(unique_gene_indices)
-        # self.logger.info("not_unique_indices INSIDE", not_unique_indices)        
 
         return new_solution, not_unique_indices, num_unsolved_duplicates
 
@@ -551,7 +550,7 @@ class Unique:
         # This means there is no way to solve the duplicates between the genes.
         # Because the space of the duplicates genes only has a single value and there is no alternatives.
         return None, gene
-    
+
     def unpack_gene_space(self, 
                           range_min,
                           range_max,
