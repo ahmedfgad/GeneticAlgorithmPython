@@ -447,7 +447,7 @@ class Mutation:
             -range_max: The maximum value in the range from which a value is selected.
             -solution: The solution where the target gene exists.
             -gene_idx: The index of the gene in the solution.
-        It returns either a single numeric value or multiple values based on whether a gene constraint exists in the gene_constraint parameter. 
+        It returns a single numeric value the satisfies the gene constraint if exists in the gene_constraint parameter. 
         """
 
         # Check if the gene has a constraint.
@@ -497,7 +497,7 @@ class Mutation:
 
                 range_min, range_max = self.get_random_mutation_range(gene_idx)
 
-                # Generate one or more random values that meet the gene constraint if exists.
+                # Generate a random value fpr mutation that meet the gene constraint if exists.
                 random_value = self.mutation_process_random_value(range_min=range_min, 
                                                                   range_max=range_max, 
                                                                   solution=offspring[offspring_idx],
@@ -535,7 +535,7 @@ class Mutation:
                 # A gene is mutated only if its mutation probability is less than or equal to the threshold.
                 if probs[gene_idx] <= self.mutation_probability:
 
-                    # Generate one or more random values that meet the gene constraint if exists.
+                    # Generate a random value fpr mutation that meet the gene constraint if exists.
                     random_value = self.mutation_process_random_value(range_min=range_min, 
                                                                       range_max=range_max, 
                                                                       solution=offspring[offspring_idx],
@@ -977,17 +977,11 @@ class Mutation:
 
                 range_min, range_max = self.get_random_mutation_range(gene_idx)
 
-                # Generating a random value.
-                random_value = numpy.random.uniform(low=range_min, 
-                                                    high=range_max, 
-                                                    size=1)[0]
-                # Change the random mutation value data type.
-                random_value = self.change_random_mutation_value_dtype(random_value, 
-                                                                       gene_idx, 
-                                                                       offspring[offspring_idx, gene_idx])
-
-                # Round the gene.
-                random_value = self.round_random_mutation_value(random_value, gene_idx)
+                # Generate a random value fpr mutation that meet the gene constraint if exists.
+                random_value = self.mutation_process_random_value(range_min=range_min, 
+                                                                  range_max=range_max, 
+                                                                  solution=offspring[offspring_idx],
+                                                                  gene_idx=gene_idx)
 
                 offspring[offspring_idx, gene_idx] = random_value
 
@@ -1187,17 +1181,11 @@ class Mutation:
                 range_min, range_max = self.get_random_mutation_range(gene_idx)
 
                 if probs[gene_idx] <= adaptive_mutation_probability:
-                    # Generating a random value.
-                    random_value = numpy.random.uniform(low=range_min, 
-                                                        high=range_max, 
-                                                        size=1)[0]
-                    # Change the random mutation value data type.
-                    random_value = self.change_random_mutation_value_dtype(random_value, 
-                                                                           gene_idx, 
-                                                                           offspring[offspring_idx, gene_idx])
-
-                    # Round the gene.
-                    random_value = self.round_random_mutation_value(random_value, gene_idx)
+                    # Generate a random value fpr mutation that meet the gene constraint if exists.
+                    random_value = self.mutation_process_random_value(range_min=range_min, 
+                                                                      range_max=range_max, 
+                                                                      solution=offspring[offspring_idx],
+                                                                      gene_idx=gene_idx)
 
                     offspring[offspring_idx, gene_idx] = random_value
 
