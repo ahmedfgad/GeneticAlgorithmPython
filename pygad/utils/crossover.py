@@ -70,12 +70,11 @@ class Crossover:
                                                                              max_val=self.random_mutation_max_val,
                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                              gene_type=self.gene_type,
-                                                                             num_trials=10)
+                                                                             num_values=100)
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
                                                                              gene_type=self.gene_type,
                                                                              num_trials=10)
-
         
         return offspring
 
@@ -143,7 +142,7 @@ class Crossover:
                                                                              max_val=self.random_mutation_max_val,
                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                              gene_type=self.gene_type,
-                                                                             num_trials=10)
+                                                                             num_values=100)
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
                                                                              gene_type=self.gene_type,
@@ -210,7 +209,7 @@ class Crossover:
                                                                              max_val=self.random_mutation_max_val,
                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                              gene_type=self.gene_type,
-                                                                             num_trials=10)
+                                                                             num_values=100)
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
                                                                              gene_type=self.gene_type,
@@ -274,7 +273,7 @@ class Crossover:
                                                                              max_val=self.random_mutation_max_val,
                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                              gene_type=self.gene_type,
-                                                                             num_trials=10)
+                                                                             num_values=100)
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
                                                                              gene_type=self.gene_type,

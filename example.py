@@ -17,14 +17,17 @@ ga_instance = pygad.GA(num_generations=100,
                        num_genes=num_genes,
                        mutation_num_genes=6,
                        fitness_func=fitness_func,
-                       init_range_low=4,
-                       init_range_high=10,
+                       init_range_low=1,
+                       init_range_high=100,
                        # suppress_warnings=True,
-                       random_mutation_min_val=4,
-                       random_mutation_max_val=10,
+                       random_mutation_min_val=1,
+                       random_mutation_max_val=100,
                        mutation_by_replacement=True,
                        gene_type=int,
+                       allow_duplicate_genes=False,
                        # mutation_probability=0.4,
-                       gene_constraint=[lambda x: x[0]>=8,None,None,None,None,None])
+                       # gene_constraint=[lambda x: x[0]>=8,None,None,None,None,None],
+                       gene_constraint=[lambda x: x[0]>=98,lambda x: x[1]>=98,lambda x: x[2]<98,lambda x: x[3]<98,lambda x: x[4]<98,lambda x: x[5]<98],
+                       )
 
 # ga_instance.run()

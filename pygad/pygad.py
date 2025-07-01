@@ -491,7 +491,7 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                                     max_val=self.init_range_high,
                                                                                                                     mutation_by_replacement=self.mutation_by_replacement,
                                                                                                                     gene_type=self.gene_type,
-                                                                                                                    num_trials=10)
+                                                                                                                    num_values=100)
                         else:
                             self.initial_population[initial_solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=initial_solution,
                                                                                                                     gene_type=self.gene_type,
@@ -1427,6 +1427,9 @@ class GA(utils.parent_selection.ParentSelection,
                     # Adding the current gene values to the population.
                     self.population[:, gene_idx] = gene_values
 
+            # Round the randomly generated values.
+            self.population = self.round_genes(self.population)
+
             # Enforce the gene constraints as much as possible.
             if gene_constraint is None:
                 pass
@@ -1434,14 +1437,13 @@ class GA(utils.parent_selection.ParentSelection,
                 # Note that gene_constraint is not validated yet.
                 # We have to set it as a propery of the pygad.GA instance to retrieve without passing it as an additional parameter.
                 self.gene_constraint = gene_constraint
-                for solution in self.population:
+                for sol_idx, solution in enumerate(self.population):
                     for gene_idx in range(self.num_genes):
                         # Check that a constraint is available for the gene and that the current value does not satisfy that constraint
                         if self.gene_constraint[gene_idx]:
-                            print(gene_idx, solution[gene_idx])
                             if not self.gene_constraint[gene_idx](solution):
                                 range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
-                                # While initializing the population, we follow a mutation by replacement approach. So, the gene value is not needed.
+                                # While initializing the population, we follow a mutation by replacement approach. So, the original gene value is not needed.
                                 random_values_filtered = self.get_valid_gene_constraint_values(range_min=range_min,
                                                                                                range_max=range_max,
                                                                                                gene_value=None,
@@ -1449,7 +1451,11 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                mutation_by_replacement=True,
                                                                                                solution=solution,
                                                                                                num_values=100)
-                                print(gene_idx, random_values_filtered)
+                                if random_values_filtered is None:
+                                    if not self.suppress_warnings:
+                                        warnings.warn(f"No value satisfied the constraint for the gene at index {gene_idx} while creating the initial population.")
+                                else:
+                                    self.population[sol_idx, gene_idx] = random.choice(random_values_filtered)
 
             if allow_duplicate_genes == False:
                 for solution_idx in range(self.population.shape[0]):
@@ -1459,7 +1465,7 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                               max_val=high,
                                                                                               mutation_by_replacement=True,
                                                                                               gene_type=gene_type,
-                                                                                              num_trials=10)
+                                                                                              num_values=100)
                     # self.logger.info("After", self.population[solution_idx])
 
         elif self.gene_space_nested:
@@ -2009,7 +2015,6 @@ class GA(utils.parent_selection.ParentSelection,
                 # Appending the best solution in the current generation to the best_solutions list.
                 if self.save_best_solutions:
                     self.best_solutions.append(list(best_solution))
-
 
                 # Note: Any code that has loop-dependant statements (e.g. continue, break, etc) must be kept inside the loop of the 'run()' method. It can be moved to another method to clean the run() method.
                 # If the on_generation attribute is not None, then cal the callback function after the generation.

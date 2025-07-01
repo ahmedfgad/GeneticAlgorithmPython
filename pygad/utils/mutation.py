@@ -379,7 +379,8 @@ class Mutation:
                                       range_min, 
                                       range_max, 
                                       solution,
-                                      gene_idx):
+                                      gene_idx,
+                                      num_values=100):
 
         """
         Randomly generate constrained values to use for applying mutation.
@@ -388,6 +389,7 @@ class Mutation:
             -range_max: The maximum value in the range from which a value is selected.
             -solution: The solution where the target gene exists.
             -gene_idx: The index of the gene in the solution.
+            -num_values: The number of random valus to generate. It tries to generate a number of values up to a maximum of num_values. But it is not always guranteed because the total number of values might not be enough or the random generator creates duplicate random values.
         It returns a single numeric value the satisfies the gene constraint if exists in the gene_constraint parameter. 
         """
 
@@ -399,7 +401,7 @@ class Mutation:
                                                             gene_value=solution[gene_idx],
                                                             gene_idx=gene_idx,
                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                            num_values=100)
+                                                            num_values=num_values)
             # Filter the values that satisfy the constraint.
             random_values_filtered = self.mutation_filter_values_by_constraint(random_values=random_values,
                                                                                solution=solution,
@@ -440,7 +442,7 @@ class Mutation:
 
                 range_min, range_max = self.get_random_mutation_range(gene_idx)
 
-                # Generate a random value fpr mutation that meet the gene constraint if exists.
+                # Generate a random value for mutation that meet the gene constraint if exists.
                 random_value = self.mutation_process_random_value(range_min=range_min, 
                                                                   range_max=range_max, 
                                                                   solution=offspring[offspring_idx],
@@ -454,7 +456,7 @@ class Mutation:
                                                                                          max_val=range_max,
                                                                                          mutation_by_replacement=self.mutation_by_replacement,
                                                                                          gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                                         num_values=100)
 
         return offspring
 
@@ -492,7 +494,7 @@ class Mutation:
                                                                                              max_val=range_max,
                                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                                              gene_type=self.gene_type,
-                                                                                             num_trials=10)
+                                                                                             num_values=100)
         return offspring
 
     def swap_mutation(self, offspring):
@@ -934,7 +936,7 @@ class Mutation:
                                                                                          max_val=range_max,
                                                                                          mutation_by_replacement=self.mutation_by_replacement,
                                                                                          gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                                         num_values=100)
         return offspring
 
     def adaptive_mutation_probs_by_space(self, offspring):
@@ -1138,5 +1140,5 @@ class Mutation:
                                                                                              max_val=range_max,
                                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                                              gene_type=self.gene_type,
-                                                                                             num_trials=10)
+                                                                                             num_values=100)
         return offspring
