@@ -24,10 +24,12 @@ def population_gene_constraint(gene_space=None,
                                init_range_low=-4,
                                init_range_high=4,
                                random_seed=123,
+                               crossover_type='single_point',
                                initial_population=None,
                                parent_selection_type='sss',
                                multi_objective=False,
-                               gene_constraint=None):
+                               gene_constraint=None,
+                               allow_duplicate_genes=True):
 
     def fitness_func_no_batch_single(ga, solution, idx):
         return random.random()
@@ -53,583 +55,169 @@ def population_gene_constraint(gene_space=None,
                            init_range_high=init_range_high,
                            random_mutation_min_val=random_mutation_min_val,
                            random_mutation_max_val=random_mutation_max_val,
-                           allow_duplicate_genes=False,
+                           allow_duplicate_genes=allow_duplicate_genes,
                            mutation_by_replacement=mutation_by_replacement,
                            random_seed=random_seed,
+                           crossover_type=crossover_type,
                            gene_constraint=gene_constraint,
                            save_solutions=True,
-                           suppress_warnings=True)
+                           suppress_warnings=False)
 
     ga_instance.run()
 
     return ga_instance
 
 #### Single-Objective
-def test_number_duplicates_default():
-    gene_constraint=[lambda x: x[0]>=98,lambda x: x[1]>=98,None,None,None,None,None,None,None,None]
+def test_initial_population_int_by_replacement():
+    gene_constraint=[lambda x: x[0]>=8,lambda x: x[1]>=8,lambda x: 5>=x[2]>=1,lambda x: 5>x[3]>3,lambda x: x[4]<2]
     ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
-                                             init_range_low=98,
-                                             init_range_high=98)
+                                             init_range_low=0,
+                                             init_range_high=10,
+                                             random_mutation_min_val=0,
+                                             random_mutation_max_val=10,
+                                             num_genes=5,
+                                             gene_type=int,
+                                             mutation_by_replacement=True)
     initial_population = ga_instance.initial_population
-    assert initial_population[:, 0] >= 98
-    assert initial_population[:, 1] >= 98
+    # print(initial_population)
 
-def test_number_duplicates_default_initial_population():
-    num_duplicates = population_gene_constraint(initial_population=initial_population)
-    
-    assert num_duplicates == 0
+    assert numpy.all(initial_population[:, 0] >= 8), "Not all values in column 0 are >= 8"
+    assert numpy.all(initial_population[:, 1] >= 8), "Not all values in column 1 are >= 8"
+    assert numpy.all(initial_population[:, 2] >= 1), "Not all values in column 2 are >= 1"
+    assert numpy.all((initial_population[:, 2] >= 1) & (initial_population[:, 2] <= 5)), "Not all values in column 2 between 1 and 5 (inclusive)"
+    assert numpy.all(initial_population[:, 3] == 4), "Not all values in column 3 between 3 and 5 (exclusive)"
+    assert numpy.all(initial_population[:, 4] < 2), "Not all values in column 4 < 2"
 
-def test_number_duplicates_float_gene_type():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_type=float,
-                                            num_genes=num_genes,
-                                            init_range_low=0,
-                                            init_range_high=1,
-                                            random_mutation_min_val=0,
-                                            random_mutation_max_val=1)
+def test_initial_population_int_by_replacement_no_duplicates():
+    gene_constraint=[lambda x: x[0]>=5,lambda x: x[1]>=5,lambda x: x[2]>=5,lambda x: x[3]>=5,lambda x: x[4]>=5]
+    ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
+                                             init_range_low=1,
+                                             init_range_high=10,
+                                             random_mutation_min_val=1,
+                                             random_mutation_max_val=10,
+                                             gene_type=int,
+                                             num_genes=5,
+                                             mutation_by_replacement=True,
+                                             allow_duplicate_genes=False)
 
-    assert num_duplicates == 0
-
-def test_number_duplicates_float_gene_type_initial_population():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_type=float,
-                                            num_genes=num_genes,
-                                            init_range_low=0,
-                                            init_range_high=1,
-                                            initial_population=initial_population,
-                                            random_mutation_min_val=0,
-                                            random_mutation_max_val=1)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_int_gene_type():
-    num_genes = 10
-    init_range_low = 0
-    init_range_high = init_range_low + num_genes
-    random_mutation_min_val = 0
-    random_mutation_max_val = random_mutation_min_val + num_genes
-    num_duplicates = population_gene_constraint(gene_type=int,
-                                            mutation_by_replacement=False,
-                                            num_genes=num_genes,
-                                            init_range_low=init_range_low,
-                                            init_range_high=init_range_high,
-                                            random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
+    num_duplicates = 0
+    for idx, solution in enumerate(ga_instance.solutions):
+        num = len(solution) - len(set(solution))
+        if num != 0:
+            print(solution, idx)
+        num_duplicates += num
 
     assert num_duplicates == 0
 
-def test_number_duplicates_int_gene_type_initial_population():
-    num_genes = 10
-    init_range_low = 0
-    init_range_high = init_range_low + num_genes
-    random_mutation_min_val = 0
-    random_mutation_max_val = random_mutation_min_val + num_genes
-    num_duplicates = population_gene_constraint(gene_type=int,
-                                            mutation_by_replacement=False,
-                                            num_genes=num_genes,
-                                            init_range_low=init_range_low,
-                                            init_range_high=init_range_high,
-                                            initial_population=initial_population,
-                                            random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
+    initial_population = ga_instance.initial_population
+    # print(initial_population)
+
+    assert numpy.all(initial_population[:, 0] >= 5), "Not all values in column 0 >= 5"
+    assert numpy.all(initial_population[:, 1] >= 5), "Not all values in column 1 >= 5"
+    assert numpy.all(initial_population[:, 2] >= 5), "Not all values in column 2 >= 5"
+    assert numpy.all(initial_population[:, 3] >= 5), "Not all values in column 3 >= 5"
+    assert numpy.all(initial_population[:, 4] >= 5), "Not all values in column 4 >= 5"
+
+def test_initial_population_int_by_replacement_no_duplicates2():
+    gene_constraint=[lambda x: x[0]>=98,lambda x: x[1]>=98,lambda x: 20<x[2]<40,lambda x: x[3]<40,lambda x: x[4]<50,lambda x: x[5]<100]
+    ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
+                                             random_mutation_min_val=1,
+                                             random_mutation_max_val=100,
+                                             init_range_low=1,
+                                             init_range_high=100,
+                                             gene_type=int,
+                                             num_genes=6,
+                                             crossover_type=None,
+                                             mutation_by_replacement=True,
+                                             allow_duplicate_genes=False)
+
+    num_duplicates = 0
+    for idx, solution in enumerate(ga_instance.solutions):
+        num = len(solution) - len(set(solution))
+        if num != 0:
+            print(solution, idx)
+        num_duplicates += num
 
     assert num_duplicates == 0
 
-def test_number_duplicates_int_gene_type_replacement():
-    num_genes = 10
-    init_range_low = 0
-    init_range_high = init_range_low + num_genes
-    random_mutation_min_val = 0
-    random_mutation_max_val = random_mutation_min_val + num_genes
-    num_duplicates = population_gene_constraint(gene_type=int,
-                                            mutation_by_replacement=True,
-                                            num_genes=num_genes,
-                                            init_range_low=init_range_low,
-                                            init_range_high=init_range_high,
-                                            random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
+    initial_population = ga_instance.initial_population
+    # print(initial_population)
+
+    assert numpy.all(initial_population[:, 0] >= 98), "Not all values in column 0 are >= 98"
+    assert numpy.all(initial_population[:, 1] >= 98), "Not all values in column 1 are >= 98"
+    assert numpy.all((initial_population[:, 2] > 20) & (initial_population[:, 2] < 40)), "Not all values in column 2 between 20 and 40 (exclusive)"
+    assert numpy.all(initial_population[:, 3] < 40), "Not all values in column 3 < 40"
+    assert numpy.all(initial_population[:, 4] < 50), "Not all values in column 4 < 50"
+    assert numpy.all(initial_population[:, 5] < 100), "Not all values in column 4 < 100"
+
+def test_initial_population_float_by_replacement_no_duplicates():
+    gene_constraint=[lambda x: x[0]>=5,lambda x: x[1]>=5,lambda x: x[2]>=5,lambda x: x[3]>=5,lambda x: x[4]>=5]
+    ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
+                                             init_range_low=1,
+                                             init_range_high=10,
+                                             gene_type=[float, 1],
+                                             num_genes=5,
+                                             crossover_type=None,
+                                             mutation_by_replacement=False,
+                                             allow_duplicate_genes=False)
+
+    num_duplicates = 0
+    for idx, solution in enumerate(ga_instance.solutions):
+        num = len(solution) - len(set(solution))
+        if num != 0:
+            print(solution, idx)
+        num_duplicates += num
 
     assert num_duplicates == 0
 
-def test_number_duplicates_int_gene_type_replacement_initial_population():
-    num_genes = 10
-    init_range_low = 0
-    init_range_high = init_range_low + num_genes
-    random_mutation_min_val = 0
-    random_mutation_max_val = random_mutation_min_val + num_genes
-    num_duplicates = population_gene_constraint(gene_type=int,
-                                            mutation_by_replacement=True,
-                                            num_genes=num_genes,
-                                            init_range_low=init_range_low,
-                                            init_range_high=init_range_high,
-                                            initial_population=initial_population,
-                                            random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
+    initial_population = ga_instance.initial_population
+    # print(initial_population)
+
+    assert numpy.all(initial_population[:, 0] >= 5), "Not all values in column 0 >= 5"
+    assert numpy.all(initial_population[:, 1] >= 5), "Not all values in column 1 >= 5"
+    assert numpy.all(initial_population[:, 2] >= 5), "Not all values in column 2 >= 5"
+    assert numpy.all(initial_population[:, 3] >= 5), "Not all values in column 3 >= 5"
+    assert numpy.all(initial_population[:, 4] >= 5), "Not all values in column 4 >= 5"
+
+def test_initial_population_float_by_replacement_no_duplicates2():
+    gene_constraint=[lambda x: x[0]>=1,lambda x: x[1]>=1,lambda x: x[2]>=1,lambda x: x[3]>=1,lambda x: x[4]>=1]
+    ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
+                                             init_range_low=1,
+                                             init_range_high=2,
+                                             gene_type=[float, 1],
+                                             num_genes=5,
+                                             crossover_type=None,
+                                             mutation_by_replacement=False,
+                                             allow_duplicate_genes=False)
+
+    num_duplicates = 0
+    for idx, solution in enumerate(ga_instance.solutions):
+        num = len(solution) - len(set(solution))
+        if num != 0:
+            print(solution, idx)
+        num_duplicates += num
 
     assert num_duplicates == 0
 
-def test_number_duplicates_single_gene_space():
-    num_duplicates = population_gene_constraint(gene_space=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                                            num_genes=10)
+    initial_population = ga_instance.initial_population
+    # print(initial_population)
 
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_gene_space_initial_population():
-    num_duplicates = population_gene_constraint(gene_space=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                                            num_genes=10,
-                                            initial_population=initial_population)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_range_gene_space():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_space=range(num_genes),
-                                            num_genes=num_genes)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_range_gene_space_initial_population():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_space=range(num_genes),
-                                            num_genes=num_genes,
-                                            initial_population=initial_population)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_numpy_range_gene_space():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_space=numpy.arange(num_genes),
-                                            num_genes=num_genes)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_numpy_range_gene_space_initial_population():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_space=numpy.arange(num_genes),
-                                            num_genes=num_genes,
-                                            initial_population=initial_population)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_nested_gene_space():
-    num_duplicates = population_gene_constraint(gene_space=[[0, 1], 
-                                                        [1, 2], 
-                                                        [2, 3],
-                                                        [3, 4],
-                                                        [4, 5],
-                                                        [5, 6],
-                                                        [6, 7],
-                                                        [7, 8],
-                                                        [8, 9],
-                                                        [9, 10]],
-                                            gene_type=int,
-                                            num_genes=10)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_nested_gene_space_initial_population():
-    num_duplicates = population_gene_constraint(gene_space=[[0, 1], 
-                                                        [1, 2], 
-                                                        [2, 3],
-                                                        [3, 4],
-                                                        [4, 5],
-                                                        [5, 6],
-                                                        [6, 7],
-                                                        [7, 8],
-                                                        [8, 9],
-                                                        [9, 10]],
-                                            gene_type=int,
-                                            num_genes=10,
-                                            initial_population=initial_population)
-
-    assert num_duplicates == 0
-
-
-# def test_number_duplicates_nested_gene_space_nested_gene_type():
-    """
-    This example causes duplicate genes that can only be solved by changing the values of a chain of genes.
-    Let's explain it using this solution: [0, 2, 3, 4, 5, 6, 6, 7, 8, 9]
-    It has 2 genes with the value 6 at indices 5 and 6.
-    According to the gene space, none of these genes can has a different value that solves the duplicates.
-        -If the value of the gene at index 5 is changed from 6 to 5, then it causes another duplicate with the gene at index 4.
-        -If the value of the gene at index 6 is changed from 6 to 7, then it causes another duplicate with the gene at index 7.
-    The solution is to change a chain of genes that make a room to solve the duplicates between the 2 genes.
-        1) Change the second gene from 2 to 1.
-        2) Change the third gene from 3 to 2.
-        3) Change the fourth gene from 4 to 3.
-        4) Change the fifth gene from 5 to 4.
-        5) Change the sixth gene from 6 to 5. This solves the duplicates.
-    But this is NOT SUPPORTED yet.
-    We support changing only a single gene that makes a room to solve the duplicates.
-
-    Let's explain it using this solution: [1, 2, 2, 4, 5, 6, 6, 7, 8, 9]
-    It has 2 genes with the value 2 at indices 1 and 2.
-    This is how the duplicates are solved:
-        1) Change the first gene from 1 to 0.
-        2) Change the second gene from 2 to 1. This solves the duplicates.
-    The result is [0, 1, 2, 4, 5, 6, 6, 7, 8, 9]
-    """
-    # num_duplicates = population_gene_constraint(gene_space=[[0, 1], 
-    #                                                     [1, 2], 
-    #                                                     [2, 3],
-    #                                                     [3, 4],
-    #                                                     [4, 5],
-    #                                                     [5, 6],
-    #                                                     [6, 7],
-    #                                                     [7, 8],
-    #                                                     [8, 9],
-    #                                                     [9, 10]],
-    #                                         gene_type=[int, int, int, int, int, int, int, int, int, int],
-    #                                         num_genes=10)
-
-    # assert num_duplicates == 0
-
-def test_number_duplicates_nested_gene_space_nested_gene_type_initial_population():
-    num_duplicates = population_gene_constraint(gene_space=[[0, 1], 
-                                                        [1, 2], 
-                                                        [2, 3],
-                                                        [3, 4],
-                                                        [4, 5],
-                                                        [5, 6],
-                                                        [6, 7],
-                                                        [7, 8],
-                                                        [8, 9],
-                                                        [9, 10]],
-                                            gene_type=[int, int, int, int, int, int, int, int, int, int],
-                                            num_genes=10,
-                                            initial_population=initial_population)
-
-    assert num_duplicates == 0
-
-#### Multi-Objective
-def test_number_duplicates_default_multi_objective():
-    num_duplicates = population_gene_constraint()
-    
-    assert num_duplicates == 0
-
-def test_number_duplicates_default_initial_population_multi_objective():
-    num_duplicates = population_gene_constraint(initial_population=initial_population)
-    
-    assert num_duplicates == 0
-
-def test_number_duplicates_float_gene_type_multi_objective():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_type=float,
-                                            num_genes=num_genes,
-                                            init_range_low=0,
-                                            init_range_high=1,
-                                            random_mutation_min_val=0,
-                                            random_mutation_max_val=1)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_float_gene_type_initial_population_multi_objective():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_type=float,
-                                            num_genes=num_genes,
-                                            init_range_low=0,
-                                            init_range_high=1,
-                                            initial_population=initial_population,
-                                            random_mutation_min_val=0,
-                                            random_mutation_max_val=1)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_int_gene_type_multi_objective():
-    num_genes = 10
-    init_range_low = 0
-    init_range_high = init_range_low + num_genes
-    random_mutation_min_val = 0
-    random_mutation_max_val = random_mutation_min_val + num_genes
-    num_duplicates = population_gene_constraint(gene_type=int,
-                                            mutation_by_replacement=False,
-                                            num_genes=num_genes,
-                                            init_range_low=init_range_low,
-                                            init_range_high=init_range_high,
-                                            random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_int_gene_type_initial_population_multi_objective():
-    num_genes = 10
-    init_range_low = 0
-    init_range_high = init_range_low + num_genes
-    random_mutation_min_val = 0
-    random_mutation_max_val = random_mutation_min_val + num_genes
-    num_duplicates = population_gene_constraint(gene_type=int,
-                                            mutation_by_replacement=False,
-                                            num_genes=num_genes,
-                                            init_range_low=init_range_low,
-                                            init_range_high=init_range_high,
-                                            initial_population=initial_population,
-                                            random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_int_gene_type_replacement_multi_objective():
-    num_genes = 10
-    init_range_low = 0
-    init_range_high = init_range_low + num_genes
-    random_mutation_min_val = 0
-    random_mutation_max_val = random_mutation_min_val + num_genes
-    num_duplicates = population_gene_constraint(gene_type=int,
-                                            mutation_by_replacement=True,
-                                            num_genes=num_genes,
-                                            init_range_low=init_range_low,
-                                            init_range_high=init_range_high,
-                                            random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_int_gene_type_replacement_initial_population_multi_objective():
-    num_genes = 10
-    init_range_low = 0
-    init_range_high = init_range_low + num_genes
-    random_mutation_min_val = 0
-    random_mutation_max_val = random_mutation_min_val + num_genes
-    num_duplicates = population_gene_constraint(gene_type=int,
-                                            mutation_by_replacement=True,
-                                            num_genes=num_genes,
-                                            init_range_low=init_range_low,
-                                            init_range_high=init_range_high,
-                                            initial_population=initial_population,
-                                            random_mutation_min_val=random_mutation_min_val,
-                                            random_mutation_max_val=random_mutation_max_val)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_gene_space_multi_objective():
-    num_duplicates = population_gene_constraint(gene_space=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                                            num_genes=10)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_gene_space_initial_population_multi_objective():
-    num_duplicates = population_gene_constraint(gene_space=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                                            num_genes=10,
-                                            initial_population=initial_population)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_range_gene_space_multi_objective():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_space=range(num_genes),
-                                            num_genes=num_genes)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_range_gene_space_initial_population_multi_objective():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_space=range(num_genes),
-                                            num_genes=num_genes,
-                                            initial_population=initial_population)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_numpy_range_gene_space_multi_objective():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_space=numpy.arange(num_genes),
-                                            num_genes=num_genes)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_single_numpy_range_gene_space_initial_population_multi_objective():
-    num_genes = 10
-    num_duplicates = population_gene_constraint(gene_space=numpy.arange(num_genes),
-                                            num_genes=num_genes,
-                                            initial_population=initial_population)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_nested_gene_space_multi_objective():
-    num_duplicates = population_gene_constraint(gene_space=[[0, 1], 
-                                                        [1, 2], 
-                                                        [2, 3],
-                                                        [3, 4],
-                                                        [4, 5],
-                                                        [5, 6],
-                                                        [6, 7],
-                                                        [7, 8],
-                                                        [8, 9],
-                                                        [9, 10]],
-                                            gene_type=int,
-                                            num_genes=10)
-
-    assert num_duplicates == 0
-
-def test_number_duplicates_nested_gene_space_initial_population_multi_objective():
-    num_duplicates = population_gene_constraint(gene_space=[[0, 1], 
-                                                        [1, 2], 
-                                                        [2, 3],
-                                                        [3, 4],
-                                                        [4, 5],
-                                                        [5, 6],
-                                                        [6, 7],
-                                                        [7, 8],
-                                                        [8, 9],
-                                                        [9, 10]],
-                                            gene_type=int,
-                                            num_genes=10,
-                                            initial_population=initial_population)
-
-    assert num_duplicates == 0
-
-
-# def test_number_duplicates_nested_gene_space_nested_gene_type_multi_objective():
-    """
-    This example causes duplicate genes that can only be solved by changing the values of a chain of genes.
-    Let's explain it using this solution: [0, 2, 3, 4, 5, 6, 6, 7, 8, 9]
-    It has 2 genes with the value 6 at indices 5 and 6.
-    According to the gene space, none of these genes can has a different value that solves the duplicates.
-        -If the value of the gene at index 5 is changed from 6 to 5, then it causes another duplicate with the gene at index 4.
-        -If the value of the gene at index 6 is changed from 6 to 7, then it causes another duplicate with the gene at index 7.
-    The solution is to change a chain of genes that make a room to solve the duplicates between the 2 genes.
-        1) Change the second gene from 2 to 1.
-        2) Change the third gene from 3 to 2.
-        3) Change the fourth gene from 4 to 3.
-        4) Change the fifth gene from 5 to 4.
-        5) Change the sixth gene from 6 to 5. This solves the duplicates.
-    But this is NOT SUPPORTED yet.
-    We support changing only a single gene that makes a room to solve the duplicates.
-
-    Let's explain it using this solution: [1, 2, 2, 4, 5, 6, 6, 7, 8, 9]
-    It has 2 genes with the value 2 at indices 1 and 2.
-    This is how the duplicates are solved:
-        1) Change the first gene from 1 to 0.
-        2) Change the second gene from 2 to 1. This solves the duplicates.
-    The result is [0, 1, 2, 4, 5, 6, 6, 7, 8, 9]
-    """
-    # num_duplicates = population_gene_constraint(gene_space=[[0, 1], 
-    #                                                     [1, 2], 
-    #                                                     [2, 3],
-    #                                                     [3, 4],
-    #                                                     [4, 5],
-    #                                                     [5, 6],
-    #                                                     [6, 7],
-    #                                                     [7, 8],
-    #                                                     [8, 9],
-    #                                                     [9, 10]],
-    #                                         gene_type=[int, int, int, int, int, int, int, int, int, int],
-    #                                         num_genes=10)
-
-    # assert num_duplicates == 0
-
-def test_number_duplicates_nested_gene_space_nested_gene_type_initial_population_multi_objective():
-    num_duplicates = population_gene_constraint(gene_space=[[0, 1], 
-                                                        [1, 2], 
-                                                        [2, 3],
-                                                        [3, 4],
-                                                        [4, 5],
-                                                        [5, 6],
-                                                        [6, 7],
-                                                        [7, 8],
-                                                        [8, 9],
-                                                        [9, 10]],
-                                            gene_type=[int, int, int, int, int, int, int, int, int, int],
-                                            num_genes=10,
-                                            initial_population=initial_population)
-
-    assert num_duplicates == 0
+    assert numpy.all(initial_population[:, 0] >= 1), "Not all values in column 0 >= 1"
+    assert numpy.all(initial_population[:, 1] >= 1), "Not all values in column 1 >= 1"
+    assert numpy.all(initial_population[:, 2] >= 1), "Not all values in column 2 >= 1"
+    assert numpy.all(initial_population[:, 3] >= 1), "Not all values in column 3 >= 1"
+    assert numpy.all(initial_population[:, 4] >= 1), "Not all values in column 4 >= 1"
 
 if __name__ == "__main__":
     #### Single-objective
     print()
-    test_number_duplicates_default()
+    test_initial_population_int_by_replacement()
     print()
-    
-    """
-    test_number_duplicates_default_initial_population()
+    test_initial_population_int_by_replacement_no_duplicates()
     print()
-
-    test_number_duplicates_float_gene_type()
+    test_initial_population_int_by_replacement_no_duplicates2()
     print()
-    test_number_duplicates_float_gene_type_initial_population()
+    test_initial_population_float_by_replacement_no_duplicates()
     print()
-
-    test_number_duplicates_int_gene_type()
+    test_initial_population_float_by_replacement_no_duplicates2()
     print()
-    test_number_duplicates_int_gene_type_initial_population()
-    print()
-
-    test_number_duplicates_int_gene_type_replacement()
-    print()
-    test_number_duplicates_int_gene_type_replacement_initial_population()
-    print()
-
-    test_number_duplicates_single_gene_space()
-    print()
-    test_number_duplicates_single_gene_space_initial_population()
-    print()
-
-    test_number_duplicates_single_range_gene_space()
-    print()
-    test_number_duplicates_single_range_gene_space_initial_population()
-    print()
-
-    test_number_duplicates_single_numpy_range_gene_space()
-    print()
-    test_number_duplicates_single_numpy_range_gene_space_initial_population()
-    print()
-
-    test_number_duplicates_nested_gene_space()
-    print()
-    test_number_duplicates_nested_gene_space_initial_population()
-    print()
-
-    # This example causes duplicates that can only be solved by changing a chain of genes.
-    # test_number_duplicates_nested_gene_space_nested_gene_type()
-    # print()
-    test_number_duplicates_nested_gene_space_nested_gene_type_initial_population()
-    print()
-
-    #### Multi-objective
-    print()
-    test_number_duplicates_default_initial_population_multi_objective()
-    print()
-
-    test_number_duplicates_float_gene_type_multi_objective()
-    print()
-    test_number_duplicates_float_gene_type_initial_population_multi_objective()
-    print()
-
-    test_number_duplicates_int_gene_type_multi_objective()
-    print()
-    test_number_duplicates_int_gene_type_initial_population_multi_objective()
-    print()
-
-    test_number_duplicates_int_gene_type_replacement_multi_objective()
-    print()
-    test_number_duplicates_int_gene_type_replacement_initial_population_multi_objective()
-    print()
-
-    test_number_duplicates_single_gene_space_multi_objective()
-    print()
-    test_number_duplicates_single_gene_space_initial_population_multi_objective()
-    print()
-
-    test_number_duplicates_single_range_gene_space_multi_objective()
-    print()
-    test_number_duplicates_single_range_gene_space_initial_population_multi_objective()
-    print()
-
-    test_number_duplicates_single_numpy_range_gene_space_multi_objective()
-    print()
-    test_number_duplicates_single_numpy_range_gene_space_initial_population_multi_objective()
-    print()
-
-    test_number_duplicates_nested_gene_space_multi_objective()
-    print()
-    test_number_duplicates_nested_gene_space_initial_population_multi_objective()
-    print()
-
-    # This example causes duplicates that can only be solved by changing a chain of genes.
-    # test_number_duplicates_nested_gene_space_nested_gene_type_multi_objective()
-    # print()
-    test_number_duplicates_nested_gene_space_nested_gene_type_initial_population_multi_objective()
-    print()
-    """
-
-

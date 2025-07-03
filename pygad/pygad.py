@@ -491,7 +491,7 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                                     max_val=self.init_range_high,
                                                                                                                     mutation_by_replacement=self.mutation_by_replacement,
                                                                                                                     gene_type=self.gene_type,
-                                                                                                                    num_values=100)
+                                                                                                                    sample_size=100)
                         else:
                             self.initial_population[initial_solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=initial_solution,
                                                                                                                     gene_type=self.gene_type,
@@ -1450,7 +1450,7 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                gene_idx=gene_idx,
                                                                                                mutation_by_replacement=True,
                                                                                                solution=solution,
-                                                                                               num_values=100)
+                                                                                               sample_size=100)
                                 if random_values_filtered is None:
                                     if not self.suppress_warnings:
                                         warnings.warn(f"No value satisfied the constraint for the gene at index {gene_idx} while creating the initial population.")
@@ -1465,7 +1465,7 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                               max_val=high,
                                                                                               mutation_by_replacement=True,
                                                                                               gene_type=gene_type,
-                                                                                              num_values=100)
+                                                                                              sample_size=100)
                     # self.logger.info("After", self.population[solution_idx])
 
         elif self.gene_space_nested:

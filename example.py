@@ -23,11 +23,15 @@ ga_instance = pygad.GA(num_generations=100,
                        random_mutation_min_val=1,
                        random_mutation_max_val=100,
                        mutation_by_replacement=True,
-                       gene_type=int,
+                       gene_type=[float, 1],
+                       save_solutions=True,
                        allow_duplicate_genes=False,
-                       # mutation_probability=0.4,
-                       # gene_constraint=[lambda x: x[0]>=8,None,None,None,None,None],
+                       # gene_space=numpy.unique(numpy.random.uniform(1, 100, size=100)),
+                       gene_space=[range(10), {"low": 1, "high": 5}, 2.5891221, [1,2,3,4], None, numpy.unique(numpy.random.uniform(1, 100, size=4))],
                        gene_constraint=[lambda x: x[0]>=98,lambda x: x[1]>=98,lambda x: x[2]<98,lambda x: x[3]<98,lambda x: x[4]<98,lambda x: x[5]<98],
                        )
 
-# ga_instance.run()
+ga_instance.run()
+
+print(ga_instance.gene_space_unpacked)
+print(ga_instance.population)

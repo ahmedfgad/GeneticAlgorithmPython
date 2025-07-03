@@ -15,7 +15,7 @@ class Unique:
                                        max_val, 
                                        mutation_by_replacement, 
                                        gene_type, 
-                                       num_values=100):
+                                       sample_size=100):
         """
         Resolves duplicates in a solution by randomly selecting new values for the duplicate genes.
 
@@ -25,7 +25,7 @@ class Unique:
             max_val (int): The maximum value of the range to sample a number randomly.
             mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
             gene_type (type): The data type of the gene (e.g., int, float).
-            num_values (int): The maximum number of random values to generate to find a unique value.
+            sample_size (int): The maximum number of random values to generate to find a unique value.
 
         Returns:
             tuple:
@@ -58,7 +58,7 @@ class Unique:
                                                                  max_val=max_val, 
                                                                  mutation_by_replacement=mutation_by_replacement, 
                                                                  gene_type=gene_type, 
-                                                                 num_values=num_values)
+                                                                 sample_size=sample_size)
  
                 if temp_val in new_solution:
                     num_unsolved_duplicates = num_unsolved_duplicates + 1
@@ -162,14 +162,14 @@ class Unique:
 
         if self.gene_constraint and self.gene_constraint[gene_index]:
             # A unique value is created out of the values that satisfy the constraint.
-            # num_values=None to return all the values.
+            # sample_size=None to return all the values.
             random_values = self.get_valid_gene_constraint_values(range_min=min_val,
                                                                   range_max=max_val,
                                                                   gene_value=solution[gene_index],
                                                                   gene_idx=gene_index,
                                                                   mutation_by_replacement=mutation_by_replacement,
                                                                   solution=solution,
-                                                                  num_values=None,
+                                                                  sample_size=None,
                                                                   step=step)
             # If there is no value satisfying the constraint, then return the current gene value.
             if random_values is None:
@@ -178,14 +178,14 @@ class Unique:
                 pass
         else:
             # There is no constraint for the current gene. Return the same range.
-            # num_values=None to return all the values.
-            random_values = self.generate_gene_random_value(range_min=min_val, 
-                                                            range_max=max_val, 
-                                                            gene_value=solution[gene_index],
-                                                            gene_idx=gene_index, 
-                                                            mutation_by_replacement=mutation_by_replacement,
-                                                            num_values=None,
-                                                            step=step)
+            # sample_size=None to return all the values.
+            random_values = self.generate_gene_value(range_min=min_val,
+                                                     range_max=max_val,
+                                                     gene_value=solution[gene_index],
+                                                     gene_idx=gene_index,
+                                                     mutation_by_replacement=mutation_by_replacement,
+                                                     sample_size=None,
+                                                     step=step)
 
         """
         # For non-integer steps, the numpy.arange() function returns zeros if the dtype parameter is set to an integer data type. So, this returns zeros if step is non-integer and dtype is set to an int data type: numpy.arange(min_val, max_val, step, dtype=gene_type[0])
@@ -223,7 +223,7 @@ class Unique:
                                      max_val, 
                                      mutation_by_replacement, 
                                      gene_type, 
-                                     num_values=100):
+                                     sample_size=100):
 
         """
         Finds a unique floating-point value for a specific gene in a solution.
@@ -235,7 +235,7 @@ class Unique:
             max_val (int): The maximum value of the range to sample a floating-point number randomly.
             mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
             gene_type (type): The data type of the gene (e.g., float, float16, float32, etc).
-            num_values (int): The maximum number of random values to generate to find a unique value.
+            sample_size (int): The maximum number of random values to generate to find a unique value.
 
         Returns:
             int: The new floating-point value of the gene. If no unique value can be found, the original gene value is returned.
@@ -243,58 +243,28 @@ class Unique:
 
         if self.gene_constraint and self.gene_constraint[gene_index]:
             # A unique value is created out of the values that satisfy the constraint.
-            random_values = self.get_valid_gene_constraint_values(range_min=min_val,
-                                                                  range_max=max_val,
-                                                                  gene_value=solution[gene_index],
-                                                                  gene_idx=gene_index,
-                                                                  mutation_by_replacement=mutation_by_replacement,
-                                                                  solution=solution,
-                                                                  num_values=num_values)
+            values = self.get_valid_gene_constraint_values(range_min=min_val,
+                                                           range_max=max_val,
+                                                           gene_value=solution[gene_index],
+                                                           gene_idx=gene_index,
+                                                           mutation_by_replacement=mutation_by_replacement,
+                                                           solution=solution,
+                                                           sample_size=sample_size)
             # If there is no value satisfying the constraint, then return the current gene value.
-            if random_values is None:
+            if values is None:
                 return solution[gene_index]
             else:
                 pass
         else:
             # There is no constraint for the current gene. Return the same range.
-            random_values = self.generate_gene_random_value(range_min=min_val, 
-                                                            range_max=max_val, 
-                                                            gene_value=solution[gene_index],
-                                                            gene_idx=gene_index, 
-                                                            mutation_by_replacement=mutation_by_replacement,
-                                                            num_values=num_values)
+            values = self.generate_gene_value(range_min=min_val,
+                                              range_max=max_val,
+                                              gene_value=solution[gene_index],
+                                              gene_idx=gene_index,
+                                              mutation_by_replacement=mutation_by_replacement,
+                                              sample_size=sample_size)
 
-        """
-        # The gene_type is of the form [type, precision]
-        dtype = gene_type
-
-        # We cannot have a list of all values out of a continous range.
-        # Solution is to create a subset (e.g. 100) of some random values out of the range.
-        some_gene_values = numpy.random.uniform(low=min_val,
-                                                high=max_val,
-                                                size=num_values)
-
-        # If mutation is by replacement, do not add the current gene value into the list.
-        # This is to avoid replacing the value by itself again. We are doing nothing in this case.
-        if mutation_by_replacement:
-            pass
-        else:
-            some_gene_values = some_gene_values + solution[gene_index]
-
-        if not dtype[1] is None:
-            # Precision is available and we have to round the number.
-            # Convert the data type and round the number.
-            some_gene_values = numpy.round(numpy.asarray(some_gene_values, 
-                                                         dtype[0]),
-                                           dtype[1])
-        else:
-            # There is no precision and rounding the number is not needed. The type is [type, None]
-            # Just convert the data type.
-            some_gene_values = numpy.asarray(some_gene_values, 
-                                             dtype[0])
-        """
-
-        selected_value = self.select_unique_value(gene_values=random_values, 
+        selected_value = self.select_unique_value(gene_values=values,
                                                   solution=solution, 
                                                   gene_index=gene_index)
         return selected_value
@@ -439,7 +409,7 @@ class Unique:
                                                                              max_val=high, 
                                                                              mutation_by_replacement=True, 
                                                                              gene_type=dtype, 
-                                                                             num_values=num_trials)
+                                                                             sample_size=num_trials)
 
 
                 elif type(curr_gene_space) is dict:
@@ -532,8 +502,10 @@ class Unique:
                     # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
                     # Remove all the genes in the current solution from the gene_space.
                     # This only leaves the unique values that could be selected for the gene.
-                    values_to_select_from = list(set(self.gene_space) - set(solution))
-    
+
+                    # Before using the gene_space, use gene_space_unpacked instead of gene_space to make sure the numbers has the right data type and its values are rounded.
+                    values_to_select_from = list(set(self.gene_space_unpacked) - set(solution))
+
                     if len(values_to_select_from) == 0:
                         if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the gene space does not have enough values to prevent duplicates.")
                         value_from_space = solution[gene_idx]
@@ -591,14 +563,14 @@ class Unique:
     def unpack_gene_space(self, 
                           range_min,
                           range_max,
-                          num_values_from_inf_range=100):
+                          sample_size_from_inf_range=100):
         """
         Unpacks the gene space for selecting a value to resolve duplicates by converting ranges into lists of values.
 
         Args:
             range_min (float or int): The minimum value of the range.
             range_max (float or int): The maximum value of the range.
-            num_values_from_inf_range (int): The number of values to generate for an infinite range of float values using `numpy.linspace()`.
+            sample_size_from_inf_range (int): The number of values to generate for an infinite range of float values using `numpy.linspace()`.
 
         Returns:
             list: A list representing the unpacked gene space.
@@ -621,7 +593,7 @@ class Unique:
                 else:
                     gene_space_unpacked = numpy.linspace(start=self.gene_space['low'],
                                                          stop=self.gene_space['high'],
-                                                         num=num_values_from_inf_range,
+                                                         num=sample_size_from_inf_range,
                                                          endpoint=False)
 
             if self.gene_type_single == True:
@@ -662,7 +634,7 @@ class Unique:
                 elif type(space) is dict:
                     # Create a list of values using the dict range.
                     # Use numpy.linspace()
-                    dtype = self.get_gene_dtype(gene_index=gene_idx)
+                    dtype = self.get_gene_dtype(gene_index=space_idx)
 
                     if dtype[0] in pygad.GA.supported_int_types:
                         if 'step' in space.keys():
@@ -681,7 +653,7 @@ class Unique:
                         else:
                             gene_space_unpacked[space_idx] = numpy.linspace(start=space['low'],
                                                                             stop=space['high'],
-                                                                            num=num_values_from_inf_range,
+                                                                            num=sample_size_from_inf_range,
                                                                             endpoint=False)    
                 elif type(space) in [numpy.ndarray, list, tuple]:
                     # list/tuple/numpy.ndarray
