@@ -432,9 +432,7 @@ class GA(utils.parent_selection.ParentSelection,
 
                     # Number of solutions in the population.
                     self.sol_per_pop = sol_per_pop
-                    self.initialize_population(low=self.init_range_low,
-                                               high=self.init_range_high,
-                                               allow_duplicate_genes=allow_duplicate_genes,
+                    self.initialize_population(allow_duplicate_genes=allow_duplicate_genes,
                                                mutation_by_replacement=True,
                                                gene_type=self.gene_type,
                                                gene_constraint=gene_constraint)
@@ -457,32 +455,7 @@ class GA(utils.parent_selection.ParentSelection,
                             self.valid_parameters = False
                             raise TypeError(f"The values in the initial population can be integers or floats but the value ({initial_population[row_idx][col_idx]}) of type {type(initial_population[row_idx][col_idx])} found.")
 
-                # Forcing the initial_population array to have the data type assigned to the gene_type parameter.
-                if self.gene_type_single == True:
-                    if self.gene_type[1] == None:
-                        self.initial_population = numpy.array(initial_population,
-                                                            dtype=self.gene_type[0])
-                    else:
-                        # This block is reached only for non-integer data types (i.e. float).
-                        self.initial_population = numpy.round(numpy.array(initial_population,
-                                                                        dtype=self.gene_type[0]),
-                                                            self.gene_type[1])
-                else:
-                    initial_population = numpy.array(initial_population)
-                    self.initial_population = numpy.zeros(shape=(initial_population.shape[0],
-                                                                initial_population.shape[1]),
-                                                        dtype=object)
-                    for gene_idx in range(initial_population.shape[1]):
-                        if self.gene_type[gene_idx][1] is None:
-                            self.initial_population[:, gene_idx] = numpy.asarray(initial_population[:, gene_idx],
-                                                                                dtype=self.gene_type[gene_idx][0])
-                        else:
-                            # This block is reached only for non-integer data types (i.e. float).
-                            self.initial_population[:, gene_idx] = numpy.round(numpy.asarray(initial_population[:, gene_idx],
-                                                                                            dtype=self.gene_type[gene_idx][0]),
-                                                                            self.gene_type[gene_idx][1])
-
-                # Check if duplicates are allowed. If not, then solve any exisiting duplicates in the passed initial population.
+                # Check if duplicates are allowed. If not, then solve any existing duplicates in the passed initial population.
                 if self.allow_duplicate_genes == False:
                     for initial_solution_idx, initial_solution in enumerate(self.initial_population):
                         if self.gene_space is None:
@@ -497,6 +470,9 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                                     gene_type=self.gene_type,
                                                                                                                     num_trials=10)
 
+                # Change the data type and round all genes within the initial population.
+                self.initial_population = self.change_population_dtype_and_round(initial_population)
+
                 # A NumPy array holding the initial population.
                 self.population = self.initial_population.copy()
                 # Number of genes in the solution.
@@ -506,9 +482,9 @@ class GA(utils.parent_selection.ParentSelection,
                 # The population size.
                 self.pop_size = (self.sol_per_pop, self.num_genes)
 
-            # Round initial_population and population
-            self.initial_population = self.round_genes(self.initial_population)
-            self.population = self.round_genes(self.population)
+            # Change the data type and round all genes within the initial population.
+            self.initial_population = self.change_population_dtype_and_round(self.initial_population)
+            self.population = self.initial_population.copy()
 
             # In case the 'gene_space' parameter is nested, then make sure the number of its elements equals to the number of genes.
             if self.gene_space_nested:
@@ -1375,8 +1351,6 @@ class GA(utils.parent_selection.ParentSelection,
         return solutions
 
     def initialize_population(self,
-                              low,
-                              high,
                               allow_duplicate_genes,
                               mutation_by_replacement,
                               gene_type,
@@ -1385,8 +1359,6 @@ class GA(utils.parent_selection.ParentSelection,
         Creates an initial population randomly as a NumPy array. The array is saved in the instance attribute named 'population'.
 
         It accepts:
-            -low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
-            -high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
             -allow_duplicate_genes: Whether duplicate genes are allowed or not.
             -mutation_by_replacement: Whether mutation by replacement is enabled or not.
             -gene_type: The data type of the genes.
@@ -1403,39 +1375,31 @@ class GA(utils.parent_selection.ParentSelection,
         self.pop_size = (self.sol_per_pop, self.num_genes)
 
         if self.gene_space is None:
-            # Creating the initial population randomly.
-            if self.gene_type_single == True:
-                # A NumPy array holding the initial population.
-                self.population = numpy.asarray(numpy.random.uniform(low=low,
-                                                                     high=high,
-                                                                     size=self.pop_size),
-                                                dtype=self.gene_type[0])
-            else:
-                # Create an empty population of dtype=object to support storing mixed data types within the same array.
-                self.population = numpy.zeros(
-                    shape=self.pop_size, dtype=object)
-                # Loop through the genes, randomly generate the values of a single gene across the entire population, and add the values of each gene to the population.
-                for gene_idx in range(self.num_genes):
+            # Create the initial population randomly.
 
-                    range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
+            # Create an empty population.
+            self.population = numpy.zeros(shape=self.pop_size)
 
-                    # A vector of all values of this single gene across all solutions in the population.
-                    gene_values = numpy.asarray(numpy.random.uniform(low=range_min,
-                                                                     high=range_max,
-                                                                     size=self.pop_size[0]),
-                                                dtype=self.gene_type[gene_idx][0])
-                    # Adding the current gene values to the population.
-                    self.population[:, gene_idx] = gene_values
+            # Loop through the genes, randomly generate the values of a single gene across the entire population, and add the values of each gene to the population.
+            for gene_idx in range(self.num_genes):
+                range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
 
-            # Round the randomly generated values.
-            self.population = self.round_genes(self.population)
+                # A vector of all values of this single gene across all solutions in the population.
+                gene_values = numpy.random.uniform(low=range_min,
+                                                   high=range_max,
+                                                   size=self.pop_size[0])
+                # Adding the current gene values to the population.
+                self.population[:, gene_idx] = gene_values
+
+            # Change the data type and round all genes within the initial population.
+            self.population = self.change_population_dtype_and_round(self.population)
 
             # Enforce the gene constraints as much as possible.
             if gene_constraint is None:
                 pass
             else:
                 # Note that gene_constraint is not validated yet.
-                # We have to set it as a propery of the pygad.GA instance to retrieve without passing it as an additional parameter.
+                # We have to set it as a property of the pygad.GA instance to retrieve without passing it as an additional parameter.
                 self.gene_constraint = gene_constraint
                 for sol_idx, solution in enumerate(self.population):
                     for gene_idx in range(self.num_genes):
@@ -1461,12 +1425,11 @@ class GA(utils.parent_selection.ParentSelection,
                 for solution_idx in range(self.population.shape[0]):
                     # self.logger.info("Before", self.population[solution_idx])
                     self.population[solution_idx], _, _ = self.solve_duplicate_genes_randomly(solution=self.population[solution_idx],
-                                                                                              min_val=low,
-                                                                                              max_val=high,
+                                                                                              min_val=self.init_range_low,
+                                                                                              max_val=self.init_range_high,
                                                                                               mutation_by_replacement=True,
                                                                                               gene_type=gene_type,
                                                                                               sample_size=100)
-                    # self.logger.info("After", self.population[solution_idx])
 
         elif self.gene_space_nested:
             if self.gene_type_single == True:
@@ -1482,13 +1445,6 @@ class GA(utils.parent_selection.ParentSelection,
 
                         if self.gene_space[gene_idx] is None:
 
-                            # The following commented code replace the None value with a single number that will not change again.
-                            # This means the gene value will be the same across all solutions.
-                            # self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=low,
-                            #                high=high,
-                            #                size=1), dtype=self.gene_type[0])[0]
-                            # self.population[sol_idx, gene_idx] = list(self.gene_space[gene_idx]).copy()
-
                             # The above problem is solved by keeping the None value in the gene_space parameter. This forces PyGAD to generate this value for each solution.
                             self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=range_min,
                                                                                                     high=range_max,
@@ -1503,8 +1459,7 @@ class GA(utils.parent_selection.ParentSelection,
                                 # We copy the gene_space to a temp variable to keep its original value.
                                 # In the next for loop, the gene_space is changed.
                                 # Later, the gene_space is restored to its original value using the temp variable.
-                                temp_gene_space = list(
-                                    self.gene_space[gene_idx]).copy()
+                                temp_gene_space = list(self.gene_space[gene_idx]).copy()
 
                             for idx, val in enumerate(self.gene_space[gene_idx]):
                                 if val is None:
@@ -1586,7 +1541,7 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                         high=self.gene_space[gene_idx]['high'],
                                                                                                         size=1),
                                                                                    dtype=self.gene_type[gene_idx][0])[0]
-                        elif type(self.gene_space[gene_idx]) == type(None):
+                        elif self.gene_space[gene_idx] is None:
                             temp_gene_value = numpy.asarray(numpy.random.uniform(low=range_min,
                                                                                  high=range_max,
                                                                                  size=1),
@@ -1676,7 +1631,9 @@ class GA(utils.parent_selection.ParentSelection,
                         # Adding the current gene values to the population.
                         self.population[:, gene_idx] = gene_values
 
-        if not (self.gene_space is None):
+        if self.gene_space is None:
+            pass
+        else:
             if allow_duplicate_genes == False:
                 for sol_idx in range(self.population.shape[0]):
                     self.population[sol_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[sol_idx],

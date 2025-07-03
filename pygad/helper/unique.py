@@ -44,18 +44,25 @@ class Unique:
             for duplicate_index in not_unique_indices:
                 dtype = self.get_gene_dtype(gene_index=duplicate_index)
 
+                if type(min_val) in self.supported_int_float_types:
+                    min_val_gene = min_val
+                    max_val_gene = max_val
+                else:
+                    min_val_gene = min_val[duplicate_index]
+                    max_val_gene = max_val[duplicate_index]
+
                 if dtype[0] in pygad.GA.supported_int_types:
                     temp_val = self.unique_int_gene_from_range(solution=new_solution, 
                                                                gene_index=duplicate_index, 
-                                                               min_val=min_val, 
-                                                               max_val=max_val, 
+                                                               min_val=min_val_gene,
+                                                               max_val=max_val_gene,
                                                                mutation_by_replacement=mutation_by_replacement, 
                                                                gene_type=gene_type)
                 else:
                     temp_val = self.unique_float_gene_from_range(solution=new_solution, 
                                                                  gene_index=duplicate_index, 
-                                                                 min_val=min_val, 
-                                                                 max_val=max_val, 
+                                                                 min_val=min_val_gene,
+                                                                 max_val=max_val_gene,
                                                                  mutation_by_replacement=mutation_by_replacement, 
                                                                  gene_type=gene_type, 
                                                                  sample_size=sample_size)
@@ -504,7 +511,7 @@ class Unique:
                     # This only leaves the unique values that could be selected for the gene.
 
                     # Before using the gene_space, use gene_space_unpacked instead of gene_space to make sure the numbers has the right data type and its values are rounded.
-                    values_to_select_from = list(set(self.gene_space_unpacked) - set(solution))
+                    values_to_select_from = list(set(self.gene_space_unpacked[gene_idx]) - set(solution))
 
                     if len(values_to_select_from) == 0:
                         if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the gene space does not have enough values to prevent duplicates.")

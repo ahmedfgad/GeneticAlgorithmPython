@@ -11,6 +11,12 @@ def fitness_func(ga_instance, solution, solution_idx):
 
 num_genes = len(function_inputs)
 
+calls = 0
+def const(x):
+    global calls
+    calls += 1
+    return x[0] >= 90
+
 ga_instance = pygad.GA(num_generations=100,
                        num_parents_mating=10,
                        sol_per_pop=20,
@@ -23,15 +29,21 @@ ga_instance = pygad.GA(num_generations=100,
                        random_mutation_min_val=1,
                        random_mutation_max_val=100,
                        mutation_by_replacement=True,
-                       gene_type=[float, 1],
-                       save_solutions=True,
-                       allow_duplicate_genes=False,
+                       # gene_type=[float, 1],
+                       gene_type=[float, [float, 5], [float, 4], [float, 3], [float, 2], [float, 1]],
+                       # save_solutions=True,
+                       # allow_duplicate_genes=False,
                        # gene_space=numpy.unique(numpy.random.uniform(1, 100, size=100)),
-                       gene_space=[range(10), {"low": 1, "high": 5}, 2.5891221, [1,2,3,4], None, numpy.unique(numpy.random.uniform(1, 100, size=4))],
-                       gene_constraint=[lambda x: x[0]>=98,lambda x: x[1]>=98,lambda x: x[2]<98,lambda x: x[3]<98,lambda x: x[4]<98,lambda x: x[5]<98],
+                       gene_space=[range(100), {"low": 1, "high": 100}, 2.5891221, [1,2,3,4], None, numpy.unique(numpy.random.uniform(1, 100, size=4))],
+                       # gene_space=numpy.linspace(1, 100, 200),
+                       gene_constraint=[const,lambda x: x[1]>=90,lambda x: x[2]<98,lambda x: x[3]<98,lambda x: x[4]<98,lambda x: x[5]<98],
                        )
+
+# print(ga_instance.initial_population)
 
 ga_instance.run()
 
-print(ga_instance.gene_space_unpacked)
+# print(ga_instance.gene_space_unpacked)
 print(ga_instance.population)
+
+print(calls)

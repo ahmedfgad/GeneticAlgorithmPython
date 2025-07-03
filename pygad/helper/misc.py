@@ -9,56 +9,116 @@ import pygad
 
 class Helper:
 
-    def change_gene_value_dtype(self,
-                                random_value,
-                                gene_index,
-                                gene_value,
-                                mutation_by_replacement):
+    def change_population_dtype_and_round(self,
+                                          population):
         """
-        Change the data type of the random value used to apply mutation.
+        Change the data type of the population. It works with iterables (e.g. lists or NumPy arrays) of shape 2D.
+        It does not handle single numeric values or 1D arrays.
+        It accepts:
+            -population: The iterable to change its dtype.
+        It returns the iterable with the data type changed for all genes.
+        """
+
+        population_new = population.copy()
+
+        # Forcing the iterable to have the data type assigned to the gene_type parameter.
+        if self.gene_type_single == True:
+            # Round the numbers first then change the data type.
+            # This solves issues with some data types such as numpy.float32.
+            if self.gene_type[1] is None:
+                pass
+            else:
+                # This block is reached only for non-integer data types (i.e. float).
+                population_new = numpy.round(numpy.array(population_new, float),
+                                             self.gene_type[1])
+
+            population_new = numpy.array(population_new,
+                                         dtype=self.gene_type[0])
+        else:
+            population = numpy.array(population.copy())
+            population_new = numpy.zeros(shape=population.shape,
+                                         dtype=object)
+            for gene_idx in range(population.shape[1]):
+                # Round the numbers first then change the data type.
+                # This solves issues with some data types such as numpy.float32.
+                if self.gene_type[gene_idx][1] is None:
+                    # Do not round.
+                    population_new[:, gene_idx] = population[:, gene_idx]
+                else:
+                    # This block is reached only for non-integer data types (i.e. float).
+                    population_new[:, gene_idx] = numpy.round(numpy.array(population[:, gene_idx], float),
+                                                              self.gene_type[gene_idx][1])
+                # Once rounding is done, change the data type.
+                population_new[:, gene_idx] = numpy.asarray(population_new[:, gene_idx],
+                                                            dtype=self.gene_type[gene_idx][0])
+        return population_new
+
+    def change_gene_dtype_and_round(self,
+                                    gene_index,
+                                    gene_value):
+        """
+        Change the data type and round a single gene value or a vector of values FOR THE SAME GENE. E.g., the input could be 6 or [6, 7, 8].
         It accepts 2 parameters:
+            -gene_index: The index of the target gene.
+            -gene_value: The gene value.
+        If gene_value has a single value, then it returns a single number with the type changed and value rounded. If gene_value is a vector, then a vector is returned after changing the data type and rounding.
+        """
+
+        if self.gene_type_single == True:
+            dtype = self.gene_type[0]
+            if self.gene_type[1] is None:
+                # No rounding for this gene. Use the old gene value.
+                round_precision = None
+            else:
+                round_precision = self.gene_type[1]
+        else:
+            dtype = self.gene_type[gene_index][0]
+            if self.gene_type[gene_index][1] is None:
+                # No rounding for this gene. Use the old gene value.
+                round_precision = None
+            else:
+                round_precision = self.gene_type[gene_index][1]
+
+        # Sometimes the values represent the gene_space when it is not nested (e.g. gene_space=range(10))
+        # Copy it to avoid changing the original gene_space.
+        gene_value = [gene_value].copy()
+
+        # Round the number before changing its data type to avoid precision loss for some data types like numpy.float32.
+        if round_precision is None:
+            pass
+        else:
+            gene_value = numpy.round(gene_value, round_precision)
+
+        gene_value_new = numpy.asarray(gene_value, dtype=dtype)
+        gene_value_new = gene_value_new[0]
+
+        return gene_value_new
+
+    def mutation_change_gene_dtype_and_round(self,
+                                             random_value,
+                                             gene_index,
+                                             gene_value,
+                                             mutation_by_replacement):
+        """
+        Change the data type and round the random value used to apply mutation.
+        It accepts:
             -random_value: The random value to change its data type.
             -gene_index: The index of the target gene.
             -gene_value: The gene value before mutation. Only used if mutation_by_replacement=False and gene_type_single=False.
             -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
-        It returns the new value after changing the data type.
+        It returns the new value after changing the data type and being rounded.
         """
 
-        # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
         if mutation_by_replacement:
-            if self.gene_type_single == True:
-                random_value = self.gene_type[0](random_value)
-            else:
-                random_value = self.gene_type[gene_index][0](random_value)
-                if type(random_value) is numpy.ndarray:
-                    random_value = random_value[0]
-        # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
+            # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
+            gene_value = random_value
         else:
-            if self.gene_type_single == True:
-                random_value = self.gene_type[0](gene_value + random_value)
-            else:
-                random_value = self.gene_type[gene_index][0](gene_value + random_value)
-                if type(random_value) is numpy.ndarray:
-                    random_value = random_value[0]
-        return random_value
+            # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
+            gene_value = gene_value + random_value
 
-    def round_gene_value(self, random_value, gene_index):
-        """
-        Round the random value used to apply mutation.
-        It accepts 2 parameters:
-            -random_value: The random value to round its value.
-            -gene_index: The index of the target gene. Only used if nested gene_type is used.
-        It returns the new value after being rounded.
-        """
-
-        # Round the gene
-        if self.gene_type_single == True:
-            if not self.gene_type[1] is None:
-                random_value = numpy.round(random_value, self.gene_type[1])
-        else:
-            if not self.gene_type[gene_index][1] is None:
-                random_value = numpy.round(random_value, self.gene_type[gene_index][1])
-        return random_value
+        gene_value_new = self.change_gene_dtype_and_round(gene_index=gene_index,
+                                                          gene_value=gene_value)
+        return gene_value_new
 
     def filter_gene_values_by_constraint(self,
                                          values,
@@ -152,18 +212,17 @@ class Helper:
         return range_min, range_max
 
     def generate_gene_value_from_space(self,
-                                       gene_value,
                                        gene_idx,
                                        mutation_by_replacement,
+                                       gene_value=None,
                                        sample_size=1):
         """
         Generate/select one or more values for the gene from the gene space.
         It accepts:
-            -gene_value: The original gene value before applying mutation.
             -gene_idx: The index of the gene in the solution.
             -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
-            -sample_size: The number of random values to generate. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values. For int data types, it could be None to keep all the values. For float data types, a None value returns only a single value.
-            -step (int, optional): The step size for generating candidate values. Defaults to 1. Only used with genes of an integer data type.
+            -gene_value (int, optional): The original gene value before applying mutation. Needed if you are calling this method to apply mutation. If None, then a sample is created from the gene space without being summed to the gene value.
+            -sample_size (int, optional): The number of random values to generate. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values. For int data types, it could be None to keep all the values. For float data types, a None value returns only a single value.
 
         It returns,
             -A single numeric value if sample_size=1. Or
@@ -222,18 +281,17 @@ class Helper:
                 if len(curr_gene_space) == 1:
                     value_from_space = curr_gene_space
                 else:
-                    # If the gene space has more than 1 value, then select a new one that is different from the current value.
-                    # To avoid selecting the current gene value again, remove it from the current gene space and do the selection.
-                    value_from_space = list(set(curr_gene_space) - set([gene_value]))
+                    # Change the data type and round the generated values.
+                    curr_gene_space = self.change_gene_dtype_and_round(gene_index=gene_idx,
+                                                                       gene_value=curr_gene_space)
 
-                    """
-                    if len(values_to_select_from) == 0:
-                        # After removing the current gene value from the space, there are no more values.
-                        # Then keep the current gene value.
-                        value_from_space = gene_value
+                    if gene_value is None:
+                        # Just generate the value(s) without being added to the gene value specially when initializing the population.
+                        value_from_space = curr_gene_space
                     else:
-                        value_from_space = random.choice(values_to_select_from)
-                    """
+                        # If the gene space has more than 1 value, then select a new one that is different from the current value.
+                        # To avoid selecting the current gene value again, remove it from the current gene space and do the selection.
+                        value_from_space = list(set(curr_gene_space) - set([gene_value]))
         else:
             # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
             # The gene's space of type dict specifies the lower and upper limits of a gene.
@@ -249,23 +307,26 @@ class Helper:
                                                             high=self.gene_space['high'],
                                                             size=sample_size)
             else:
-                # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
-                # To avoid selecting the current gene value again, remove it from the current gene space and do the selection.
-                value_from_space = list(set(self.gene_space) - set([gene_value]))
+                # Change the data type and round the generated values.
+                # Pass a copy of the gene_space to avoid changing its value.
+                curr_gene_space = self.change_gene_dtype_and_round(gene_index=gene_idx,
+                                                                   gene_value=self.gene_space)
 
-                """
-                if len(values_to_select_from) == 0:
-                    # After removing the current gene value from the space, there are no more values.
-                    # Then keep the current gene value.
-                    value_from_space = gene_value
+                if gene_value is None:
+                    # Just generate the value(s) without being added to the gene value specially when initializing the population.
+                    value_from_space = curr_gene_space
                 else:
-                    value_from_space = random.choice(values_to_select_from)
-                """
+                    # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
+                    # To avoid selecting the current gene value again, remove it from the current gene space and do the selection.
+                    value_from_space = list(set(curr_gene_space) - set([gene_value]))
 
         if len(value_from_space) == 0:
-            # After removing the current gene value from the space, there are no more values.
-            # Then keep the current gene value.
-            value_from_space = gene_value
+            if gene_value is None:
+                raise ValueError(f"There are no values to select from the gene_space for the gene at index {gene_idx}.")
+            else:
+                # After removing the current gene value from the space, there are no more values.
+                # Then keep the current gene value.
+                value_from_space = gene_value
         elif sample_size == 1:
             value_from_space = random.choice(value_from_space)
 
@@ -273,13 +334,16 @@ class Helper:
             # It might happen that the value None is selected.
             # In this case, generate a random value out of the mutation range.
             if value_from_space is None:
-                # TODO: Return index 0.
-                # TODO: Check if this if statement is necessary.
                 value_from_space = numpy.random.uniform(low=range_min,
                                                         high=range_max,
                                                         size=sample_size)
         else:
             value_from_space = numpy.array(value_from_space)
+
+        # Change the data type and round the generated values.
+        # It has to be called here for all the missed cases.
+        value_from_space = self.change_gene_dtype_and_round(gene_index=gene_idx,
+                                                            gene_value=value_from_space)
 
         return value_from_space
 
@@ -335,13 +399,10 @@ class Helper:
 
         # Change the random mutation value data type.
         for idx, val in enumerate(random_value):
-            random_value[idx] = self.change_gene_value_dtype(random_value[idx],
-                                                             gene_idx,
-                                                             gene_value,
-                                                             mutation_by_replacement=mutation_by_replacement)
-
-            # Round the gene.
-            random_value[idx] = self.round_gene_value(random_value[idx], gene_idx)
+            random_value[idx] = self.mutation_change_gene_dtype_and_round(random_value[idx],
+                                                                          gene_idx,
+                                                                          gene_value,
+                                                                          mutation_by_replacement=mutation_by_replacement)
 
         # Rounding different values could return the same value multiple times.
         # For example, 2.8 and 2.7 will be 3.0.
