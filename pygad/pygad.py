@@ -460,15 +460,16 @@ class GA(utils.parent_selection.ParentSelection,
                     for initial_solution_idx, initial_solution in enumerate(self.initial_population):
                         if self.gene_space is None:
                             self.initial_population[initial_solution_idx], _, _ = self.solve_duplicate_genes_randomly(solution=initial_solution,
-                                                                                                                    min_val=self.init_range_low,
-                                                                                                                    max_val=self.init_range_high,
-                                                                                                                    mutation_by_replacement=self.mutation_by_replacement,
-                                                                                                                    gene_type=self.gene_type,
-                                                                                                                    sample_size=100)
+                                                                                                                      min_val=self.init_range_low,
+                                                                                                                      max_val=self.init_range_high,
+                                                                                                                      mutation_by_replacement=True,
+                                                                                                                      gene_type=self.gene_type,
+                                                                                                                      sample_size=100)
                         else:
                             self.initial_population[initial_solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=initial_solution,
-                                                                                                                    gene_type=self.gene_type,
-                                                                                                                    num_trials=10)
+                                                                                                                      gene_type=self.gene_type,
+                                                                                                                      sample_size=100,
+                                                                                                                      mutation_by_replacement=True)
 
                 # Change the data type and round all genes within the initial population.
                 self.initial_population = self.change_population_dtype_and_round(initial_population)
@@ -1374,272 +1375,86 @@ class GA(utils.parent_selection.ParentSelection,
         # The population will have sol_per_pop chromosome where each chromosome has num_genes genes.
         self.pop_size = (self.sol_per_pop, self.num_genes)
 
+        # There are 4 steps to build the initial population:
+            # 1) Generate the population.
+            # 2) Change the data type and round the values.
+            # 3) Check for the constraints.
+            # 4) Solve duplicates if not allowed.
+
+        # Create an empty population.
+        self.population = numpy.zeros(shape=self.pop_size)
+
+        # 1) Create the initial population either randomly or using the gene space.
         if self.gene_space is None:
             # Create the initial population randomly.
 
-            # Create an empty population.
-            self.population = numpy.zeros(shape=self.pop_size)
+            # Set gene_value=None to consider generating values for the initial population instead of generating values for mutation.
+            # Loop through the genes, randomly generate the values of a single gene at a time, and insert the values of each gene to the population.
+            for sol_idx in range(self.sol_per_pop):
+                for gene_idx in range(self.num_genes):
+                    range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
+                    self.population[sol_idx, gene_idx] = self.generate_gene_value_randomly(range_min=range_min,
+                                                                                           range_max=range_max,
+                                                                                           gene_idx=gene_idx,
+                                                                                           mutation_by_replacement=True,
+                                                                                           gene_value=None,
+                                                                                           sample_size=1,
+                                                                                           step=1)
 
-            # Loop through the genes, randomly generate the values of a single gene across the entire population, and add the values of each gene to the population.
-            for gene_idx in range(self.num_genes):
-                range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
+        else:
+            # Generate the initial population using the gene_space.
+            for sol_idx in range(self.sol_per_pop):
+                for gene_idx in range(self.num_genes):
+                    self.population[sol_idx, gene_idx] = self.generate_gene_value_from_space(gene_idx=gene_idx,
+                                                                                             mutation_by_replacement=True,
+                                                                                             gene_value=None,
+                                                                                             sample_size=1)
 
-                # A vector of all values of this single gene across all solutions in the population.
-                gene_values = numpy.random.uniform(low=range_min,
-                                                   high=range_max,
-                                                   size=self.pop_size[0])
-                # Adding the current gene values to the population.
-                self.population[:, gene_idx] = gene_values
+        # 2) Change the data type and round all genes within the initial population.
+        self.population = self.change_population_dtype_and_round(self.population)
 
-            # Change the data type and round all genes within the initial population.
-            self.population = self.change_population_dtype_and_round(self.population)
+        # 3) Enforce the gene constraints as much as possible.
+        if gene_constraint is None:
+            pass
+        else:
+            # Note that gene_constraint is not validated yet.
+            # We have to set it as a property of the pygad.GA instance to retrieve without passing it as an additional parameter.
+            self.gene_constraint = gene_constraint
+            for sol_idx, solution in enumerate(self.population):
+                for gene_idx in range(self.num_genes):
+                    # Check that a constraint is available for the gene and that the current value does not satisfy that constraint
+                    if self.gene_constraint[gene_idx]:
+                        if not self.gene_constraint[gene_idx](solution):
+                            range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
+                            # While initializing the population, we follow a mutation by replacement approach. So, the original gene value is not needed.
+                            values_filtered = self.get_valid_gene_constraint_values(range_min=range_min,
+                                                                                    range_max=range_max,
+                                                                                    gene_value=None,
+                                                                                    gene_idx=gene_idx,
+                                                                                    mutation_by_replacement=True,
+                                                                                    solution=solution,
+                                                                                    sample_size=100)
+                            if values_filtered is None:
+                                if not self.suppress_warnings:
+                                    warnings.warn(f"No value satisfied the constraint for the gene at index {gene_idx} while creating the initial population.")
+                            else:
+                                self.population[sol_idx, gene_idx] = random.choice(values_filtered)
 
-            # Enforce the gene constraints as much as possible.
-            if gene_constraint is None:
-                pass
-            else:
-                # Note that gene_constraint is not validated yet.
-                # We have to set it as a property of the pygad.GA instance to retrieve without passing it as an additional parameter.
-                self.gene_constraint = gene_constraint
-                for sol_idx, solution in enumerate(self.population):
-                    for gene_idx in range(self.num_genes):
-                        # Check that a constraint is available for the gene and that the current value does not satisfy that constraint
-                        if self.gene_constraint[gene_idx]:
-                            if not self.gene_constraint[gene_idx](solution):
-                                range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
-                                # While initializing the population, we follow a mutation by replacement approach. So, the original gene value is not needed.
-                                random_values_filtered = self.get_valid_gene_constraint_values(range_min=range_min,
-                                                                                               range_max=range_max,
-                                                                                               gene_value=None,
-                                                                                               gene_idx=gene_idx,
-                                                                                               mutation_by_replacement=True,
-                                                                                               solution=solution,
-                                                                                               sample_size=100)
-                                if random_values_filtered is None:
-                                    if not self.suppress_warnings:
-                                        warnings.warn(f"No value satisfied the constraint for the gene at index {gene_idx} while creating the initial population.")
-                                else:
-                                    self.population[sol_idx, gene_idx] = random.choice(random_values_filtered)
-
-            if allow_duplicate_genes == False:
-                for solution_idx in range(self.population.shape[0]):
-                    # self.logger.info("Before", self.population[solution_idx])
+        # 4) Solve duplicate genes.
+        if allow_duplicate_genes == False:
+            for solution_idx in range(self.population.shape[0]):
+                if self.gene_space is None:
                     self.population[solution_idx], _, _ = self.solve_duplicate_genes_randomly(solution=self.population[solution_idx],
                                                                                               min_val=self.init_range_low,
                                                                                               max_val=self.init_range_high,
                                                                                               mutation_by_replacement=True,
                                                                                               gene_type=gene_type,
                                                                                               sample_size=100)
-
-        elif self.gene_space_nested:
-            if self.gene_type_single == True:
-                # Reaching this block means:
-                # 1) gene_space is nested (gene_space_nested is True).
-                # 2) gene_type is not nested (gene_type_single is True).
-                self.population = numpy.zeros(shape=self.pop_size,
-                                              dtype=self.gene_type[0])
-                for sol_idx in range(self.sol_per_pop):
-                    for gene_idx in range(self.num_genes):
-
-                        range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
-
-                        if self.gene_space[gene_idx] is None:
-
-                            # The above problem is solved by keeping the None value in the gene_space parameter. This forces PyGAD to generate this value for each solution.
-                            self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=range_min,
-                                                                                                    high=range_max,
-                                                                                                    size=1),
-                                                                               dtype=self.gene_type[0])[0]
-                        elif type(self.gene_space[gene_idx]) in [numpy.ndarray, list, tuple, range]:
-                            # Check if the gene space has None values. If any, then replace it with randomly generated values according to the 3 attributes init_range_low, init_range_high, and gene_type.
-                            if type(self.gene_space[gene_idx]) is range:
-                                temp_gene_space = self.gene_space[gene_idx]
-                            else:
-                                # Convert to list because tuple and range do not have copy().
-                                # We copy the gene_space to a temp variable to keep its original value.
-                                # In the next for loop, the gene_space is changed.
-                                # Later, the gene_space is restored to its original value using the temp variable.
-                                temp_gene_space = list(self.gene_space[gene_idx]).copy()
-
-                            for idx, val in enumerate(self.gene_space[gene_idx]):
-                                if val is None:
-                                    self.gene_space[gene_idx][idx] = numpy.asarray(numpy.random.uniform(low=range_min,
-                                                                                                        high=range_max,
-                                                                                                        size=1),
-                                                                                   dtype=self.gene_type[0])[0]
-                            # Find the difference between the current gene space and the current values in the solution.
-                            unique_gene_values = list(set(self.gene_space[gene_idx]).difference(
-                                set(self.population[sol_idx, :gene_idx])))
-                            if len(unique_gene_values) > 0:
-                                self.population[sol_idx, gene_idx] = random.choice(unique_gene_values)
-                            else:
-                                # If there is no unique values, then we have to select a duplicate value.
-                                self.population[sol_idx, gene_idx] = random.choice(
-                                    self.gene_space[gene_idx])
-
-                            self.population[sol_idx, gene_idx] = self.gene_type[0](
-                                self.population[sol_idx, gene_idx])
-                            # Restore the gene_space from the temp_gene_space variable.
-                            self.gene_space[gene_idx] = list(
-                                temp_gene_space).copy()
-                        elif type(self.gene_space[gene_idx]) is dict:
-                            if 'step' in self.gene_space[gene_idx].keys():
-                                self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.choice(numpy.arange(start=self.gene_space[gene_idx]['low'],
-                                                                                                                    stop=self.gene_space[gene_idx]['high'],
-                                                                                                                    step=self.gene_space[gene_idx]['step']),
-                                                                                                       size=1),
-                                                                                   dtype=self.gene_type[0])[0]
-                            else:
-                                self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=self.gene_space[gene_idx]['low'],
-                                                                                                        high=self.gene_space[gene_idx]['high'],
-                                                                                                        size=1),
-                                                                                   dtype=self.gene_type[0])[0]
-                        elif type(self.gene_space[gene_idx]) in GA.supported_int_float_types:
-                            self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]
-                        else:
-                            # There is no more options.
-                            pass
-            else:
-                # Reaching this block means:
-                # 1) gene_space is nested (gene_space_nested is True).
-                # 2) gene_type is nested (gene_type_single is False).
-                self.population = numpy.zeros(shape=self.pop_size,
-                                              dtype=object)
-                for sol_idx in range(self.sol_per_pop):
-                    for gene_idx in range(self.num_genes):
-
-                        range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
-
-                        if type(self.gene_space[gene_idx]) in [numpy.ndarray, list, tuple, range]:
-                            # Convert to list because tuple and range do not have copy().
-                            # We copy the gene_space to a temp variable to keep its original value.
-                            # In the next for loop, the gene_space is changed.
-                            # Later, the gene_space is restored to its original value using the temp variable.
-                            temp_gene_space = list(self.gene_space[gene_idx]).copy()
-
-                            # Check if the gene space has None values. If any, then replace it with randomly generated values according to the 3 attributes init_range_low, init_range_high, and gene_type.
-                            for idx, val in enumerate(self.gene_space[gene_idx]):
-                                if val is None:
-                                    self.gene_space[gene_idx][idx] = numpy.asarray(numpy.random.uniform(low=range_min,
-                                                                                                        high=range_max,
-                                                                                                        size=1),
-                                                                                   dtype=self.gene_type[gene_idx][0])[0]
-
-                            self.population[sol_idx, gene_idx] = random.choice(self.gene_space[gene_idx])
-                            self.population[sol_idx, gene_idx] = self.gene_type[gene_idx][0](self.population[sol_idx, gene_idx])
-                            # Restore the gene_space from the temp_gene_space variable.
-                            self.gene_space[gene_idx] = temp_gene_space.copy()
-                        elif type(self.gene_space[gene_idx]) is dict:
-                            if 'step' in self.gene_space[gene_idx].keys():
-                                self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.choice(numpy.arange(start=self.gene_space[gene_idx]['low'],
-                                                                                                                    stop=self.gene_space[gene_idx]['high'],
-                                                                                                                    step=self.gene_space[gene_idx]['step']),
-                                                                                                       size=1),
-                                                                                   dtype=self.gene_type[gene_idx][0])[0]
-                            else:
-                                self.population[sol_idx, gene_idx] = numpy.asarray(numpy.random.uniform(low=self.gene_space[gene_idx]['low'],
-                                                                                                        high=self.gene_space[gene_idx]['high'],
-                                                                                                        size=1),
-                                                                                   dtype=self.gene_type[gene_idx][0])[0]
-                        elif self.gene_space[gene_idx] is None:
-                            temp_gene_value = numpy.asarray(numpy.random.uniform(low=range_min,
-                                                                                 high=range_max,
-                                                                                 size=1),
-                                                            dtype=self.gene_type[gene_idx][0])[0]
-
-                            self.population[sol_idx, gene_idx] = temp_gene_value.copy()
-                        elif type(self.gene_space[gene_idx]) in GA.supported_int_float_types:
-                            self.population[sol_idx, gene_idx] = self.gene_space[gene_idx]
-                        else:
-                            # There is no more options.
-                            pass
-        else:
-            # Handle the non-nested gene_space. It can be assigned a numeric value, list, numpy.ndarray, or a dict.
-            if self.gene_type_single == True:
-                # Reaching this block means:
-                # 1) gene_space is not nested (gene_space_nested is False).
-                # 2) gene_type is not nested (gene_type_single is True).
-
-                # Replace all the None values with random values using the init_range_low, init_range_high, and gene_type attributes.
-                for gene_idx, curr_gene_space in enumerate(self.gene_space):
-
-                    range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
-
-                    if curr_gene_space is None:
-                        self.gene_space[gene_idx] = numpy.asarray(numpy.random.uniform(low=range_min,
-                                                                                       high=range_max,
-                                                                                       size=1),
-                                                                  dtype=self.gene_type[0])[0]
-
-                # Creating the initial population by randomly selecting the genes' values from the values inside the 'gene_space' parameter.
-                if type(self.gene_space) is dict:
-                    if 'step' in self.gene_space.keys():
-                        self.population = numpy.asarray(numpy.random.choice(numpy.arange(start=self.gene_space['low'],
-                                                                                         stop=self.gene_space['high'],
-                                                                                         step=self.gene_space['step']),
-                                                                            size=self.pop_size),
-                                                        dtype=self.gene_type[0])
-                    else:
-                        self.population = numpy.asarray(numpy.random.uniform(low=self.gene_space['low'],
-                                                                             high=self.gene_space['high'],
-                                                                             size=self.pop_size),
-                                                        dtype=self.gene_type[0])  # A NumPy array holding the initial population.
                 else:
-                    self.population = numpy.asarray(numpy.random.choice(self.gene_space,
-                                                                        size=self.pop_size),
-                                                    dtype=self.gene_type[0])  # A NumPy array holding the initial population.
-            else:
-                # Reaching this block means:
-                # 1) gene_space is not nested (gene_space_nested is False).
-                # 2) gene_type is nested (gene_type_single is False).
-
-                # Creating the initial population by randomly selecting the genes' values from the values inside the 'gene_space' parameter.
-                if type(self.gene_space) is dict:
-                    # Create an empty population of dtype=object to support storing mixed data types within the same array.
-                    self.population = numpy.zeros(shape=self.pop_size,
-                                                  dtype=object)
-                    # Loop through the genes, randomly generate the values of a single gene across the entire population, and add the values of each gene to the population.
-                    for gene_idx in range(self.num_genes):
-                        # Generate the values of the current gene across all solutions.
-                        # A vector of all values of this single gene across all solutions in the population.
-                        if 'step' in self.gene_space.keys():
-                            gene_values = numpy.asarray(numpy.random.choice(numpy.arange(start=self.gene_space['low'],
-                                                                                         stop=self.gene_space['high'],
-                                                                                         step=self.gene_space['step']),
-                                                                            size=self.pop_size[0]),
-                                                        dtype=self.gene_type[gene_idx][0])
-                        else:
-                            gene_values = numpy.asarray(numpy.random.uniform(low=self.gene_space['low'],
-                                                                             high=self.gene_space['high'],
-                                                                             size=self.pop_size[0]),
-                                                        dtype=self.gene_type[gene_idx][0])
-                        # Adding the current gene values to the population.
-                        self.population[:, gene_idx] = gene_values
-
-                else:
-                    # Reaching this block means that the gene_space is not None or dict.
-                    # It can be either range, numpy.ndarray, or list.
-
-                    # Create an empty population of dtype=object to support storing mixed data types within the same array.
-                    self.population = numpy.zeros(shape=self.pop_size, dtype=object)
-                    # Loop through the genes, randomly generate the values of a single gene across the entire population, and add the values of each gene to the population.
-                    for gene_idx in range(self.num_genes):
-                        # A vector of all values of this single gene across all solutions in the population.
-                        gene_values = numpy.asarray(numpy.random.choice(self.gene_space,
-                                                                        size=self.pop_size[0]),
-                                                    dtype=self.gene_type[gene_idx][0])
-                        # Adding the current gene values to the population.
-                        self.population[:, gene_idx] = gene_values
-
-        if self.gene_space is None:
-            pass
-        else:
-            if allow_duplicate_genes == False:
-                for sol_idx in range(self.population.shape[0]):
-                    self.population[sol_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[sol_idx],
+                    self.population[sol_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[solution_idx],
                                                                                          gene_type=self.gene_type,
-                                                                                         num_trials=10,
-                                                                                         build_initial_pop=True)
+                                                                                         sample_size=100,
+                                                                                         mutation_by_replacement=True)
 
         # Keeping the initial population in the initial_population attribute.
         self.initial_population = self.population.copy()

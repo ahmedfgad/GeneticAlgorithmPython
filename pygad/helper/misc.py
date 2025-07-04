@@ -229,7 +229,12 @@ class Helper:
             -An array with number of maximum number of values equal to sample_size if sample_size>1.
         """
 
-        range_min, range_max = self.get_random_mutation_range(gene_idx)
+        if gene_value is None:
+            # Use the initial population range.
+            range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
+        else:
+            # Use the mutation range. 
+            range_min, range_max = self.get_random_mutation_range(gene_idx)
 
         if self.gene_space_nested:
             # Returning the current gene space from the 'gene_space' attribute.
