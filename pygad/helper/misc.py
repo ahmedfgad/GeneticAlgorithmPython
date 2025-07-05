@@ -367,6 +367,8 @@ class Helper:
         # It has to be called here for all the missed cases.
         value_from_space = self.change_gene_dtype_and_round(gene_index=gene_idx,
                                                             gene_value=value_from_space)
+        if sample_size == 1 and type(value_from_space) not in pygad.GA.supported_int_float_types:
+            value_from_space = value_from_space[0]
 
         return value_from_space
 

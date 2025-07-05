@@ -31,6 +31,7 @@ def number_respect_gene_space(gene_space=None,
                               init_range_low=-4,
                               init_range_high=4,
                               initial_population=None,
+                              allow_duplicate_genes=False,
                               parent_selection_type='sss',
                               multi_objective=False):
 
@@ -167,7 +168,7 @@ def test_gene_space_dict_with_step():
     assert num_outside == 0
 
 def test_gene_space_list_single_value():
-    num_outside, ga_instance = number_respect_gene_space(gene_space=[5])
+    num_outside, ga_instance = number_respect_gene_space(gene_space=[5], allow_duplicate_genes=True)
 
     assert num_outside == 0
 

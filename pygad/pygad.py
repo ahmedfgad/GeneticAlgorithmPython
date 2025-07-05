@@ -1376,7 +1376,7 @@ class GA(utils.parent_selection.ParentSelection,
             # 4) Solve duplicates if not allowed.
 
         # Create an empty population.
-        self.population = numpy.empty(shape=self.pop_size, dtype=object)
+        self.population = numpy.zeros(shape=self.pop_size, dtype=object)
 
         # 1) Create the initial population either randomly or using the gene space.
         if self.gene_space is None:
