@@ -120,7 +120,7 @@ class Unique:
                                                                                                    build_initial_pop=build_initial_pop)
         else:
             return new_solution, not_unique_indices, len(not_unique_indices)
-    
+
         # DEEP-DUPLICATE-REMOVAL-NEEDED
         # Search by this phrase to find where deep duplicates removal should be applied.
         # If there exist duplicate genes, then changing either of the 2 duplicating genes (with indices 2 and 3) will not solve the problem.
@@ -179,6 +179,7 @@ class Unique:
                                                      range_max=max_val,
                                                      gene_value=solution[gene_index],
                                                      gene_idx=gene_index,
+                                                     solution=solution,
                                                      mutation_by_replacement=mutation_by_replacement,
                                                      sample_size=None,
                                                      step=step)
@@ -237,6 +238,7 @@ class Unique:
                                               range_max=max_val,
                                               gene_value=solution[gene_index],
                                               gene_idx=gene_index,
+                                              solution=solution,
                                               mutation_by_replacement=mutation_by_replacement,
                                               sample_size=sample_size)
 
@@ -253,17 +255,15 @@ class Unique:
         Args:
             gene_values (NumPy Array): An array of values from which a unique value should be selected.
             solution (list): A solution containing genes, potentially with duplicate values.
+            gene_index (int): The index of the gene for which to find a unique value.
 
         Returns:
             selected_gene: The new (hopefully unique) value of the gene. If no unique value can be found, the original gene value is returned.
         """
 
         values_to_select_from = list(set(list(gene_values)) - set(solution))
-    
+
         if len(values_to_select_from) == 0:
-            print("@@@@@@@@")
-            print(solution)
-            print(gene_values)
             # If there are no values, then keep the current gene value.
             if not self.suppress_warnings: warnings.warn(f"'allow_duplicate_genes=False' but cannot find a unique value for the gene at index {gene_index} with value {solution[gene_index]}.")
             selected_value = solution[gene_index]
@@ -367,6 +367,7 @@ class Unique:
                                               range_max=None,
                                               gene_value=gene_value,
                                               gene_idx=gene_idx,
+                                              solution=solution,
                                               mutation_by_replacement=mutation_by_replacement,
                                               sample_size=sample_size)
 
@@ -438,6 +439,10 @@ class Unique:
 
             if self.gene_type_single == True:
                 # Change the data type.
+                for idx in range(len(gene_space_unpacked)):
+                    if gene_space_unpacked[idx] is None:
+                        gene_space_unpacked[idx] = numpy.random.uniform(low=range_min,
+                                                                        high=range_max)
                 gene_space_unpacked = numpy.array(gene_space_unpacked,
                                                   dtype=self.gene_type[0])
                 if not self.gene_type[1] is None:

@@ -216,6 +216,7 @@ class Helper:
     def generate_gene_value_from_space(self,
                                        gene_idx,
                                        mutation_by_replacement,
+                                       solution=None,
                                        gene_value=None,
                                        sample_size=1):
         """
@@ -223,6 +224,7 @@ class Helper:
         It accepts:
             -gene_idx: The index of the gene in the solution.
             -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
+            -solution (iterable, optional): The solution where we need to generate a gene. Needed if you are selecting a single value (sample_size=1) to select a value that respects the allow_duplicate_genes parameter instead of selecting a value randomly. If None, then the gene value is selected randomly.
             -gene_value (int, optional): The original gene value before applying mutation. Needed if you are calling this method to apply mutation. If None, then a sample is created from the gene space without being summed to the gene value.
             -sample_size (int, optional): The number of random values to generate. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values. For int data types, it could be None to keep all the values. For float data types, a None value returns only a single value.
 
@@ -314,10 +316,13 @@ class Helper:
                                                             high=self.gene_space['high'],
                                                             size=sample_size)
             else:
-                # Change the data type and round the generated values.
-                # Pass a copy of the gene_space to avoid changing its value.
+                curr_gene_space = list(self.gene_space).copy()
+                for idx in range(len(curr_gene_space)):
+                    if curr_gene_space[idx] is None:
+                        curr_gene_space[idx] = numpy.random.uniform(low=range_min,
+                                                                    high=range_max)
                 curr_gene_space = self.change_gene_dtype_and_round(gene_index=gene_idx,
-                                                                   gene_value=self.gene_space)
+                                                                   gene_value=curr_gene_space)
 
                 if gene_value is None:
                     # Just generate the value(s) without being added to the gene value specially when initializing the population.
@@ -334,8 +339,19 @@ class Helper:
                 # After removing the current gene value from the space, there are no more values.
                 # Then keep the current gene value.
                 value_from_space = gene_value
+                if sample_size > 1:
+                    value_from_space = numpy.array([gene_value])
         elif sample_size == 1:
-            value_from_space = random.choice(value_from_space)
+            if self.allow_duplicate_genes == True:
+                # Select a value randomly from the current gene space.
+                value_from_space = random.choice(value_from_space)
+            else:
+                # We must check if the selected value will respect the allow_duplicate_genes parameter.
+                # Instead of selecting a value randomly, we have to select a value that will be unique if allow_duplicate_genes=False.
+                # Only select a value from the current gene space that is, hopefully, unique.
+                value_from_space = self.select_unique_value(gene_values=value_from_space,
+                                                            solution=solution,
+                                                            gene_index=gene_idx)
 
             # The gene space might be [None, 1, 7].
             # It might happen that the value None is selected.
@@ -425,6 +441,7 @@ class Helper:
                             gene_value,
                             gene_idx,
                             mutation_by_replacement,
+                            solution=None,
                             range_min=None,
                             range_max=None,
                             sample_size=1,
@@ -435,6 +452,7 @@ class Helper:
             -gene_value: The original gene value before applying mutation.
             -gene_idx: The index of the gene in the solution.
             -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
+            -solution (iterable, optional): The solution where we need to generate a gene. Needed if you are selecting a single value (sample_size=1) to select a value that respects the allow_duplicate_genes parameter instead of selecting a value randomly. If None, then the gene value is selected randomly.
             -range_min (int, optional): The minimum value in the range from which a value is selected. It must be passed for generating the gene value randomly because we cannot decide whether it is the range for the initial population (init_range_low and init_range_high) or mutation (random_mutation_min_val and random_mutation_max_val).
             -range_max (int, optional): The maximum value in the range from which a value is selected. It must be passed for generating the gene value randomly because we cannot decide whether it is the range for the initial population (init_range_low and init_range_high) or mutation (random_mutation_min_val and random_mutation_max_val).
             -sample_size: The number of random values to generate/select and return. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values. For int data types, it could be None to keep all the values. For float data types, a None value returns only a single value.
@@ -456,6 +474,7 @@ class Helper:
             output = self.generate_gene_value_from_space(gene_value=gene_value,
                                                          gene_idx=gene_idx,
                                                          mutation_by_replacement=mutation_by_replacement,
+                                                         solution=solution,
                                                          sample_size=sample_size)
         return output
 

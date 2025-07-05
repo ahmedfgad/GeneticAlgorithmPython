@@ -167,6 +167,7 @@ class Mutation:
                                                       range_max=range_max,
                                                       gene_value=solution[gene_idx],
                                                       gene_idx=gene_idx,
+                                                      solution=solution,
                                                       mutation_by_replacement=self.mutation_by_replacement,
                                                       sample_size=1)
         # Even that its name is singular, it might have a multiple values.

@@ -73,7 +73,7 @@ class GA(utils.parent_selection.ParentSelection,
         num_parents_mating: Number of solutions to be selected as parents in the mating pool.
 
         fitness_func: Accepts a function/method and returns the fitness value of the solution. In PyGAD 2.20.0, a third parameter is passed referring to the 'pygad.GA' instance. If method, then it must accept 4 parameters where the fourth one refers to the method's object.
-        fitness_batch_size: Added in PyGAD 2.19.0. Supports calculating the fitness in batches. If the value is 1 or None, then the fitness function is called for each invidiaul solution. If given another value X where X is neither 1 nor None (e.g. X=3), then the fitness function is called once for each X (3) solutions.
+        fitness_batch_size: Added in PyGAD 2.19.0. Supports calculating the fitness in batches. If the value is 1 or None, then the fitness function is called for each individual solution. If given another value X where X is neither 1 nor None (e.g. X=3), then the fitness function is called once for each X (3) solutions.
 
         initial_population: A user-defined initial population. It is useful when the user wants to start the generations with a custom initial population. It defaults to None which means no initial population is specified by the user. In this case, PyGAD creates an initial population using the 'sol_per_pop' and 'num_genes' parameters. An exception is raised if the 'initial_population' is None while any of the 2 parameters ('sol_per_pop' or 'num_genes') is also None.
         sol_per_pop: Number of solutions in the population. 
@@ -81,20 +81,20 @@ class GA(utils.parent_selection.ParentSelection,
 
         init_range_low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
         init_range_high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
-        # It is OK to set the value of any of the 2 parameters ('init_range_low' and 'init_range_high') to be equal, higher or lower than the other parameter (i.e. init_range_low is not needed to be lower than init_range_high).
+        # It is OK to set the value of the 2 parameters ('init_range_low' and 'init_range_high') to be equal, higher or lower than the other parameter (i.e. init_range_low is not needed to be lower than init_range_high).
 
         gene_type: The type of the gene. It is assigned to any of these types (int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, float, numpy.float16, numpy.float32, numpy.float64) and forces all the genes to be of that type.
 
         parent_selection_type: Type of parent selection.
-        keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. Some parent selection operators such as rank selection, favor population diversity and therefore keeping the parents in the next generation can be beneficial. However, some other parent selection operators, such as roulette wheel selection (RWS), have higher selection pressure and keeping more than one parent in the next generation can seriously harm population diversity. This parameter have an effect only when the keep_elitism parameter is 0. Thanks to Prof. Fernando Jiménez Barrionuevo (http://webs.um.es/fernan) for editing this sentence.
+        keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. Some parent selection operators such as rank selection, favor population diversity and therefore keeping the parents in the next generation can be beneficial. However, some other parent selection operators, such as roulette wheel selection (RWS), have higher selection pressure and keeping more than one parent in the next generation can seriously harm population diversity. This parameter have an effect only when the keep_elitism parameter is 0. Thanks to Prof. Fernando Jiménez (http://webs.um.es/fernan) for editing this sentence.
         K_tournament: When the value of 'parent_selection_type' is 'tournament', the 'K_tournament' parameter specifies the number of solutions from which a parent is selected randomly.
 
-        keep_elitism: Added in PyGAD 2.18.0. It can take the value 0 or a positive integer that satisfies (0 <= keep_elitism <= sol_per_pop). It defaults to 1 which means only the best solution in the current generation is kept in the next generation. If assigned 0, this means it has no effect. If assigned a positive integer K, then the best K solutions are kept in the next generation. It cannot be assigned a value greater than the value assigned to the sol_per_pop parameter. If this parameter has a value different than 0, then the keep_parents parameter will have no effect.
+        keep_elitism: Added in PyGAD 2.18.0. It can take the value 0 or a positive integer that satisfies (0 <= keep_elitism <= sol_per_pop). It defaults to 1 which means only the best solution in the current generation is kept in the next generation. If assigned 0, this means it has no effect. If assigned a positive integer K, then the best K solutions are kept in the next generation. It cannot be assigned a value greater than the value assigned to the sol_per_pop parameter. If this parameter has a value different from 0, then the keep_parents parameter will have no effect.
 
-        crossover_type: Type of the crossover opreator. If  crossover_type=None, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
+        crossover_type: Type of the crossover operator. If  crossover_type=None, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
         crossover_probability: The probability of selecting a solution for the crossover operation. If the solution probability is <= crossover_probability, the solution is selected. The value must be between 0 and 1 inclusive.
 
-        mutation_type: Type of the mutation opreator. If mutation_type=None, then the mutation step is bypassed which means no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
+        mutation_type: Type of the mutation operator. If mutation_type=None, then the mutation step is bypassed which means no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
         mutation_probability: The probability of selecting a gene for the mutation operation. If the gene probability is <= mutation_probability, the gene is selected. It accepts either a single value for fixed mutation or a list/tuple/numpy.ndarray of 2 values for adaptive mutation. The values must be between 0 and 1 inclusive. If specified, then no need for the 2 parameters mutation_percent_genes and mutation_num_genes.
 
         mutation_by_replacement: An optional bool parameter. It works only when the selected type of mutation is random (mutation_type="random"). In this case, setting mutation_by_replacement=True means replace the gene by the randomly generated value. If False, then it has no effect and random mutation works by adding the random value to the gene.
@@ -108,13 +108,13 @@ class GA(utils.parent_selection.ParentSelection,
 
         gene_constraint: It accepts a list of constraints for the genes. Each constraint is a Python function. Added in PyGAD 3.5.0.
 
-        on_start: Accepts a function/method to be called only once before the genetic algorithm starts its evolution. If function, then it must accept a single parameter representing the instance of the genetic algorithm. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
-        on_fitness: Accepts a function/method to be called after calculating the fitness values of all solutions in the population. If function, then it must accept 2 parameters: 1) a list of all solutions' fitness values 2) the instance of the genetic algorithm. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
-        on_parents: Accepts a function/method to be called after selecting the parents that mates. If function, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the selected parents. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
-        on_crossover: Accepts a function/method to be called each time the crossover operation is applied. If function, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring generated using crossover. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
-        on_mutation: Accepts a function/method to be called each time the mutation operation is applied. If function, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring after applying the mutation. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
-        on_generation: Accepts a function/method to be called after each generation. If function, then it must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
-        on_stop: Accepts a function/method to be called only once exactly before the genetic algorithm stops or when it completes all the generations. If function, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of fitness values of the last population's solutions. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0. 
+        on_start: Accepts a function/method to be called only once before the genetic algorithm starts its evolution. If functioned, then it must accept a single parameter representing the instance of the genetic algorithm. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
+        on_fitness: Accepts a function/method to be called after calculating the fitness values of all solutions in the population. If functioned, then it must accept 2 parameters: 1) a list of all solutions' fitness values 2) the instance of the genetic algorithm. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
+        on_parents: Accepts a function/method to be called after selecting the parents that mates. If functioned, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the selected parents. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
+        on_crossover: Accepts a function/method to be called each time the crossover operation is applied. If functioned, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring generated using crossover. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
+        on_mutation: Accepts a function/method to be called each time the mutation operation is applied. If functioned, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring after applying the mutation. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
+        on_generation: Accepts a function/method to be called after each generation. If functioned, then it must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
+        on_stop: Accepts a function/method to be called only once exactly before the genetic algorithm stops or when it completes all the generations. If functioned, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of fitness values of the last population's solutions. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
 
         save_best_solutions: Added in PyGAD 2.9.0 and its type is bool. If True, then the best solution in each generation is saved into the 'best_solutions' attribute. Use this parameter with caution as it may cause memory overflow when either the number of generations or the number of genes is large.
         save_solutions: Added in PyGAD 2.15.0 and its type is bool. If True, then all solutions in each generation are saved into the 'solutions' attribute. Use this parameter with caution as it may cause memory overflow when either the number of generations, number of genes, or number of solutions in population is large.
@@ -175,7 +175,7 @@ class GA(utils.parent_selection.ParentSelection,
                 numpy.random.seed(self.random_seed)
                 random.seed(self.random_seed)
 
-            # If suppress_warnings is bool and its valud is False, then print warning messages.
+            # If suppress_warnings is bool and its value is False, then print warning messages.
             if type(suppress_warnings) is bool:
                 self.suppress_warnings = suppress_warnings
             else:
@@ -288,13 +288,6 @@ class GA(utils.parent_selection.ParentSelection,
                     self.valid_parameters = False
                     raise TypeError(f"Type mismatch between the 2 parameters 'init_range_low' {type(init_range_low)} and 'init_range_high' {type(init_range_high)}.")
             elif type(init_range_low) in [list, tuple, numpy.ndarray]:
-                # The self.num_genes attribute is not created yet.
-                # if len(init_range_low) == self.num_genes:
-                #     pass
-                # else:
-                #     self.valid_parameters = False
-                #     raise ValueError(f"The length of the 'init_range_low' parameter is {len(init_range_low)} which is different from the number of genes {self.num_genes}.")
-
                 # Get the number of genes before validating the num_genes parameter.
                 if num_genes is None:
                     if initial_population is None:
@@ -410,7 +403,7 @@ class GA(utils.parent_selection.ParentSelection,
             if initial_population is None:
                 if (sol_per_pop is None) or (num_genes is None):
                     self.valid_parameters = False
-                    raise TypeError("Error creating the initial population:\n\nWhen the parameter 'initial_population' is None, then the 2 parameters 'sol_per_pop' and 'num_genes' cannot be None too.\nThere are 2 options to prepare the initial population:\n1) Assinging the initial population to the 'initial_population' parameter. In this case, the values of the 2 parameters sol_per_pop and num_genes will be deduced.\n2) Assign integer values to the 'sol_per_pop' and 'num_genes' parameters so that PyGAD can create the initial population automatically.")
+                    raise TypeError("Error creating the initial population:\n\nWhen the parameter 'initial_population' is None, then the 2 parameters 'sol_per_pop' and 'num_genes' cannot be None too.\nThere are 2 options to prepare the initial population:\n1) Assigning the initial population to the 'initial_population' parameter. In this case, the values of the 2 parameters sol_per_pop and num_genes will be deduced.\n2) Assign integer values to the 'sol_per_pop' and 'num_genes' parameters so that PyGAD can create the initial population automatically.")
                 elif (type(sol_per_pop) is int) and (type(num_genes) is int):
                     # Validating the number of solutions in the population (sol_per_pop)
                     if sol_per_pop <= 0:
@@ -455,6 +448,9 @@ class GA(utils.parent_selection.ParentSelection,
                             self.valid_parameters = False
                             raise TypeError(f"The values in the initial population can be integers or floats but the value ({initial_population[row_idx][col_idx]}) of type {type(initial_population[row_idx][col_idx])} found.")
 
+                # Change the data type and round all genes within the initial population.
+                self.initial_population = self.change_population_dtype_and_round(initial_population)
+
                 # Check if duplicates are allowed. If not, then solve any existing duplicates in the passed initial population.
                 if self.allow_duplicate_genes == False:
                     for initial_solution_idx, initial_solution in enumerate(self.initial_population):
@@ -471,9 +467,6 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                                       sample_size=100,
                                                                                                                       mutation_by_replacement=True,
                                                                                                                       build_initial_pop=True)
-
-                # Change the data type and round all genes within the initial population.
-                self.initial_population = self.change_population_dtype_and_round(initial_population)
 
                 # A NumPy array holding the initial population.
                 self.population = self.initial_population.copy()
@@ -589,7 +582,7 @@ class GA(utils.parent_selection.ParentSelection,
             if crossover_type is None:
                 self.crossover = None
             elif inspect.ismethod(crossover_type):
-                # Check if the crossover_type is a method that accepts 4 paramaters.
+                # Check if the crossover_type is a method that accepts 4 parameters.
                 if crossover_type.__code__.co_argcount == 4:
                     # The crossover method assigned to the crossover_type parameter is validated.
                     self.crossover = crossover_type
@@ -597,7 +590,7 @@ class GA(utils.parent_selection.ParentSelection,
                     self.valid_parameters = False
                     raise ValueError(f"When 'crossover_type' is assigned to a method, then this crossover method must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The selected parents.\n3) The size of the offspring to be produced.\n4) The instance from the pygad.GA class.\n\nThe passed crossover method named '{crossover_type.__code__.co_name}' accepts {crossover_type.__code__.co_argcount} parameter(s).")
             elif callable(crossover_type):
-                # Check if the crossover_type is a function that accepts 2 paramaters.
+                # Check if the crossover_type is a function that accepts 2 parameters.
                 if crossover_type.__code__.co_argcount == 3:
                     # The crossover function assigned to the crossover_type parameter is validated.
                     self.crossover = crossover_type
@@ -609,13 +602,13 @@ class GA(utils.parent_selection.ParentSelection,
                 raise TypeError(f"The expected type of the 'crossover_type' parameter is either callable or str but {type(crossover_type)} found.")
             else:  # type crossover_type is str
                 crossover_type = crossover_type.lower()
-                if (crossover_type == "single_point"):
+                if crossover_type == "single_point":
                     self.crossover = self.single_point_crossover
-                elif (crossover_type == "two_points"):
+                elif crossover_type == "two_points":
                     self.crossover = self.two_points_crossover
-                elif (crossover_type == "uniform"):
+                elif crossover_type == "uniform":
                     self.crossover = self.uniform_crossover
-                elif (crossover_type == "scattered"):
+                elif crossover_type == "scattered":
                     self.crossover = self.scattered_crossover
                 else:
                     self.valid_parameters = False
@@ -627,7 +620,7 @@ class GA(utils.parent_selection.ParentSelection,
             if crossover_probability is None:
                 self.crossover_probability = None
             elif type(crossover_probability) in GA.supported_int_float_types:
-                if crossover_probability >= 0 and crossover_probability <= 1:
+                if 0 <= crossover_probability <= 1:
                     self.crossover_probability = crossover_probability
                 else:
                     self.valid_parameters = False
@@ -642,7 +635,7 @@ class GA(utils.parent_selection.ParentSelection,
             if mutation_type is None:
                 self.mutation = None
             elif inspect.ismethod(mutation_type):
-                # Check if the mutation_type is a method that accepts 3 paramater.
+                # Check if the mutation_type is a method that accepts 3 parameters.
                 if (mutation_type.__code__.co_argcount == 3):
                     # The mutation method assigned to the mutation_type parameter is validated.
                     self.mutation = mutation_type
@@ -650,7 +643,7 @@ class GA(utils.parent_selection.ParentSelection,
                     self.valid_parameters = False
                     raise ValueError(f"When 'mutation_type' is assigned to a method, then it must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The offspring to be mutated.\n3) The instance from the pygad.GA class.\n\nThe passed mutation method named '{mutation_type.__code__.co_name}' accepts {mutation_type.__code__.co_argcount} parameter(s).")
             elif callable(mutation_type):
-                # Check if the mutation_type is a function that accepts 2 paramater.
+                # Check if the mutation_type is a function that accepts 2 parameters.
                 if (mutation_type.__code__.co_argcount == 2):
                     # The mutation function assigned to the mutation_type parameter is validated.
                     self.mutation = mutation_type
@@ -662,15 +655,15 @@ class GA(utils.parent_selection.ParentSelection,
                 raise TypeError(f"The expected type of the 'mutation_type' parameter is either callable or str but {type(mutation_type)} found.")
             else:  # type mutation_type is str
                 mutation_type = mutation_type.lower()
-                if (mutation_type == "random"):
+                if mutation_type == "random":
                     self.mutation = self.random_mutation
-                elif (mutation_type == "swap"):
+                elif mutation_type == "swap":
                     self.mutation = self.swap_mutation
-                elif (mutation_type == "scramble"):
+                elif mutation_type == "scramble":
                     self.mutation = self.scramble_mutation
-                elif (mutation_type == "inversion"):
+                elif mutation_type == "inversion":
                     self.mutation = self.inversion_mutation
-                elif (mutation_type == "adaptive"):
+                elif mutation_type == "adaptive":
                     self.mutation = self.adaptive_mutation
                 else:
                     self.valid_parameters = False
@@ -682,10 +675,10 @@ class GA(utils.parent_selection.ParentSelection,
             if not (self.mutation_type is None):
                 if mutation_probability is None:
                     self.mutation_probability = None
-                elif (mutation_type != "adaptive"):
+                elif mutation_type != "adaptive":
                     # Mutation probability is fixed not adaptive.
                     if type(mutation_probability) in GA.supported_int_float_types:
-                        if mutation_probability >= 0 and mutation_probability <= 1:
+                        if 0 <= mutation_probability <= 1:
                             self.mutation_probability = mutation_probability
                         else:
                             self.valid_parameters = False
@@ -699,7 +692,7 @@ class GA(utils.parent_selection.ParentSelection,
                         if len(mutation_probability) == 2:
                             for el in mutation_probability:
                                 if type(el) in GA.supported_int_float_types:
-                                    if el >= 0 and el <= 1:
+                                    if 0 <= el <= 1:
                                         pass
                                     else:
                                         self.valid_parameters = False
@@ -709,7 +702,7 @@ class GA(utils.parent_selection.ParentSelection,
                                     raise TypeError(f"Unexpected type for a value assigned to the 'mutation_probability' parameter. A numeric value is expected but ({el}) of type {type(el)} found.")
                             if mutation_probability[0] < mutation_probability[1]:
                                 if not self.suppress_warnings:
-                                    warnings.warn(f"The first element in the 'mutation_probability' parameter is {mutation_probability[0]} which is smaller than the second element {mutation_probability[1]}. This means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high qualitiy solutions while making little changes in the low quality solutions. Please make the first element higher than the second element.")
+                                    warnings.warn(f"The first element in the 'mutation_probability' parameter is {mutation_probability[0]} which is smaller than the second element {mutation_probability[1]}. This means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high quality solutions while making little changes in the low quality solutions. Please make the first element higher than the second element.")
                             self.mutation_probability = mutation_probability
                         else:
                             self.valid_parameters = False
@@ -724,7 +717,7 @@ class GA(utils.parent_selection.ParentSelection,
             if not (self.mutation_type is None):
                 if mutation_num_genes is None:
                     # The mutation_num_genes parameter does not exist. Checking whether adaptive mutation is used.
-                    if (mutation_type != "adaptive"):
+                    if mutation_type != "adaptive":
                         # The percent of genes to mutate is fixed not adaptive.
                         if mutation_percent_genes == 'default'.lower():
                             mutation_percent_genes = 10
@@ -740,7 +733,7 @@ class GA(utils.parent_selection.ParentSelection,
                                 mutation_num_genes = 1
 
                         elif type(mutation_percent_genes) in GA.supported_int_float_types:
-                            if (mutation_percent_genes <= 0 or mutation_percent_genes > 100):
+                            if mutation_percent_genes <= 0 or mutation_percent_genes > 100:
                                 self.valid_parameters = False
                                 raise ValueError(f"The percentage of selected genes for mutation (mutation_percent_genes) must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n")
                             else:
@@ -768,7 +761,7 @@ class GA(utils.parent_selection.ParentSelection,
                                     mutation_percent_genes, dtype=numpy.uint32)
                                 for idx, el in enumerate(mutation_percent_genes):
                                     if type(el) in GA.supported_int_float_types:
-                                        if (el <= 0 or el > 100):
+                                        if el <= 0 or el > 100:
                                             self.valid_parameters = False
                                             raise ValueError(f"The values assigned to the 'mutation_percent_genes' must be > 0 and <= 100 but ({mutation_percent_genes}) found.\n")
                                     else:
@@ -785,8 +778,8 @@ class GA(utils.parent_selection.ParentSelection,
                                         mutation_num_genes[idx] = 1
                                 if mutation_percent_genes[0] < mutation_percent_genes[1]:
                                     if not self.suppress_warnings:
-                                        warnings.warn(f"The first element in the 'mutation_percent_genes' parameter is ({mutation_percent_genes[0]}) which is smaller than the second element ({mutation_percent_genes[1]}).\nThis means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high qualitiy solutions while making little changes in the low quality solutions.\nPlease make the first element higher than the second element.")
-                                # At this point outside the loop, all values of the parameter 'mutation_percent_genes' are validated. Eveyrthing is OK.
+                                        warnings.warn(f"The first element in the 'mutation_percent_genes' parameter is ({mutation_percent_genes[0]}) which is smaller than the second element ({mutation_percent_genes[1]}).\nThis means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high quality solutions while making little changes in the low quality solutions.\nPlease make the first element higher than the second element.")
+                                # At this point outside the loop, all values of the parameter 'mutation_percent_genes' are validated. Everything is OK.
                             else:
                                 self.valid_parameters = False
                                 raise ValueError(f"When mutation_type='adaptive', then the 'mutation_percent_genes' parameter must have only 2 elements but ({len(mutation_percent_genes)}) element(s) found.")
@@ -795,13 +788,13 @@ class GA(utils.parent_selection.ParentSelection,
                                 self.valid_parameters = False
                                 raise TypeError(f"Unexpected type of the 'mutation_percent_genes' parameter. When mutation_type='adaptive', then the 'mutation_percent_genes' parameter should exist and assigned a list/tuple/numpy.ndarray with 2 values but ({mutation_percent_genes}) found.")
                 # The mutation_num_genes parameter exists. Checking whether adaptive mutation is used.
-                elif (mutation_type != "adaptive"):
+                elif mutation_type != "adaptive":
                     # Number of genes to mutate is fixed not adaptive.
                     if type(mutation_num_genes) in GA.supported_int_types:
-                        if (mutation_num_genes <= 0):
+                        if mutation_num_genes <= 0:
                             self.valid_parameters = False
                             raise ValueError(f"The number of selected genes for mutation (mutation_num_genes) cannot be <= 0 but ({mutation_num_genes}) found. If you do not want to use mutation, please set mutation_type=None\n")
-                        elif (mutation_num_genes > self.num_genes):
+                        elif mutation_num_genes > self.num_genes:
                             self.valid_parameters = False
                             raise ValueError(f"The number of selected genes for mutation (mutation_num_genes), which is ({mutation_num_genes}), cannot be greater than the number of genes ({self.num_genes}).\n")
                     else:
@@ -813,10 +806,10 @@ class GA(utils.parent_selection.ParentSelection,
                         if len(mutation_num_genes) == 2:
                             for el in mutation_num_genes:
                                 if type(el) in GA.supported_int_types:
-                                    if (el <= 0):
+                                    if el <= 0:
                                         self.valid_parameters = False
                                         raise ValueError(f"The values assigned to the 'mutation_num_genes' cannot be <= 0 but ({el}) found. If you do not want to use mutation, please set mutation_type=None\n")
-                                    elif (el > self.num_genes):
+                                    elif el > self.num_genes:
                                         self.valid_parameters = False
                                         raise ValueError(f"The values assigned to the 'mutation_num_genes' cannot be greater than the number of genes ({self.num_genes}) but ({el}) found.\n")
                                 else:
@@ -825,8 +818,8 @@ class GA(utils.parent_selection.ParentSelection,
                                 # At this point of the loop, the current value assigned to the parameter 'mutation_num_genes' is validated.
                             if mutation_num_genes[0] < mutation_num_genes[1]:
                                 if not self.suppress_warnings:
-                                    warnings.warn(f"The first element in the 'mutation_num_genes' parameter is {mutation_num_genes[0]} which is smaller than the second element {mutation_num_genes[1]}. This means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high qualitiy solutions while making little changes in the low quality solutions. Please make the first element higher than the second element.")
-                            # At this point outside the loop, all values of the parameter 'mutation_num_genes' are validated. Eveyrthing is OK.
+                                    warnings.warn(f"The first element in the 'mutation_num_genes' parameter is {mutation_num_genes[0]} which is smaller than the second element {mutation_num_genes[1]}. This means the mutation rate for the high-quality solutions is higher than the mutation rate of the low-quality ones. This causes high disruption in the high quality solutions while making little changes in the low quality solutions. Please make the first element higher than the second element.")
+                            # At this point outside the loop, all values of the parameter 'mutation_num_genes' are validated. Everything is OK.
                         else:
                             self.valid_parameters = False
                             raise ValueError(f"When mutation_type='adaptive', then the 'mutation_num_genes' parameter must have only 2 elements but ({len(mutation_num_genes)}) element(s) found.")
@@ -849,18 +842,18 @@ class GA(utils.parent_selection.ParentSelection,
             # select_parents: Refers to a method that selects the parents based on the parent selection type specified in the parent_selection_type attribute.
             # Validating the selected type of parent selection: parent_selection_type
             if inspect.ismethod(parent_selection_type):
-                # Check if the parent_selection_type is a method that accepts 4 paramaters.
-                if (parent_selection_type.__code__.co_argcount == 4):
-                    # population: Added in PyGAD 2.16.0. It should used only to support custom parent selection functions. Otherwise, it should be left to None to retirve the population by self.population.
+                # Check if the parent_selection_type is a method that accepts 4 parameters.
+                if parent_selection_type.__code__.co_argcount == 4:
+                    # population: Added in PyGAD 2.16.0. It should use only to support custom parent selection functions. Otherwise, it should be left to None to retrieve the population by self.population.
                     # The parent selection method assigned to the parent_selection_type parameter is validated.
                     self.select_parents = parent_selection_type
                 else:
                     self.valid_parameters = False
                     raise ValueError(f"When 'parent_selection_type' is assigned to a method, then it must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The fitness values of the current population.\n3) The number of parents needed.\n4) The instance from the pygad.GA class.\n\nThe passed parent selection method named '{parent_selection_type.__code__.co_name}' accepts {parent_selection_type.__code__.co_argcount} parameter(s).")
             elif callable(parent_selection_type):
-                # Check if the parent_selection_type is a function that accepts 3 paramaters.
-                if (parent_selection_type.__code__.co_argcount == 3):
-                    # population: Added in PyGAD 2.16.0. It should used only to support custom parent selection functions. Otherwise, it should be left to None to retirve the population by self.population.
+                # Check if the parent_selection_type is a function that accepts 3 parameters.
+                if parent_selection_type.__code__.co_argcount == 3:
+                    # population: Added in PyGAD 2.16.0. It should use only to support custom parent selection functions. Otherwise, it should be left to None to retrieve the population by self.population.
                     # The parent selection function assigned to the parent_selection_type parameter is validated.
                     self.select_parents = parent_selection_type
                 else:
@@ -872,33 +865,33 @@ class GA(utils.parent_selection.ParentSelection,
                 raise TypeError(f"The expected type of the 'parent_selection_type' parameter is either callable or str but {type(parent_selection_type)} found.")
             else:
                 parent_selection_type = parent_selection_type.lower()
-                if (parent_selection_type == "sss"):
+                if parent_selection_type == "sss":
                     self.select_parents = self.steady_state_selection
-                elif (parent_selection_type == "rws"):
+                elif parent_selection_type == "rws":
                     self.select_parents = self.roulette_wheel_selection
-                elif (parent_selection_type == "sus"):
+                elif parent_selection_type == "sus":
                     self.select_parents = self.stochastic_universal_selection
-                elif (parent_selection_type == "random"):
+                elif parent_selection_type == "random":
                     self.select_parents = self.random_selection
-                elif (parent_selection_type == "tournament"):
+                elif parent_selection_type == "tournament":
                     self.select_parents = self.tournament_selection
-                elif (parent_selection_type == "tournament_nsga2"): # Supported in PyGAD >= 3.2
+                elif parent_selection_type == "tournament_nsga2": # Supported in PyGAD >= 3.2
                     self.select_parents = self.tournament_selection_nsga2
-                elif (parent_selection_type == "nsga2"): # Supported in PyGAD >= 3.2
+                elif parent_selection_type == "nsga2": # Supported in PyGAD >= 3.2
                     self.select_parents = self.nsga2_selection
-                elif (parent_selection_type == "rank"):
+                elif parent_selection_type == "rank":
                     self.select_parents = self.rank_selection
                 else:
                     self.valid_parameters = False
                     raise TypeError(f"Undefined parent selection type: {parent_selection_type}. \nThe assigned value to the 'parent_selection_type' parameter does not refer to one of the supported parent selection techniques which are: \n-sss (steady state selection)\n-rws (roulette wheel selection)\n-sus (stochastic universal selection)\n-rank (rank selection)\n-random (random selection)\n-tournament (tournament selection)\n-tournament_nsga2: (Tournament selection for NSGA-II)\n-nsga2: (NSGA-II parent selection).\n")
 
             # For tournament selection, validate the K value.
-            if (parent_selection_type == "tournament"):
-                if (K_tournament > self.sol_per_pop):
+            if parent_selection_type == "tournament":
+                if K_tournament > self.sol_per_pop:
                     K_tournament = self.sol_per_pop
                     if not self.suppress_warnings:
                         warnings.warn(f"K of the tournament selection ({K_tournament}) should not be greater than the number of solutions within the population ({self.sol_per_pop}).\nK will be clipped to be equal to the number of solutions in the population (sol_per_pop).\n")
-                elif (K_tournament <= 0):
+                elif K_tournament <= 0:
                     self.valid_parameters = False
                     raise ValueError(f"K of the tournament selection cannot be <=0 but ({K_tournament}) found.\n")
 
@@ -908,7 +901,7 @@ class GA(utils.parent_selection.ParentSelection,
             if not (type(keep_parents) in GA.supported_int_types):
                 self.valid_parameters = False
                 raise TypeError(f"Incorrect type of the value assigned to the keep_parents parameter. The value ({keep_parents}) of type {type(keep_parents)} found but an integer is expected.")
-            elif (keep_parents > self.sol_per_pop or keep_parents > self.num_parents_mating or keep_parents < -1):
+            elif keep_parents > self.sol_per_pop or keep_parents > self.num_parents_mating or keep_parents < -1:
                 self.valid_parameters = False
                 raise ValueError(f"Incorrect value to the keep_parents parameter: {keep_parents}. \nThe assigned value to the keep_parent parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Less than or equal to num_parents_mating\n3) Greater than or equal to -1.")
 
@@ -922,7 +915,7 @@ class GA(utils.parent_selection.ParentSelection,
             if not (type(keep_elitism) in GA.supported_int_types):
                 self.valid_parameters = False
                 raise TypeError(f"Incorrect type of the value assigned to the keep_elitism parameter. The value ({keep_elitism}) of type {type(keep_elitism)} found but an integer is expected.")
-            elif (keep_elitism > self.sol_per_pop or keep_elitism < 0):
+            elif keep_elitism > self.sol_per_pop or keep_elitism < 0:
                 self.valid_parameters = False
                 raise ValueError(f"Incorrect value to the keep_elitism parameter: {keep_elitism}. \nThe assigned value to the keep_elitism parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Greater than or equal to 0.")
 
@@ -931,13 +924,13 @@ class GA(utils.parent_selection.ParentSelection,
             # Validate keep_parents.
             if self.keep_elitism == 0:
                 # Keep all parents in the next population.
-                if (self.keep_parents == -1):
+                if self.keep_parents == -1:
                     self.num_offspring = self.sol_per_pop - self.num_parents_mating
                 # Keep no parents in the next population.
-                elif (self.keep_parents == 0):
+                elif self.keep_parents == 0:
                     self.num_offspring = self.sol_per_pop
                 # Keep the specified number of parents in the next population.
-                elif (self.keep_parents > 0):
+                elif self.keep_parents > 0:
                     self.num_offspring = self.sol_per_pop - self.keep_parents
             else:
                 self.num_offspring = self.sol_per_pop - self.keep_elitism
@@ -946,15 +939,15 @@ class GA(utils.parent_selection.ParentSelection,
             # In PyGAD 2.19.0, a method can be passed to the fitness function. If function is passed, then it accepts 2 parameters. If method, then it accepts 3 parameters.
             # In PyGAD 2.20.0, a new parameter is passed referring to the instance of the `pygad.GA` class. So, the function accepts 3 parameters and the method accepts 4 parameters.
             if inspect.ismethod(fitness_func):
-                # If the fitness is calculated through a method, not a function, then there is a fourth 'self` paramaters.
-                if (fitness_func.__code__.co_argcount == 4):
+                # If the fitness is calculated through a method, not a function, then there is a fourth 'self` parameters.
+                if fitness_func.__code__.co_argcount == 4:
                     self.fitness_func = fitness_func
                 else:
                     self.valid_parameters = False
                     raise ValueError(f"In PyGAD 2.20.0, if a method is used to calculate the fitness value, then it must accept 4 parameters\n1) Expected to be the 'self' object.\n2) The instance of the 'pygad.GA' class.\n3) A solution to calculate its fitness value.\n4) The solution's index within the population.\n\nThe passed fitness method named '{fitness_func.__code__.co_name}' accepts {fitness_func.__code__.co_argcount} parameter(s).")
             elif callable(fitness_func):
-                # Check if the fitness function accepts 2 paramaters.
-                if (fitness_func.__code__.co_argcount == 3):
+                # Check if the fitness function accepts 2 parameters.
+                if fitness_func.__code__.co_argcount == 3:
                     self.fitness_func = fitness_func
                 else:
                     self.valid_parameters = False
@@ -978,16 +971,16 @@ class GA(utils.parent_selection.ParentSelection,
             # Check if the on_start exists.
             if not (on_start is None):
                 if inspect.ismethod(on_start):
-                    # Check if the on_start method accepts 2 paramaters.
-                    if (on_start.__code__.co_argcount == 2):
+                    # Check if the on_start method accepts 2 parameters.
+                    if on_start.__code__.co_argcount == 2:
                         self.on_start = on_start
                     else:
                         self.valid_parameters = False
                         raise ValueError(f"The method assigned to the on_start parameter must accept only 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{on_start.__code__.co_name}' accepts {on_start.__code__.co_argcount} parameter(s).")
                 # Check if the on_start is a function.
                 elif callable(on_start):
-                    # Check if the on_start function accepts only a single paramater.
-                    if (on_start.__code__.co_argcount == 1):
+                    # Check if the on_start function accepts only a single parameter.
+                    if on_start.__code__.co_argcount == 1:
                         self.on_start = on_start
                     else:
                         self.valid_parameters = False
@@ -1003,16 +996,16 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_fitness is None):
                 # Check if the on_fitness is a method.
                 if inspect.ismethod(on_fitness):
-                    # Check if the on_fitness method accepts 3 paramaters.
-                    if (on_fitness.__code__.co_argcount == 3):
+                    # Check if the on_fitness method accepts 3 parameters.
+                    if on_fitness.__code__.co_argcount == 3:
                         self.on_fitness = on_fitness
                     else:
                         self.valid_parameters = False
                         raise ValueError(f"The method assigned to the on_fitness parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.3) The fitness values of all solutions.\nThe passed method named '{on_fitness.__code__.co_name}' accepts {on_fitness.__code__.co_argcount} parameter(s).")
                 # Check if the on_fitness is a function.
                 elif callable(on_fitness):
-                    # Check if the on_fitness function accepts 2 paramaters.
-                    if (on_fitness.__code__.co_argcount == 2):
+                    # Check if the on_fitness function accepts 2 parameters.
+                    if on_fitness.__code__.co_argcount == 2:
                         self.on_fitness = on_fitness
                     else:
                         self.valid_parameters = False
@@ -1027,16 +1020,16 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_parents is None):
                 # Check if the on_parents is a method.
                 if inspect.ismethod(on_parents):
-                    # Check if the on_parents method accepts 3 paramaters.
-                    if (on_parents.__code__.co_argcount == 3):
+                    # Check if the on_parents method accepts 3 parameters.
+                    if on_parents.__code__.co_argcount == 3:
                         self.on_parents = on_parents
                     else:
                         self.valid_parameters = False
                         raise ValueError(f"The method assigned to the on_parents parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n3) The fitness values of all solutions.\nThe passed method named '{on_parents.__code__.co_name}' accepts {on_parents.__code__.co_argcount} parameter(s).")
                 # Check if the on_parents is a function.
                 elif callable(on_parents):
-                    # Check if the on_parents function accepts 2 paramaters.
-                    if (on_parents.__code__.co_argcount == 2):
+                    # Check if the on_parents function accepts 2 parameters.
+                    if on_parents.__code__.co_argcount == 2:
                         self.on_parents = on_parents
                     else:
                         self.valid_parameters = False
@@ -1051,16 +1044,16 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_crossover is None):
                 # Check if the on_crossover is a method.
                 if inspect.ismethod(on_crossover):
-                    # Check if the on_crossover method accepts 3 paramaters.
-                    if (on_crossover.__code__.co_argcount == 3):
+                    # Check if the on_crossover method accepts 3 parameters.
+                    if on_crossover.__code__.co_argcount == 3:
                         self.on_crossover = on_crossover
                     else:
                         self.valid_parameters = False
                         raise ValueError(f"The method assigned to the on_crossover parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) The offspring generated using crossover.\nThe passed method named '{on_crossover.__code__.co_name}' accepts {on_crossover.__code__.co_argcount} parameter(s).")
                 # Check if the on_crossover is a function.
                 elif callable(on_crossover):
-                    # Check if the on_crossover function accepts 2 paramaters.
-                    if (on_crossover.__code__.co_argcount == 2):
+                    # Check if the on_crossover function accepts 2 parameters.
+                    if on_crossover.__code__.co_argcount == 2:
                         self.on_crossover = on_crossover
                     else:
                         self.valid_parameters = False
@@ -1075,16 +1068,16 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_mutation is None):
                 # Check if the on_mutation is a method.
                 if inspect.ismethod(on_mutation):
-                    # Check if the on_mutation method accepts 3 paramaters.
-                    if (on_mutation.__code__.co_argcount == 3):
+                    # Check if the on_mutation method accepts 3 parameters.
+                    if on_mutation.__code__.co_argcount == 3:
                         self.on_mutation = on_mutation
                     else:
                         self.valid_parameters = False
                         raise ValueError(f"The method assigned to the on_mutation parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) The offspring after applying the mutation operation.\nThe passed method named '{on_mutation.__code__.co_name}' accepts {on_mutation.__code__.co_argcount} parameter(s).")
                 # Check if the on_mutation is a function.
                 elif callable(on_mutation):
-                    # Check if the on_mutation function accepts 2 paramaters.
-                    if (on_mutation.__code__.co_argcount == 2):
+                    # Check if the on_mutation function accepts 2 parameters.
+                    if on_mutation.__code__.co_argcount == 2:
                         self.on_mutation = on_mutation
                     else:
                         self.valid_parameters = False
@@ -1099,16 +1092,16 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_generation is None):
                 # Check if the on_generation is a method.
                 if inspect.ismethod(on_generation):
-                    # Check if the on_generation method accepts 2 paramaters.
-                    if (on_generation.__code__.co_argcount == 2):
+                    # Check if the on_generation method accepts 2 parameters.
+                    if on_generation.__code__.co_argcount == 2:
                         self.on_generation = on_generation
                     else:
                         self.valid_parameters = False
                         raise ValueError(f"The method assigned to the on_generation parameter must accept 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{on_generation.__code__.co_name}' accepts {on_generation.__code__.co_argcount} parameter(s).")
                 # Check if the on_generation is a function.
                 elif callable(on_generation):
-                    # Check if the on_generation function accepts only a single paramater.
-                    if (on_generation.__code__.co_argcount == 1):
+                    # Check if the on_generation function accepts only a single parameter.
+                    if on_generation.__code__.co_argcount == 1:
                         self.on_generation = on_generation
                     else:
                         self.valid_parameters = False
@@ -1123,16 +1116,16 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_stop is None):
                 # Check if the on_stop is a method.
                 if inspect.ismethod(on_stop):
-                    # Check if the on_stop method accepts 3 paramaters.
-                    if (on_stop.__code__.co_argcount == 3):
+                    # Check if the on_stop method accepts 3 parameters.
+                    if on_stop.__code__.co_argcount == 3:
                         self.on_stop = on_stop
                     else:
                         self.valid_parameters = False
                         raise ValueError(f"The method assigned to the on_stop parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) A list of the fitness values of the solutions in the last population.\nThe passed method named '{on_stop.__code__.co_name}' accepts {on_stop.__code__.co_argcount} parameter(s).")
                 # Check if the on_stop is a function.
                 elif callable(on_stop):
-                    # Check if the on_stop function accepts 2 paramaters.
-                    if (on_stop.__code__.co_argcount == 2):
+                    # Check if the on_stop function accepts 2 parameters.
+                    if on_stop.__code__.co_argcount == 2:
                         self.on_stop = on_stop
                     else:
                         self.valid_parameters = False
@@ -1212,7 +1205,7 @@ class GA(utils.parent_selection.ParentSelection,
                     raise ValueError(f"For format of a single criterion in the 'stop_criteria' parameter is 'word_number' but '{stop_criteria}' found.")
 
             elif type(stop_criteria) in [list, tuple, numpy.ndarray]:
-                # Remove duplicate criterira by converting the list to a set then back to a list.
+                # Remove duplicate criteria by converting the list to a set then back to a list.
                 stop_criteria = list(set(stop_criteria))
                 for idx, val in enumerate(stop_criteria):
                     if type(val) is str:
@@ -1262,7 +1255,7 @@ class GA(utils.parent_selection.ParentSelection,
                         if parallel_processing[0] in ["process", "thread"]:
                             if (type(parallel_processing[1]) in GA.supported_int_types and parallel_processing[1] > 0) or (parallel_processing[1] == 0) or (parallel_processing[1] is None):
                                 if parallel_processing[1] == 0:
-                                    # If the number of processes/threads is 0, this means no parallel processing is used. It is equivelant to setting parallel_processing=None.
+                                    # If the number of processes/threads is 0, this means no parallel processing is used. It is equivalent to setting parallel_processing=None.
                                     self.parallel_processing = None
                                 else:
                                     # Whether the second value is None or a positive integer.
@@ -1289,7 +1282,7 @@ class GA(utils.parent_selection.ParentSelection,
             # The number of completed generations.
             self.generations_completed = 0
 
-            # At this point, all necessary parameters validation is done successfully and we are sure that the parameters are valid.
+            # At this point, all necessary parameters validation is done successfully, and we are sure that the parameters are valid.
             # Set to True when all the parameters passed in the GA class constructor are valid.
             self.valid_parameters = True
 
@@ -1383,7 +1376,7 @@ class GA(utils.parent_selection.ParentSelection,
             # 4) Solve duplicates if not allowed.
 
         # Create an empty population.
-        self.population = numpy.zeros(shape=self.pop_size, dtype=object)
+        self.population = numpy.empty(shape=self.pop_size, dtype=object)
 
         # 1) Create the initial population either randomly or using the gene space.
         if self.gene_space is None:
@@ -1409,18 +1402,20 @@ class GA(utils.parent_selection.ParentSelection,
                     self.population[sol_idx, gene_idx] = self.generate_gene_value_from_space(gene_idx=gene_idx,
                                                                                              mutation_by_replacement=True,
                                                                                              gene_value=None,
+                                                                                             solution=self.population[sol_idx],
                                                                                              sample_size=1)
 
         # 2) Change the data type and round all genes within the initial population.
         self.population = self.change_population_dtype_and_round(self.population)
 
+        # Note that gene_constraint is not validated yet.
+        # We have to set it as a property of the pygad.GA instance to retrieve without passing it as an additional parameter.
+        self.gene_constraint = gene_constraint
+
         # 3) Enforce the gene constraints as much as possible.
-        if gene_constraint is None:
+        if self.gene_constraint is None:
             pass
         else:
-            # Note that gene_constraint is not validated yet.
-            # We have to set it as a property of the pygad.GA instance to retrieve without passing it as an additional parameter.
-            self.gene_constraint = gene_constraint
             for sol_idx, solution in enumerate(self.population):
                 for gene_idx in range(self.num_genes):
                     # Check that a constraint is available for the gene and that the current value does not satisfy that constraint
@@ -1452,11 +1447,14 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                               gene_type=gene_type,
                                                                                               sample_size=100)
                 else:
-                    self.population[sol_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[solution_idx],
-                                                                                         gene_type=self.gene_type,
-                                                                                         sample_size=100,
-                                                                                         mutation_by_replacement=True,
-                                                                                         build_initial_pop=True)
+                    self.population[solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[solution_idx].copy(),
+                                                                                              gene_type=self.gene_type,
+                                                                                              sample_size=100,
+                                                                                              mutation_by_replacement=True,
+                                                                                              build_initial_pop=True)
+
+        # Change the data type and round all genes within the initial population.
+        self.population = self.change_population_dtype_and_round(self.population)
 
         # Keeping the initial population in the initial_population attribute.
         self.initial_population = self.population.copy()
@@ -1475,11 +1473,15 @@ class GA(utils.parent_selection.ParentSelection,
             # It is used to return the parent index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
             if self.last_generation_parents is not None:
                 last_generation_parents_as_list = self.last_generation_parents.tolist()
+            else:
+                last_generation_parents_as_list = []
 
             # 'last_generation_elitism_as_list' is the list version of 'self.last_generation_elitism'
             # It is used to return the elitism index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
             if self.last_generation_elitism is not None:
                 last_generation_elitism_as_list = self.last_generation_elitism.tolist()
+            else:
+                last_generation_elitism_as_list = []
 
             pop_fitness = ["undefined"] * len(self.population)
             if self.parallel_processing is None:
@@ -1790,7 +1792,7 @@ class GA(utils.parent_selection.ParentSelection,
                 if self.save_best_solutions:
                     self.best_solutions.append(list(best_solution))
 
-                # Note: Any code that has loop-dependant statements (e.g. continue, break, etc) must be kept inside the loop of the 'run()' method. It can be moved to another method to clean the run() method.
+                # Note: Any code that has loop-dependant statements (e.g. continue, break, etc.) must be kept inside the loop of the 'run()' method. It can be moved to another method to clean the run() method.
                 # If the on_generation attribute is not None, then cal the callback function after the generation.
                 if not (self.on_generation is None):
                     r = self.on_generation(self)
@@ -1830,6 +1832,10 @@ class GA(utils.parent_selection.ParentSelection,
                                         reach_fitness_value = criterion[obj_idx + 1]
                                     elif len(criterion[1:]) == 1:
                                         reach_fitness_value = criterion[1]
+                                    else:
+                                        # Unexpected to be reached, but it is safer to handle it.
+                                        self.valid_parameters = False
+                                        raise ValueError(f"The number of values does not equal the number of objectives.")
 
                                     if max(self.last_generation_fitness[:, obj_idx]) >= reach_fitness_value:
                                         pass
@@ -1838,7 +1844,7 @@ class GA(utils.parent_selection.ParentSelection,
                                         break
                         elif criterion[0] == "saturate":
                             criterion[1] = int(criterion[1])
-                            if (self.generations_completed >= criterion[1]):
+                            if self.generations_completed >= criterion[1]:
                                 # Single-objective problem.
                                 if type(self.last_generation_fitness[0]) in GA.supported_int_float_types:
                                     if (self.best_solutions_fitness[self.generations_completed - criterion[1]] - self.best_solutions_fitness[self.generations_completed - 1]) == 0:
@@ -1929,7 +1935,7 @@ class GA(utils.parent_selection.ParentSelection,
 
     def run_select_parents(self, call_on_parents=True):
         """
-        This method must be only callled from inside the run() method. It is not meant for use by the user.
+        This method must be only called from inside the run() method. It is not meant for use by the user.
         Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
 
         The objective of the 'run_select_parents()' method is to select the parents and call the callable on_parents() if defined.
@@ -1994,7 +2000,7 @@ class GA(utils.parent_selection.ParentSelection,
                             if on_parents_selected_parents.shape == self.last_generation_parents.shape:
                                 self.last_generation_parents = on_parents_selected_parents
                             else:
-                                raise ValueError(f"Size mismatch between the parents retrned by on_parents() {on_parents_selected_parents.shape} and the expected parents shape {self.last_generation_parents.shape}.")
+                                raise ValueError(f"Size mismatch between the parents returned by on_parents() {on_parents_selected_parents.shape} and the expected parents shape {self.last_generation_parents.shape}.")
                         else:
                             raise ValueError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but the first output type is {type(on_parents_selected_parents)}.")
     
@@ -2005,6 +2011,7 @@ class GA(utils.parent_selection.ParentSelection,
                         if type(on_parents_selected_parents_indices) in [tuple, list, numpy.ndarray, range]:
                             on_parents_selected_parents_indices = numpy.array(on_parents_selected_parents_indices)
                             if on_parents_selected_parents_indices.shape == self.last_generation_parents_indices.shape:
+                                # Add this new instance attribute.
                                 self.last_generation_parents_indices = on_parents_selected_parents_indices
                             else:
                                 raise ValueError(f"Size mismatch between the parents indices returned by on_parents() {on_parents_selected_parents_indices.shape} and the expected crossover output {self.last_generation_parents_indices.shape}.")
@@ -2016,7 +2023,7 @@ class GA(utils.parent_selection.ParentSelection,
 
     def run_crossover(self):
         """
-        This method must be only callled from inside the run() method. It is not meant for use by the user.
+        This method must be only called from inside the run() method. It is not meant for use by the user.
         Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
 
         The objective of the 'run_crossover()' method is to apply crossover and call the callable on_crossover() if defined.
@@ -2083,7 +2090,7 @@ class GA(utils.parent_selection.ParentSelection,
 
     def run_mutation(self):
         """
-        This method must be only callled from inside the run() method. It is not meant for use by the user.
+        This method must be only called from inside the run() method. It is not meant for use by the user.
         Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
 
         The objective of the 'run_mutation()' method is to apply mutation and call the callable on_mutation() if defined.
@@ -2133,7 +2140,7 @@ class GA(utils.parent_selection.ParentSelection,
 
     def run_update_population(self):
         """
-        This method must be only callled from inside the run() method. It is not meant for use by the user.
+        This method must be only called from inside the run() method. It is not meant for use by the user.
         Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
 
         The objective of the 'run_update_population()' method is to update the 'population' attribute after completing the processes of crossover and mutation.
@@ -2148,13 +2155,13 @@ class GA(utils.parent_selection.ParentSelection,
         # Update the population attribute according to the offspring generated.
         if self.keep_elitism == 0:
             # If the keep_elitism parameter is 0, then the keep_parents parameter will be used to decide if the parents are kept in the next generation.
-            if (self.keep_parents == 0):
+            if self.keep_parents == 0:
                 self.population = self.last_generation_offspring_mutation
-            elif (self.keep_parents == -1):
+            elif self.keep_parents == -1:
                 # Creating the new population based on the parents and offspring.
                 self.population[0:self.last_generation_parents.shape[0],:] = self.last_generation_parents
                 self.population[self.last_generation_parents.shape[0]:, :] = self.last_generation_offspring_mutation
-            elif (self.keep_parents > 0):
+            elif self.keep_parents > 0:
                 parents_to_keep, _ = self.steady_state_selection(self.last_generation_fitness,
                                                                  num_parents=self.keep_parents)
                 self.population[0:parents_to_keep.shape[0],:] = parents_to_keep
@@ -2250,7 +2257,7 @@ class GA(utils.parent_selection.ParentSelection,
 
         def create_row(columns, line_length=line_length, fill_character=fill_character, split_percentages=None):
             filled_columns = []
-            if split_percentages == None:
+            if split_percentages is None:
                 split_percentages = [int(100/len(columns))] * 3
             columns_lengths = [int((split_percentages[idx] * line_length) / 100)
                                for idx in range(len(split_percentages))]
@@ -2258,7 +2265,6 @@ class GA(utils.parent_selection.ParentSelection,
                 current_column_length = len(column)
                 extra_characters = columns_lengths[column_idx] - \
                     current_column_length
-                filled_column = column + fill_character * extra_characters
                 filled_column = column + fill_character * extra_characters
                 filled_columns.append(filled_column)
 
