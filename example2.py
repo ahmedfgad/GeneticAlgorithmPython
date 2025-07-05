@@ -28,12 +28,12 @@ ga_instance = pygad.GA(num_generations=100,
                        allow_duplicate_genes=False,
                        # gene_space=numpy.unique(numpy.random.uniform(1, 100, size=100)),
                        gene_space=[range(0, 100), {"low": 0, "high": 100, 'step': 1}, 2.5891221, [1,2,3,4], None, numpy.unique(numpy.random.uniform(1, 100, size=4))],
-                       gene_constraint=[lambda x: x[0]>=95,lambda x: x[1]>=95,lambda x: x[2]<98,lambda x: x[3]<98,lambda x: x[4]<98,lambda x: x[5]<98],
+                       gene_constraint=[lambda x: x[0]>=70,lambda x: x[1]>=70,lambda x: x[2]<98,lambda x: x[3]<98,lambda x: x[4]<98,lambda x: x[5]<98],
                        )
 
 print(ga_instance.initial_population)
 
-# ga_instance.run()
+ga_instance.run()
 
 # print(ga_instance.gene_space_unpacked)
 # print(ga_instance.population)

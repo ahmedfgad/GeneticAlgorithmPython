@@ -84,7 +84,8 @@ class Unique:
     def solve_duplicate_genes_by_space(self, 
                                        solution, 
                                        gene_type, 
-                                       num_trials=10, 
+                                       mutation_by_replacement,
+                                       sample_size=100,
                                        build_initial_pop=False):
     
         """
@@ -93,7 +94,7 @@ class Unique:
         Args:
             solution (list): A solution containing genes, potentially with duplicate values.
             gene_type (type): The data type of the gene (e.g., int, float).
-            num_trials (int): The maximum number of attempts to resolve duplicates by selecting values from the gene space.
+            sample_size (int): The maximum number of attempts to resolve duplicates by selecting values from the gene space.
 
         Returns:
             tuple:
@@ -106,16 +107,16 @@ class Unique:
 
         _, unique_gene_indices = numpy.unique(solution, return_index=True)
         not_unique_indices = set(range(len(solution))) - set(unique_gene_indices)
-        # self.logger.info("not_unique_indices OUTSIDE", not_unique_indices)
 
         # First try to solve the duplicates.
         # For a solution like [3 2 0 0], the indices of the 2 duplicating genes are 2 and 3.
         # The next call to the find_unique_value() method tries to change the value of the gene with index 3 to solve the duplicate.
         if len(not_unique_indices) > 0:
-            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(new_solution=new_solution, 
+            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(solution=new_solution,
                                                                                                    gene_type=gene_type, 
                                                                                                    not_unique_indices=not_unique_indices, 
-                                                                                                   num_trials=10,
+                                                                                                   sample_size=sample_size,
+                                                                                                   mutation_by_replacement=mutation_by_replacement,
                                                                                                    build_initial_pop=build_initial_pop)
         else:
             return new_solution, not_unique_indices, len(not_unique_indices)
@@ -260,8 +261,11 @@ class Unique:
         values_to_select_from = list(set(list(gene_values)) - set(solution))
     
         if len(values_to_select_from) == 0:
+            print("@@@@@@@@")
+            print(solution)
+            print(gene_values)
             # If there are no values, then keep the current gene value.
-            if not self.suppress_warnings: warnings.warn(f"'allow_duplicate_genes=False' but cannot find a unique value for the gene at index {gene_index}.")
+            if not self.suppress_warnings: warnings.warn(f"'allow_duplicate_genes=False' but cannot find a unique value for the gene at index {gene_index} with value {solution[gene_index]}.")
             selected_value = solution[gene_index]
         else:
             selected_value = random.choice(values_to_select_from)
@@ -269,10 +273,11 @@ class Unique:
         return selected_value
 
     def unique_genes_by_space(self, 
-                              new_solution, 
+                              solution,
                               gene_type, 
-                              not_unique_indices, 
-                              num_trials=10, 
+                              not_unique_indices,
+                              mutation_by_replacement,
+                              sample_size=100,
                               build_initial_pop=False):
 
         """
@@ -280,10 +285,10 @@ class Unique:
         For each duplicate gene, a call is made to the `unique_gene_by_space()` function.
 
         Args:
-            new_solution (list): A solution containing genes with duplicate values.
+            solution (list): A solution containing genes with duplicate values.
             gene_type (type): The data type of the all the genes (e.g., int, float).
             not_unique_indices (list): The indices of genes with duplicate values.
-            num_trials (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
+            sample_size (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
 
         Returns:
             tuple:
@@ -294,31 +299,33 @@ class Unique:
 
         num_unsolved_duplicates = 0
         for duplicate_index in not_unique_indices:
-            temp_val = self.unique_gene_by_space(solution=new_solution, 
+            temp_val = self.unique_gene_by_space(solution=solution,
                                                  gene_idx=duplicate_index, 
                                                  gene_type=gene_type,
-                                                 build_initial_pop=build_initial_pop,
-                                                 num_trials=num_trials)
+                                                 mutation_by_replacement=mutation_by_replacement,
+                                                 sample_size=sample_size,
+                                                 build_initial_pop=build_initial_pop)
 
-            if temp_val in new_solution:
-                # self.logger.info("temp_val, duplicate_index", temp_val, duplicate_index, new_solution)
+            if temp_val in solution:
+                # self.logger.info("temp_val, duplicate_index", temp_val, duplicate_index, solution)
                 num_unsolved_duplicates = num_unsolved_duplicates + 1
-                if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {new_solution[duplicate_index]}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
+                if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {solution[duplicate_index]}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
             else:
-                new_solution[duplicate_index] = temp_val
+                solution[duplicate_index] = temp_val
     
         # Update the list of duplicate indices after each iteration.
-        _, unique_gene_indices = numpy.unique(new_solution, return_index=True)
-        not_unique_indices = set(range(len(new_solution))) - set(unique_gene_indices)
+        _, unique_gene_indices = numpy.unique(solution, return_index=True)
+        not_unique_indices = set(range(len(solution))) - set(unique_gene_indices)
 
-        return new_solution, not_unique_indices, num_unsolved_duplicates
+        return solution, not_unique_indices, num_unsolved_duplicates
 
     def unique_gene_by_space(self, 
                              solution, 
                              gene_idx, 
-                             gene_type, 
-                             build_initial_pop=False,
-                             num_trials=10):
+                             gene_type,
+                             mutation_by_replacement,
+                             sample_size=100,
+                             build_initial_pop=False):
     
         """
         Returns a unique value for a specific gene based on its value space to resolve duplicates.
@@ -327,15 +334,47 @@ class Unique:
             solution (list): A solution containing genes with duplicate values.
             gene_idx (int): The index of the gene that has a duplicate value.
             gene_type (type): The data type of the gene (e.g., int, float).
-            num_trials (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
+            sample_size (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
 
         Returns:
             Any: A unique value for the gene, if one exists; otherwise, the original gene value.            
         """
 
+        # When gene_value is None, this forces the gene value generators to select a value for use by the initial population.
+        # Otherwise, it considers selecting a value for mutation.
+        if build_initial_pop:
+            gene_value = None
+        else:
+            gene_value = solution[gene_idx]
 
+        if self.gene_constraint and self.gene_constraint[gene_idx]:
+            # A unique value is created out of the values that satisfy the constraint.
+            values = self.get_valid_gene_constraint_values(range_min=None,
+                                                           range_max=None,
+                                                           gene_value=gene_value,
+                                                           gene_idx=gene_idx,
+                                                           mutation_by_replacement=mutation_by_replacement,
+                                                           solution=solution,
+                                                           sample_size=sample_size)
+            # If there is no value satisfying the constraint, then return the current gene value.
+            if values is None:
+                return solution[gene_idx]
+            else:
+                pass
+        else:
+            # There is no constraint for the current gene. Return the same range.
+            values = self.generate_gene_value(range_min=None,
+                                              range_max=None,
+                                              gene_value=gene_value,
+                                              gene_idx=gene_idx,
+                                              mutation_by_replacement=mutation_by_replacement,
+                                              sample_size=sample_size)
 
-        return value_from_space
+        selected_value = self.select_unique_value(gene_values=values,
+                                                  solution=solution,
+                                                  gene_index=gene_idx)
+
+        return selected_value
 
     def find_two_duplicates(self, 
                             solution,

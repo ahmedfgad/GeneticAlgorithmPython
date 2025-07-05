@@ -74,7 +74,9 @@ class Crossover:
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
                                                                              gene_type=self.gene_type,
-                                                                             num_trials=10)
+                                                                             sample_size=100,
+                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                             build_initial_pop=False)
         
         return offspring
 
@@ -146,7 +148,9 @@ class Crossover:
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
                                                                              gene_type=self.gene_type,
-                                                                             num_trials=10)
+                                                                             sample_size=100,
+                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                             build_initial_pop=False)
         return offspring
 
     def uniform_crossover(self, parents, offspring_size):
@@ -213,7 +217,9 @@ class Crossover:
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
                                                                              gene_type=self.gene_type,
-                                                                             num_trials=10)
+                                                                             sample_size=100,
+                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                             build_initial_pop=False)
 
         return offspring
 
@@ -277,5 +283,7 @@ class Crossover:
                 else:
                     offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
                                                                              gene_type=self.gene_type,
-                                                                             num_trials=10)
+                                                                             sample_size=100,
+                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                             build_initial_pop=False)
         return offspring

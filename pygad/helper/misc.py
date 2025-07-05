@@ -19,7 +19,7 @@ class Helper:
         It returns the iterable with the data type changed for all genes.
         """
 
-        population_new = population.copy()
+        population_new = numpy.array(population.copy(), dtype=object)
 
         # Forcing the iterable to have the data type assigned to the gene_type parameter.
         if self.gene_type_single == True:
@@ -49,8 +49,10 @@ class Helper:
                     population_new[:, gene_idx] = numpy.round(numpy.array(population[:, gene_idx], float),
                                                               self.gene_type[gene_idx][1])
                 # Once rounding is done, change the data type.
-                population_new[:, gene_idx] = numpy.asarray(population_new[:, gene_idx],
-                                                            dtype=self.gene_type[gene_idx][0])
+                # population_new[:, gene_idx] = numpy.asarray(population_new[:, gene_idx], dtype=self.gene_type[gene_idx][0])
+                # Use a for loop to maintain the data type of each individual gene.
+                for sol_idx in range(population.shape[0]):
+                    population_new[sol_idx, gene_idx] = self.gene_type[gene_idx][0](population_new[sol_idx, gene_idx])
         return population_new
 
     def change_gene_dtype_and_round(self,
@@ -153,7 +155,7 @@ class Helper:
         else:
             # No value found for the current gene that satisfies the constraint.
             if not self.suppress_warnings:
-                warnings.warn(f"No value found for the gene at index {gene_idx} that satisfies its gene constraint.")
+                warnings.warn(f"No value found for the gene at index {gene_idx} with value {solution[gene_idx]} that satisfies its gene constraint.")
             return None
 
         filtered_values = values[filtered_values_indices]

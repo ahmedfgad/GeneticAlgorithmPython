@@ -469,7 +469,8 @@ class GA(utils.parent_selection.ParentSelection,
                             self.initial_population[initial_solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=initial_solution,
                                                                                                                       gene_type=self.gene_type,
                                                                                                                       sample_size=100,
-                                                                                                                      mutation_by_replacement=True)
+                                                                                                                      mutation_by_replacement=True,
+                                                                                                                      build_initial_pop=True)
 
                 # Change the data type and round all genes within the initial population.
                 self.initial_population = self.change_population_dtype_and_round(initial_population)
@@ -1382,7 +1383,7 @@ class GA(utils.parent_selection.ParentSelection,
             # 4) Solve duplicates if not allowed.
 
         # Create an empty population.
-        self.population = numpy.zeros(shape=self.pop_size)
+        self.population = numpy.zeros(shape=self.pop_size, dtype=object)
 
         # 1) Create the initial population either randomly or using the gene space.
         if self.gene_space is None:
@@ -1436,7 +1437,7 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                     sample_size=100)
                             if values_filtered is None:
                                 if not self.suppress_warnings:
-                                    warnings.warn(f"No value satisfied the constraint for the gene at index {gene_idx} while creating the initial population.")
+                                    warnings.warn(f"No value satisfied the constraint for the gene at index {gene_idx} with value {solution[gene_idx]} while creating the initial population.")
                             else:
                                 self.population[sol_idx, gene_idx] = random.choice(values_filtered)
 
@@ -1454,7 +1455,8 @@ class GA(utils.parent_selection.ParentSelection,
                     self.population[sol_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[solution_idx],
                                                                                          gene_type=self.gene_type,
                                                                                          sample_size=100,
-                                                                                         mutation_by_replacement=True)
+                                                                                         mutation_by_replacement=True,
+                                                                                         build_initial_pop=True)
 
         # Keeping the initial population in the initial_population attribute.
         self.initial_population = self.population.copy()

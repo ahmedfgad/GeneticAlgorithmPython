@@ -79,7 +79,9 @@ class Mutation:
                 if self.allow_duplicate_genes == False:
                     offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                          gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                                         sample_size=100,
+                                                                                         mutation_by_replacement=self.mutation_by_replacement,
+                                                                                         build_initial_pop=False)
         return offspring
 
     def mutation_probs_by_space(self, offspring):
@@ -117,7 +119,9 @@ class Mutation:
                     if self.allow_duplicate_genes == False:
                         offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                              gene_type=self.gene_type,
-                                                                                             num_trials=10)
+                                                                                             sample_size=100,
+                                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                                             build_initial_pop=False)
         return offspring
 
     def mutation_process_gene_value(self,
@@ -544,7 +548,9 @@ class Mutation:
                 if self.allow_duplicate_genes == False:
                     offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                          gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                                         sample_size=100,
+                                                                                         mutation_by_replacement=self.mutation_by_replacement,
+                                                                                         build_initial_pop=False)
         return offspring
 
     def adaptive_mutation_randomly(self, offspring):
@@ -678,7 +684,9 @@ class Mutation:
                     if self.allow_duplicate_genes == False:
                         offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                              gene_type=self.gene_type,
-                                                                                             num_trials=10)
+                                                                                             sample_size=100,
+                                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                                             build_initial_pop=False)
         return offspring
 
     def adaptive_mutation_probs_randomly(self, offspring):
