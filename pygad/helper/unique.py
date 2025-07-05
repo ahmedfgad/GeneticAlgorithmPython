@@ -262,6 +262,7 @@ class Unique:
         """
 
         values_to_select_from = list(set(list(gene_values)) - set(solution))
+        print("PPPPPPPPP", values_to_select_from)
 
         if len(values_to_select_from) == 0:
             # If there are no values, then keep the current gene value.
@@ -269,7 +270,6 @@ class Unique:
             selected_value = solution[gene_index]
         else:
             selected_value = random.choice(values_to_select_from)
-
         return selected_value
 
     def unique_genes_by_space(self, 

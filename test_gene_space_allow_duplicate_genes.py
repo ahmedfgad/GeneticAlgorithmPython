@@ -168,7 +168,7 @@ def test_gene_space_dict_with_step():
     assert num_outside == 0
 
 def test_gene_space_list_single_value():
-    num_outside, ga_instance = number_respect_gene_space(gene_space=[5], allow_duplicate_genes=True)
+    num_outside, ga_instance = number_respect_gene_space(gene_space=[5])
 
     assert num_outside == 0
 

@@ -349,9 +349,12 @@ class Helper:
                 # We must check if the selected value will respect the allow_duplicate_genes parameter.
                 # Instead of selecting a value randomly, we have to select a value that will be unique if allow_duplicate_genes=False.
                 # Only select a value from the current gene space that is, hopefully, unique.
+                print("KKKKKKKK", value_from_space)
                 value_from_space = self.select_unique_value(gene_values=value_from_space,
                                                             solution=solution,
                                                             gene_index=gene_idx)
+                print("<<<<<<<<<<", value_from_space)
+                # TODO WHY THIS VALUE IS NONE
 
             # The gene space might be [None, 1, 7].
             # It might happen that the value None is selected.

@@ -1376,7 +1376,7 @@ class GA(utils.parent_selection.ParentSelection,
             # 4) Solve duplicates if not allowed.
 
         # Create an empty population.
-        self.population = numpy.zeros(shape=self.pop_size, dtype=object)
+        self.population = numpy.empty(shape=self.pop_size, dtype=object)
 
         # 1) Create the initial population either randomly or using the gene space.
         if self.gene_space is None:
@@ -1404,6 +1404,7 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                              gene_value=None,
                                                                                              solution=self.population[sol_idx],
                                                                                              sample_size=1)
+                    print('AAAAAAAAA', self.population[sol_idx, gene_idx])
 
         # 2) Change the data type and round all genes within the initial population.
         self.population = self.change_population_dtype_and_round(self.population)
