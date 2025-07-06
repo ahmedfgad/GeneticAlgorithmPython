@@ -108,7 +108,7 @@ class GA(utils.parent_selection.ParentSelection,
         gene_space: It accepts a list of all possible values of the gene. This list is used in the mutation step. Should be used only if the gene space is a set of discrete values. No need for the 2 parameters (random_mutation_min_val and random_mutation_max_val) if the parameter gene_space exists. Added in PyGAD 2.5.0. In PyGAD 2.11.0, the gene_space can be assigned a dict.
 
         gene_constraint: It accepts a list of constraints for the genes. Each constraint is a Python function. Added in PyGAD 3.5.0.
-        sample_size: To select a gene value that respects a constraint, this variable defines the size of the sample from which a value is selected. Useful if either allow_duplicate_genes or gene_constraint is used. Added in PyGAD 3.5.0.
+        sample_size: To select a gene value that respects a constraint, this variable defines the size of the sample from which a value is selected randomly. Useful if either allow_duplicate_genes or gene_constraint is used. Added in PyGAD 3.5.0.
 
         on_start: Accepts a function/method to be called only once before the genetic algorithm starts its evolution. If functioned, then it must accept a single parameter representing the instance of the genetic algorithm. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
         on_fitness: Accepts a function/method to be called after calculating the fitness values of all solutions in the population. If functioned, then it must accept 2 parameters: 1) a list of all solutions' fitness values 2) the instance of the genetic algorithm. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
@@ -429,7 +429,6 @@ class GA(utils.parent_selection.ParentSelection,
                     # Number of solutions in the population.
                     self.sol_per_pop = sol_per_pop
                     self.initialize_population(allow_duplicate_genes=allow_duplicate_genes,
-                                               mutation_by_replacement=True,
                                                gene_type=self.gene_type,
                                                gene_constraint=gene_constraint)
                 else:
@@ -1354,7 +1353,6 @@ class GA(utils.parent_selection.ParentSelection,
 
     def initialize_population(self,
                               allow_duplicate_genes,
-                              mutation_by_replacement,
                               gene_type,
                               gene_constraint):
         """
@@ -1362,7 +1360,6 @@ class GA(utils.parent_selection.ParentSelection,
 
         It accepts:
             -allow_duplicate_genes: Whether duplicate genes are allowed or not.
-            -mutation_by_replacement: Whether mutation by replacement is enabled or not.
             -gene_type: The data type of the genes.
             -gene_constraint: The constraints of the genes.
 
@@ -1450,14 +1447,14 @@ class GA(utils.parent_selection.ParentSelection,
                     self.population[solution_idx], _, _ = self.solve_duplicate_genes_randomly(solution=self.population[solution_idx],
                                                                                               min_val=self.init_range_low,
                                                                                               max_val=self.init_range_high,
-                                                                                              mutation_by_replacement=True,
                                                                                               gene_type=gene_type,
+                                                                                              mutation_by_replacement=True,
                                                                                               sample_size=self.sample_size)
                 else:
                     self.population[solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[solution_idx].copy(),
                                                                                               gene_type=self.gene_type,
-                                                                                              sample_size=self.sample_size,
                                                                                               mutation_by_replacement=True,
+                                                                                              sample_size=self.sample_size,
                                                                                               build_initial_pop=True)
 
         # Change the data type and round all genes within the initial population.

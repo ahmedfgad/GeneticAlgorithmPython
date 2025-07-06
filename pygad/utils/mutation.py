@@ -60,7 +60,8 @@ class Mutation:
             for gene_idx in mutation_indices:
 
                 value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
-                                                                    gene_idx=gene_idx)
+                                                                    gene_idx=gene_idx,
+                                                                    sample_size=self.sample_size)
 
                 # Before assigning the selected value from the space to the gene, change its data type and round it.
                 if self.gene_type_single == True:
@@ -100,7 +101,8 @@ class Mutation:
 
                 if probs[gene_idx] <= self.mutation_probability:
                     value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
-                                                                        gene_idx=gene_idx)
+                                                                        gene_idx=gene_idx,
+                                                                        sample_size=self.sample_size)
 
                     # Assigning the selected value from the space to the gene.
                     if self.gene_type_single == True:
@@ -195,7 +197,8 @@ class Mutation:
                 random_value = self.mutation_process_gene_value(range_min=range_min,
                                                                 range_max=range_max,
                                                                 solution=offspring[offspring_idx],
-                                                                gene_idx=gene_idx)
+                                                                gene_idx=gene_idx,
+                                                                sample_size=self.sample_size)
 
                 offspring[offspring_idx, gene_idx] = random_value
 
@@ -233,7 +236,8 @@ class Mutation:
                     random_value = self.mutation_process_gene_value(range_min=range_min,
                                                                     range_max=range_max,
                                                                     solution=offspring[offspring_idx],
-                                                                    gene_idx=gene_idx)
+                                                                    gene_idx=gene_idx,
+                                                                    sample_size=self.sample_size)
 
                     offspring[offspring_idx, gene_idx] = random_value
 
@@ -530,7 +534,8 @@ class Mutation:
             for gene_idx in mutation_indices:
 
                 value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
-                                                                    gene_idx=gene_idx)
+                                                                    gene_idx=gene_idx,
+                                                                    sample_size=self.sample_size)
 
                 # Assigning the selected value from the space to the gene.
                 if self.gene_type_single == True:
@@ -604,7 +609,8 @@ class Mutation:
                 random_value = self.mutation_process_gene_value(range_min=range_min,
                                                                 range_max=range_max,
                                                                 solution=offspring[offspring_idx],
-                                                                gene_idx=gene_idx)
+                                                                gene_idx=gene_idx,
+                                                                sample_size=self.sample_size)
 
                 offspring[offspring_idx, gene_idx] = random_value
 
@@ -666,7 +672,8 @@ class Mutation:
                 if probs[gene_idx] <= adaptive_mutation_probability:
 
                     value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
-                                                                        gene_idx=gene_idx)
+                                                                        gene_idx=gene_idx,
+                                                                        sample_size=self.sample_size)
 
                     # Assigning the selected value from the space to the gene.
                     if self.gene_type_single == True:
@@ -741,7 +748,8 @@ class Mutation:
                     random_value = self.mutation_process_gene_value(range_min=range_min,
                                                                     range_max=range_max,
                                                                     solution=offspring[offspring_idx],
-                                                                    gene_idx=gene_idx)
+                                                                    gene_idx=gene_idx,
+                                                                    sample_size=self.sample_size)
 
                     offspring[offspring_idx, gene_idx] = random_value
 

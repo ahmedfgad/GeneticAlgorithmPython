@@ -87,14 +87,16 @@ class Unique:
                                        mutation_by_replacement,
                                        sample_size=100,
                                        build_initial_pop=False):
-    
+
         """
         Resolves duplicates in a solution by selecting new values for the duplicate genes from the gene space.
 
         Args:
             solution (list): A solution containing genes, potentially with duplicate values.
             gene_type (type): The data type of the gene (e.g., int, float).
-            sample_size (int): The maximum number of attempts to resolve duplicates by selecting values from the gene space.
+            mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
+            sample_size (int, optional): The maximum number of attempts to resolve duplicates by selecting values from the gene space.
+            build_initial_pop (bool, optional): Indicates if initial population should be built.
 
         Returns:
             tuple:
@@ -247,7 +249,10 @@ class Unique:
                                                   gene_index=gene_index)
         return selected_value
 
-    def select_unique_value(self, gene_values, solution, gene_index):
+    def select_unique_value(self,
+                            gene_values,
+                            solution,
+                            gene_index):
 
         """
         Select a unique value (if possible) from a list of gene values.
@@ -293,7 +298,9 @@ class Unique:
             solution (list): A solution containing genes with duplicate values.
             gene_type (type): The data type of the all the genes (e.g., int, float).
             not_unique_indices (list): The indices of genes with duplicate values.
+            mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
             sample_size (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
+            build_initial_pop (bool, optional): Indicates if initial population should be built.
 
         Returns:
             tuple:
@@ -338,7 +345,9 @@ class Unique:
             solution (list): A solution containing genes with duplicate values.
             gene_idx (int): The index of the gene that has a duplicate value.
             gene_type (type): The data type of the gene (e.g., int, float).
+            mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
             sample_size (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
+            build_initial_pop (bool, optional): Indicates if initial population should be built.
 
         Returns:
             Any: A unique value for the gene, if one exists; otherwise, the original gene value.            
@@ -387,10 +396,13 @@ class Unique:
         """
         Identifies the first occurrence of a duplicate gene in the solution.
 
+        Args:
+            solution: The solution containing genes with duplicate values.
+            gene_space_unpacked: A list of values from the gene space to choose the values that resolve duplicates.
+
         Returns:
-            tuple:
-                int: The index of the first gene with a duplicate value.
-                Any: The value of the duplicate gene.
+            int: The index of the first gene with a duplicate value.
+            Any: The value of the duplicate gene.
         """
 
         for gene in set(solution):
@@ -538,9 +550,6 @@ class Unique:
 
         Args:
             solution (list): The current solution containing genes, potentially with duplicates.
-            gene_idx1 (int): The index of the first gene involved in the duplication.
-            gene_idx2 (int): The index of the second gene involved in the duplication.
-            assist_gene_idx (int): The index of the third gene used to assist in resolving the duplication.
 
         Returns:
             list or None: The updated solution with duplicates resolved, or `None` if the duplicates cannot be resolved.
@@ -565,10 +574,6 @@ class Unique:
         # This removes all the occurrences of this value.
         gene_other_values = [v for v in gene_other_values if v != duplicate_value]
 
-        # The remove() function only removes the first occurrence of the value.
-        # Do not use it.
-        # gene_other_values.remove(duplicate_value)
-    
         # Two conditions to solve the duplicates of the value D:
             # 1. From gene_other_values, select a value V such that it is available in the gene space of another gene X.
             # 2. Find an alternate value for the gene X that will not cause any duplicates.

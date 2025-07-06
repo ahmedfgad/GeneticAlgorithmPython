@@ -1,5 +1,5 @@
 """
-The pygad.helper.helper module has some generic helper methods.
+The pygad.helper.misc module has some generic helper methods.
 """
 
 import numpy
@@ -14,8 +14,10 @@ class Helper:
         """
         Change the data type of the population. It works with iterables (e.g. lists or NumPy arrays) of shape 2D.
         It does not handle single numeric values or 1D arrays.
+
         It accepts:
             -population: The iterable to change its dtype.
+
         It returns the iterable with the data type changed for all genes.
         """
 
@@ -60,9 +62,11 @@ class Helper:
                                     gene_value):
         """
         Change the data type and round a single gene value or a vector of values FOR THE SAME GENE. E.g., the input could be 6 or [6, 7, 8].
+
         It accepts 2 parameters:
             -gene_index: The index of the target gene.
             -gene_value: The gene value.
+
         If gene_value has a single value, then it returns a single number with the type changed and value rounded. If gene_value is a vector, then a vector is returned after changing the data type and rounding.
         """
 
@@ -103,11 +107,13 @@ class Helper:
                                              mutation_by_replacement):
         """
         Change the data type and round the random value used to apply mutation.
+
         It accepts:
             -random_value: The random value to change its data type.
             -gene_index: The index of the target gene.
             -gene_value: The gene value before mutation. Only used if mutation_by_replacement=False and gene_type_single=False.
             -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
+
         It returns the new value after changing the data type and being rounded.
         """
 
@@ -129,10 +135,12 @@ class Helper:
 
         """
         Filter the random values generated for mutation based on whether they meet the gene constraint in the gene_constraint parameter.
+
         It accepts:
             -values: The values to filter.
             -solution: The solution containing the target gene.
             -gene_idx: The index of the gene in the solution.
+
         It returns None if no values satisfy the constraint. Otherwise, an array of values that satisfy the constraint is returned.
         """
 
@@ -166,8 +174,10 @@ class Helper:
 
         """
         Returns the data type of the gene by its index.
+
         It accepts a single parameter:
             -gene_index: The index of the gene to get its data type. Only used if each gene has its own data type.
+
         It returns the data type of the gene.
         """
 
@@ -181,8 +191,10 @@ class Helper:
 
         """
         Returns the minimum and maximum values of the mutation range.
+
         It accepts a single parameter:
             -gene_index: The index of the gene to get its range. Only used if the gene has a specific mutation range.
+
         It returns the minimum and maximum values of the gene mutation range.
         """
 
@@ -199,8 +211,10 @@ class Helper:
 
         """
         Returns the minimum and maximum values of the initial population range.
+
         It accepts a single parameter:
             -gene_index: The index of the gene to get its range. Only used if the gene has a specific range
+
         It returns the minimum and maximum values of the gene initial population range.
         """
 
@@ -221,6 +235,7 @@ class Helper:
                                        sample_size=1):
         """
         Generate/select one or more values for the gene from the gene space.
+
         It accepts:
             -gene_idx: The index of the gene in the solution.
             -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
@@ -508,7 +523,6 @@ class Helper:
             -None if no value found that satisfies the constraint.
         """
 
-        print("AAAA", sample_size)
         # Either generate the values randomly or from the gene space.
         values = self.generate_gene_value(range_min=range_min,
                                           range_max=range_max,
