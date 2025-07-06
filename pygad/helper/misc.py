@@ -507,6 +507,8 @@ class Helper:
             -An array with number of values equal to sample_size if sample_size>1. Or
             -None if no value found that satisfies the constraint.
         """
+
+        print("AAAA", sample_size)
         # Either generate the values randomly or from the gene space.
         values = self.generate_gene_value(range_min=range_min,
                                           range_max=range_max,

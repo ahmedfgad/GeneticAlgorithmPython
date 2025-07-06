@@ -79,7 +79,7 @@ class Mutation:
                 if self.allow_duplicate_genes == False:
                     offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                          gene_type=self.gene_type,
-                                                                                         sample_size=100,
+                                                                                         sample_size=self.sample_size,
                                                                                          mutation_by_replacement=self.mutation_by_replacement,
                                                                                          build_initial_pop=False)
         return offspring
@@ -119,7 +119,7 @@ class Mutation:
                     if self.allow_duplicate_genes == False:
                         offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                              gene_type=self.gene_type,
-                                                                                             sample_size=100,
+                                                                                             sample_size=self.sample_size,
                                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                                              build_initial_pop=False)
         return offspring
@@ -205,7 +205,7 @@ class Mutation:
                                                                                          max_val=range_max,
                                                                                          mutation_by_replacement=self.mutation_by_replacement,
                                                                                          gene_type=self.gene_type,
-                                                                                         sample_size=100)
+                                                                                         sample_size=self.sample_size)
 
         return offspring
 
@@ -243,7 +243,7 @@ class Mutation:
                                                                                              max_val=range_max,
                                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                                              gene_type=self.gene_type,
-                                                                                             sample_size=100)
+                                                                                             sample_size=self.sample_size)
         return offspring
 
     def swap_mutation(self, offspring):
@@ -549,7 +549,7 @@ class Mutation:
                 if self.allow_duplicate_genes == False:
                     offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                          gene_type=self.gene_type,
-                                                                                         sample_size=100,
+                                                                                         sample_size=self.sample_size,
                                                                                          mutation_by_replacement=self.mutation_by_replacement,
                                                                                          build_initial_pop=False)
         return offspring
@@ -614,7 +614,7 @@ class Mutation:
                                                                                          max_val=range_max,
                                                                                          mutation_by_replacement=self.mutation_by_replacement,
                                                                                          gene_type=self.gene_type,
-                                                                                         sample_size=100)
+                                                                                         sample_size=self.sample_size)
         return offspring
 
     def adaptive_mutation_probs_by_space(self, offspring):
@@ -685,7 +685,7 @@ class Mutation:
                     if self.allow_duplicate_genes == False:
                         offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                              gene_type=self.gene_type,
-                                                                                             sample_size=100,
+                                                                                             sample_size=self.sample_size,
                                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                                              build_initial_pop=False)
         return offspring
@@ -751,5 +751,5 @@ class Mutation:
                                                                                              max_val=range_max,
                                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                                              gene_type=self.gene_type,
-                                                                                             sample_size=100)
+                                                                                             sample_size=self.sample_size)
         return offspring

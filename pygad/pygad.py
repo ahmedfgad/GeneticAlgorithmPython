@@ -51,6 +51,7 @@ class GA(utils.parent_selection.ParentSelection,
                  random_mutation_max_val=1.0,
                  gene_space=None,
                  gene_constraint=None,
+                 sample_size=100,
                  allow_duplicate_genes=True,
                  on_start=None,
                  on_fitness=None,
@@ -107,6 +108,7 @@ class GA(utils.parent_selection.ParentSelection,
         gene_space: It accepts a list of all possible values of the gene. This list is used in the mutation step. Should be used only if the gene space is a set of discrete values. No need for the 2 parameters (random_mutation_min_val and random_mutation_max_val) if the parameter gene_space exists. Added in PyGAD 2.5.0. In PyGAD 2.11.0, the gene_space can be assigned a dict.
 
         gene_constraint: It accepts a list of constraints for the genes. Each constraint is a Python function. Added in PyGAD 3.5.0.
+        sample_size: To select a gene value that respects a constraint, this variable defines the size of the sample from which a value is selected. Useful if either allow_duplicate_genes or gene_constraint is used. Added in PyGAD 3.5.0.
 
         on_start: Accepts a function/method to be called only once before the genetic algorithm starts its evolution. If functioned, then it must accept a single parameter representing the instance of the genetic algorithm. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
         on_fitness: Accepts a function/method to be called after calculating the fitness values of all solutions in the population. If functioned, then it must accept 2 parameters: 1) a list of all solutions' fitness values 2) the instance of the genetic algorithm. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
@@ -189,6 +191,19 @@ class GA(utils.parent_selection.ParentSelection,
 
             self.mutation_by_replacement = mutation_by_replacement
 
+            # Validate the sample_size parameter.
+            if type(sample_size) in GA.supported_int_types:
+                if sample_size > 0:
+                    pass
+                else:
+                    self.valid_parameters = False
+                    raise ValueError(f"The value of the sample_size parameter must be > 0 but the value ({sample_size}) found.")
+            else:
+                self.valid_parameters = False
+                raise TypeError(f"The type of the sample_size parameter must be integer but the value ({sample_size}) of type ({type(sample_size)}) found.")
+
+            self.sample_size = sample_size
+
             # Validate allow_duplicate_genes
             if not (type(allow_duplicate_genes) is bool):
                 self.valid_parameters = False
@@ -265,18 +280,6 @@ class GA(utils.parent_selection.ParentSelection,
                 raise TypeError(f"The expected type of 'gene_space' is list, range, or numpy.ndarray but {type(gene_space)} found.")
 
             self.gene_space = gene_space
-
-            # Validate init_range_low and init_range_high
-            # if type(init_range_low) in GA.supported_int_float_types:
-            #     if type(init_range_high) in GA.supported_int_float_types:
-            #         self.init_range_low = init_range_low
-            #         self.init_range_high = init_range_high
-            #     else:
-            #         self.valid_parameters = False
-            #         raise ValueError(f"The value passed to the 'init_range_high' parameter must be either integer or floating-point number but the value ({init_range_high}) of type {type(init_range_high)} found.")
-            # else:
-            #     self.valid_parameters = False
-            #     raise ValueError(f"The value passed to the 'init_range_low' parameter must be either integer or floating-point number but the value ({init_range_low}) of type {type(init_range_low)} found.")
 
             # Validate init_range_low and init_range_high
             if type(init_range_low) in GA.supported_int_float_types:
@@ -460,11 +463,11 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                                                       max_val=self.init_range_high,
                                                                                                                       mutation_by_replacement=True,
                                                                                                                       gene_type=self.gene_type,
-                                                                                                                      sample_size=100)
+                                                                                                                      sample_size=self.sample_size)
                         else:
                             self.initial_population[initial_solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=initial_solution,
                                                                                                                       gene_type=self.gene_type,
-                                                                                                                      sample_size=100,
+                                                                                                                      sample_size=self.sample_size,
                                                                                                                       mutation_by_replacement=True,
                                                                                                                       build_initial_pop=True)
 
@@ -887,13 +890,17 @@ class GA(utils.parent_selection.ParentSelection,
 
             # For tournament selection, validate the K value.
             if parent_selection_type == "tournament":
-                if K_tournament > self.sol_per_pop:
-                    K_tournament = self.sol_per_pop
-                    if not self.suppress_warnings:
-                        warnings.warn(f"K of the tournament selection ({K_tournament}) should not be greater than the number of solutions within the population ({self.sol_per_pop}).\nK will be clipped to be equal to the number of solutions in the population (sol_per_pop).\n")
-                elif K_tournament <= 0:
+                if type(K_tournament) in GA.supported_int_types:
+                    if K_tournament > self.sol_per_pop:
+                        K_tournament = self.sol_per_pop
+                        if not self.suppress_warnings:
+                            warnings.warn(f"K of the tournament selection ({K_tournament}) should not be greater than the number of solutions within the population ({self.sol_per_pop}).\nK will be clipped to be equal to the number of solutions in the population (sol_per_pop).\n")
+                    elif K_tournament <= 0:
+                        self.valid_parameters = False
+                        raise ValueError(f"K of the tournament selection cannot be <=0 but ({K_tournament}) found.\n")
+                else:
                     self.valid_parameters = False
-                    raise ValueError(f"K of the tournament selection cannot be <=0 but ({K_tournament}) found.\n")
+                    raise ValueError(f"The type of K of the tournament selection must be integer but the value ({K_tournament}) of type ({type(K_tournament)}) found.")
 
             self.K_tournament = K_tournament
 
@@ -1429,7 +1436,7 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                     gene_idx=gene_idx,
                                                                                     mutation_by_replacement=True,
                                                                                     solution=solution,
-                                                                                    sample_size=100)
+                                                                                    sample_size=self.sample_size)
                             if values_filtered is None:
                                 if not self.suppress_warnings:
                                     warnings.warn(f"No value satisfied the constraint for the gene at index {gene_idx} with value {solution[gene_idx]} while creating the initial population.")
@@ -1445,11 +1452,11 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                               max_val=self.init_range_high,
                                                                                               mutation_by_replacement=True,
                                                                                               gene_type=gene_type,
-                                                                                              sample_size=100)
+                                                                                              sample_size=self.sample_size)
                 else:
                     self.population[solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[solution_idx].copy(),
                                                                                               gene_type=self.gene_type,
-                                                                                              sample_size=100,
+                                                                                              sample_size=self.sample_size,
                                                                                               mutation_by_replacement=True,
                                                                                               build_initial_pop=True)
 
