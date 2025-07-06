@@ -1404,7 +1404,6 @@ class GA(utils.parent_selection.ParentSelection,
                                                                                              gene_value=None,
                                                                                              solution=self.population[sol_idx],
                                                                                              sample_size=1)
-                    print('AAAAAAAAA', self.population[sol_idx, gene_idx])
 
         # 2) Change the data type and round all genes within the initial population.
         self.population = self.change_population_dtype_and_round(self.population)

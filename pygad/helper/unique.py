@@ -262,12 +262,17 @@ class Unique:
         """
 
         values_to_select_from = list(set(list(gene_values)) - set(solution))
-        print("PPPPPPPPP", values_to_select_from)
 
         if len(values_to_select_from) == 0:
-            # If there are no values, then keep the current gene value.
-            if not self.suppress_warnings: warnings.warn(f"'allow_duplicate_genes=False' but cannot find a unique value for the gene at index {gene_index} with value {solution[gene_index]}.")
-            selected_value = solution[gene_index]
+            if solution[gene_index] is None:
+                # The initial population is created as an empty array (numpy.empty()).
+                # If we are assigning values to the initial population, then the gene value is already None.
+                # If the gene value is None, then we do not have an option other than selecting a value even if it causes duplicates.
+                # If there is no value that is unique to the solution, then select any of the current values randomly from the current set of gene values.
+                selected_value = random.choice(gene_values)
+            else:
+                # If the gene is not None, then just keep its current value as long as there are no values that make it unique.
+                selected_value = solution[gene_index]
         else:
             selected_value = random.choice(values_to_select_from)
         return selected_value
@@ -307,7 +312,6 @@ class Unique:
                                                  build_initial_pop=build_initial_pop)
 
             if temp_val in solution:
-                # self.logger.info("temp_val, duplicate_index", temp_val, duplicate_index, solution)
                 num_unsolved_duplicates = num_unsolved_duplicates + 1
                 if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {solution[duplicate_index]}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
             else:
