@@ -15,7 +15,7 @@ class Unique:
                                        max_val, 
                                        mutation_by_replacement, 
                                        gene_type, 
-                                       num_trials=10):
+                                       sample_size=100):
         """
         Resolves duplicates in a solution by randomly selecting new values for the duplicate genes.
 
@@ -25,7 +25,7 @@ class Unique:
             max_val (int): The maximum value of the range to sample a number randomly.
             mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
             gene_type (type): The data type of the gene (e.g., int, float).
-            num_trials (int): The maximum number of attempts to resolve duplicates by changing the gene values. Only works for floating-point gene types.
+            sample_size (int): The maximum number of random values to generate to find a unique value.
 
         Returns:
             tuple:
@@ -42,26 +42,30 @@ class Unique:
         num_unsolved_duplicates = 0
         if len(not_unique_indices) > 0:
             for duplicate_index in not_unique_indices:
-                if self.gene_type_single == True:
-                    dtype = gene_type
+                dtype = self.get_gene_dtype(gene_index=duplicate_index)
+
+                if type(min_val) in self.supported_int_float_types:
+                    min_val_gene = min_val
+                    max_val_gene = max_val
                 else:
-                    dtype = gene_type[duplicate_index]
+                    min_val_gene = min_val[duplicate_index]
+                    max_val_gene = max_val[duplicate_index]
 
                 if dtype[0] in pygad.GA.supported_int_types:
                     temp_val = self.unique_int_gene_from_range(solution=new_solution, 
                                                                gene_index=duplicate_index, 
-                                                               min_val=min_val, 
-                                                               max_val=max_val, 
+                                                               min_val=min_val_gene,
+                                                               max_val=max_val_gene,
                                                                mutation_by_replacement=mutation_by_replacement, 
                                                                gene_type=gene_type)
                 else:
                     temp_val = self.unique_float_gene_from_range(solution=new_solution, 
                                                                  gene_index=duplicate_index, 
-                                                                 min_val=min_val, 
-                                                                 max_val=max_val, 
+                                                                 min_val=min_val_gene,
+                                                                 max_val=max_val_gene,
                                                                  mutation_by_replacement=mutation_by_replacement, 
                                                                  gene_type=gene_type, 
-                                                                 num_trials=num_trials)
+                                                                 sample_size=sample_size)
  
                 if temp_val in new_solution:
                     num_unsolved_duplicates = num_unsolved_duplicates + 1
@@ -80,16 +84,19 @@ class Unique:
     def solve_duplicate_genes_by_space(self, 
                                        solution, 
                                        gene_type, 
-                                       num_trials=10, 
+                                       mutation_by_replacement,
+                                       sample_size=100,
                                        build_initial_pop=False):
-    
+
         """
         Resolves duplicates in a solution by selecting new values for the duplicate genes from the gene space.
 
         Args:
             solution (list): A solution containing genes, potentially with duplicate values.
             gene_type (type): The data type of the gene (e.g., int, float).
-            num_trials (int): The maximum number of attempts to resolve duplicates by selecting values from the gene space.
+            mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
+            sample_size (int, optional): The maximum number of attempts to resolve duplicates by selecting values from the gene space.
+            build_initial_pop (bool, optional): Indicates if initial population should be built.
 
         Returns:
             tuple:
@@ -102,39 +109,27 @@ class Unique:
 
         _, unique_gene_indices = numpy.unique(solution, return_index=True)
         not_unique_indices = set(range(len(solution))) - set(unique_gene_indices)
-        # self.logger.info("not_unique_indices OUTSIDE", not_unique_indices)
 
         # First try to solve the duplicates.
         # For a solution like [3 2 0 0], the indices of the 2 duplicating genes are 2 and 3.
         # The next call to the find_unique_value() method tries to change the value of the gene with index 3 to solve the duplicate.
         if len(not_unique_indices) > 0:
-            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(new_solution=new_solution, 
+            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(solution=new_solution,
                                                                                                    gene_type=gene_type, 
                                                                                                    not_unique_indices=not_unique_indices, 
-                                                                                                   num_trials=10,
+                                                                                                   sample_size=sample_size,
+                                                                                                   mutation_by_replacement=mutation_by_replacement,
                                                                                                    build_initial_pop=build_initial_pop)
         else:
             return new_solution, not_unique_indices, len(not_unique_indices)
-    
-        # Do another try if there exist duplicate genes.
-        # If there are no possible values for the gene 3 with index 3 to solve the duplicate, try to change the value of the other gene with index 2.
-        if len(not_unique_indices) > 0:
-            not_unique_indices = set(numpy.where(new_solution == new_solution[list(not_unique_indices)[0]])[0]) - set([list(not_unique_indices)[0]])
-            new_solution, not_unique_indices, num_unsolved_duplicates = self.unique_genes_by_space(new_solution=new_solution, 
-                                                                                                   gene_type=gene_type, 
-                                                                                                   not_unique_indices=not_unique_indices, 
-                                                                                                   num_trials=10,
-                                                                                                   build_initial_pop=build_initial_pop)
-        else:
-            # DEEP-DUPLICATE-REMOVAL-NEEDED
-            # Search by this phrase to find where deep duplicates removal should be applied.
 
-            # If there exist duplicate genes, then changing either of the 2 duplicating genes (with indices 2 and 3) will not solve the problem.
-            # This problem can be solved by randomly changing one of the non-duplicating genes that may make a room for a unique value in one the 2 duplicating genes.
-            # For example, if gene_space=[[3, 0, 1], [4, 1, 2], [0, 2], [3, 2, 0]] and the solution is [3 2 0 0], then the values of the last 2 genes duplicate.
-            # There are no possible changes in the last 2 genes to solve the problem. But it could be solved by changing the second gene from 2 to 4.
-            # As a result, any of the last 2 genes can take the value 2 and solve the duplicates.
-            return new_solution, not_unique_indices, len(not_unique_indices)
+        # DEEP-DUPLICATE-REMOVAL-NEEDED
+        # Search by this phrase to find where deep duplicates removal should be applied.
+        # If there exist duplicate genes, then changing either of the 2 duplicating genes (with indices 2 and 3) will not solve the problem.
+        # This problem can be solved by randomly changing one of the non-duplicating genes that may make a room for a unique value in one the 2 duplicating genes.
+        # For example, if gene_space=[[3, 0, 1], [4, 1, 2], [0, 2], [3, 2, 0]] and the solution is [3 2 0 0], then the values of the last 2 genes duplicate.
+        # There are no possible changes in the last 2 genes to solve the problem. But it could be solved by changing the second gene from 2 to 4.
+        # As a result, any of the last 2 genes can take the value 2 and solve the duplicates.
 
         return new_solution, not_unique_indices, num_unsolved_duplicates
 
@@ -163,32 +158,40 @@ class Unique:
             int: The new integer value of the gene. If no unique value can be found, the original gene value is returned.
         """
 
-        # The gene_type is of the form [type, precision]
-        dtype = gene_type
-
-        # For non-integer steps, the numpy.arange() function returns zeros if the dtype parameter is set to an integer data type. So, this returns zeros if step is non-integer and dtype is set to an int data type: numpy.arange(min_val, max_val, step, dtype=gene_type[0])
-        # To solve this issue, the data type casting will not be handled inside numpy.arange(). The range is generated by numpy.arange() and then the data type is converted using the numpy.asarray() function.
-        all_gene_values = numpy.asarray(numpy.arange(min_val, 
-                                                     max_val, 
-                                                     step), 
-                                        dtype=dtype[0])
-
-        # If mutation is by replacement, do not add the current gene value into the list.
-        # This is to avoid replacing the value by itself again. We are doing nothing in this case.
-        if mutation_by_replacement:
-            pass
+        if self.gene_constraint and self.gene_constraint[gene_index]:
+            # A unique value is created out of the values that satisfy the constraint.
+            # sample_size=None to return all the values.
+            random_values = self.get_valid_gene_constraint_values(range_min=min_val,
+                                                                  range_max=max_val,
+                                                                  gene_value=solution[gene_index],
+                                                                  gene_idx=gene_index,
+                                                                  mutation_by_replacement=mutation_by_replacement,
+                                                                  solution=solution,
+                                                                  sample_size=None,
+                                                                  step=step)
+            # If there is no value satisfying the constraint, then return the current gene value.
+            if random_values is None:
+                return solution[gene_index]
+            else:
+                pass
         else:
-            all_gene_values = all_gene_values + solution[gene_index]
+            # There is no constraint for the current gene. Return the same range.
+            # sample_size=None to return all the values.
+            random_values = self.generate_gene_value(range_min=min_val,
+                                                     range_max=max_val,
+                                                     gene_value=solution[gene_index],
+                                                     gene_idx=gene_index,
+                                                     solution=solution,
+                                                     mutation_by_replacement=mutation_by_replacement,
+                                                     sample_size=None,
+                                                     step=step)
 
-            # After adding solution[gene_index] to the list, we have to change the data type again.
-            all_gene_values = numpy.asarray(all_gene_values, 
-                                            dtype[0])
-
-        selected_value = self.select_unique_value(gene_values=all_gene_values, 
+        selected_value = self.select_unique_value(gene_values=random_values, 
                                                   solution=solution, 
                                                   gene_index=gene_index)
 
-        selected_value = dtype[0](selected_value)
+        # The gene_type is of the form [type, precision]
+        selected_value = gene_type[0](selected_value)
     
         return selected_value
 
@@ -199,7 +202,7 @@ class Unique:
                                      max_val, 
                                      mutation_by_replacement, 
                                      gene_type, 
-                                     num_trials=10):
+                                     sample_size=100):
 
         """
         Finds a unique floating-point value for a specific gene in a solution.
@@ -211,46 +214,45 @@ class Unique:
             max_val (int): The maximum value of the range to sample a floating-point number randomly.
             mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
             gene_type (type): The data type of the gene (e.g., float, float16, float32, etc).
-            num_trials (int): The maximum number of attempts to resolve duplicates by changing the gene values.
+            sample_size (int): The maximum number of random values to generate to find a unique value.
 
         Returns:
             int: The new floating-point value of the gene. If no unique value can be found, the original gene value is returned.
         """
 
-        # The gene_type is of the form [type, precision]
-        dtype = gene_type
-
-        # We cannot have a list of all values out of a continous range.
-        # Solution is to create a subset (e.g. 100) of all the values.
-        some_gene_values = numpy.random.uniform(low=min_val,
-                                                high=max_val,
-                                                size=100)
-
-        # If mutation is by replacement, do not add the current gene value into the list.
-        # This is to avoid replacing the value by itself again. We are doing nothing in this case.
-        if mutation_by_replacement:
-            pass
+        if self.gene_constraint and self.gene_constraint[gene_index]:
+            # A unique value is created out of the values that satisfy the constraint.
+            values = self.get_valid_gene_constraint_values(range_min=min_val,
+                                                           range_max=max_val,
+                                                           gene_value=solution[gene_index],
+                                                           gene_idx=gene_index,
+                                                           mutation_by_replacement=mutation_by_replacement,
+                                                           solution=solution,
+                                                           sample_size=sample_size)
+            # If there is no value satisfying the constraint, then return the current gene value.
+            if values is None:
+                return solution[gene_index]
+            else:
+                pass
         else:
-            some_gene_values = some_gene_values + solution[gene_index]
+            # There is no constraint for the current gene. Return the same range.
+            values = self.generate_gene_value(range_min=min_val,
+                                              range_max=max_val,
+                                              gene_value=solution[gene_index],
+                                              gene_idx=gene_index,
+                                              solution=solution,
+                                              mutation_by_replacement=mutation_by_replacement,
+                                              sample_size=sample_size)
 
-        if not dtype[1] is None:
-            # Precision is available and we have to round the number.
-            # Convert the data type and round the number.
-            some_gene_values = numpy.round(numpy.asarray(some_gene_values, 
-                                                         dtype[0]),
-                                           dtype[1])
-        else:
-            # There is no precision and rounding the number is not needed. The type is [type, None]
-            # Just convert the data type.
-            some_gene_values = numpy.asarray(some_gene_values, 
-                                             dtype[0])
-
-        selected_value = self.select_unique_value(gene_values=some_gene_values, 
+        selected_value = self.select_unique_value(gene_values=values,
                                                   solution=solution, 
                                                   gene_index=gene_index)
         return selected_value
 
-    def select_unique_value(self, gene_values, solution, gene_index):
+    def select_unique_value(self,
+                            gene_values,
+                            solution,
+                            gene_index):
 
         """
         Select a unique value (if possible) from a list of gene values.
@@ -258,27 +260,34 @@ class Unique:
         Args:
             gene_values (NumPy Array): An array of values from which a unique value should be selected.
             solution (list): A solution containing genes, potentially with duplicate values.
+            gene_index (int): The index of the gene for which to find a unique value.
 
         Returns:
             selected_gene: The new (hopefully unique) value of the gene. If no unique value can be found, the original gene value is returned.
         """
 
         values_to_select_from = list(set(list(gene_values)) - set(solution))
-    
+
         if len(values_to_select_from) == 0:
-            # If there are no values, then keep the current gene value.
-            if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but cannot find a value to prevent duplicates.")
-            selected_value = solution[gene_index]
+            if solution[gene_index] is None:
+                # The initial population is created as an empty array (numpy.empty()).
+                # If we are assigning values to the initial population, then the gene value is already None.
+                # If the gene value is None, then we do not have an option other than selecting a value even if it causes duplicates.
+                # If there is no value that is unique to the solution, then select any of the current values randomly from the current set of gene values.
+                selected_value = random.choice(gene_values)
+            else:
+                # If the gene is not None, then just keep its current value as long as there are no values that make it unique.
+                selected_value = solution[gene_index]
         else:
             selected_value = random.choice(values_to_select_from)
-
         return selected_value
 
     def unique_genes_by_space(self, 
-                              new_solution, 
+                              solution,
                               gene_type, 
-                              not_unique_indices, 
-                              num_trials=10, 
+                              not_unique_indices,
+                              mutation_by_replacement,
+                              sample_size=100,
                               build_initial_pop=False):
 
         """
@@ -286,10 +295,12 @@ class Unique:
         For each duplicate gene, a call is made to the `unique_gene_by_space()` function.
 
         Args:
-            new_solution (list): A solution containing genes with duplicate values.
+            solution (list): A solution containing genes with duplicate values.
             gene_type (type): The data type of the all the genes (e.g., int, float).
             not_unique_indices (list): The indices of genes with duplicate values.
-            num_trials (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
+            mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
+            sample_size (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
+            build_initial_pop (bool, optional): Indicates if initial population should be built.
 
         Returns:
             tuple:
@@ -300,233 +311,84 @@ class Unique:
 
         num_unsolved_duplicates = 0
         for duplicate_index in not_unique_indices:
-            temp_val = self.unique_gene_by_space(solution=new_solution, 
+            temp_val = self.unique_gene_by_space(solution=solution,
                                                  gene_idx=duplicate_index, 
                                                  gene_type=gene_type,
-                                                 build_initial_pop=build_initial_pop,
-                                                 num_trials=num_trials)
+                                                 mutation_by_replacement=mutation_by_replacement,
+                                                 sample_size=sample_size,
+                                                 build_initial_pop=build_initial_pop)
 
-            if temp_val in new_solution:
-                # self.logger.info("temp_val, duplicate_index", temp_val, duplicate_index, new_solution)
+            if temp_val in solution:
                 num_unsolved_duplicates = num_unsolved_duplicates + 1
-                if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {new_solution[duplicate_index]}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
+                if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {solution[duplicate_index]}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
             else:
-                new_solution[duplicate_index] = temp_val
+                solution[duplicate_index] = temp_val
     
         # Update the list of duplicate indices after each iteration.
-        _, unique_gene_indices = numpy.unique(new_solution, return_index=True)
-        not_unique_indices = set(range(len(new_solution))) - set(unique_gene_indices)
-        # self.logger.info("not_unique_indices INSIDE", not_unique_indices)        
+        _, unique_gene_indices = numpy.unique(solution, return_index=True)
+        not_unique_indices = set(range(len(solution))) - set(unique_gene_indices)
 
-        return new_solution, not_unique_indices, num_unsolved_duplicates
+        return solution, not_unique_indices, num_unsolved_duplicates
 
     def unique_gene_by_space(self, 
                              solution, 
                              gene_idx, 
-                             gene_type, 
-                             build_initial_pop=False,
-                             num_trials=10):
+                             gene_type,
+                             mutation_by_replacement,
+                             sample_size=100,
+                             build_initial_pop=False):
     
-            """
-            Returns a unique value for a specific gene based on its value space to resolve duplicates.
+        """
+        Returns a unique value for a specific gene based on its value space to resolve duplicates.
 
-            Args:
-                solution (list): A solution containing genes with duplicate values.
-                gene_idx (int): The index of the gene that has a duplicate value.
-                gene_type (type): The data type of the gene (e.g., int, float).
-                num_trials (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
+        Args:
+            solution (list): A solution containing genes with duplicate values.
+            gene_idx (int): The index of the gene that has a duplicate value.
+            gene_type (type): The data type of the gene (e.g., int, float).
+            mutation_by_replacement (bool): Indicates if mutation is performed by replacement.
+            sample_size (int): The maximum number of attempts to resolve duplicates for each gene. Only works for floating-point numbers.
+            build_initial_pop (bool, optional): Indicates if initial population should be built.
 
-            Returns:
-                Any: A unique value for the gene, if one exists; otherwise, the original gene value.            """
+        Returns:
+            Any: A unique value for the gene, if one exists; otherwise, the original gene value.            
+        """
 
-            if self.gene_space_nested:
-                if type(self.gene_space[gene_idx]) in [numpy.ndarray, list, tuple]:
-                    # Return the current gene space from the 'gene_space' attribute.
-                    curr_gene_space = list(self.gene_space[gene_idx]).copy()
-                else:
-                    # Return the entire gene space from the 'gene_space' attribute.
-                    # curr_gene_space = list(self.gene_space[gene_idx]).copy()
-                    curr_gene_space = self.gene_space[gene_idx]
+        # When gene_value is None, this forces the gene value generators to select a value for use by the initial population.
+        # Otherwise, it considers selecting a value for mutation.
+        if build_initial_pop:
+            gene_value = None
+        else:
+            gene_value = solution[gene_idx]
 
-                # If the gene space has only a single value, use it as the new gene value.
-                if type(curr_gene_space) in pygad.GA.supported_int_float_types:
-                    value_from_space = curr_gene_space
-                    # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-                elif curr_gene_space is None:
-                    if self.gene_type_single == True:
-                        dtype = gene_type
-                    else:
-                        dtype = gene_type[gene_idx]
-
-                    if dtype[0] in pygad.GA.supported_int_types:
-                        if build_initial_pop == True:
-                            # If we are building the initial population, then use the range of the initial population.
-                            min_val = self.init_range_low
-                            max_val = self.init_range_high
-                        else:
-                            # If we are NOT building the initial population, then use the range of the random mutation.
-                            min_val = self.random_mutation_min_val
-                            max_val = self.random_mutation_max_val
-
-                        value_from_space = self.unique_int_gene_from_range(solution=solution, 
-                                                                           gene_index=gene_idx, 
-                                                                           min_val=min_val, 
-                                                                           max_val=max_val, 
-                                                                           mutation_by_replacement=True,
-                                                                           gene_type=dtype)
-                    else:
-                        if build_initial_pop == True:
-                            low = self.init_range_low
-                            high = self.init_range_high
-                        else:
-                            low = self.random_mutation_min_val
-                            high = self.random_mutation_max_val
-
-                        """
-                        value_from_space = numpy.random.uniform(low=low,
-                                                                high=high,
-                                                                size=1)[0]
-                        """
-
-                        value_from_space = self.unique_float_gene_from_range(solution=solution, 
-                                                                             gene_index=gene_idx, 
-                                                                             min_val=low, 
-                                                                             max_val=high, 
-                                                                             mutation_by_replacement=True, 
-                                                                             gene_type=dtype, 
-                                                                             num_trials=num_trials)
-
-
-                elif type(curr_gene_space) is dict:
-                    if self.gene_type_single == True:
-                        dtype = gene_type
-                    else:
-                        dtype = gene_type[gene_idx]
-
-                    # Use index 0 to return the type from the list (e.g. [int, None] or [float, 2]).
-                    if dtype[0] in pygad.GA.supported_int_types:
-                        if 'step' in curr_gene_space.keys():
-                            step = curr_gene_space['step']
-                        else:
-                            step = None
-
-                        value_from_space = self.unique_int_gene_from_range(solution=solution, 
-                                                                           gene_index=gene_idx, 
-                                                                           min_val=curr_gene_space['low'], 
-                                                                           max_val=curr_gene_space['high'], 
-                                                                           step=step,
-                                                                           mutation_by_replacement=True, 
-                                                                           gene_type=dtype)
-                    else:
-                        if 'step' in curr_gene_space.keys():
-                            value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
-                                                                                stop=curr_gene_space['high'],
-                                                                                step=curr_gene_space['step']),
-                                                                   size=1)[0]
-                        else:
-                            value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
-                                                                    high=curr_gene_space['high'],
-                                                                    size=1)[0]
-                else:
-                    # Selecting a value randomly based on the current gene's space in the 'gene_space' attribute.
-                    # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
-                    if len(curr_gene_space) == 1:
-                        value_from_space = curr_gene_space[0]
-                        if not self.suppress_warnings: warnings.warn(f"You set 'allow_duplicate_genes=False' but the space of the gene with index {gene_idx} has only a single value. Thus, duplicates are possible.")
-                    # If the gene space has more than 1 value, then select a new one that is different from the current value.
-                    else:
-                        values_to_select_from = list(set(curr_gene_space) - set(solution))
-    
-                        if len(values_to_select_from) == 0:
-                            # DEEP-DUPLICATE-REMOVAL-NEEDED
-                            # Search by this phrase to find where deep duplicates removal should be applied.
-
-                            # Reaching this block means there is no value in the gene space of this gene to solve the duplicates.
-                            # To solve the duplicate between the 2 genes, the solution is to change the value of a third gene that makes a room to solve the duplicate.
-
-                            if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the gene space does not have enough values to prevent duplicates.")
-
-                            solution2 = self.solve_duplicates_deeply(solution)
-                            if solution2 is None:
-                                # Cannot solve duplicates. At the moment, we are changing the value of a third gene to solve the duplicates between 2 genes.
-                                # Maybe a 4th, 5th, 6th, or even more genes need to be changed to solve the duplicates.
-                                pass
-                            else:
-                                solution = solution2
-                            value_from_space = solution[gene_idx]
-
-                        else:
-                            value_from_space = random.choice(values_to_select_from)
+        if self.gene_constraint and self.gene_constraint[gene_idx]:
+            # A unique value is created out of the values that satisfy the constraint.
+            values = self.get_valid_gene_constraint_values(range_min=None,
+                                                           range_max=None,
+                                                           gene_value=gene_value,
+                                                           gene_idx=gene_idx,
+                                                           mutation_by_replacement=mutation_by_replacement,
+                                                           solution=solution,
+                                                           sample_size=sample_size)
+            # If there is no value satisfying the constraint, then return the current gene value.
+            if values is None:
+                return solution[gene_idx]
             else:
-                # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
-                if type(self.gene_space) is dict:
-                    if self.gene_type_single == True:
-                        dtype = gene_type
-                    else:
-                        dtype = gene_type[gene_idx]
+                pass
+        else:
+            # There is no constraint for the current gene. Return the same range.
+            values = self.generate_gene_value(range_min=None,
+                                              range_max=None,
+                                              gene_value=gene_value,
+                                              gene_idx=gene_idx,
+                                              solution=solution,
+                                              mutation_by_replacement=mutation_by_replacement,
+                                              sample_size=sample_size)
 
-                    if dtype[0] in pygad.GA.supported_int_types:
-                        if 'step' in self.gene_space.keys():
-                            step = self.gene_space['step']
-                        else:
-                            step = None
+        selected_value = self.select_unique_value(gene_values=values,
+                                                  solution=solution,
+                                                  gene_index=gene_idx)
 
-                        value_from_space = self.unique_int_gene_from_range(solution=solution, 
-                                                                           gene_index=gene_idx, 
-                                                                           min_val=self.gene_space['low'], 
-                                                                           max_val=self.gene_space['high'], 
-                                                                           step=step,
-                                                                           mutation_by_replacement=True, 
-                                                                           gene_type=dtype)
-                    else:
-                        # When the gene_space is assigned a dict object, then it specifies the lower and upper limits of all genes in the space.
-                        if 'step' in self.gene_space.keys():
-                            value_from_space = numpy.random.choice(numpy.arange(start=self.gene_space['low'],
-                                                                                stop=self.gene_space['high'],
-                                                                                step=self.gene_space['step']),
-                                                                   size=1)[0]
-                        else:
-                            value_from_space = numpy.random.uniform(low=self.gene_space['low'],
-                                                                    high=self.gene_space['high'],
-                                                                    size=1)[0]
-                else:
-                    # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
-                    # Remove all the genes in the current solution from the gene_space.
-                    # This only leaves the unique values that could be selected for the gene.
-                    values_to_select_from = list(set(self.gene_space) - set(solution))
-    
-                    if len(values_to_select_from) == 0:
-                        if not self.suppress_warnings: warnings.warn("You set 'allow_duplicate_genes=False' but the gene space does not have enough values to prevent duplicates.")
-                        value_from_space = solution[gene_idx]
-                    else:
-                        value_from_space = random.choice(values_to_select_from)
-
-            if value_from_space is None:
-                if build_initial_pop == True:
-                    low = self.init_range_low
-                    high = self.init_range_high
-                else:
-                    low = self.random_mutation_min_val
-                    high = self.random_mutation_max_val
-
-                value_from_space = numpy.random.uniform(low=low,
-                                                        high=high,
-                                                        size=1)[0]
-
-            # Similar to the round_genes() method in the pygad module,
-            # Create a round_gene() method to round a single gene.
-            if self.gene_type_single == True:
-                dtype = gene_type
-            else:
-                dtype = gene_type[gene_idx]
-
-            if not dtype[1] is None:
-                value_from_space = numpy.round(dtype[0](value_from_space),
-                                               dtype[1])
-            else:
-                value_from_space = dtype[0](value_from_space)
-
-            return value_from_space
+        return selected_value
 
     def find_two_duplicates(self, 
                             solution,
@@ -534,10 +396,13 @@ class Unique:
         """
         Identifies the first occurrence of a duplicate gene in the solution.
 
+        Args:
+            solution: The solution containing genes with duplicate values.
+            gene_space_unpacked: A list of values from the gene space to choose the values that resolve duplicates.
+
         Returns:
-            tuple:
-                int: The index of the first gene with a duplicate value.
-                Any: The value of the duplicate gene.
+            int: The index of the first gene with a duplicate value.
+            Any: The value of the duplicate gene.
         """
 
         for gene in set(solution):
@@ -551,18 +416,18 @@ class Unique:
         # This means there is no way to solve the duplicates between the genes.
         # Because the space of the duplicates genes only has a single value and there is no alternatives.
         return None, gene
-    
+
     def unpack_gene_space(self, 
                           range_min,
                           range_max,
-                          num_values_from_inf_range=100):
+                          sample_size_from_inf_range=100):
         """
         Unpacks the gene space for selecting a value to resolve duplicates by converting ranges into lists of values.
 
         Args:
             range_min (float or int): The minimum value of the range.
             range_max (float or int): The maximum value of the range.
-            num_values_from_inf_range (int): The number of values to generate for an infinite range of float values using `numpy.linspace()`.
+            sample_size_from_inf_range (int): The number of values to generate for an infinite range of float values using `numpy.linspace()`.
 
         Returns:
             list: A list representing the unpacked gene space.
@@ -585,11 +450,15 @@ class Unique:
                 else:
                     gene_space_unpacked = numpy.linspace(start=self.gene_space['low'],
                                                          stop=self.gene_space['high'],
-                                                         num=num_values_from_inf_range,
+                                                         num=sample_size_from_inf_range,
                                                          endpoint=False)
 
             if self.gene_type_single == True:
                 # Change the data type.
+                for idx in range(len(gene_space_unpacked)):
+                    if gene_space_unpacked[idx] is None:
+                        gene_space_unpacked[idx] = numpy.random.uniform(low=range_min,
+                                                                        high=range_max)
                 gene_space_unpacked = numpy.array(gene_space_unpacked,
                                                   dtype=self.gene_type[0])
                 if not self.gene_type[1] is None:
@@ -626,10 +495,7 @@ class Unique:
                 elif type(space) is dict:
                     # Create a list of values using the dict range.
                     # Use numpy.linspace()
-                    if self.gene_type_single == True:
-                        dtype = self.gene_type
-                    else:
-                        dtype = self.gene_type[space_idx]
+                    dtype = self.get_gene_dtype(gene_index=space_idx)
 
                     if dtype[0] in pygad.GA.supported_int_types:
                         if 'step' in space.keys():
@@ -648,7 +514,7 @@ class Unique:
                         else:
                             gene_space_unpacked[space_idx] = numpy.linspace(start=space['low'],
                                                                             stop=space['high'],
-                                                                            num=num_values_from_inf_range,
+                                                                            num=sample_size_from_inf_range,
                                                                             endpoint=False)    
                 elif type(space) in [numpy.ndarray, list, tuple]:
                     # list/tuple/numpy.ndarray
@@ -664,10 +530,7 @@ class Unique:
                                                                 size=1)[0]
                             gene_space_unpacked[space_idx][idx] = random_value
     
-                if self.gene_type_single == True:
-                    dtype = self.gene_type
-                else:
-                    dtype = self.gene_type[space_idx]
+                dtype = self.get_gene_dtype(gene_index=space_idx)
 
                 # Change the data type.
                 gene_space_unpacked[space_idx] = numpy.array(gene_space_unpacked[space_idx],
@@ -687,9 +550,6 @@ class Unique:
 
         Args:
             solution (list): The current solution containing genes, potentially with duplicates.
-            gene_idx1 (int): The index of the first gene involved in the duplication.
-            gene_idx2 (int): The index of the second gene involved in the duplication.
-            assist_gene_idx (int): The index of the third gene used to assist in resolving the duplication.
 
         Returns:
             list or None: The updated solution with duplicates resolved, or `None` if the duplicates cannot be resolved.
@@ -714,10 +574,6 @@ class Unique:
         # This removes all the occurrences of this value.
         gene_other_values = [v for v in gene_other_values if v != duplicate_value]
 
-        # The remove() function only removes the first occurrence of the value.
-        # Do not use it.
-        # gene_other_values.remove(duplicate_value)
-    
         # Two conditions to solve the duplicates of the value D:
             # 1. From gene_other_values, select a value V such that it is available in the gene space of another gene X.
             # 2. Find an alternate value for the gene X that will not cause any duplicates.

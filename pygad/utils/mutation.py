@@ -8,6 +8,8 @@ import random
 import pygad
 import concurrent.futures
 
+import warnings
+
 class Mutation:
 
     def __init__(self):
@@ -43,24 +45,6 @@ class Mutation:
 
         return offspring
 
-    def get_mutation_range(self, gene_index):
-
-        """
-        Returns the minimum and maximum values of the mutation range.
-        It accepts a single parameter:
-            -gene_index: The index of the gene to mutate. Only used if the gene has a specific mutation range
-        It returns the minimum and maximum values of the mutation range.
-        """
-
-        # We can use either random_mutation_min_val or random_mutation_max_val.
-        if type(self.random_mutation_min_val) in self.supported_int_float_types:
-            range_min = self.random_mutation_min_val
-            range_max = self.random_mutation_max_val
-        else:
-            range_min = self.random_mutation_min_val[gene_index]
-            range_max = self.random_mutation_max_val[gene_index]
-        return range_min, range_max
-
     def mutation_by_space(self, offspring):
 
         """
@@ -75,111 +59,11 @@ class Mutation:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
             for gene_idx in mutation_indices:
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
+                                                                    gene_idx=gene_idx,
+                                                                    sample_size=self.sample_size)
 
-                if self.gene_space_nested:
-                    # Returning the current gene space from the 'gene_space' attribute.
-                    if type(self.gene_space[gene_idx]) in [numpy.ndarray, list]:
-                        curr_gene_space = self.gene_space[gene_idx].copy()
-                    else:
-                        curr_gene_space = self.gene_space[gene_idx]
-
-                    # If the gene space has only a single value, use it as the new gene value.
-                    if type(curr_gene_space) in pygad.GA.supported_int_float_types:
-                        value_from_space = curr_gene_space
-                    # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-                    elif curr_gene_space is None:
-                        rand_val = numpy.random.uniform(low=range_min,
-                                                        high=range_max,
-                                                        size=1)[0]
-                        if self.mutation_by_replacement:
-                            value_from_space = rand_val
-                        else:
-                            value_from_space = offspring[offspring_idx, gene_idx] + rand_val
-                    elif type(curr_gene_space) is dict:
-                        # The gene's space of type dict specifies the lower and upper limits of a gene.
-                        if 'step' in curr_gene_space.keys():
-                            # The numpy.random.choice() and numpy.random.uniform() functions return a NumPy array as the output even if the array has a single value.
-                            # We have to return the output at index 0 to force a numeric value to be returned not an object of type numpy.ndarray. 
-                            # If numpy.ndarray is returned, then it will cause an issue later while using the set() function.
-                            # Randomly select a value from a discrete range.
-                            value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
-                                                                                stop=curr_gene_space['high'],
-                                                                                step=curr_gene_space['step']),
-                                                                   size=1)[0]
-                        else:
-                            # Return the current gene value.
-                            value_from_space = offspring[offspring_idx, gene_idx]
-                            # Generate a random value to be added to the current gene value.
-                            rand_val = numpy.random.uniform(low=range_min,
-                                                            high=range_max,
-                                                            size=1)[0]
-                            # The objective is to have a new gene value that respects the gene_space boundaries.
-                            # The next if-else block checks if adding the random value keeps the new gene value within the gene_space boundaries.
-                            temp_val = value_from_space + rand_val
-                            if temp_val < curr_gene_space['low']:
-                                # Restrict the new value to be > curr_gene_space['low']
-                                # If subtracting the random value makes the new gene value outside the boundaries [low, high), then use the lower boundary the gene value.
-                                if curr_gene_space['low'] <= value_from_space - rand_val < curr_gene_space['high']:
-                                    # Because subtracting the random value keeps the new gene value within the boundaries [low, high), then use such a value as the gene value.
-                                    temp_val = value_from_space - rand_val
-                                else:
-                                    # Because subtracting the random value makes the new gene value outside the boundaries [low, high), then use the lower boundary as the gene value.
-                                    temp_val = curr_gene_space['low']
-                            elif temp_val >= curr_gene_space['high']:
-                                # Restrict the new value to be < curr_gene_space['high']
-                                # If subtracting the random value makes the new gene value outside the boundaries [low, high), then use such a value as the gene value.
-                                if curr_gene_space['low'] <= value_from_space - rand_val < curr_gene_space['high']:
-                                    # Because subtracting the random value keeps the new value within the boundaries [low, high), then use such a value as the gene value.
-                                    temp_val = value_from_space - rand_val
-                                else:
-                                    # Because subtracting the random value makes the new gene value outside the boundaries [low, high), then use the lower boundary as the gene value.
-                                    temp_val = curr_gene_space['low']
-                            value_from_space = temp_val
-                    else:
-                        # Selecting a value randomly based on the current gene's space in the 'gene_space' attribute.
-                        # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
-                        if len(curr_gene_space) == 1:
-                            value_from_space = curr_gene_space[0]
-                        # If the gene space has more than 1 value, then select a new one that is different from the current value.
-                        else:
-                            values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
-
-                            if len(values_to_select_from) == 0:
-                                value_from_space = offspring[offspring_idx, gene_idx]
-                            else:
-                                value_from_space = random.choice(values_to_select_from)
-                else:
-                    # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
-                    if type(self.gene_space) is dict:
-                        # When the gene_space is assigned a dict object, then it specifies the lower and upper limits of all genes in the space.
-                        if 'step' in self.gene_space.keys():
-                            value_from_space = numpy.random.choice(numpy.arange(start=self.gene_space['low'],
-                                                                                stop=self.gene_space['high'],
-                                                                                step=self.gene_space['step']),
-                                                                   size=1)[0]
-                        else:
-                            value_from_space = numpy.random.uniform(low=self.gene_space['low'],
-                                                                    high=self.gene_space['high'],
-                                                                    size=1)[0]
-                    else:
-                        # If the space type is not of type dict, then a value is randomly selected from the gene_space attribute.
-                        values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
-
-                        if len(values_to_select_from) == 0:
-                            value_from_space = offspring[offspring_idx, gene_idx]
-                        else:
-                            value_from_space = random.choice(values_to_select_from)
-                    # value_from_space = random.choice(self.gene_space)
-
-                if value_from_space is None:
-                    # TODO: Return index 0.
-                    # TODO: Check if this if statement is necessary.
-                    value_from_space = numpy.random.uniform(low=range_min, 
-                                                            high=range_max, 
-                                                            size=1)[0]
-
-                # Assinging the selected value from the space to the gene.
+                # Before assigning the selected value from the space to the gene, change its data type and round it.
                 if self.gene_type_single == True:
                     if not self.gene_type[1] is None:
                         offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
@@ -190,14 +74,15 @@ class Mutation:
                     if not self.gene_type[gene_idx][1] is None:
                         offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
                                                                          self.gene_type[gene_idx][1])
-
                     else:
                         offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
 
                 if self.allow_duplicate_genes == False:
                     offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                          gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                                         sample_size=self.sample_size,
+                                                                                         mutation_by_replacement=self.mutation_by_replacement,
+                                                                                         build_initial_pop=False)
         return offspring
 
     def mutation_probs_by_space(self, offspring):
@@ -214,71 +99,10 @@ class Mutation:
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
-
                 if probs[gene_idx] <= self.mutation_probability:
-                    if self.gene_space_nested:
-                        # Returning the current gene space from the 'gene_space' attribute.
-                        if type(self.gene_space[gene_idx]) in [numpy.ndarray, list]:
-                            curr_gene_space = self.gene_space[gene_idx].copy()
-                        else:
-                            curr_gene_space = self.gene_space[gene_idx]
-        
-                        # If the gene space has only a single value, use it as the new gene value.
-                        if type(curr_gene_space) in pygad.GA.supported_int_float_types:
-                            value_from_space = curr_gene_space
-                        # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-                        elif curr_gene_space is None:
-                            rand_val = numpy.random.uniform(low=range_min,
-                                                            high=range_max,
-                                                            size=1)[0]
-                            if self.mutation_by_replacement:
-                                value_from_space = rand_val
-                            else:
-                                value_from_space = offspring[offspring_idx, gene_idx] + rand_val
-                        elif type(curr_gene_space) is dict:
-                            # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
-                            if 'step' in curr_gene_space.keys():
-                                value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
-                                                                                    stop=curr_gene_space['high'],
-                                                                                    step=curr_gene_space['step']),
-                                                                       size=1)[0]
-                            else:
-                                value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
-                                                                        high=curr_gene_space['high'],
-                                                                        size=1)[0]
-                        else:
-                            # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
-                            # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
-                            if len(curr_gene_space) == 1:
-                                value_from_space = curr_gene_space[0]
-                            # If the gene space has more than 1 value, then select a new one that is different from the current value.
-                            else:
-                                values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
-
-                                if len(values_to_select_from) == 0:
-                                    value_from_space = offspring[offspring_idx, gene_idx]
-                                else:
-                                    value_from_space = random.choice(values_to_select_from)
-                    else:
-                        # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
-                        if type(self.gene_space) is dict:
-                            if 'step' in self.gene_space.keys():
-                                value_from_space = numpy.random.choice(numpy.arange(start=self.gene_space['low'],
-                                                                                    stop=self.gene_space['high'],
-                                                                                    step=self.gene_space['step']),
-                                                                       size=1)[0]
-                            else:
-                                value_from_space = numpy.random.uniform(low=self.gene_space['low'],
-                                                                        high=self.gene_space['high'],
-                                                                        size=1)[0]
-                        else:
-                            values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
-
-                            if len(values_to_select_from) == 0:
-                                value_from_space = offspring[offspring_idx, gene_idx]
-                            else:
-                                value_from_space = random.choice(values_to_select_from)
+                    value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
+                                                                        gene_idx=gene_idx,
+                                                                        sample_size=self.sample_size)
 
                     # Assigning the selected value from the space to the gene.
                     if self.gene_type_single == True:
@@ -297,54 +121,59 @@ class Mutation:
                     if self.allow_duplicate_genes == False:
                         offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                              gene_type=self.gene_type,
-                                                                                             num_trials=10)
+                                                                                             sample_size=self.sample_size,
+                                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                                             build_initial_pop=False)
         return offspring
 
+    def mutation_process_gene_value(self,
+                                    solution,
+                                    gene_idx,
+                                    range_min=None,
+                                    range_max=None,
+                                    sample_size=100):
 
-    def change_random_mutation_value_dtype(self, random_value, gene_index):
         """
-        Change the data type of the random value used to apply mutation.
-        It accepts 2 parameters:
-            -random_value: The random value to change its data type.
-            -gene_index: The index of the target gene.
-        It returns the new value after changing the data type.
+        Generate/select values for the gene that satisfy the constraint. The values could be generated randomly or from the gene space.
+        It accepts:
+            -range_min: The minimum value in the range from which a value is selected.
+            -range_max: The maximum value in the range from which a value is selected.
+            -solution: The solution where the target gene exists.
+            -gene_idx: The index of the gene in the solution.
+            -sample_size: The number of random values to generate from which a value is selected. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values.
+        It returns a single numeric value the satisfies the gene constraint if exists in the gene_constraint parameter. 
         """
 
-        # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
-        if self.mutation_by_replacement:
-            if self.gene_type_single == True:
-                random_value = self.gene_type[0](random_value)
+        # Check if the gene has a constraint.
+        if self.gene_constraint and self.gene_constraint[gene_idx]:
+            # Generate values that meet the gene constraint. Select more than 1 value.
+            # This method: 1) generates or selects the values 2) filters the values according to the constraint.
+            values = self.get_valid_gene_constraint_values(range_min=range_min,
+                                                           range_max=range_max,
+                                                           gene_value=solution[gene_idx],
+                                                           gene_idx=gene_idx,
+                                                           mutation_by_replacement=self.mutation_by_replacement,
+                                                           solution=solution,
+                                                           sample_size=sample_size)
+            if values is None:
+                # No value found that satisfy the constraint.
+                # Keep the old value.
+                value_selected = solution[gene_idx]
             else:
-                random_value = self.gene_type[gene_index][0](random_value)
-                if type(random_value) is numpy.ndarray:
-                    random_value = random_value[0]
-        # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
+                # Select a value randomly from the list of values satisfying the constraint.
+                # If size is used with numpy.random.choice(), it returns an array even if it has a single value. To return a numeric value, not an array, then return index 0.
+                value_selected = numpy.random.choice(values, size=1)[0]
         else:
-            if self.gene_type_single == True:
-                random_value = self.gene_type[0](offspring[offspring_idx, gene_index] + random_value)
-            else:
-                random_value = self.gene_type[gene_index][0](offspring[offspring_idx, gene_index] + random_value)
-                if type(random_value) is numpy.ndarray:
-                    random_value = random_value[0]
-        return random_value
-
-    def round_random_mutation_value(self, random_value, gene_index):
-        """
-        Round the random value used to apply mutation.
-        It accepts 2 parameters:
-            -random_value: The random value to round its value.
-            -gene_index: The index of the target gene. Only used if nested gene_type is used.
-        It returns the new value after being rounded.
-        """
-
-        # Round the gene
-        if self.gene_type_single == True:
-            if not self.gene_type[1] is None:
-                random_value = numpy.round(random_value, self.gene_type[1])
-        else:
-            if not self.gene_type[gene_index][1] is None:
-                random_value = numpy.round(random_value, self.gene_type[gene_index][1])
-        return random_value
+            # The gene does not have a constraint. Just select a single value.
+            value_selected = self.generate_gene_value(range_min=range_min,
+                                                      range_max=range_max,
+                                                      gene_value=solution[gene_idx],
+                                                      gene_idx=gene_idx,
+                                                      solution=solution,
+                                                      mutation_by_replacement=self.mutation_by_replacement,
+                                                      sample_size=1)
+        # Even that its name is singular, it might have a multiple values.
+        return value_selected
 
     def mutation_randomly(self, offspring):
 
@@ -357,20 +186,19 @@ class Mutation:
 
         # Random mutation changes one or more genes in each offspring randomly.
         for offspring_idx in range(offspring.shape[0]):
-            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
+            # Return the indices of the genes to mutate.
+            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), 
+                                                         self.mutation_num_genes))
             for gene_idx in mutation_indices:
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
-                # Generating a random value.
-                random_value = numpy.random.uniform(low=range_min, 
-                                                    high=range_max, 
-                                                    size=1)[0]
-                # Change the random mutation value data type.
-                random_value = self.change_random_mutation_value_dtype(random_value, gene_idx)
-
-                # Round the gene.
-                random_value = self.round_random_mutation_value(random_value, gene_idx)
+                # Generate a random value for mutation that meet the gene constraint if exists.
+                random_value = self.mutation_process_gene_value(range_min=range_min,
+                                                                range_max=range_max,
+                                                                solution=offspring[offspring_idx],
+                                                                gene_idx=gene_idx,
+                                                                sample_size=self.sample_size)
 
                 offspring[offspring_idx, gene_idx] = random_value
 
@@ -380,7 +208,7 @@ class Mutation:
                                                                                          max_val=range_max,
                                                                                          mutation_by_replacement=self.mutation_by_replacement,
                                                                                          gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                                         sample_size=self.sample_size)
 
         return offspring
 
@@ -395,21 +223,21 @@ class Mutation:
 
         # Random mutation changes one or more genes in each offspring randomly.
         for offspring_idx in range(offspring.shape[0]):
+            # The mutation probabilities for the current offspring.
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
+                # A gene is mutated only if its mutation probability is less than or equal to the threshold.
                 if probs[gene_idx] <= self.mutation_probability:
-                    # Generating a random value.
-                    random_value = numpy.random.uniform(low=range_min, 
-                                                        high=range_max, 
-                                                        size=1)[0]
-                    # Change the random mutation value data type.
-                    random_value = self.change_random_mutation_value_dtype(random_value, gene_idx)
 
-                    # Round the gene.
-                    random_value = self.round_random_mutation_value(random_value, gene_idx)
+                    # Generate a random value fpr mutation that meet the gene constraint if exists.
+                    random_value = self.mutation_process_gene_value(range_min=range_min,
+                                                                    range_max=range_max,
+                                                                    solution=offspring[offspring_idx],
+                                                                    gene_idx=gene_idx,
+                                                                    sample_size=self.sample_size)
 
                     offspring[offspring_idx, gene_idx] = random_value
 
@@ -419,7 +247,7 @@ class Mutation:
                                                                                              max_val=range_max,
                                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                                              gene_type=self.gene_type,
-                                                                                             num_trials=10)
+                                                                                             sample_size=self.sample_size)
         return offspring
 
     def swap_mutation(self, offspring):
@@ -617,8 +445,6 @@ class Mutation:
                             else:
                                 raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value ({sol_fitness}) of type {type(sol_fitness)} found.")
 
-
-
         if len(fitness.shape) > 1:
             # TODO This is a multi-objective optimization problem.
             # Calculate the average of each objective's fitness across all solutions in the population.
@@ -707,79 +533,9 @@ class Mutation:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
             for gene_idx in mutation_indices:
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
-
-                if self.gene_space_nested:
-                    # Returning the current gene space from the 'gene_space' attribute.
-                    if type(self.gene_space[gene_idx]) in [numpy.ndarray, list]:
-                        curr_gene_space = self.gene_space[gene_idx].copy()
-                    else:
-                        curr_gene_space = self.gene_space[gene_idx]
-
-                    # If the gene space has only a single value, use it as the new gene value.
-                    if type(curr_gene_space) in pygad.GA.supported_int_float_types:
-                        value_from_space = curr_gene_space
-                    # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-                    elif curr_gene_space is None:
-                        rand_val = numpy.random.uniform(low=range_min,
-                                                        high=range_max,
-                                                        size=1)[0]
-                        if self.mutation_by_replacement:
-                            value_from_space = rand_val
-                        else:
-                            value_from_space = offspring[offspring_idx, gene_idx] + rand_val
-                    elif type(curr_gene_space) is dict:
-                            # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
-                            if 'step' in curr_gene_space.keys():
-                                # The numpy.random.choice() and numpy.random.uniform() functions return a NumPy array as the output even if the array has a single value.
-                                # We have to return the output at index 0 to force a numeric value to be returned not an object of type numpy.ndarray. 
-                                # If numpy.ndarray is returned, then it will cause an issue later while using the set() function.
-                                value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
-                                                                                    stop=curr_gene_space['high'],
-                                                                                    step=curr_gene_space['step']),
-                                                                       size=1)[0]
-                            else:
-                                value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
-                                                                        high=curr_gene_space['high'],
-                                                                        size=1)[0]
-                    else:
-                        # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
-                        # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
-                        if len(curr_gene_space) == 1:
-                            value_from_space = curr_gene_space[0]
-                        # If the gene space has more than 1 value, then select a new one that is different from the current value.
-                        else:
-                            values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
-
-                            if len(values_to_select_from) == 0:
-                                value_from_space = offspring[offspring_idx, gene_idx]
-                            else:
-                                value_from_space = random.choice(values_to_select_from)
-                else:
-                    # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
-                    if type(self.gene_space) is dict:
-                        if 'step' in self.gene_space.keys():
-                            value_from_space = numpy.random.choice(numpy.arange(start=self.gene_space['low'],
-                                                                                stop=self.gene_space['high'],
-                                                                                step=self.gene_space['step']),
-                                                                   size=1)[0]
-                        else:
-                            value_from_space = numpy.random.uniform(low=self.gene_space['low'],
-                                                                    high=self.gene_space['high'],
-                                                                    size=1)[0]
-                    else:
-                        values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
-
-                        if len(values_to_select_from) == 0:
-                            value_from_space = offspring[offspring_idx, gene_idx]
-                        else:
-                            value_from_space = random.choice(values_to_select_from)
-
-
-                if value_from_space is None:
-                    value_from_space = numpy.random.uniform(low=range_min, 
-                                                            high=range_max, 
-                                                            size=1)[0]
+                value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
+                                                                    gene_idx=gene_idx,
+                                                                    sample_size=self.sample_size)
 
                 # Assigning the selected value from the space to the gene.
                 if self.gene_type_single == True:
@@ -798,7 +554,9 @@ class Mutation:
                 if self.allow_duplicate_genes == False:
                     offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                          gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                                         sample_size=self.sample_size,
+                                                                                         mutation_by_replacement=self.mutation_by_replacement,
+                                                                                         build_initial_pop=False)
         return offspring
 
     def adaptive_mutation_randomly(self, offspring):
@@ -845,17 +603,14 @@ class Mutation:
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
             for gene_idx in mutation_indices:
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
-                # Generating a random value.
-                random_value = numpy.random.uniform(low=range_min, 
-                                                    high=range_max, 
-                                                    size=1)[0]
-                # Change the random mutation value data type.
-                random_value = self.change_random_mutation_value_dtype(random_value, gene_idx)
-
-                # Round the gene.
-                random_value = self.round_random_mutation_value(random_value, gene_idx)
+                # Generate a random value fpr mutation that meet the gene constraint if exists.
+                random_value = self.mutation_process_gene_value(range_min=range_min,
+                                                                range_max=range_max,
+                                                                solution=offspring[offspring_idx],
+                                                                gene_idx=gene_idx,
+                                                                sample_size=self.sample_size)
 
                 offspring[offspring_idx, gene_idx] = random_value
 
@@ -865,7 +620,7 @@ class Mutation:
                                                                                          max_val=range_max,
                                                                                          mutation_by_replacement=self.mutation_by_replacement,
                                                                                          gene_type=self.gene_type,
-                                                                                         num_trials=10)
+                                                                                         sample_size=self.sample_size)
         return offspring
 
     def adaptive_mutation_probs_by_space(self, offspring):
@@ -914,81 +669,13 @@ class Mutation:
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
-
                 if probs[gene_idx] <= adaptive_mutation_probability:
-                    if self.gene_space_nested:
-                        # Returning the current gene space from the 'gene_space' attribute.
-                        if type(self.gene_space[gene_idx]) in [numpy.ndarray, list]:
-                            curr_gene_space = self.gene_space[gene_idx].copy()
-                        else:
-                            curr_gene_space = self.gene_space[gene_idx]
-        
-                        # If the gene space has only a single value, use it as the new gene value.
-                        if type(curr_gene_space) in pygad.GA.supported_int_float_types:
-                            value_from_space = curr_gene_space
-                        # If the gene space is None, apply mutation by adding a random value between the range defined by the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-                        elif curr_gene_space is None:
-                            rand_val = numpy.random.uniform(low=range_min,
-                                                            high=range_max,
-                                                            size=1)[0]
-                            if self.mutation_by_replacement:
-                                value_from_space = rand_val
-                            else:
-                                value_from_space = offspring[offspring_idx, gene_idx] + rand_val
-                        elif type(curr_gene_space) is dict:
-                            # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
-                            if 'step' in curr_gene_space.keys():
-                                value_from_space = numpy.random.choice(numpy.arange(start=curr_gene_space['low'],
-                                                                                    stop=curr_gene_space['high'],
-                                                                                    step=curr_gene_space['step']),
-                                                                       size=1)[0]
-                            else:
-                                value_from_space = numpy.random.uniform(low=curr_gene_space['low'],
-                                                                        high=curr_gene_space['high'],
-                                                                        size=1)[0]
-                        else:
-                            # Selecting a value randomly from the current gene's space in the 'gene_space' attribute.
-                            # If the gene space has only 1 value, then select it. The old and new values of the gene are identical.
-                            if len(curr_gene_space) == 1:
-                                value_from_space = curr_gene_space[0]
-                            # If the gene space has more than 1 value, then select a new one that is different from the current value.
-                            else:
-                                values_to_select_from = list(set(curr_gene_space) - set([offspring[offspring_idx, gene_idx]]))
 
-                                if len(values_to_select_from) == 0:
-                                    value_from_space = offspring[offspring_idx, gene_idx]
-                                else:
-                                    value_from_space = random.choice(values_to_select_from)
-                    else:
-                        # Selecting a value randomly from the global gene space in the 'gene_space' attribute.
-                        if type(self.gene_space) is dict:
-                            if 'step' in self.gene_space.keys():
-                                # The numpy.random.choice() and numpy.random.uniform() functions return a NumPy array as the output even if the array has a single value.
-                                # We have to return the output at index 0 to force a numeric value to be returned not an object of type numpy.ndarray. 
-                                # If numpy.ndarray is returned, then it will cause an issue later while using the set() function.
-                                value_from_space = numpy.random.choice(numpy.arange(start=self.gene_space['low'],
-                                                                                    stop=self.gene_space['high'],
-                                                                                    step=self.gene_space['step']),
-                                                                       size=1)[0]
-                            else:
-                                value_from_space = numpy.random.uniform(low=self.gene_space['low'],
-                                                                        high=self.gene_space['high'],
-                                                                        size=1)[0]
-                        else:
-                            values_to_select_from = list(set(self.gene_space) - set([offspring[offspring_idx, gene_idx]]))
+                    value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
+                                                                        gene_idx=gene_idx,
+                                                                        sample_size=self.sample_size)
 
-                            if len(values_to_select_from) == 0:
-                                value_from_space = offspring[offspring_idx, gene_idx]
-                            else:
-                                value_from_space = random.choice(values_to_select_from)
-
-                    if value_from_space is None:
-                        value_from_space = numpy.random.uniform(low=range_min, 
-                                                                high=range_max, 
-                                                                size=1)[0]
-
-                    # Assinging the selected value from the space to the gene.
+                    # Assigning the selected value from the space to the gene.
                     if self.gene_type_single == True:
                         if not self.gene_type[1] is None:
                             offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
@@ -1005,7 +692,9 @@ class Mutation:
                     if self.allow_duplicate_genes == False:
                         offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
                                                                                              gene_type=self.gene_type,
-                                                                                             num_trials=10)
+                                                                                             sample_size=self.sample_size,
+                                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                                             build_initial_pop=False)
         return offspring
 
     def adaptive_mutation_probs_randomly(self, offspring):
@@ -1052,18 +741,15 @@ class Mutation:
             probs = numpy.random.random(size=offspring.shape[1])
             for gene_idx in range(offspring.shape[1]):
 
-                range_min, range_max = self.get_mutation_range(gene_idx)
+                range_min, range_max = self.get_random_mutation_range(gene_idx)
 
                 if probs[gene_idx] <= adaptive_mutation_probability:
-                    # Generating a random value.
-                    random_value = numpy.random.uniform(low=range_min, 
-                                                        high=range_max, 
-                                                        size=1)[0]
-                    # Change the random mutation value data type.
-                    random_value = self.change_random_mutation_value_dtype(random_value, gene_idx)
-
-                    # Round the gene.
-                    random_value = self.round_random_mutation_value(random_value, gene_idx)
+                    # Generate a random value fpr mutation that meet the gene constraint if exists.
+                    random_value = self.mutation_process_gene_value(range_min=range_min,
+                                                                    range_max=range_max,
+                                                                    solution=offspring[offspring_idx],
+                                                                    gene_idx=gene_idx,
+                                                                    sample_size=self.sample_size)
 
                     offspring[offspring_idx, gene_idx] = random_value
 
@@ -1073,5 +759,5 @@ class Mutation:
                                                                                              max_val=range_max,
                                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                                              gene_type=self.gene_type,
-                                                                                             num_trials=10)
+                                                                                             sample_size=self.sample_size)
         return offspring

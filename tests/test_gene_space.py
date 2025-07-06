@@ -201,7 +201,7 @@ def number_respect_gene_space(gene_space=None,
                         else:
                             num_outside += 1
 
-    print(f"Number of outside range is {num_outside}.")
+    print(f"Number of values outside the range is: {num_outside}.")
     return num_outside, ga_instance
 
 #### Single-Objective

@@ -5,7 +5,7 @@ num_generations = 100
 sol_per_pop = 10
 num_parents_mating = 5
 
-# TODO Verify that the each entry in 'solutions_fitness' and 'best_solutions_fitness' have values equal to the number of objectives.
+# TODO Verify that each entry in 'solutions_fitness' and 'best_solutions_fitness' has values equal to the number of objectives.
 
 def number_saved_solutions(keep_elitism=1, 
                            keep_parents=-1,

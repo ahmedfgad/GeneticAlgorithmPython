@@ -31,6 +31,7 @@ def number_respect_gene_space(gene_space=None,
                               init_range_low=-4,
                               init_range_high=4,
                               initial_population=None,
+                              allow_duplicate_genes=False,
                               parent_selection_type='sss',
                               multi_objective=False):
 
@@ -85,7 +86,7 @@ def number_respect_gene_space(gene_space=None,
             elif type(ga_instance.gene_space[gene_idx]) is dict:
                 if not "step" in ga_instance.gene_space[gene_idx].keys():
                     for val in all_gene_values:
-                        if val >= ga_instance.gene_space[gene_idx]["low"] and val < ga_instance.gene_space[gene_idx]["high"]:
+                        if ga_instance.gene_space[gene_idx]["low"] <= val <= ga_instance.gene_space[gene_idx]["high"]:
                             pass
                         else:
                             num_outside += 1
@@ -118,7 +119,7 @@ def number_respect_gene_space(gene_space=None,
             elif type(ga_instance.gene_space) is dict:
                 if not "step" in ga_instance.gene_space.keys():
                     for val in all_gene_values:
-                        if val >= ga_instance.gene_space["low"] and val < ga_instance.gene_space["high"]:
+                        if ga_instance.gene_space["low"] <= val <= ga_instance.gene_space["high"]:
                             pass
                         else:
                             num_outside += 1
@@ -197,7 +198,7 @@ def test_gene_space_numpy_nested_gene_type():
 
 def test_gene_space_dict_without_step_nested_gene_type():
     num_outside, ga_instance = number_respect_gene_space(gene_space={"low": 0, "high": 10},
-                                               gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
+                                                         gene_type=[int, float, numpy.float64, [float, 3], [float, 4], numpy.int16, [numpy.float32, 1], int, float, [float, 3]])
     assert num_outside == 0
 
 def test_gene_space_dict_with_step_nested_gene_type():
