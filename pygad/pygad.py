@@ -545,13 +545,13 @@ class GA(utils.parent_selection.ParentSelection,
                             if item is None:
                                 pass
                             elif item and callable(item):
-                                if item.__code__.co_argcount == 1:
-                                    # Every callable is valid if it receives a single argument.
-                                    # This argument represents the solution.
+                                if item.__code__.co_argcount == 2:
+                                    # Every callable is valid if it receives 2 arguments.
+                                    # The 2 arguments: 1) solution 2) A list or numpy.ndarray of values to check if they meet the constraint.
                                     pass
                                 else:
                                     self.valid_parameters = False
-                                    raise ValueError(f"Every callable inside the gene_constraint parameter must accept a single argument representing the solution/chromosome. But the callable at index {constraint_idx} named '{item.__code__.co_name}' accepts {item.__code__.co_argcount} argument(s).")
+                                    raise ValueError(f"Every callable inside the gene_constraint parameter must accept 2 arguments representing 1) The solution/chromosome where the gene exists 2) A list of NumPy array of values to check if they meet the constraint. But the callable at index {constraint_idx} named '{item.__code__.co_name}' accepts {item.__code__.co_argcount} argument(s).")
                             else:
                                 self.valid_parameters = False
                                 raise TypeError(f"The expected type of an element in the 'gene_constraint' parameter is None or a callable (e.g. function). But {item} at index {constraint_idx} of type {type(item)} found.")
@@ -1424,7 +1424,18 @@ class GA(utils.parent_selection.ParentSelection,
                 for gene_idx in range(self.num_genes):
                     # Check that a constraint is available for the gene and that the current value does not satisfy that constraint
                     if self.gene_constraint[gene_idx]:
-                        if not self.gene_constraint[gene_idx](solution):
+                        # Remember that the second argument to the gene constraint callable is a list/numpy.ndarray of the values to check if they meet the gene constraint.
+                        values = [solution[gene_idx]]
+                        filtered_values = self.gene_constraint[gene_idx](solution, values)
+                        result = self.validate_gene_constraint_callable_output(selected_values=filtered_values,
+                                                                               values=values)
+                        if result:
+                            pass
+                        else:
+                            raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is subset of the passed values (second argument).")
+
+                        # Check if the gene value satisfies the gene constraint.
+                        if len(filtered_values) == 1 and filtered_values[0] == solution[gene_idx]:
                             range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
                             # While initializing the population, we follow a mutation by replacement approach. So, the original gene value is not needed.
                             values_filtered = self.get_valid_gene_constraint_values(range_min=range_min,
