@@ -1434,8 +1434,15 @@ class GA(utils.parent_selection.ParentSelection,
                         else:
                             raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is subset of the passed values (second argument).")
 
-                        # Check if the gene value satisfies the gene constraint.
-                        if len(filtered_values) == 1 and filtered_values[0] == solution[gene_idx]:
+                        if len(filtered_values) ==1 and filtered_values[0] != solution[gene_idx]:
+                            # Error by the user's defined gene constraint callable.
+                            raise Exception(f"It is expected to receive a list/numpy.ndarray from the gene_constraint callable with a single value equal to {values[0]}, but the value {filtered_values[0]} found.")
+
+                        # Check if the gene value does not satisfy the gene constraint.
+                        # Note that we already passed a list of a single value.
+                        # It is expected to receive a list of either a single value or an empty list.
+                        if len(filtered_values) < 1:
+                            # Search for a value that satisfies the gene constraint.
                             range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
                             # While initializing the population, we follow a mutation by replacement approach. So, the original gene value is not needed.
                             values_filtered = self.get_valid_gene_constraint_values(range_min=range_min,
@@ -1450,6 +1457,12 @@ class GA(utils.parent_selection.ParentSelection,
                                     warnings.warn(f"No value satisfied the constraint for the gene at index {gene_idx} with value {solution[gene_idx]} while creating the initial population.")
                             else:
                                 self.population[sol_idx, gene_idx] = random.choice(values_filtered)
+                        elif len(filtered_values) == 1:
+                            # The value already satisfied the gene constraint.
+                            pass
+                        else:
+                            # Error by the user's defined gene constraint callable.
+                            raise Exception(f"It is expected to receive a list/numpy.ndarray from the gene_constraint callable that is either empty or has a single value equal, but received a list/numpy.ndarray of length {len(filtered_values)}.")
 
         # 4) Solve duplicate genes.
         if allow_duplicate_genes == False:

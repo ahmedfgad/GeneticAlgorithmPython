@@ -25,11 +25,11 @@ ga_instance = pygad.GA(num_generations=100,
                        gene_type=int,
                        sample_size=100,
                        random_seed=10,
-                       gene_constraint=[lambda x, v: [val for val in v if val>=98],
-                                        lambda x, v: [val for val in v if val>=98],
-                                        lambda x, v: [val for val in v if 80<val<90],
+                       gene_constraint=[lambda x,v: [val for val in v if val>=98],
+                                        lambda x,v: [val for val in v if val>=98],
+                                        lambda x,v: [val for val in v if 80<val<90],
                                         None,
-                                        lambda x, v: [val for val in v if 20<val<40],
+                                        lambda x,v: [val for val in v if 20<val<40],
                                         None]
                        )
 
