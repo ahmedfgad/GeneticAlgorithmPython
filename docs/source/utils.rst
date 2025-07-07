@@ -71,11 +71,58 @@ the supported mutation operations which are:
 
 4. Scramble: Implemented using the ``scramble_mutation()`` method.
 
-5. Scramble: Implemented using the ``adaptive_mutation()`` method.
+5. Adaptive: Implemented using the ``adaptive_mutation()`` method.
 
 All mutation methods accept this parameter:
 
 1. ``offspring``: The offspring to mutate.
+
+The ``pygad.utils.mutation`` module has some helper methods to assist
+applying the mutation operation:
+
+1.  ``mutation_by_space()``: Applies the mutation using the
+    ``gene_space`` parameter.
+
+2.  ``mutation_probs_by_space()``: Uses the mutation probabilities in
+    the ``mutation_probabilities`` instance attribute to apply the
+    mutation using the ``gene_space`` parameter. For each gene, if its
+    probability is <= that the mutation probability, then it will be
+    mutated based on the mutation space.
+
+3.  ``mutation_process_gene_value()``: Generate/select values for the
+    gene that satisfy the constraint. The values could be generated
+    randomly or from the gene space.
+
+4.  ``mutation_randomly()``: Applies the random mutation.
+
+5.  ``mutation_probs_randomly()``: Uses the mutation probabilities in
+    the ``mutation_probabilities`` instance attribute to apply the
+    random mutation. For each gene, if its probability is <= that the
+    mutation probability, then it will be mutated randomly.
+
+6.  ``adaptive_mutation_population_fitness()``: A helper method to
+    calculate the average fitness of the solutions before applying the
+    adaptive mutation.
+
+7.  ``adaptive_mutation_by_space()``: Applies the adaptive mutation
+    based on the ``gene_space`` parameter. A number of genes are
+    selected randomly for mutation. This number depends on the fitness
+    of the solution. The random values are selected from the
+    ``gene_space`` parameter.
+
+8.  ``adaptive_mutation_probs_by_space()``: Uses the mutation
+    probabilities to decide which genes to apply the adaptive mutation
+    by space.
+
+9.  ``adaptive_mutation_randomly()``: Applies the adaptive mutation
+    based on randomly. A number of genes are selected randomly for
+    mutation. This number depends on the fitness of the solution. The
+    random values are selected based on the 2 parameters
+    ``andom_mutation_min_val`` and ``random_mutation_max_val``.
+
+10. ``adaptive_mutation_probs_randomly()``: Uses the mutation
+    probabilities to decide which genes to apply the adaptive mutation
+    randomly.
 
 Adaptive Mutation
 =================
@@ -132,8 +179,7 @@ In PyGAD, if ``f=f_avg``, then the solution is regarded of high quality.
 
 The next figure summarizes the previous steps.
 
-.. image:: https://user-images.githubusercontent.com/16560492/103468973-e3c26600-4d2c-11eb-8af3-b3bb39b50540.jpg
-   :alt: 
+|image1|
 
 This strategy is applied in PyGAD.
 
@@ -268,13 +314,19 @@ are:
 7. NSGA-II: Implemented using the ``nsga2_selection()`` method.
 
 8. NSGA-II Tournament: Implemented using the
-   ``tournament_nsga2_selection()`` method.
+   ``tournament_selection_nsga2()`` method.
 
 All parent selection methods accept these parameters:
 
 1. ``fitness``: The fitness of the entire population.
 
 2. ``num_parents``: The number of parents to select.
+
+It has the following helper methods:
+
+1. ``wheel_cumulative_probs()``: A helper function to calculate the
+   wheel probabilities for these 2 methods: 1)
+   ``roulette_wheel_selection()`` 2) ``rank_selection()``
 
 .. _pygadutilsnsga2-submodule:
 
@@ -472,25 +524,25 @@ parameter.
 
 Note that there are other things to take into consideration like:
 
--  Making sure that each gene conforms to the data type(s) listed in the
-   ``gene_type`` parameter.
+- Making sure that each gene conforms to the data type(s) listed in the
+  ``gene_type`` parameter.
 
--  If the ``gene_space`` parameter is used, then the new value for the
-   gene should conform to the values/ranges listed.
+- If the ``gene_space`` parameter is used, then the new value for the
+  gene should conform to the values/ranges listed.
 
--  Mutating a number of genes that conforms to the parameters
-   ``mutation_percent_genes``, ``mutation_probability``, and
-   ``mutation_num_genes``.
+- Mutating a number of genes that conforms to the parameters
+  ``mutation_percent_genes``, ``mutation_probability``, and
+  ``mutation_num_genes``.
 
--  Whether mutation happens with or without replacement based on the
-   ``mutation_by_replacement`` parameter.
+- Whether mutation happens with or without replacement based on the
+  ``mutation_by_replacement`` parameter.
 
--  The minimum and maximum values from which a random value is generated
-   based on the ``random_mutation_min_val`` and
-   ``random_mutation_max_val`` parameters.
+- The minimum and maximum values from which a random value is generated
+  based on the ``random_mutation_min_val`` and
+  ``random_mutation_max_val`` parameters.
 
--  Whether duplicates are allowed or not in the chromosome based on the
-   ``allow_duplicate_genes`` parameter.
+- Whether duplicates are allowed or not in the chromosome based on the
+  ``allow_duplicate_genes`` parameter.
 
 and more.
 
@@ -705,3 +757,5 @@ This is the same example but using methods instead of functions.
 
    ga_instance.run()
    ga_instance.plot_fitness()
+
+.. |image1| image:: https://user-images.githubusercontent.com/16560492/103468973-e3c26600-4d2c-11eb-8af3-b3bb39b50540.jpg

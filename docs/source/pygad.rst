@@ -298,6 +298,26 @@ The ``pygad.GA`` class constructor supports the following parameters:
   from the start to the end of the range specified by the 2 existing
   keys ``"low"`` and ``"high"``.
 
+- ``gene_constraint=None``: A list of callables (i.e. functions) acting
+  as constraints for the gene values. Before selecting a value for a
+  gene, the callable is called to ensure the candidate value is valid.
+  Added in `PyGAD
+  3.5.0 <https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0>`__.
+  Check the `Gene
+  Constraint <https://pygad.readthedocs.io/en/latest/pygad_more.html#gene-constraint>`__
+  section for more information.
+
+- ``sample_size=100``: In some cases where a gene value is to be
+  selected, this variable defines the size of the sample from which a
+  value is selected randomly. Useful if either ``allow_duplicate_genes``
+  or ``gene_constraint`` is used. If PyGAD failed to find a unique value
+  or a value that meets a gene constraint, it is recommended to
+  increases this parameter's value. Added in `PyGAD
+  3.5.0 <https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0>`__.
+  Check the `sample_size
+  Parameter <https://pygad.readthedocs.io/en/latest/pygad_more.html#sample-size-parameter>`__
+  section for more information.
+
 - ``on_start=None``: Accepts a function/method to be called only once
   before the genetic algorithm starts its evolution. If function, then
   it must accept a single parameter representing the instance of the
@@ -615,6 +635,13 @@ Other Methods
 
   4. ``run_update_population()``: Update the ``population`` attribute
      after completing the processes of crossover and mutation.
+
+There are many methods that are not designed for user usage. Some of
+them are listed above but this is not a comprehensive list. The `release
+history <https://pygad.readthedocs.io/en/latest/releases.html>`__
+section usually covers them. Moreover, you can check the `PyGAD GitHub
+repository <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ to
+find more.
 
 The next sections discuss the methods available in the ``pygad.GA``
 class.

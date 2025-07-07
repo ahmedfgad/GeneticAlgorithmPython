@@ -412,6 +412,177 @@ to the gene value.
 
    Gene space: {'low': 1, 'high': 5, 'step': 0.5}
 
+Gene Constraint
+===============
+
+In `PyGAD
+3.5.0 <https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0>`__,
+a new parameter called ``gene_constraint`` is added to the constructor
+of the ``pygad.GA`` class. An instance attribute of the same name is
+created for any instance of the ``pygad.GA`` class.
+
+The ``gene_constraint`` parameter allows the users to define constraints
+to be enforced (as much as possible) when selecting a value for a gene.
+For example, this constraint is enforced when applying mutation to make
+sure the new gene value after mutation meets the gene constraint.
+
+The default value of this parameter is ``None`` which means no genes
+have constraints. It can be assigned a list but the length of this list
+must be equal to the number of genes as specified by the ``num_gene``
+parameter.
+
+When assigned a list, the allowed values for each element are:
+
+1. ``None``: No constraint for the gene.
+
+2. ``callable``: A callable/function that accepts 2 parameters:
+
+   1. The solution where the gene exists.
+
+   2. A list or NumPy array of candidate values for the gene.
+
+It is the user's responsibility to build such callables to filter the
+passed list of values and return a new list with the values that meets
+the gene constraint. If no value meets the constraint, return an empty
+list or NumPy array.
+
+For example, if the gene must be smaller than 5, then use this callable:
+
+.. code:: python
+
+   lambda solution,values: [val for val in values if val<5]
+
+The first parameter is the solution where the target gene exists. It is
+passed just in case you would like to compare the gene value with other
+genes. The second parameter is the list of candidate values for the
+gene. The objective of the lambda function is to filter the values and
+return only the valid values that are less than 5.
+
+A lambda function is used in this case but we can use a regular
+function:
+
+.. code:: python
+
+   def constraint_func(solution,values): 
+       return [val for val in values if val<5]
+
+Assuming ``num_genes`` is 2, then here is a valid value for the
+``gene_constraint`` parameter.
+
+.. code:: python
+
+   import pygad
+
+   def fitness_func(...):
+       ...
+       return fitness
+
+   ga_instance = pygad.GA(
+       num_genes=2,
+       sample_size=200,
+       ...
+       gene_constraint=
+       [
+           lambda solution,values: [val for val in values if val<5],
+           lambda solution,values: [val for val in values if val>[solution[0]]
+       ]
+   )
+
+The first lambda function filters the values for the first gene by only
+considering the gene values that are less than 5. If the passed values
+is ``[-5, 2, 6, 13, 3, 4, 0]``, then the returned filtered values will
+be ``[-5, 2, 3, 4, 0]``.
+
+The constraint for the second gene makes sure the selected value is
+larger than the value of the first gene. Assuming the values for the 2
+parameters are:
+
+1. ``solution=[1, 4]``
+
+2. ``values=[17, 2, -1, 0.5, -2.1, 1.4]``
+
+Then the value of the first gene in the passed solution is ``1``. By
+filtering the passed values using the callable corresponding to the
+second gene, then the returned values will be ``[17, 2, 1.4]`` because
+these are the only values that are larger than the first gene value of
+``1``.
+
+Sometimes it is normal for PyGAD to fail to find a gene value that
+satisfies the constraint. For example, if the possible gene values are
+only ``[20,30,40]`` and the gene constraint restricts the values to be
+greater than 50, then it is impossible to meet the constraint.
+
+For some other cases, the constraint can be met but with some changes.
+For example, increasing the range from which a value is sampled. If the
+``gene_space`` is used and assigned ``range(10)``, then the gene
+constraint can be met by using ``range(50)`` so that we can find values
+greater than 50.
+
+Even if the the gene space is already assigned ``range(1000)``, it might
+still not find values meeting the constraints This is because PyGAD
+samples a number of values equal to the ``sample_size`` parameter which
+defaults to *100*.
+
+Out of the range of *1000* numbers, all the 100 values might not be
+satisfying the constraint. This issue could be solved by simply
+assigning a larger value for the ``sample_size`` parameter.
+
+   PyGAD does not yet handle the **dependencies** among the genes in the
+   ``gene_constraint`` parameter.
+
+   For example, gene 0 might depend on gene 1. To efficiently enforce
+   the constraints, the constraint for gene 1 must be enforced first (if
+   not ``None``) then the constraint for gene 0.
+
+   PyGAD applies constraints sequentially, starting from the first gene
+   to the last. To ensure correct behavior when genes depend on each
+   other, structure your GA problem so that if gene X depends on gene Y,
+   then gene Y appears earlier in the chromosome (solution) than gene X.
+
+Full Example
+------------
+
+For a full example, please check the
+```examples/example_gene_constraint.py``
+script <https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_gene_constraint.py>`__.
+
+.. _samplesize-parameter:
+
+``sample_size`` Parameter
+=========================
+
+In `PyGAD
+3.5.0 <https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0>`__,
+a new parameter called ``sample_size``. It is used in some situations
+where PyGAD seeks a single value for a gene out of a range. Two of the
+important use cases are:
+
+1. Find a unique value for the gene. This is when the
+   ``allow_duplicate_genes`` parameter is set to ``False`` to reject the
+   duplicate gene values within the same solution.
+
+2. Find a value that satisfies the ``gene_constraint`` parameter.
+
+Given that we are sampling values from a continuous range as defined by
+the 2 attributes:
+
+1. ``random_mutation_min_val=0``
+
+2. ``random_mutation_max_val=100``
+
+PyGAD samples a fixed number of values out of this continuous range. The
+number of values in the sample is defined by the ``sample_size``
+parameter which defaults to ``100``.
+
+If the objective is to find a unique value or enforce the gene
+constraint, then the 100 values are filtered to keep only the values
+that keep the gene unique or meet the constraint.
+
+Sometimes 100 values is not enough and PyGAD sometimes fails to find a
+good value. In this case, it is highly recommended to increase the
+``sample_size`` parameter. This is to create a larger sample to increase
+the chance of finding a value that meets our objectives.
+
 Stop at Any Generation
 ======================
 
@@ -476,27 +647,27 @@ reached ``127.4`` or if the fitness saturates for ``15`` generations.
 
 .. code:: python
 
-   import pygad
-   import numpy
-   
-   equation_inputs = [4, -2, 3.5, 8, 9, 4]
-   desired_output = 44
-   
-   def fitness_func(ga_instance, solution, solution_idx):
-       output = numpy.sum(solution * equation_inputs)
-   
-       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
-   
-       return fitness
-   
-   ga_instance = pygad.GA(num_generations=200,
-                          sol_per_pop=10,
-                          num_parents_mating=4,
-                          num_genes=len(equation_inputs),
-                          fitness_func=fitness_func,
-                          stop_criteria=["reach_127.4", "saturate_15"])
-   
-   ga_instance.run()
+   import pygad
+   import numpy
+
+   equation_inputs = [4, -2, 3.5, 8, 9, 4]
+   desired_output = 44
+
+   def fitness_func(ga_instance, solution, solution_idx):
+       output = numpy.sum(solution * equation_inputs)
+
+       fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
+
+       return fitness
+
+   ga_instance = pygad.GA(num_generations=200,
+                          sol_per_pop=10,
+                          num_parents_mating=4,
+                          num_genes=len(equation_inputs),
+                          fitness_func=fitness_func,
+                          stop_criteria=["reach_127.4", "saturate_15"])
+
+   ga_instance.run()
    print(f"Number of generations passed is {ga_instance.generations_completed}")
 
 Multi-Objective Stop Criteria
@@ -837,6 +1008,7 @@ population after each generation.
                           fitness_func=fitness_func,
                           gene_type=int,
                           on_generation=on_generation,
+                          sample_size=200,
                           allow_duplicate_genes=False)
    ga_instance.run()
 
@@ -899,6 +1071,7 @@ has the same space of values that consists of 4 values (1, 2, 3, and 4).
                           gene_type=int,
                           gene_space=[[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]],
                           on_generation=on_generation,
+                          sample_size=200,
                           allow_duplicate_genes=False)
    ga_instance.run()
 
@@ -941,6 +1114,15 @@ duplicate their values as provided by the next output.
 You should care of giving enough values for the genes so that PyGAD is
 able to find alternatives for the gene value in case it duplicates with
 another gene.
+
+If PyGAD failed to find a unique gene while there is still room to find
+a unique value, one possible option is to set the ``sample_size``
+parameter to a larger value. Check the `sample_size
+Parameter <https://pygad.readthedocs.io/en/latest/pygad_more.html#sample-size-parameter>`__
+section for more information.
+
+Limitation
+----------
 
 There might be 2 duplicate genes where changing either of the 2
 duplicating genes will not solve the problem. For example, if

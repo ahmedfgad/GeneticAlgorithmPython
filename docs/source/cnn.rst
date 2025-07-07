@@ -107,40 +107,40 @@ Using the ``pygad.cnn.Conv2D`` class, convolution (conv) layers can be
 created. To create a convolution layer, just create a new instance of
 the class. The constructor accepts the following parameters:
 
--  ``num_filters``: Number of filters.
+- ``num_filters``: Number of filters.
 
--  ``kernel_size``: Filter kernel size.
+- ``kernel_size``: Filter kernel size.
 
--  ``previous_layer``: A reference to the previous layer. Using the
-   ``previous_layer`` attribute, a linked list is created that connects
-   all network layers. For more information about this attribute, please
-   check the **previous_layer** attribute section of the ``pygad.nn``
-   module documentation.
+- ``previous_layer``: A reference to the previous layer. Using the
+  ``previous_layer`` attribute, a linked list is created that connects
+  all network layers. For more information about this attribute, please
+  check the **previous_layer** attribute section of the ``pygad.nn``
+  module documentation.
 
--  ``activation_function=None``: A string representing the activation
-   function to be used in this layer. Defaults to ``None`` which means
-   no activation function is applied while applying the convolution
-   layer. An activation layer can be added separately in this case. The
-   supported activation functions in the conv layer are ``relu`` and
-   ``sigmoid``.
+- ``activation_function=None``: A string representing the activation
+  function to be used in this layer. Defaults to ``None`` which means no
+  activation function is applied while applying the convolution layer.
+  An activation layer can be added separately in this case. The
+  supported activation functions in the conv layer are ``relu`` and
+  ``sigmoid``.
 
 Within the constructor, the accepted parameters are used as instance
 attributes. Besides the parameters, some new instance attributes are
 created which are:
 
--  ``filter_bank_size``: Size of the filter bank in this layer.
+- ``filter_bank_size``: Size of the filter bank in this layer.
 
--  ``initial_weights``: The initial weights for the conv layer.
+- ``initial_weights``: The initial weights for the conv layer.
 
--  ``trained_weights``: The trained weights of the conv layer. This
-   attribute is initialized by the value in the ``initial_weights``
-   attribute.
+- ``trained_weights``: The trained weights of the conv layer. This
+  attribute is initialized by the value in the ``initial_weights``
+  attribute.
 
--  ``layer_input_size``
+- ``layer_input_size``
 
--  ``layer_output_size``
+- ``layer_output_size``
 
--  ``layer_output``
+- ``layer_output``
 
 Here is an example for creating a conv layer with 2 filters and a kernel
 size of 3. Note that the ``previous_layer`` parameter is assigned to the
@@ -215,22 +215,22 @@ The ``pygad.cnn.MaxPooling2D`` class builds a max pooling layer for the
 CNN architecture. The constructor of this class accepts the following
 parameter:
 
--  ``pool_size``: Size of the window.
+- ``pool_size``: Size of the window.
 
--  ``previous_layer``: A reference to the previous layer in the CNN
-   architecture.
+- ``previous_layer``: A reference to the previous layer in the CNN
+  architecture.
 
--  ``stride=2``: A stride that default to 2.
+- ``stride=2``: A stride that default to 2.
 
 Within the constructor, the accepted parameters are used as instance
 attributes. Besides the parameters, some new instance attributes are
 created which are:
 
--  ``layer_input_size``
+- ``layer_input_size``
 
--  ``layer_output_size``
+- ``layer_output_size``
 
--  ``layer_output``
+- ``layer_output``
 
 .. _pygadcnnaveragepooling2d-class:
 
@@ -252,13 +252,13 @@ constructor accepts only the ``previous_layer`` parameter.
 
 The following instance attributes exist:
 
--  ``previous_layer``
+- ``previous_layer``
 
--  ``layer_input_size``
+- ``layer_input_size``
 
--  ``layer_output_size``
+- ``layer_output_size``
 
--  ``layer_output``
+- ``layer_output``
 
 .. _pygadcnnrelu-class:
 
@@ -272,13 +272,13 @@ The constructor accepts only the ``previous_layer`` parameter.
 
 The following instance attributes exist:
 
--  ``previous_layer``
+- ``previous_layer``
 
--  ``layer_input_size``
+- ``layer_input_size``
 
--  ``layer_output_size``
+- ``layer_output_size``
 
--  ``layer_output``
+- ``layer_output``
 
 .. _pygadcnnsigmoid-class:
 
@@ -297,30 +297,30 @@ function.
 The ``pygad.cnn.Dense`` class implement the dense layer. Its constructor
 accepts the following parameters:
 
--  ``num_neurons``: Number of neurons in the dense layer.
+- ``num_neurons``: Number of neurons in the dense layer.
 
--  ``previous_layer``: A reference to the previous layer.
+- ``previous_layer``: A reference to the previous layer.
 
--  ``activation_function``: A string representing the activation
-   function to be used in this layer. Defaults to ``"sigmoid"``.
-   Currently, the supported activation functions in the dense layer are
-   ``"sigmoid"``, ``"relu"``, and ``softmax``.
+- ``activation_function``: A string representing the activation function
+  to be used in this layer. Defaults to ``"sigmoid"``. Currently, the
+  supported activation functions in the dense layer are ``"sigmoid"``,
+  ``"relu"``, and ``softmax``.
 
 Within the constructor, the accepted parameters are used as instance
 attributes. Besides the parameters, some new instance attributes are
 created which are:
 
--  ``initial_weights``: The initial weights for the dense layer.
+- ``initial_weights``: The initial weights for the dense layer.
 
--  ``trained_weights``: The trained weights of the dense layer. This
-   attribute is initialized by the value in the ``initial_weights``
-   attribute.
+- ``trained_weights``: The trained weights of the dense layer. This
+  attribute is initialized by the value in the ``initial_weights``
+  attribute.
 
--  ``layer_input_size``
+- ``layer_input_size``
 
--  ``layer_output_size``
+- ``layer_output_size``
 
--  ``layer_output``
+- ``layer_output``
 
 .. _pygadcnnmodel-class:
 
@@ -330,12 +330,12 @@ created which are:
 An instance of the ``pygad.cnn.Model`` class represents a CNN model. The
 constructor of this class accepts the following parameters:
 
--  ``last_layer``: A reference to the last layer in the CNN architecture
-   (i.e. dense layer).
+- ``last_layer``: A reference to the last layer in the CNN architecture
+  (i.e. dense layer).
 
--  ``epochs=10``: Number of epochs.
+- ``epochs=10``: Number of epochs.
 
--  ``learning_rate=0.01``: Learning rate.
+- ``learning_rate=0.01``: Learning rate.
 
 Within the constructor, the accepted parameters are used as instance
 attributes. Besides the parameters, a new instance attribute named
@@ -361,9 +361,9 @@ Trains the CNN model.
 
 Accepts the following parameters:
 
--  ``train_inputs``: Training data inputs.
+- ``train_inputs``: Training data inputs.
 
--  ``train_outputs``: Training data outputs.
+- ``train_outputs``: Training data outputs.
 
 This method trains the CNN model according to the number of epochs
 specified in the constructor of the ``pygad.cnn.Model`` class.
@@ -397,7 +397,7 @@ Uses the trained CNN for making predictions.
 
 Accepts the following parameter:
 
--  ``data_inputs``: The inputs to predict their label.
+- ``data_inputs``: The inputs to predict their label.
 
 It returns a list holding the samples predictions.
 
@@ -425,19 +425,19 @@ Steps to Build a Neural Network
 This section discusses how to use the ``pygad.cnn`` module for building
 a neural network. The summary of the steps are as follows:
 
--  Reading the Data
+- Reading the Data
 
--  Building the CNN Architecture
+- Building the CNN Architecture
 
--  Building Model
+- Building Model
 
--  Model Summary
+- Model Summary
 
--  Training the CNN
+- Training the CNN
 
--  Making Predictions
+- Making Predictions
 
--  Calculating Some Statistics
+- Calculating Some Statistics
 
 Reading the Data
 ----------------

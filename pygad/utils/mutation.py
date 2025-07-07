@@ -20,8 +20,10 @@ class Mutation:
         """
         Applies the random mutation which changes the values of a number of genes randomly.
         The random value is selected either using the 'gene_space' parameter or the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-        It accepts a single parameter:
+
+        It accepts:
             -offspring: The offspring to mutate.
+
         It returns an array of the mutated offspring.
         """
 
@@ -48,8 +50,8 @@ class Mutation:
     def mutation_by_space(self, offspring):
 
         """
-        Applies the random mutation using the mutation values' space.
-        It accepts a single parameter:
+        Applies the mutation using the gene_space parameter.
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring using the mutation space.
         """
@@ -88,8 +90,8 @@ class Mutation:
     def mutation_probs_by_space(self, offspring):
 
         """
-        Applies the random mutation using the mutation values' space and the mutation probability. For each gene, if its probability is <= that mutation probability, then it will be mutated based on the mutation space.
-        It accepts a single parameter:
+        Applies the random mutation using the mutation values' space and the mutation probability. For each gene, if its probability is <= that the mutation probability, then it will be mutated based on the mutation space.
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring using the mutation space.
         """
@@ -178,8 +180,8 @@ class Mutation:
     def mutation_randomly(self, offspring):
 
         """
-        Applies the random mutation the mutation probability. For each gene, if its probability is <= that mutation probability, then it will be mutated randomly.
-        It accepts a single parameter:
+        Applies the random mutation.
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
@@ -216,7 +218,7 @@ class Mutation:
 
         """
         Applies the random mutation using the mutation probability. For each gene, if its probability is <= that mutation probability, then it will be mutated randomly.
-        It accepts a single parameter:
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
@@ -254,7 +256,7 @@ class Mutation:
 
         """
         Applies the swap mutation which interchanges the values of 2 randomly selected genes.
-        It accepts a single parameter:
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
@@ -272,7 +274,7 @@ class Mutation:
 
         """
         Applies the inversion mutation which selects a subset of genes and inverts them (in order).
-        It accepts a single parameter:
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
@@ -289,7 +291,7 @@ class Mutation:
 
         """
         Applies the scramble mutation which selects a subset of genes and shuffles their order randomly.
-        It accepts a single parameter:
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
@@ -308,7 +310,7 @@ class Mutation:
 
         """
         A helper method to calculate the average fitness of the solutions before applying the adaptive mutation.
-        It accepts a single parameter:
+        It accepts:
             -offspring: The offspring to mutate.
         It returns the average fitness to be used in adaptive mutation.
         """        
@@ -460,7 +462,7 @@ class Mutation:
         """
         Applies the adaptive mutation which changes the values of a number of genes randomly. In adaptive mutation, the number of genes to mutate differs based on the fitness value of the solution.
         The random value is selected either using the 'gene_space' parameter or the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-        It accepts a single parameter:
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
@@ -493,7 +495,7 @@ class Mutation:
         Applies the adaptive mutation based on the 2 parameters 'mutation_num_genes' and 'gene_space'. 
         A number of genes equal are selected randomly for mutation. This number depends on the fitness of the solution.
         The random values are selected from the 'gene_space' parameter.
-        It accepts a single parameter:
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
@@ -565,7 +567,7 @@ class Mutation:
         Applies the adaptive mutation based on the 'mutation_num_genes' parameter. 
         A number of genes equal are selected randomly for mutation. This number depends on the fitness of the solution.
         The random values are selected based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-        It accepts a single parameter:
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
@@ -629,7 +631,7 @@ class Mutation:
         Applies the adaptive mutation based on the 2 parameters 'mutation_probability' and 'gene_space'.
         Based on whether the solution fitness is above or below a threshold, the mutation is applied diffrently by mutating high or low number of genes.
         The random values are selected based on space of values for each gene.
-        It accepts a single parameter:
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
@@ -703,7 +705,7 @@ class Mutation:
         Applies the adaptive mutation based on the 'mutation_probability' parameter. 
         Based on whether the solution fitness is above or below a threshold, the mutation is applied diffrently by mutating high or low number of genes.
         The random values are selected based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-        It accepts a single parameter:
+        It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
         """
