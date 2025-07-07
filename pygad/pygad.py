@@ -2227,8 +2227,19 @@ class GA(utils.parent_selection.ParentSelection,
                 raise ValueError(f"The type of the 'pop_fitness' parameter is expected to be list, tuple, or numpy.ndarray but ({type(pop_fitness)}) found.")
 
             # Return the index of the best solution that has the best fitness value.
-            best_match_idx = numpy.where(
-                pop_fitness == numpy.max(pop_fitness))[0][0]
+            # For multi-objective optimization: find the index of the solution with the maximum fitness in the first objective,
+            # break ties using the second objective, then third, etc.
+            pop_fitness_arr = numpy.array(pop_fitness)
+            # Get the indices that would sort by all objectives in descending order
+            sorted_indices = numpy.lexsort([ -pop_fitness_arr[:,i] for i in reversed(range(pop_fitness_arr.shape[1])) ])
+            best_match_idx = sorted_indices[0]
+            maximum_fitness_value = pop_fitness_arr[best_match_idx]
+
+            best_match_list = numpy.where(
+                pop_fitness == maximum_fitness_value)
+            
+            best_match_idx = best_match_list[0][0]  # Get the first index of the best match.
+
 
             best_solution = self.population[best_match_idx, :].copy()
             best_solution_fitness = pop_fitness[best_match_idx]
