@@ -69,7 +69,7 @@ class Unique:
  
                 if temp_val in new_solution:
                     num_unsolved_duplicates = num_unsolved_duplicates + 1
-                    if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {solution[duplicate_index]}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
+                    if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {solution[duplicate_index]} at generation {self.generations_completed}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
                 else:
                     # Unique gene value found.
                     new_solution[duplicate_index] = temp_val
@@ -320,7 +320,7 @@ class Unique:
 
             if temp_val in solution:
                 num_unsolved_duplicates = num_unsolved_duplicates + 1
-                if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {solution[duplicate_index]}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
+                if not self.suppress_warnings: warnings.warn(f"Failed to find a unique value for gene with index {duplicate_index} whose value is {solution[duplicate_index]} at generation {self.generations_completed+1}. Consider adding more values in the gene space or use a wider range for initial population or random mutation.")
             else:
                 solution[duplicate_index] = temp_val
     

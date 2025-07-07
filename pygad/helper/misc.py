@@ -128,6 +128,20 @@ class Helper:
                                                           gene_value=gene_value)
         return gene_value_new
 
+    def validate_gene_constraint_callable_output(self,
+                                                 selected_values,
+                                                 values):
+        if type(selected_values) in [list, numpy.ndarray]:
+            selected_values_set = set(selected_values)
+            if selected_values_set.issubset(values):
+                pass
+            else:
+                return False
+        else:
+            return False
+
+        return True
+
     def filter_gene_values_by_constraint(self,
                                          values,
                                          solution,
@@ -144,29 +158,29 @@ class Helper:
         It returns None if no values satisfy the constraint. Otherwise, an array of values that satisfy the constraint is returned.
         """
 
-        # A list of the indices where the random values satisfy the constraint.
-        filtered_values_indices = []
+        if self.gene_constraint and self.gene_constraint[gene_idx]:
+            pass
+        else:
+            raise Exception(f"Either the gene at index {gene_idx} is not assigned a callable/function or the gene_constraint itself is not used.")
+
         # A temporary solution to avoid changing the original solution.
         solution_tmp = solution.copy()
-        # Loop through the random values to filter the ones satisfying the constraint.
-        for value_idx, value in enumerate(values):
-            solution_tmp[gene_idx] = value
-            # Check if the constraint is satisfied.
-            if self.gene_constraint[gene_idx](solution_tmp):
-                # The current value satisfies the constraint.
-                filtered_values_indices.append(value_idx)
+        filtered_values = self.gene_constraint[gene_idx](solution_tmp, values.copy())
+        result = self.validate_gene_constraint_callable_output(selected_values=filtered_values,
+                                                               values=values)
+        if result:
+            pass
+        else:
+            raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is subset of the passed values (second argument).")
 
         # After going through all the values, check if any value satisfies the constraint.
-        if len(filtered_values_indices) > 0:
+        if len(filtered_values) > 0:
             # At least one value was found that meets the gene constraint.
             pass
         else:
             # No value found for the current gene that satisfies the constraint.
-            if not self.suppress_warnings:
-                warnings.warn(f"No value found for the gene at index {gene_idx} with value {solution[gene_idx]} that satisfies its gene constraint.")
+            if not self.suppress_warnings: warnings.warn(f"Failed to find a value that satisfies its gene constraint for the gene at index {gene_idx} with value {solution[gene_idx]} at generation {self.generations_completed}.")
             return None
-
-        filtered_values = values[filtered_values_indices]
 
         return filtered_values
 

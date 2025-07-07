@@ -69,7 +69,11 @@ def population_gene_constraint(gene_space=None,
 
 #### Single-Objective
 def test_initial_population_int_by_replacement():
-    gene_constraint=[lambda x: x[0]>=8,lambda x: x[1]>=8,lambda x: 5>=x[2]>=1,lambda x: 5>x[3]>3,lambda x: x[4]<2]
+    gene_constraint=[lambda x,v: [val for val in v if val>=8],
+                     lambda x,v: [val for val in v if val>=8],
+                     lambda x,v: [val for val in v if 5>=val>=1],
+                     lambda x,v: [val for val in v if 5>val>3],
+                     lambda x,v: [val for val in v if val<2]]
     ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
                                              init_range_low=0,
                                              init_range_high=10,
@@ -79,7 +83,6 @@ def test_initial_population_int_by_replacement():
                                              gene_type=int,
                                              mutation_by_replacement=True)
     initial_population = ga_instance.initial_population
-    # print(initial_population)
 
     assert numpy.all(initial_population[:, 0] >= 8), "Not all values in column 0 are >= 8"
     assert numpy.all(initial_population[:, 1] >= 8), "Not all values in column 1 are >= 8"
@@ -87,9 +90,14 @@ def test_initial_population_int_by_replacement():
     assert numpy.all((initial_population[:, 2] >= 1) & (initial_population[:, 2] <= 5)), "Not all values in column 2 between 1 and 5 (inclusive)"
     assert numpy.all(initial_population[:, 3] == 4), "Not all values in column 3 between 3 and 5 (exclusive)"
     assert numpy.all(initial_population[:, 4] < 2), "Not all values in column 4 < 2"
+    print("All constraints are met")
 
 def test_initial_population_int_by_replacement_no_duplicates():
-    gene_constraint=[lambda x: x[0]>=5,lambda x: x[1]>=5,lambda x: x[2]>=5,lambda x: x[3]>=5,lambda x: x[4]>=5]
+    gene_constraint=[lambda x,v: [val for val in v if val>=5],
+                     lambda x,v: [val for val in v if val>=5],
+                     lambda x,v: [val for val in v if val>=5],
+                     lambda x,v: [val for val in v if val>=5],
+                     lambda x,v: [val for val in v if val>=5]]
     ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
                                              init_range_low=1,
                                              init_range_high=10,
@@ -117,9 +125,15 @@ def test_initial_population_int_by_replacement_no_duplicates():
     assert numpy.all(initial_population[:, 2] >= 5), "Not all values in column 2 >= 5"
     assert numpy.all(initial_population[:, 3] >= 5), "Not all values in column 3 >= 5"
     assert numpy.all(initial_population[:, 4] >= 5), "Not all values in column 4 >= 5"
+    print("All constraints are met")
 
 def test_initial_population_int_by_replacement_no_duplicates2():
-    gene_constraint=[lambda x: x[0]>=98,lambda x: x[1]>=98,lambda x: 20<x[2]<40,lambda x: x[3]<40,lambda x: x[4]<50,lambda x: x[5]<100]
+    gene_constraint=[lambda x,v: [val for val in v if val>=98],
+                     lambda x,v: [val for val in v if val>=98],
+                     lambda x,v: [val for val in v if 20<val<40],
+                     lambda x,v: [val for val in v if val<40],
+                     lambda x,v: [val for val in v if val<50],
+                     lambda x,v: [val for val in v if val<100]]
     ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
                                              random_mutation_min_val=1,
                                              random_mutation_max_val=100,
@@ -149,9 +163,14 @@ def test_initial_population_int_by_replacement_no_duplicates2():
     assert numpy.all(initial_population[:, 3] < 40), "Not all values in column 3 < 40"
     assert numpy.all(initial_population[:, 4] < 50), "Not all values in column 4 < 50"
     assert numpy.all(initial_population[:, 5] < 100), "Not all values in column 4 < 100"
+    print("All constraints are met")
 
 def test_initial_population_float_by_replacement_no_duplicates():
-    gene_constraint=[lambda x: x[0]>=5,lambda x: x[1]>=5,lambda x: x[2]>=5,lambda x: x[3]>=5,lambda x: x[4]>=5]
+    gene_constraint=[lambda x,v: [val for val in v if val>=5],
+                     lambda x,v: [val for val in v if val>=5],
+                     lambda x,v: [val for val in v if val>=5],
+                     lambda x,v: [val for val in v if val>=5],
+                     lambda x,v: [val for val in v if val>=5]]
     ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
                                              init_range_low=1,
                                              init_range_high=10,
@@ -178,9 +197,14 @@ def test_initial_population_float_by_replacement_no_duplicates():
     assert numpy.all(initial_population[:, 2] >= 5), "Not all values in column 2 >= 5"
     assert numpy.all(initial_population[:, 3] >= 5), "Not all values in column 3 >= 5"
     assert numpy.all(initial_population[:, 4] >= 5), "Not all values in column 4 >= 5"
+    print("All constraints are met")
 
 def test_initial_population_float_by_replacement_no_duplicates2():
-    gene_constraint=[lambda x: x[0]>=1,lambda x: x[1]>=1,lambda x: x[2]>=1,lambda x: x[3]>=1,lambda x: x[4]>=1]
+    gene_constraint=[lambda x,v: [val for val in v if val>=1],
+                     lambda x,v: [val for val in v if val>=1],
+                     lambda x,v: [val for val in v if val>=1],
+                     lambda x,v: [val for val in v if val>=1],
+                     lambda x,v: [val for val in v if val>=1]]
     ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
                                              init_range_low=1,
                                              init_range_high=2,
@@ -207,6 +231,41 @@ def test_initial_population_float_by_replacement_no_duplicates2():
     assert numpy.all(initial_population[:, 2] >= 1), "Not all values in column 2 >= 1"
     assert numpy.all(initial_population[:, 3] >= 1), "Not all values in column 3 >= 1"
     assert numpy.all(initial_population[:, 4] >= 1), "Not all values in column 4 >= 1"
+    print("All constraints are met")
+
+def test_initial_population_float_by_replacement_no_duplicates_None_constraints():
+    gene_constraint=[lambda x,v: [val for val in v if val>=1],
+                     None,
+                     lambda x,v: [val for val in v if val>=1],
+                     None,
+                     lambda x,v: [val for val in v if val>=1]]
+    ga_instance = population_gene_constraint(gene_constraint=gene_constraint,
+                                             init_range_low=1,
+                                             init_range_high=2,
+                                             gene_type=[float, 1],
+                                             num_genes=5,
+                                             crossover_type=None,
+                                             mutation_by_replacement=False,
+                                             allow_duplicate_genes=False)
+
+    num_duplicates = 0
+    for idx, solution in enumerate(ga_instance.solutions):
+        num = len(solution) - len(set(solution))
+        if num != 0:
+            print(solution, idx)
+        num_duplicates += num
+
+    assert num_duplicates == 0
+
+    initial_population = ga_instance.initial_population
+    # print(initial_population)
+
+    assert numpy.all(initial_population[:, 0] >= 1), "Not all values in column 0 >= 1"
+    assert numpy.all(initial_population[:, 1] >= 1), "Not all values in column 1 >= 1"
+    assert numpy.all(initial_population[:, 2] >= 1), "Not all values in column 2 >= 1"
+    assert numpy.all(initial_population[:, 3] >= 1), "Not all values in column 3 >= 1"
+    assert numpy.all(initial_population[:, 4] >= 1), "Not all values in column 4 >= 1"
+    print("All constraints are met")
 
 if __name__ == "__main__":
     #### Single-objective
@@ -220,4 +279,6 @@ if __name__ == "__main__":
     test_initial_population_float_by_replacement_no_duplicates()
     print()
     test_initial_population_float_by_replacement_no_duplicates2()
+    print()
+    test_initial_population_float_by_replacement_no_duplicates_None_constraints()
     print()

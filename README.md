@@ -7,7 +7,7 @@
 Check documentation of the [PyGAD](https://pygad.readthedocs.io/en/latest).
 
 [![PyPI Downloads](https://pepy.tech/badge/pygad)](https://pepy.tech/project/pygad) [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/pygad.svg?label=Conda%20Downloads)](
-https://anaconda.org/conda-forge/PyGAD) [![PyPI version](https://badge.fury.io/py/pygad.svg)](https://badge.fury.io/py/pygad) ![Docs](https://readthedocs.org/projects/pygad/badge) [![PyGAD PyTest / Python 3.11](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py311.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py311.yml) [![PyGAD PyTest / Python 3.10](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py310.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py310.yml) [![PyGAD PyTest / Python 3.9](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py39.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py39.yml) [![PyGAD PyTest / Python 3.8](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py38.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py38.yml) [![PyGAD PyTest / Python 3.7](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py37.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py37.yml) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Translation](https://hosted.weblate.org/widgets/weblate/-/svg-badge.svg)](https://hosted.weblate.org/engage/weblate/) [![REUSE](https://api.reuse.software/badge/github.com/WeblateOrg/weblate)](https://api.reuse.software/info/github.com/WeblateOrg/weblate) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-Ask%20questions-blue.svg)](
+https://anaconda.org/conda-forge/PyGAD) [![PyPI version](https://badge.fury.io/py/pygad.svg)](https://badge.fury.io/py/pygad)![Docs](https://readthedocs.org/projects/pygad/badge)[![PyGAD PyTest / Python 3.13](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py313.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py313.yml) [![PyGAD PyTest / Python 3.12](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py312.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py312.yml) [![PyGAD PyTest / Python 3.11](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py311.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py311.yml) [![PyGAD PyTest / Python 3.10](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py310.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py310.yml) [![PyGAD PyTest / Python 3.9](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py39.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py39.yml) [![PyGAD PyTest / Python 3.8](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py38.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py38.yml) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Translation](https://hosted.weblate.org/widgets/weblate/-/svg-badge.svg)](https://hosted.weblate.org/engage/weblate/) [![REUSE](https://api.reuse.software/badge/github.com/WeblateOrg/weblate)](https://api.reuse.software/info/github.com/WeblateOrg/weblate) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-Ask%20questions-blue.svg)](
 https://stackoverflow.com/questions/tagged/pygad) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ahmedfgad/GeneticAlgorithmPython/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ahmedfgad/GeneticAlgorithmPython) [![DOI](https://zenodo.org/badge/DOI/10.1007/s11042-023-17167-y.svg)](https://doi.org/10.1007/s11042-023-17167-y)
 
 ![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
@@ -253,16 +253,6 @@ Get started with the genetic algorithm by reading the tutorial titled [**Introdu
 
 [![Introduction to Genetic Algorithm](https://user-images.githubusercontent.com/16560492/82078259-26252d00-96e1-11ea-9a02-52a99e1054b9.jpg)](https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad)
 
-## Tutorial: Build Neural Networks in Python
-
-Read about building neural networks in Python through the tutorial titled [**Artificial Neural Network Implementation using NumPy and Classification of the Fruits360 Image Dataset**](https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad) available at these links:
-
-* [LinkedIn](https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad)
-* [Towards Data Science](https://towardsdatascience.com/artificial-neural-network-implementation-using-numpy-and-classification-of-the-fruits360-image-3c56affa4491)
-* [KDnuggets](https://www.kdnuggets.com/2019/02/artificial-neural-network-implementation-using-numpy-and-image-classification.html)
-
-[![Building Neural Networks Python](https://user-images.githubusercontent.com/16560492/82078281-30472b80-96e1-11ea-8017-6a1f4383d602.jpg)](https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad)
-
 ## Tutorial: Optimize Neural Networks with Genetic Algorithm
 
 Read about training neural networks using the genetic algorithm through the tutorial titled [**Artificial Neural Networks Optimization using Genetic Algorithm with Python**](https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad) available at these links:
@@ -272,29 +262,6 @@ Read about training neural networks using the genetic algorithm through the tuto
 - [KDnuggets](https://www.kdnuggets.com/2019/03/artificial-neural-networks-optimization-genetic-algorithm-python.html)
 
 [![Training Neural Networks using Genetic Algorithm Python](https://user-images.githubusercontent.com/16560492/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg)](https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad)
-
-## Tutorial: Building CNN in Python
-
-To start with coding the genetic algorithm, you can check the tutorial titled [**Building Convolutional Neural Network using NumPy from Scratch**](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad) available at these links:
-
-- [LinkedIn](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)
-- [Towards Data Science](https://towardsdatascience.com/building-convolutional-neural-network-using-numpy-from-scratch-b30aac50e50a)
-- [KDnuggets](https://www.kdnuggets.com/2018/04/building-convolutional-neural-network-numpy-scratch.html)
-- [Chinese Translation](http://m.aliyun.com/yunqi/articles/585741)
-
-[This tutorial](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)) is prepared based on a previous version of the project but it still a good resource to start with coding CNNs.
-
-[![Building CNN in Python](https://user-images.githubusercontent.com/16560492/82431022-6c3a1200-9a8e-11ea-8f1b-b055196d76e3.png)](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)
-
-## Tutorial: Derivation of CNN from FCNN
-
-Get started with the genetic algorithm by reading the tutorial titled [**Derivation of Convolutional Neural Network from Fully Connected Network Step-By-Step**](https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad) which is available at these links:
-
-* [LinkedIn](https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad)
-* [Towards Data Science](https://towardsdatascience.com/derivation-of-convolutional-neural-network-from-fully-connected-network-step-by-step-b42ebafa5275)
-* [KDnuggets](https://www.kdnuggets.com/2018/04/derivation-convolutional-neural-network-fully-connected-step-by-step.html)
-
-[![Derivation of CNN from FCNN](https://user-images.githubusercontent.com/16560492/82431369-db176b00-9a8e-11ea-99bd-e845192873fc.png)](https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad)
 
 ## Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 
