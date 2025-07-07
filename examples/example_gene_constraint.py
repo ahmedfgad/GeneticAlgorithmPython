@@ -3,7 +3,6 @@ import numpy
 
 """
 An example of using the gene_constraint parameter.
-
 """
 
 function_inputs = [4,-2,3.5,5,-11,-4.7]

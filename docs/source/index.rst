@@ -15,6 +15,11 @@ open-source Python library for building the genetic algorithm and
 optimizing machine learning algorithms. It works with
 `Keras <https://keras.io>`__ and `PyTorch <https://pytorch.org>`__.
 
+   Try the `Optimization Gadget <https://optimgadget.com>`__, a free
+   cloud-based tool powered by PyGAD. It simplifies optimization by
+   reducing or eliminating the need for coding while providing
+   insightful visualizations.
+
 `PyGAD <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ supports
 different types of crossover, mutation, and parent selection operators.
 `PyGAD <https://github.com/ahmedfgad/GeneticAlgorithmPython>`__ allows

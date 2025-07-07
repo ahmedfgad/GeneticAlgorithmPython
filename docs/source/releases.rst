@@ -1625,6 +1625,136 @@ Release Date 07 January 2025
     fitness before the GA completes.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/291
 
+.. _pygad-350:
+
+PyGAD 3.5.0
+-----------
+
+Release Date 07 July 2025
+
+1.  Fix a bug when minus sign (-) is used inside the ``stop_criteria``
+    parameter for multi-objective problems.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/314
+
+2.  Fix a bug when the ``stop_criteria`` parameter is passed as an
+    iterable (e.g. list) for multi-objective problems (e.g.
+    ``['reach_50_60', 'reach_20, 40']``).
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/314
+
+3.  Call the ``get_matplotlib()`` function from the ``plot_genes()``
+    method inside the ``pygad.visualize.plot.Plot`` class to import the
+    matplotlib library.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/315
+
+4.  Create a new helper method called ``select_unique_value()`` inside
+    the ``pygad/helper/unique.py`` script to select a unique gene from
+    an array of values.
+
+5.  Create a new helper method called ``get_random_mutation_range()``
+    inside the ``pygad/utils/mutation.py`` script that returns the
+    random mutation range (min and max) for a single gene by its index.
+
+6.  Create a new helper method called
+    ``change_random_mutation_value_dtype`` inside the
+    ``pygad/utils/mutation.py`` script that changes the data type of the
+    value used to apply random mutation.
+
+7.  Create a new helper method called ``round_random_mutation_value()``
+    inside the ``pygad/utils/mutation.py`` script that rounds the value
+    used to apply random mutation.
+
+8.  Create the ``pygad/helper/misc.py`` script with a class called
+    ``Helper`` that has the following helper methods:
+
+    1.  ``change_population_dtype_and_round()``: For each gene in the
+        population, round the gene value and change the data type.
+
+    2.  ``change_gene_dtype_and_round()``: Round the change the data
+        type of a single gene.
+
+    3.  ``mutation_change_gene_dtype_and_round()``: Decides whether
+        mutation is done by replacement or not. Then it rounds and
+        change the data type of the new gene value.
+
+    4.  ``validate_gene_constraint_callable_output()``: Validates the
+        output of the user-defined callable/function that checks whether
+        the gene constraint defined in the ``gene_constraint`` parameter
+        is satisfied or not.
+
+    5.  ``get_gene_dtype()``: Returns the gene data type from the
+        ``gene_type`` instance attribute.
+
+    6.  ``get_random_mutation_range()``: Returns the random mutation
+        range using the ``random_mutation_min_val`` and
+        ``random_mutation_min_val`` instance attributes.
+
+    7.  ``get_initial_population_range()``: Returns the initial
+        population values range using the ``init_range_low`` and
+        ``init_range_high`` instance attributes.
+
+    8.  ``generate_gene_value_from_space()``: Generates/selects a value
+        for a gene using the ``gene_space`` instance attribute.
+
+    9.  ``generate_gene_value_randomly()``: Generates a random value for
+        the gene. Only used if ``gene_space`` is ``None``.
+
+    10. ``generate_gene_value()``: Generates a value for the gene. It
+        checks whether ``gene_space`` is ``None`` and calls either
+        ``generate_gene_value_randomly()`` or
+        ``generate_gene_value_from_space()``.
+
+    11. ``filter_gene_values_by_constraint()``: Receives a list of
+        values for a gene. Then it filters such values using the gene
+        constraint.
+
+    12. ``get_valid_gene_constraint_values()``: Selects one valid gene
+        value that satisfy the gene constraint. It simply calls
+        ``generate_gene_value()`` to generate some gene values then it
+        filters such values using
+        ``filter_gene_values_by_constraint()``.
+
+9.  Create a new helper method called
+    ``mutation_process_random_value()`` inside the
+    ``pygad/utils/mutation.py`` script that generates constrained random
+    values for mutation. It calls either ``generate_gene_value()`` or
+    ``get_valid_gene_constraint_values()`` based on whether the
+    ``gene_constraint`` parameter is used or not.
+
+10. A new parameter called ``gene_constraint`` is added. It accepts a
+    list of callables (i.e. functions) acting as constraints for the
+    gene values. Before selecting a value for a gene, the callable is
+    called to ensure the candidate value is valid. Check the `Gene
+    Constraint <https://pygad.readthedocs.io/en/latest/pygad_more.html#gene-constraint>`__
+    section for more information.
+
+11. A new parameter called ``sample_size`` is added. To select a gene
+    value that respects a constraint, this variable defines the size of
+    the sample from which a value is selected randomly. Useful if either
+    ``allow_duplicate_genes`` or ``gene_constraint`` is used. An
+    instance attribute of the same name is created in the instances of
+    the ``pygad.GA`` class. Check the `sample_size
+    Parameter <https://pygad.readthedocs.io/en/latest/pygad_more.html#sample-size-parameter>`__
+    section for more information.
+
+12. Use the ``sample_size`` parameter instead of ``num_trials`` in the
+    methods ``solve_duplicate_genes_randomly()`` and
+    ``unique_float_gene_from_range()`` inside the
+    ``pygad/helper/unique.py`` script. It is the maximum number of
+    values to generate as the search space when looking for a unique
+    float value out of a range.
+
+13. Fixed a bug in population initialization when
+    ``allow_duplicate_genes=False``. Previously, gene values were
+    checked for duplicates before rounding, which could allow
+    near-duplicates like 7.61 and 7.62 to pass. After rounding (e.g.,
+    both becoming 7.6), this resulted in unintended duplicates. The fix
+    ensures gene values are now rounded before duplicate checks,
+    preventing such cases.
+
+14. More tests are created.
+
+15. More examples are created.
+
 PyGAD Projects at GitHub
 ========================
 
