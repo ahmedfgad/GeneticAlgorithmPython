@@ -107,7 +107,7 @@ class ParentSelection:
 
         """
         Selects the parents using the tournament selection technique. Later, these parents will mate to produce the offspring.
-        It accepts 2 parameters:
+        It accepts:
             -fitness: The fitness values of the solutions in the current population.
             -num_parents: The number of parents to be selected.
         It returns:
@@ -127,10 +127,8 @@ class ParentSelection:
         parents_indices = []
 
         for parent_num in range(num_parents):
-            # Generate random indices for the candiadate solutions.
-            rand_indices = numpy.random.randint(low=0.0, high=len(fitness), size=self.K_tournament)
-            # K_fitnesses = fitness[rand_indices]
-            # selected_parent_idx = numpy.where(K_fitnesses == numpy.max(K_fitnesses))[0][0]
+            # Generate random indices for the candidate solutions.
+            rand_indices = numpy.random.randint(low=0, high=len(fitness), size=self.K_tournament)
 
             # Find the rank of the candidate solutions. The lower the rank, the better the solution.
             rand_indices_rank = [fitness_sorted.index(rand_idx) for rand_idx in rand_indices]
@@ -275,8 +273,6 @@ class ParentSelection:
             probs_start[min_probs_idx] = curr
             curr = curr + probs[min_probs_idx]
             probs_end[min_probs_idx] = curr
-            # Replace 99999999999 by float('inf')
-            # probs[min_probs_idx] = 99999999999
             probs[min_probs_idx] = float('inf')
 
         pointers_distance = 1.0 / self.num_parents_mating # Distance between different pointers.
@@ -304,8 +300,7 @@ class ParentSelection:
 
     def tournament_selection_nsga2(self,
                                    fitness,
-                                   num_parents
-                                   ):
+                                   num_parents):
     
         """
         Select the parents using the tournament selection technique for NSGA-II. 
@@ -347,85 +342,97 @@ class ParentSelection:
         self.pareto_fronts = pareto_fronts.copy()
 
         # Randomly generate pairs of indices to apply for NSGA-II tournament selection for selecting the parents solutions.
-        rand_indices = numpy.random.randint(low=0.0, 
+        rand_indices = numpy.random.randint(low=0,
                                             high=len(solutions_fronts_indices), 
                                             size=(num_parents, self.K_tournament))
-    
+
         for parent_num in range(num_parents):
             # Return the indices of the current 2 solutions.
             current_indices = rand_indices[parent_num]
             # Return the front index of the 2 solutions.
             parent_fronts_indices = solutions_fronts_indices[current_indices]
-    
-            if parent_fronts_indices[0] < parent_fronts_indices[1]:
-                # If the first solution is in a lower pareto front than the second, then select it.
-                selected_parent_idx = current_indices[0]
-            elif parent_fronts_indices[0] > parent_fronts_indices[1]:
-                # If the second solution is in a lower pareto front than the first, then select it.
-                selected_parent_idx = current_indices[1]
+            parent_fronts_indices_unique = numpy.unique(parent_fronts_indices)
+
+            # Here are the possible cases:
+            # 1) All the solutions are in the same front (e.g. [0, 0, 0, 0]). Select a solution randomly.
+            # 2) Each solution is in a different front but there is only one solution in the pareto front with the lowest index (e.g. [0, 1, 2, 3]). Use the solution in the best front (lower front index).
+            # 3) The solutions are split into groups in different pareto fronts and there are more than one solution in the pareto front with the lowest index (e.g. [0, 0, 1, 1]). Filter the solutions in the lowest rank pareto front and randomly select a solution from this filtered list.
+
+            # If no single solution found, then store the unique solutions indices.
+            current_indices_unique = None
+            # If a single solution found, store its index here.
+            selected_parent_index = None
+            # The pareto front where the filtered solutions exists.
+            selected_pareto_front_index = None
+            if len(parent_fronts_indices_unique) == 1:
+                # CASE 1
+                # There are multiple solutions at the same front.
+                # Use crowding distance to select a solution.
+                selected_pareto_front_index = parent_fronts_indices_unique[0]
+                current_indices_unique = numpy.unique(current_indices[parent_fronts_indices == selected_pareto_front_index])
             else:
-                # The 2 solutions are in the same pareto front.
+                best_pareto_front = min(parent_fronts_indices_unique)
+                best_pareto_front_count = list(parent_fronts_indices).count(best_pareto_front)
+                if best_pareto_front_count == 1:
+                    # CASE 2
+                    #### DONE
+                    # Use the single solution at the best pareto front directly as parent.
+                    selected_parent_index = current_indices[parent_fronts_indices == best_pareto_front][0]
+                else:
+                    # CASE 3
+                    current_indices_unique = numpy.unique(current_indices[parent_fronts_indices == best_pareto_front])
+                    if len(current_indices_unique) == 1:
+                        #### DONE
+                        # There is only one solution in the best pareto front. Just select it as a parent.
+                        # The same solution index was randomly generated more than once using the numpy.random.randint()
+                        selected_parent_index = current_indices_unique[0]
+                    else:
+                        # There are different solutions at the same front.
+                        # Use crowding distance to select a solution.
+                        selected_pareto_front_index = best_pareto_front
+
+            if selected_parent_index is not None:
+                pass
+            else:
+                # Use crowding distance to select between 1 or more solutions within the same pareto front.
                 # The selection is made using the crowding distance.
-    
-                # A list holding the crowding distance of the current 2 solutions. It is initialized to -1.
-                solutions_crowding_distance = [-1, -1]
-    
+                # If more than 1 solution has the same crowding distance, select a solution randomly.
+
                 # Fetch the current pareto front.
-                pareto_front = pareto_fronts[parent_fronts_indices[0]] # Index 1 can also be used.
+                pareto_front = pareto_fronts[selected_pareto_front_index]
 
                 # If there is only 1 solution in the pareto front, just return it without calculating the crowding distance (it is useless).
                 if pareto_front.shape[0] == 1:
-                    selected_parent_idx = current_indices[0] # Index 1 can also be used.
+                    selected_parent_index = current_indices[0] # Index 1 can also be used.
                 else:
-                    # Reaching here means the pareto front has more than 1 solution.
-    
+                    # Reaching here means the selected pareto front has more than 1 solution.
                     # Calculate the crowding distance of the solutions of the pareto front.
                     obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = self.crowding_distance(pareto_front=pareto_front.copy(),
-                                                                                                                                                                      fitness=fitness)
-    
-                    # This list has the sorted front-based indices for the solutions in the current pareto front.
-                    crowding_dist_front_sorted_indices = list(crowding_dist_front_sorted_indices)
+                                                                                                                                                                     fitness=fitness)
                     # This list has the sorted population-based indices for the solutions in the current pareto front.
                     crowding_dist_pop_sorted_indices = list(crowding_dist_pop_sorted_indices)
-    
-                    # Return the indices of the solutions from the pareto front.
-                    solution1_idx = crowding_dist_pop_sorted_indices.index(current_indices[0])
-                    solution2_idx = crowding_dist_pop_sorted_indices.index(current_indices[1])
-        
+
+                    # Return the indices of the solutions from the pareto front based on the crowding distance.
+                    # If there is more than one solution, select the solution that has a better crowding distance.
+                    # This solution comes first in the order in the crowding_dist_pop_sorted_indices list.
+                    solutions_indices = [crowding_dist_pop_sorted_indices.index(rand_sol_idx) for rand_sol_idx in current_indices_unique]
+
                     # Fetch the crowding distance using the indices.
-                    solutions_crowding_distance[0] = crowding_distance_sum[solution1_idx][1]
-                    solutions_crowding_distance[1] = crowding_distance_sum[solution2_idx][1]
-        
-                    # # Instead of using the crowding distance, we can select the solution that comes first in the list.
-                    # # Its limitation is that it is biased towards the low indexed solution if the 2 solutions have the same crowding distance.
-                    # if solution1_idx < solution2_idx:
-                    #     # Select the first solution if it has higher crowding distance.
-                    #     selected_parent_idx = current_indices[0]
-                    # else:
-                    #     # Select the second solution if it has higher crowding distance.
-                    #     selected_parent_idx = current_indices[1]
-        
-                    if solutions_crowding_distance[0] > solutions_crowding_distance[1]:
-                        # Select the first solution if it has higher crowding distance.
-                        selected_parent_idx = current_indices[0]
-                    elif solutions_crowding_distance[1] > solutions_crowding_distance[0]:
-                        # Select the second solution if it has higher crowding distance.
-                        selected_parent_idx = current_indices[1]
+                    solutions_crowding_distance = [crowding_distance_sum[rand_sol_idx][1] for rand_sol_idx in solutions_indices]
+                    max_crowding_distance = max(solutions_crowding_distance)
+
+                    if solutions_crowding_distance.count(max_crowding_distance) == 1:
+                        # There is only a single solution with the maximum crowding distance. Just select it.
+                        selected_parent_index = current_indices_unique[solutions_crowding_distance.index(max_crowding_distance)]
                     else:
-                        # If the crowding distance is equal, select the parent randomly.
-                        rand_num = numpy.random.uniform()
-                        if rand_num < 0.5:
-                            # If the random number is < 0.5, then select the first solution.
-                            selected_parent_idx = current_indices[0]
-                        else:
-                            # If the random number is >= 0.5, then select the second solution.
-                            selected_parent_idx = current_indices[1]
+                        # If the crowding distance is equal across multiple solutions, select a solution randomly as a parent.
+                        selected_parent_index = numpy.random.choice(current_indices_unique)
 
             # Insert the selected parent index.
-            parents_indices.append(selected_parent_idx)
+            parents_indices.append(selected_parent_index)
             # Insert the selected parent.
-            parents[parent_num, :] = self.population[selected_parent_idx, :].copy()
-    
+            parents[parent_num, :] = self.population[selected_parent_index, :].copy()
+
         # Make sure the parents indices is returned as a NumPy array.
         return parents, numpy.array(parents_indices)
     

@@ -455,11 +455,12 @@ class Plot:
 
         # Plot the pareto front curve.
         remaining_set = list(zip(range(0, self.last_generation_fitness.shape[0]), self.last_generation_fitness))
+        # The non-dominated set is the pareto front set.
         dominated_set, non_dominated_set = self.get_non_dominated_set(remaining_set)
 
         # Extract the fitness values (objective values) of the non-dominated solutions for plotting.
-        pareto_front_x = [self.last_generation_fitness[item[0]][0] for item in dominated_set]
-        pareto_front_y = [self.last_generation_fitness[item[0]][1] for item in dominated_set]
+        pareto_front_x = [self.last_generation_fitness[item[0]][0] for item in non_dominated_set]
+        pareto_front_y = [self.last_generation_fitness[item[0]][1] for item in non_dominated_set]
 
         # Sort the Pareto front solutions (optional but can make the plot cleaner)
         sorted_pareto_front = sorted(zip(pareto_front_x, pareto_front_y))

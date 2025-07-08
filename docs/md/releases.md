@@ -566,7 +566,7 @@ Release Date 07 January 2025
 6. Created a new method called `unique_float_gene_from_range()` inside the `pygad.helper.unique.Unique` class to find a unique floating-point number from a range.
 7. Fix a bug in the `pygad.helper.unique.Unique.unique_gene_by_space()` method to return the numeric value only instead of a NumPy array.
 8. Refactoring the `pygad/helper/unique.py` script to remove duplicate codes and reformatting the docstrings.
-9. The plot_pareto_front_curve() method added to the pygad.visualize.plot.Plot class to visualize the Pareto front for multi-objective problems. It only supports 2 objectives. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/279
+9. The `plot_pareto_front_curve()` method added to the pygad.visualize.plot.Plot class to visualize the Pareto front for multi-objective problems. It only supports 2 objectives. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/279
 11. Fix a bug converting a nested NumPy array to a nested list. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/300
 12. The `Matplotlib` library is only imported when a method inside the `pygad/visualize/plot.py` script is used. This is more efficient than using `import matplotlib.pyplot` at the module level as this causes it to be imported when `pygad` is imported even when it is not needed. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/292
 13. Fix a bug when minus sign (-) is used inside the `stop_criteria` parameter (e.g. `stop_criteria=["saturate_10", "reach_-0.5"]`). https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/296
@@ -575,9 +575,9 @@ Release Date 07 January 2025
 
 ## PyGAD 3.5.0
 
-Release Date 07 July 2025
+Release Date 08 July 2025
 
-1. Fix a bug when minus sign (-) is used inside the `stop_criteria` parameter for multi-objective problems. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/314
+1. Fix a bug when minus sign (-) is used inside the `stop_criteria` parameter for multi-objective problems. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/314 https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/323
 2. Fix a bug when the `stop_criteria` parameter is passed as an iterable (e.g. list) for multi-objective problems (e.g. `['reach_50_60', 'reach_20, 40']`). https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/314
 3. Call the `get_matplotlib()` function from the `plot_genes()` method inside the `pygad.visualize.plot.Plot` class to import the matplotlib library. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/315
 4. Create a new helper method called `select_unique_value()` inside the `pygad/helper/unique.py` script to select a unique gene from an array of values.
@@ -598,12 +598,14 @@ Release Date 07 July 2025
    11. `filter_gene_values_by_constraint()`: Receives a list of values for a gene. Then it filters such values using the gene constraint.
    12. `get_valid_gene_constraint_values()`: Selects one valid gene value that satisfy the gene constraint. It simply calls `generate_gene_value()` to generate some gene values then it filters such values using `filter_gene_values_by_constraint()`.
 9. Create a new helper method called `mutation_process_random_value()` inside the `pygad/utils/mutation.py` script that generates constrained random values for mutation. It calls either `generate_gene_value()` or `get_valid_gene_constraint_values()` based on whether the `gene_constraint` parameter is used or not.
-10. A new parameter called `gene_constraint` is added. It accepts a list of callables (i.e. functions) acting as constraints for the gene values. Before selecting a value for a gene, the callable is called to ensure the candidate value is valid. Check the [Gene Constraint](https://pygad.readthedocs.io/en/latest/pygad_more.html#gene-constraint) section for more information.
+10. A new parameter called `gene_constraint` is added. It accepts a list of callables (i.e. functions) acting as constraints for the gene values. Before selecting a value for a gene, the callable is called to ensure the candidate value is valid. Check the [Gene Constraint](https://pygad.readthedocs.io/en/latest/pygad_more.html#gene-constraint) section for more information. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/119
 11. A new parameter called `sample_size` is added. To select a gene value that respects a constraint, this variable defines the size of the sample from which a value is selected randomly. Useful if either `allow_duplicate_genes` or `gene_constraint` is used. An instance attribute of the same name is created in the instances of the `pygad.GA` class. Check the [sample_size Parameter](https://pygad.readthedocs.io/en/latest/pygad_more.html#sample-size-parameter) section for more information.
 12. Use the `sample_size` parameter instead of `num_trials` in the methods `solve_duplicate_genes_randomly()` and `unique_float_gene_from_range()` inside the `pygad/helper/unique.py` script. It is the maximum number of values to generate as the search space when looking for a unique float value out of a range.
 13. Fixed a bug in population initialization when `allow_duplicate_genes=False`. Previously, gene values were checked for duplicates before rounding, which could allow near-duplicates like 7.61 and 7.62 to pass. After rounding (e.g., both becoming 7.6), this resulted in unintended duplicates. The fix ensures gene values are now rounded before duplicate checks, preventing such cases.
 14. More tests are created.
 15. More examples are created.
+16. Edited the `sort_solutions_nsga2()` method in the `pygad/utils/nsga2.py` script to accept an optional parameter called `find_best_solution` when calling this method just to find the best solution.
+17. Fixed a bug while applying the non-dominated sorting in the `get_non_dominated_set()` method inside the `pygad/utils/nsga2.py` script. It was swapping the non-dominated and dominated sets. In other words, it used the non-dominated set as if it is the dominated set and vice versa. All the calls to this method were edited accordingly. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/320.
 
 # PyGAD Projects at GitHub
 
