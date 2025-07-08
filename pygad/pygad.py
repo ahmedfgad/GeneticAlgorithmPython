@@ -2231,14 +2231,22 @@ class GA(utils.parent_selection.ParentSelection,
             # break ties using the second objective, then third, etc.
             pop_fitness_arr = numpy.array(pop_fitness)
             # Get the indices that would sort by all objectives in descending order
-            sorted_indices = numpy.lexsort([ -pop_fitness_arr[:,i] for i in reversed(range(pop_fitness_arr.shape[1])) ])
-            best_match_idx = sorted_indices[0]
-            maximum_fitness_value = pop_fitness_arr[best_match_idx]
+            if pop_fitness_arr.ndim == 1:
+                # Single-objective optimization.
+                best_match_idx = numpy.where(
+                 pop_fitness == numpy.max(pop_fitness))[0][0]
+            elif pop_fitness_arr.ndim == 2:
+                # Multi-objective optimization.
+                # Sort by all objectives in descending order.
+                # The first objective is the most important, then the second, etc.
+                sorted_indices = numpy.lexsort([ -pop_fitness_arr[:,i] for i in reversed(range(pop_fitness_arr.shape[1])) ])
+                best_match_idx = sorted_indices[0]
+                maximum_fitness_value = pop_fitness_arr[best_match_idx]
 
-            best_match_list = numpy.where(
-                pop_fitness == maximum_fitness_value)
+                best_match_list = numpy.where(
+                    pop_fitness == maximum_fitness_value)
             
-            best_match_idx = best_match_list[0][0]  # Get the first index of the best match.
+                best_match_idx = best_match_list[0][0]  # Get the first index of the best match.
 
 
             best_solution = self.population[best_match_idx, :].copy()
