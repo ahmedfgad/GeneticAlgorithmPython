@@ -606,6 +606,7 @@ Release Date 08 July 2025
 15. More examples are created.
 16. Edited the `sort_solutions_nsga2()` method in the `pygad/utils/nsga2.py` script to accept an optional parameter called `find_best_solution` when calling this method just to find the best solution.
 17. Fixed a bug while applying the non-dominated sorting in the `get_non_dominated_set()` method inside the `pygad/utils/nsga2.py` script. It was swapping the non-dominated and dominated sets. In other words, it used the non-dominated set as if it is the dominated set and vice versa. All the calls to this method were edited accordingly. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/320.
+18. Fix a bug retrieving in the `best_solution()` method when retrieving the best solution for multi-objective problems. https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/331
 
 # PyGAD Projects at GitHub
 

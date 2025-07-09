@@ -1593,7 +1593,7 @@ Release Date 07 January 2025
 8.  Refactoring the ``pygad/helper/unique.py`` script to remove
     duplicate codes and reformatting the docstrings.
 
-9.  The plot_pareto_front_curve() method added to the
+9.  The ``plot_pareto_front_curve()`` method added to the
     pygad.visualize.plot.Plot class to visualize the Pareto front for
     multi-objective problems. It only supports 2 objectives.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/279
@@ -1630,11 +1630,12 @@ Release Date 07 January 2025
 PyGAD 3.5.0
 -----------
 
-Release Date 07 July 2025
+Release Date 08 July 2025
 
 1.  Fix a bug when minus sign (-) is used inside the ``stop_criteria``
     parameter for multi-objective problems.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/314
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/323
 
 2.  Fix a bug when the ``stop_criteria`` parameter is passed as an
     iterable (e.g. list) for multi-objective problems (e.g.
@@ -1726,6 +1727,7 @@ Release Date 07 July 2025
     called to ensure the candidate value is valid. Check the `Gene
     Constraint <https://pygad.readthedocs.io/en/latest/pygad_more.html#gene-constraint>`__
     section for more information.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/119
 
 11. A new parameter called ``sample_size`` is added. To select a gene
     value that respects a constraint, this variable defines the size of
@@ -1754,6 +1756,23 @@ Release Date 07 July 2025
 14. More tests are created.
 
 15. More examples are created.
+
+16. Edited the ``sort_solutions_nsga2()`` method in the
+    ``pygad/utils/nsga2.py`` script to accept an optional parameter
+    called ``find_best_solution`` when calling this method just to find
+    the best solution.
+
+17. Fixed a bug while applying the non-dominated sorting in the
+    ``get_non_dominated_set()`` method inside the
+    ``pygad/utils/nsga2.py`` script. It was swapping the non-dominated
+    and dominated sets. In other words, it used the non-dominated set as
+    if it is the dominated set and vice versa. All the calls to this
+    method were edited accordingly.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/320.
+
+18. Fix a bug retrieving in the ``best_solution()`` method when
+    retrieving the best solution for multi-objective problems.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/331
 
 PyGAD Projects at GitHub
 ========================
