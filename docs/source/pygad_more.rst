@@ -530,14 +530,23 @@ assigning a larger value for the ``sample_size`` parameter.
    PyGAD does not yet handle the **dependencies** among the genes in the
    ``gene_constraint`` parameter.
 
-   For example, gene 0 might depend on gene 1. To efficiently enforce
-   the constraints, the constraint for gene 1 must be enforced first (if
-   not ``None``) then the constraint for gene 0.
+   This is an example where gene 0 depends on gene 1. To efficiently
+   enforce the constraints, the constraint for gene 1 must be enforced
+   first (if not ``None``) then the constraint for gene 0.
+
+   .. code:: python
+
+       gene_constraint=
+       [
+           lambda solution,values: [val for val in values if val<solution[1]],
+           lambda solution,values: [val for val in values if val>10]
+       ]
 
    PyGAD applies constraints sequentially, starting from the first gene
    to the last. To ensure correct behavior when genes depend on each
    other, structure your GA problem so that if gene X depends on gene Y,
    then gene Y appears earlier in the chromosome (solution) than gene X.
+   As a result, its gene constraint will be earlier in the list.
 
 Full Example
 ------------

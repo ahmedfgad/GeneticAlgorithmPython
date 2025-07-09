@@ -2237,17 +2237,13 @@ class GA(utils.parent_selection.ParentSelection,
                  pop_fitness == numpy.max(pop_fitness))[0][0]
             elif pop_fitness_arr.ndim == 2:
                 # Multi-objective optimization.
-                # Sort by all objectives in descending order.
-                # The first objective is the most important, then the second, etc.
-                sorted_indices = numpy.lexsort([ -pop_fitness_arr[:,i] for i in reversed(range(pop_fitness_arr.shape[1])) ])
-                best_match_idx = sorted_indices[0]
-                maximum_fitness_value = pop_fitness_arr[best_match_idx]
+                # Use NSGA-2 to sort the solutions using the fitness.
+                # Set find_best_solution=True to avoid overriding the pareto_fronts instance attribute.
+                best_match_list = self.sort_solutions_nsga2(fitness=pop_fitness,
+                                                            find_best_solution=True)
 
-                best_match_list = numpy.where(
-                    pop_fitness == maximum_fitness_value)
-            
-                best_match_idx = best_match_list[0][0]  # Get the first index of the best match.
-
+                # Get the first index of the best match.
+                best_match_idx = best_match_list[0]
 
             best_solution = self.population[best_match_idx, :].copy()
             best_solution_fitness = pop_fitness[best_match_idx]
