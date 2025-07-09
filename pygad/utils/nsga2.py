@@ -3,7 +3,7 @@ import pygad
 
 class NSGA2:
 
-    def __init__():
+    def __init__(self):
         pass
 
     def get_non_dominated_set(self, curr_solutions):
@@ -26,10 +26,11 @@ class NSGA2:
         # List of the members of the current dominated pareto front/set.
         dominated_set = []
         # List of the non-members of the current dominated pareto front/set.
+        # The non-dominated set is the pareto front set.
         non_dominated_set = []
         for idx1, sol1 in enumerate(curr_solutions):
             # Flag indicates whether the solution is a member of the current dominated set.
-            is_dominated = True
+            is_not_dominated = True
             for idx2, sol2 in enumerate(curr_solutions):
                 if idx1 == idx2:
                     continue
@@ -45,28 +46,30 @@ class NSGA2:
                 gr_eq = two_solutions[:, 1] >= two_solutions[:, 0]
                 gr = two_solutions[:, 1] > two_solutions[:, 0]
 
-                # If the 2 conditions hold, then a solution dominates the current solution.
-                # The current solution is not considered a member of the dominated set.
+                # If the 2 conditions hold, then a solution (sol2) dominates the current solution (sol1).
+                # The current solution (sol1) is not considered a member of the non-dominated set.
                 if gr_eq.all() and gr.any():
-                    # Set the is_dominated flag to False to NOT insert the current solution in the current dominated set.
-                    # Instead, insert it into the non-dominated set.
-                    is_dominated = False
-                    non_dominated_set.append(sol1)
+                    # Set the is_not_dominated flag to False because another solution dominates the current solution (sol1)
+                    is_not_dominated = False
+                    # DO NOT insert the current solution in the current non-dominated set.
+                    # Instead, insert it into the dominated set.
+                    dominated_set.append(sol1)
                     break
                 else:
                     # Reaching here means the solution does not dominate the current solution.
                     pass
     
             # If the flag is True, then no solution dominates the current solution.
-            if is_dominated:
-                dominated_set.append(sol1)
+            # Insert the current solution (sol1) into the non-dominated set.
+            if is_not_dominated:
+                non_dominated_set.append(sol1)
     
         # Return the dominated and non-dominated sets.
         return dominated_set, non_dominated_set
-    
+
     def non_dominated_sorting(self, fitness):
         """
-        Apply non-dominant sorting over the fitness to create the pareto fronts based on non-dominaned sorting of the solutions.
+        Apply non-dominant sorting over the fitness to create the pareto fronts based on non-dominated sorting of the solutions.
     
         Parameters
         ----------
@@ -101,7 +104,6 @@ class NSGA2:
         # Each element has:
             # 1) The index of the solution.
             # 2) An array of the fitness values of this solution across all objectives.
-        # remaining_set = numpy.array(list(zip(range(0, fitness.shape[0]), non_dominated_set)))
         remaining_set = list(zip(range(0, fitness.shape[0]), remaining_set))
     
         # A list mapping the index of each pareto front to the set of solutions in this front.
@@ -112,15 +114,15 @@ class NSGA2:
         front_index = -1
         while len(remaining_set) > 0:
             front_index += 1
-    
+
             # Get the current non-dominated set of solutions.
-            pareto_front, remaining_set = self.get_non_dominated_set(curr_solutions=remaining_set)
+            remaining_set, pareto_front = self.get_non_dominated_set(curr_solutions=remaining_set)
             pareto_front = numpy.array(pareto_front, dtype=object)
             pareto_fronts.append(pareto_front)
     
             solutions_indices = pareto_front[:, 0].astype(int)
             solutions_fronts_indices[solutions_indices] = front_index
-    
+
         return pareto_fronts, solutions_fronts_indices
 
     def crowding_distance(self, pareto_front, fitness):
@@ -200,7 +202,7 @@ class NSGA2:
                 # Insert the crowding distance back into the list to override the initial zero.
                 obj_sorted[idx][2] = crowding_dist
         
-            # Sort the objective by the original index at index 0 of the each child list.
+            # Sort the objective by the original index at index 0 of each child list.
             obj_sorted = sorted(obj_sorted, key=lambda x: x[0])
             obj_crowding_dist_list.append(obj_sorted)
     
@@ -225,8 +227,10 @@ class NSGA2:
         crowding_dist_pop_sorted_indices = crowding_dist_pop_sorted_indices.astype(int)
     
         return obj_crowding_dist_list, crowding_dist_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices
-    
-    def sort_solutions_nsga2(self, fitness):
+
+    def sort_solutions_nsga2(self,
+                             fitness,
+                             find_best_solution=False):
         """
         Sort the solutions based on the fitness.
         The sorting procedure differs based on whether the problem is single-objective or multi-objective optimization.
@@ -237,9 +241,9 @@ class NSGA2:
     
         Parameters
         ----------
-        fitness : TYPE
-            The fitness of the entire population.
-    
+        fitness: The fitness of the entire population.
+        find_best_solution: Whether the method is called only to find the best solution or as part of the PyGAD lifecycle. This is to decide whether the pareto_fronts instance attribute is edited or not.
+
         Returns
         -------
         solutions_sorted : TYPE
@@ -251,7 +255,13 @@ class NSGA2:
             solutions_sorted = []
             # Split the solutions into pareto fronts using non-dominated sorting.
             pareto_fronts, solutions_fronts_indices = self.non_dominated_sorting(fitness)
-            self.pareto_fronts = pareto_fronts.copy()
+            if find_best_solution:
+                # Do not edit the pareto_fronts instance attribute when just getting the best solution.
+                pass
+            else:
+                # The method is called within the regular GA lifecycle.
+                # We have to edit the pareto_fronts to be assigned the latest pareto front.
+                self.pareto_fronts = pareto_fronts.copy()
             for pareto_front in pareto_fronts:
                 # Sort the solutions in the front using crowded distance.
                 _, _, _, crowding_dist_pop_sorted_indices = self.crowding_distance(pareto_front=pareto_front.copy(),
@@ -264,5 +274,7 @@ class NSGA2:
             solutions_sorted = sorted(range(len(fitness)), key=lambda k: fitness[k])
             # Reverse the sorted solutions so that the best solution comes first.
             solutions_sorted.reverse()
-    
+        else:
+            raise TypeError(f'Each element in the fitness array must be of a number of an iterable (list, tuple, numpy.ndarray). But the type {type(fitness[0])} found')
+
         return solutions_sorted

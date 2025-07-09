@@ -190,7 +190,7 @@ It has the following helper methods:
 The `pygad.utils.nsga2` module has a class named `NSGA2` that implements NSGA-II. The methods inside this class are:
 
 1. `non_dominated_sorting()`: Returns all the pareto fronts by applying non-dominated sorting over the solutions.
-2. `get_non_dominated_set()`: Returns the set of non-dominated solutions from the passed solutions.
+2. `get_non_dominated_set()`: Returns the 2 sets of non-dominated solutions and dominated solutions from the passed solutions. Note that the Pareto front consists of the solutions in the non-dominated set.
 3. `crowding_distance()`: Calculates the crowding distance for all solutions in the current pareto front.
 4. `sort_solutions_nsga2()`: Sort the solutions. If the problem is single-objective, then the solutions are sorted by sorting the fitness values of the population. If it is multi-objective, then non-dominated sorting and crowding distance are applied to sort the solutions.
 
