@@ -31,9 +31,20 @@ class Crossover:
 
         # Randomly generate all the K points at which crossover takes place between each two parents. The point does not have to be always at the center of the solutions.
         # This saves time by calling the numpy.random.randint() function only once.
-        crossover_points = numpy.random.randint(low=0, 
-                                                high=parents.shape[1], 
-                                                size=offspring_size[0])
+        if self.gene_structure is None:
+            crossover_points = numpy.random.randint(low=0, 
+                                                    high=parents.shape[1], 
+                                                    size=offspring_size[0])
+        else:
+            # Select random boundary index excluding the 0th index and last index to ensure split?
+            # boundaries: [0, 2, 5, 10] -> valid cuts are 2, 5. So boundaries[1:-1]
+            # If structure has only 1 block, crossover point is meaningless? Standard GA allows index (0..N).
+            # Standard: low=0, high=N. Point K means split at index K.
+            # 0 -> Empty first part, Full second part.
+            # N -> Full first part, Empty second.
+            # So boundaries are valid crossover points immediately.
+            valid_cuts = self.boundaries
+            crossover_points = numpy.random.choice(valid_cuts, size=offspring_size[0])
 
         for k in range(offspring_size[0]):
             # Check if the crossover_probability parameter is used.
@@ -97,15 +108,54 @@ class Crossover:
 
         # Randomly generate all the first K points at which crossover takes place between each two parents. 
         # This saves time by calling the numpy.random.randint() function only once.
-        if (parents.shape[1] == 1): # If the chromosome has only a single gene. In this case, this gene is copied from the second parent.
-            crossover_points_1 = numpy.zeros(offspring_size[0])
+        if self.gene_structure is None:
+            if (parents.shape[1] == 1):
+                crossover_points_1 = numpy.zeros(offspring_size[0])
+            else:
+                crossover_points_1 = numpy.random.randint(low=0, 
+                                                          high=numpy.ceil(parents.shape[1]/2 + 1), 
+                                                          size=offspring_size[0])
+            # The second point must always be greater than the first point.
+            crossover_points_2 = crossover_points_1 + int(parents.shape[1]/2) 
         else:
-            crossover_points_1 = numpy.random.randint(low=0, 
-                                                      high=numpy.ceil(parents.shape[1]/2 + 1), 
-                                                      size=offspring_size[0])
-
-        # The second point must always be greater than the first point.
-        crossover_points_2 = crossover_points_1 + int(parents.shape[1]/2) 
+            num_logical = len(self.gene_structure)
+            if num_logical < 2:
+                # Can't do meaningful 2-point on < 2 blocks? Standard allows splitting anywhere.
+                # If only 1 block [0, 10], Boundaries are 0, 10.
+                # Cuts: 0, 10.
+                crossover_points_1 = numpy.zeros(offspring_size[0], dtype=int)
+                crossover_points_2 = numpy.full(offspring_size[0], parents.shape[1], dtype=int)
+            else:
+                # Select 2 distinct boundary indices.
+                # To ensure p1 != p2 efficiently for N offspring:
+                # 1. Pick p1_idx from [0, num_boundaries).
+                # 2. Pick offset from [1, num_boundaries).
+                # 3. p2_idx = (p1_idx + offset) % num_boundaries.
+                # This guarantees p1_idx != p2_idx.
+                
+                num_boundaries = len(self.boundaries)
+                # We need indices [0, num_boundaries-1]
+                
+                # p1 indices:
+                p1_idx = numpy.random.randint(low=0, high=num_boundaries, size=offspring_size[0])
+                
+                # Offsets: at least 1, at most num_boundaries-1
+                # If num_boundaries <= 1 (impossible if num_logical >= 1, boundaries has at least 0, N), 
+                # but if num_logical=1, boundaries=[0, N]. len=2. offset must be 1.
+                # randint(1, 2) -> returns [1]. Correct.
+                
+                offsets = numpy.random.randint(low=1, high=num_boundaries, size=offspring_size[0])
+                
+                p2_idx = (p1_idx + offsets) % num_boundaries
+                
+                # Gather points
+                # Stack to sort
+                points_idx = numpy.column_stack((p1_idx, p2_idx))
+                points_idx.sort(axis=1)
+                
+                # Map indices to actual boundary values
+                crossover_points_1 = self.boundaries[points_idx[:, 0]]
+                crossover_points_2 = self.boundaries[points_idx[:, 1]] 
 
         for k in range(offspring_size[0]):
 
@@ -172,9 +222,22 @@ class Crossover:
         # This saves time by calling the numpy.random.randint() function only once.
         # There is a list of 0 and 1 for each offspring.
         # [0, 1, 0, 0, 1, 1]: If the value is 0, then take the gene from the first parent. If 1, take it from the second parent.
-        genes_sources = numpy.random.randint(low=0, 
-                                             high=2, 
-                                             size=offspring_size)
+        if self.gene_structure is None:
+            genes_sources = numpy.random.randint(low=0, 
+                                                 high=2, 
+                                                 size=offspring_size)
+        else:
+            # Generate sources for LOGICAL blocks
+            num_logical = len(self.gene_structure)
+            logical_sources = numpy.random.randint(low=0, high=2, size=(offspring_size[0], num_logical))
+            
+            # Map logical sources to full gene mask
+            genes_sources = numpy.empty(offspring_size, dtype=int)
+            for k in range(offspring_size[0]):
+                for b_idx in range(num_logical):
+                    start = self.boundaries[b_idx]
+                    end = self.boundaries[b_idx+1]
+                    genes_sources[k, start:end] = logical_sources[k, b_idx]
 
         for k in range(offspring_size[0]):
             if not (self.crossover_probability is None):
@@ -242,9 +305,22 @@ class Crossover:
         # This saves time by calling the numpy.random.randint() function only once.
         # There is a list of 0 and 1 for each offspring.
         # [0, 1, 0, 0, 1, 1]: If the value is 0, then take the gene from the first parent. If 1, take it from the second parent.
-        genes_sources = numpy.random.randint(low=0, 
-                                             high=2, 
-                                             size=offspring_size)
+        if self.gene_structure is None:
+            genes_sources = numpy.random.randint(low=0, 
+                                                 high=2, 
+                                                 size=offspring_size)
+        else:
+            # Generate sources for LOGICAL blocks
+            num_logical = len(self.gene_structure)
+            logical_sources = numpy.random.randint(low=0, high=2, size=(offspring_size[0], num_logical))
+            
+            # Map logical sources to full gene mask
+            genes_sources = numpy.empty(offspring_size, dtype=int)
+            for k in range(offspring_size[0]):
+                for b_idx in range(num_logical):
+                    start = self.boundaries[b_idx]
+                    end = self.boundaries[b_idx+1]
+                    genes_sources[k, start:end] = logical_sources[k, b_idx]
 
         for k in range(offspring_size[0]):
             if not (self.crossover_probability is None):
