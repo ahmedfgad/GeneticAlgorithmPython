@@ -368,6 +368,14 @@ class Mutation:
         It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
+        
+        If gene_structure is used, we do NOT invert the order of the blocks themselves,
+        as that might violate structural integrity (different block sizes/types).
+        Instead, we select a range of logical blocks and invert the content WITHIN each block.
+        Example: Block A=[0, 1, 0], B=[1, 1, 0]. Logic selects range [A, B].
+        Result: A becomes [1, 0, 1], B becomes [0, 0, 1]. The blocks stay in positions A, B.
+        Might be confusing, when shown with binary values, but basically we still use the numpy.flip function, which when 
+        applied to a numpy array, reverses the order of the elements in the array.
         """
 
         for idx in range(offspring.shape[0]):
@@ -378,14 +386,9 @@ class Mutation:
                 genes_to_scramble = numpy.flip(offspring[idx, mutation_gene1:mutation_gene2])
                 offspring[idx, mutation_gene1:mutation_gene2] = genes_to_scramble
             else:
+                # gene_structure is used to define the structure of the gene.
+                # The inversion mutation is applied to the gene structure.
                 num_logical = len(self.gene_structure)
-
-                # Intra-Block Inversion Logic
-                # When gene_structure is used, we do NOT invert the order of the blocks themselves,
-                # as that might violate structural integrity (different block sizes/types).
-                # Instead, we select a range of logical blocks and invert the content WITHIN each block.
-                # Example: Block A=[0, 1], B=[2]. Logic selects range [A, B].
-                # Result: A becomes [1, 0], B becomes [2] (its own reverse). The blocks stay in positions A, B.
                 
                 mutation_block1 = numpy.random.randint(low=0, high=num_logical, size=1)[0]
                 # Default "range logic" from standard method is somewhat arbitrary (roughly half).

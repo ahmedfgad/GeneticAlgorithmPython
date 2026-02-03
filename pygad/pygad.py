@@ -91,7 +91,10 @@ class GA(utils.parent_selection.ParentSelection,
         # It is OK to set the value of the 2 parameters ('init_range_low' and 'init_range_high') to be equal, higher or lower than the other parameter (i.e. init_range_low is not needed to be lower than init_range_high).
 
         gene_type: The type of the gene. It is assigned to any of these types (int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, float, numpy.float16, numpy.float32, numpy.float64) and forces all the genes to be of that type.
-        complex_gene_type: A multi value objects like a lists or an arrays are going to be treated a gene_type when set True
+        gene_structure: A List of containing positive integers, that indicate the number of int/floats inside a single gene_type/index of the gene
+            Example: num_genes=10; gene_structure=[1,2,5,1,1] -> 5 genes in total, first gene has 1 int/float, second gene has 2 int/floats, third gene has 5 int/floats, fourth gene has 1 int/float, and fifth gene has 1 int/float.
+            Note: The sum of the values in the 'gene_structure' list must be equal to the value assigned to the 'num_genes' parameter.
+
 
         parent_selection_type: Type of parent selection.
         keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. Some parent selection operators such as rank selection, favor population diversity and therefore keeping the parents in the next generation can be beneficial. However, some other parent selection operators, such as roulette wheel selection (RWS), have higher selection pressure and keeping more than one parent in the next generation can seriously harm population diversity. This parameter have an effect only when the keep_elitism parameter is 0. Thanks to Prof. Fernando Jiménez (http://webs.um.es/fernan) for editing this sentence.
