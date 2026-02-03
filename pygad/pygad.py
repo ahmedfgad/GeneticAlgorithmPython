@@ -5,6 +5,9 @@ import warnings
 import concurrent.futures
 import inspect
 import logging
+
+import numpy as np
+
 from pygad import utils
 from pygad import helper
 from pygad import visualize
@@ -25,6 +28,8 @@ class GA(utils.parent_selection.ParentSelection,
                              object]
     supported_int_float_types = supported_int_types + supported_float_types
 
+    boundaries = None
+
     def __init__(self,
                  num_generations,
                  num_parents_mating,
@@ -36,6 +41,7 @@ class GA(utils.parent_selection.ParentSelection,
                  init_range_low=-4,
                  init_range_high=4,
                  gene_type=float,
+                 gene_structure=None,
                  parent_selection_type="sss",
                  keep_parents=-1,
                  keep_elitism=1,
@@ -85,6 +91,7 @@ class GA(utils.parent_selection.ParentSelection,
         # It is OK to set the value of the 2 parameters ('init_range_low' and 'init_range_high') to be equal, higher or lower than the other parameter (i.e. init_range_low is not needed to be lower than init_range_high).
 
         gene_type: The type of the gene. It is assigned to any of these types (int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, float, numpy.float16, numpy.float32, numpy.float64) and forces all the genes to be of that type.
+        complex_gene_type: A multi value objects like a lists or an arrays are going to be treated a gene_type when set True
 
         parent_selection_type: Type of parent selection.
         keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. Some parent selection operators such as rank selection, favor population diversity and therefore keeping the parents in the next generation can be beneficial. However, some other parent selection operators, such as roulette wheel selection (RWS), have higher selection pressure and keeping more than one parent in the next generation can seriously harm population diversity. This parameter have an effect only when the keep_elitism parameter is 0. Thanks to Prof. Fernando Jiménez (http://webs.um.es/fernan) for editing this sentence.
@@ -334,6 +341,14 @@ class GA(utils.parent_selection.ParentSelection,
 
             self.init_range_low = init_range_low
             self.init_range_high = init_range_high
+
+            # Transform gene_structure to np.array
+            if (gene_structure is not None):
+                self.gene_structure = np.array(gene_structure)
+                # Example: [1, 1, 3] -> [0, 1, 2, 5]
+                self.boundaries = numpy.insert(numpy.cumsum(self.gene_structure), 0, 0)
+            else:
+                self.gene_structure = None
 
             # Validate gene_type
             if gene_type in GA.supported_int_float_types:
@@ -1351,10 +1366,15 @@ class GA(utils.parent_selection.ParentSelection,
                                                          self.gene_type[gene_idx][1])
         return solutions
 
+    def check_gene_structure(self,gene_structure,num_gene):
+        assert (np.sum(gene_structure)==num_gene, "the sum of all integers inside the gene_structure parameter must equal the num_gene parameter")
+        # it is also possible to write this function in such way that we return the num_gene and therefore ensure it this way, this likely would produce more user errors
+
     def initialize_population(self,
                               allow_duplicate_genes,
                               gene_type,
-                              gene_constraint):
+                              gene_constraint,
+                              gene_structure=None):
         """
         Creates an initial population randomly as a NumPy array. The array is saved in the instance attribute named 'population'.
 
@@ -1362,6 +1382,9 @@ class GA(utils.parent_selection.ParentSelection,
             -allow_duplicate_genes: Whether duplicate genes are allowed or not.
             -gene_type: The data type of the genes.
             -gene_constraint: The constraints of the genes.
+
+            -gene_structure: A List of containing positive integers, that indicate the number of int/floats inside a single gene_type/index of the gene
+                Example: num_genes=10; gene_structure=[1,2,5,1,1]
 
         This method assigns the values of the following 3 instance attributes:
             1. pop_size: Size of the population.

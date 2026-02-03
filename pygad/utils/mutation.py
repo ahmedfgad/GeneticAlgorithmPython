@@ -58,33 +58,53 @@ class Mutation:
 
         # For each offspring, a value from the gene space is selected randomly and assigned to the selected mutated gene.
         for offspring_idx in range(offspring.shape[0]):
-            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
-            for gene_idx in mutation_indices:
+            if self.gene_structure is None:
+                mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
+                logical_to_flat = [(idx, idx + 1) for idx in mutation_indices]
+            else:
+                num_logical_genes = len(self.gene_structure)
+                mutation_indices = numpy.array(random.sample(range(0, num_logical_genes), self.mutation_num_genes))
+                # Map logical index to (start, end) using pre-calculated boundaries
+                logical_to_flat = [(self.boundaries[i], self.boundaries[i + 1]) for i in mutation_indices]
 
-                value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
-                                                                    gene_idx=gene_idx,
-                                                                    sample_size=self.sample_size)
+            for start, end in logical_to_flat:
+                # We must mutate every value within this block's range
+                for flat_idx in range(start, end):
+                    # 1. Get the new value for this specific flat index
+                    value_from_space = self.mutation_process_gene_value(
+                        solution=offspring[offspring_idx],
+                        gene_idx=flat_idx,
+                        sample_size=self.sample_size
+                    )
 
-                # Before assigning the selected value from the space to the gene, change its data type and round it.
-                if self.gene_type_single == True:
-                    if not self.gene_type[1] is None:
-                        offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
-                                                                         self.gene_type[1])
+                    # 2. Assignment Logic (Now INSIDE the flat_idx loop)
+                    if self.gene_type_single:
+                        if self.gene_type[1] is not None:
+                            offspring[offspring_idx, flat_idx] = numpy.round(
+                                self.gene_type[0](value_from_space), self.gene_type[1]
+                            )
+                        else:
+                            offspring[offspring_idx, flat_idx] = self.gene_type[0](value_from_space)
                     else:
-                        offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
-                else:
-                    if not self.gene_type[gene_idx][1] is None:
-                        offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
-                                                                         self.gene_type[gene_idx][1])
-                    else:
-                        offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
+                        # Use flat_idx to get the specific type for this position
+                        current_type = self.gene_type[flat_idx]
+                        if current_type[1] is not None:
+                            offspring[offspring_idx, flat_idx] = numpy.round(
+                                current_type[0](value_from_space), current_type[1]
+                            )
+                        else:
+                            offspring[offspring_idx, flat_idx] = current_type[0](value_from_space)
 
-                if self.allow_duplicate_genes == False:
-                    offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
-                                                                                         gene_type=self.gene_type,
-                                                                                         sample_size=self.sample_size,
-                                                                                         mutation_by_replacement=self.mutation_by_replacement,
-                                                                                         build_initial_pop=False)
+            # 3. Duplicate check happens once per individual after all blocks are mutated
+            if not self.allow_duplicate_genes:
+                offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(
+                    solution=offspring[offspring_idx],
+                    gene_type=self.gene_type,
+                    sample_size=self.sample_size,
+                    mutation_by_replacement=self.mutation_by_replacement,
+                    build_initial_pop=False
+                )
+
         return offspring
 
     def mutation_probs_by_space(self, offspring):
@@ -97,35 +117,68 @@ class Mutation:
         """
 
         # For each offspring, a value from the gene space is selected randomly and assigned to the selected mutated gene.
+        # For each offspring, a value from the gene space is selected randomly and assigned to the selected mutated gene.
         for offspring_idx in range(offspring.shape[0]):
-            probs = numpy.random.random(size=offspring.shape[1])
-            for gene_idx in range(offspring.shape[1]):
+            if self.gene_structure is None:
+                probs = numpy.random.random(size=offspring.shape[1])
+                for gene_idx in range(offspring.shape[1]):
 
-                if probs[gene_idx] <= self.mutation_probability:
-                    value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
-                                                                        gene_idx=gene_idx,
-                                                                        sample_size=self.sample_size)
+                    if probs[gene_idx] <= self.mutation_probability:
+                        value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
+                                                                            gene_idx=gene_idx,
+                                                                            sample_size=self.sample_size)
 
-                    # Assigning the selected value from the space to the gene.
-                    if self.gene_type_single == True:
-                        if not self.gene_type[1] is None:
-                            offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
-                                                                             self.gene_type[1])
+                        # Assigning the selected value from the space to the gene.
+                        if self.gene_type_single == True:
+                            if not self.gene_type[1] is None:
+                                offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
+                                                                                 self.gene_type[1])
+                            else:
+                                offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
                         else:
-                            offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
-                    else:
-                        if not self.gene_type[gene_idx][1] is None:
-                            offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
-                                                                             self.gene_type[gene_idx][1])
-                        else:
-                            offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
+                            if not self.gene_type[gene_idx][1] is None:
+                                offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
+                                                                                 self.gene_type[gene_idx][1])
+                            else:
+                                offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
 
-                    if self.allow_duplicate_genes == False:
-                        offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
-                                                                                             gene_type=self.gene_type,
-                                                                                             sample_size=self.sample_size,
-                                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                                             build_initial_pop=False)
+                        if self.allow_duplicate_genes == False:
+                            offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
+                                                                                                 gene_type=self.gene_type,
+                                                                                                 sample_size=self.sample_size,
+                                                                                                 mutation_by_replacement=self.mutation_by_replacement,
+                                                                                                 build_initial_pop=False)
+            else:
+                num_logical_genes = len(self.gene_structure)
+                probs = numpy.random.random(size=num_logical_genes)
+                for logical_idx in range(num_logical_genes):
+                    if probs[logical_idx] <= self.mutation_probability:
+                        start, end = self.boundaries[logical_idx], self.boundaries[logical_idx+1]
+                        for gene_idx in range(start, end):
+                            value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
+                                                                                gene_idx=gene_idx,
+                                                                                sample_size=self.sample_size)
+
+                            # Assigning the selected value from the space to the gene.
+                            if self.gene_type_single == True:
+                                if not self.gene_type[1] is None:
+                                    offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
+                                                                                     self.gene_type[1])
+                                else:
+                                    offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
+                            else:
+                                if not self.gene_type[gene_idx][1] is None:
+                                    offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
+                                                                                     self.gene_type[gene_idx][1])
+                                else:
+                                    offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
+
+                            if self.allow_duplicate_genes == False:
+                                offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
+                                                                                                     gene_type=self.gene_type,
+                                                                                                     sample_size=self.sample_size,
+                                                                                                     mutation_by_replacement=self.mutation_by_replacement,
+                                                                                                     build_initial_pop=False)
         return offspring
 
     def mutation_process_gene_value(self,
@@ -187,54 +240,22 @@ class Mutation:
         """
 
         # Random mutation changes one or more genes in each offspring randomly.
-        for offspring_idx in range(offspring.shape[0]):
-            # Return the indices of the genes to mutate.
-            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), 
-                                                         self.mutation_num_genes))
-            for gene_idx in mutation_indices:
-
-                range_min, range_max = self.get_random_mutation_range(gene_idx)
-
-                # Generate a random value for mutation that meet the gene constraint if exists.
-                random_value = self.mutation_process_gene_value(range_min=range_min,
-                                                                range_max=range_max,
-                                                                solution=offspring[offspring_idx],
-                                                                gene_idx=gene_idx,
-                                                                sample_size=self.sample_size)
-
-                offspring[offspring_idx, gene_idx] = random_value
-
-                if self.allow_duplicate_genes == False:
-                    offspring[offspring_idx], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[offspring_idx],
-                                                                                         min_val=range_min,
-                                                                                         max_val=range_max,
-                                                                                         mutation_by_replacement=self.mutation_by_replacement,
-                                                                                         gene_type=self.gene_type,
-                                                                                         sample_size=self.sample_size)
-
-        return offspring
-
-    def mutation_probs_randomly(self, offspring):
-
-        """
-        Applies the random mutation using the mutation probability. For each gene, if its probability is <= that mutation probability, then it will be mutated randomly.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
-        """
-
         # Random mutation changes one or more genes in each offspring randomly.
         for offspring_idx in range(offspring.shape[0]):
-            # The mutation probabilities for the current offspring.
-            probs = numpy.random.random(size=offspring.shape[1])
-            for gene_idx in range(offspring.shape[1]):
+            if self.gene_structure is None:
+                mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
+                logical_to_flat = [(idx, idx + 1) for idx in mutation_indices]
+            else:
+                num_logical_genes = len(self.gene_structure)
+                mutation_indices = numpy.array(random.sample(range(0, num_logical_genes), self.mutation_num_genes))
+                logical_to_flat = [(self.boundaries[i], self.boundaries[i+1]) for i in mutation_indices]
 
-                range_min, range_max = self.get_random_mutation_range(gene_idx)
+            for start, end in logical_to_flat:
+                for gene_idx in range(start, end):
 
-                # A gene is mutated only if its mutation probability is less than or equal to the threshold.
-                if probs[gene_idx] <= self.mutation_probability:
+                    range_min, range_max = self.get_random_mutation_range(gene_idx)
 
-                    # Generate a random value fpr mutation that meet the gene constraint if exists.
+                    # Generate a random value for mutation that meet the gene constraint if exists.
                     random_value = self.mutation_process_gene_value(range_min=range_min,
                                                                     range_max=range_max,
                                                                     solution=offspring[offspring_idx],
@@ -250,6 +271,72 @@ class Mutation:
                                                                                              mutation_by_replacement=self.mutation_by_replacement,
                                                                                              gene_type=self.gene_type,
                                                                                              sample_size=self.sample_size)
+
+        return offspring
+
+    def mutation_probs_randomly(self, offspring):
+
+        """
+        Applies the random mutation using the mutation probability. For each gene, if its probability is <= that mutation probability, then it will be mutated randomly.
+        It accepts:
+            -offspring: The offspring to mutate.
+        It returns an array of the mutated offspring.
+        """
+
+        # Random mutation changes one or more genes in each offspring randomly.
+        # Random mutation changes one or more genes in each offspring randomly.
+        for offspring_idx in range(offspring.shape[0]):
+            # The mutation probabilities for the current offspring.
+            if self.gene_structure is None:
+                probs = numpy.random.random(size=offspring.shape[1])
+                for gene_idx in range(offspring.shape[1]):
+
+                    range_min, range_max = self.get_random_mutation_range(gene_idx)
+
+                    # A gene is mutated only if its mutation probability is less than or equal to the threshold.
+                    if probs[gene_idx] <= self.mutation_probability:
+
+                        # Generate a random value fpr mutation that meet the gene constraint if exists.
+                        random_value = self.mutation_process_gene_value(range_min=range_min,
+                                                                        range_max=range_max,
+                                                                        solution=offspring[offspring_idx],
+                                                                        gene_idx=gene_idx,
+                                                                        sample_size=self.sample_size)
+
+                        offspring[offspring_idx, gene_idx] = random_value
+
+                        if self.allow_duplicate_genes == False:
+                            offspring[offspring_idx], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[offspring_idx],
+                                                                                                 min_val=range_min,
+                                                                                                 max_val=range_max,
+                                                                                                 mutation_by_replacement=self.mutation_by_replacement,
+                                                                                                 gene_type=self.gene_type,
+                                                                                                 sample_size=self.sample_size)
+            else:
+                num_logical_genes = len(self.gene_structure)
+                probs = numpy.random.random(size=num_logical_genes)
+                for logical_idx in range(num_logical_genes):
+                    if probs[logical_idx] <= self.mutation_probability:
+                        start, end = self.boundaries[logical_idx], self.boundaries[logical_idx+1]
+                        for gene_idx in range(start, end):
+                            range_min, range_max = self.get_random_mutation_range(gene_idx)
+
+                            # Generate a random value fpr mutation that meet the gene constraint if exists.
+                            random_value = self.mutation_process_gene_value(range_min=range_min,
+                                                                            range_max=range_max,
+                                                                            solution=offspring[offspring_idx],
+                                                                            gene_idx=gene_idx,
+                                                                            sample_size=self.sample_size)
+
+                            offspring[offspring_idx, gene_idx] = random_value
+
+                            if self.allow_duplicate_genes == False:
+                                offspring[offspring_idx], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[offspring_idx],
+                                                                                                     min_val=range_min,
+                                                                                                     max_val=range_max,
+                                                                                                     mutation_by_replacement=self.mutation_by_replacement,
+                                                                                                     gene_type=self.gene_type,
+                                                                                                     sample_size=self.sample_size)
         return offspring
 
     def swap_mutation(self, offspring):
@@ -262,12 +349,16 @@ class Mutation:
         """
 
         for idx in range(offspring.shape[0]):
-            mutation_gene1 = numpy.random.randint(low=0, high=offspring.shape[1]/2, size=1)[0]
-            mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
+            if self.gene_structure is None:
+                mutation_gene1 = numpy.random.randint(low=0, high=offspring.shape[1]/2, size=1)[0]
+                mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
 
-            temp = offspring[idx, mutation_gene1]
-            offspring[idx, mutation_gene1] = offspring[idx, mutation_gene2]
-            offspring[idx, mutation_gene2] = temp
+                temp = offspring[idx, mutation_gene1]
+                offspring[idx, mutation_gene1] = offspring[idx, mutation_gene2]
+                offspring[idx, mutation_gene2] = temp
+            else:
+                 # Swap mutation is not supported with gene_structure as it may break the structure.
+                 pass
         return offspring
 
     def inversion_mutation(self, offspring):
@@ -280,11 +371,42 @@ class Mutation:
         """
 
         for idx in range(offspring.shape[0]):
-            mutation_gene1 = numpy.random.randint(low=0, high=numpy.ceil(offspring.shape[1]/2 + 1), size=1)[0]
-            mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
+            if self.gene_structure is None:
+                mutation_gene1 = numpy.random.randint(low=0, high=numpy.ceil(offspring.shape[1]/2 + 1), size=1)[0]
+                mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
 
-            genes_to_scramble = numpy.flip(offspring[idx, mutation_gene1:mutation_gene2])
-            offspring[idx, mutation_gene1:mutation_gene2] = genes_to_scramble
+                genes_to_scramble = numpy.flip(offspring[idx, mutation_gene1:mutation_gene2])
+                offspring[idx, mutation_gene1:mutation_gene2] = genes_to_scramble
+            else:
+                num_logical = len(self.gene_structure)
+
+                # Intra-Block Inversion Logic
+                # When gene_structure is used, we do NOT invert the order of the blocks themselves,
+                # as that might violate structural integrity (different block sizes/types).
+                # Instead, we select a range of logical blocks and invert the content WITHIN each block.
+                # Example: Block A=[0, 1], B=[2]. Logic selects range [A, B].
+                # Result: A becomes [1, 0], B becomes [2] (its own reverse). The blocks stay in positions A, B.
+                
+                mutation_block1 = numpy.random.randint(low=0, high=num_logical, size=1)[0]
+                # Default "range logic" from standard method is somewhat arbitrary (roughly half).
+                # Here we ensure we select at least 1 block to operate on.
+                mutation_block2 = mutation_block1 + 1 
+                
+                # Optional: Randomize length roughly similar to standard method (up to full length)
+                max_len = num_logical
+                if max_len > 1:
+                     length = numpy.random.randint(low=1, high=max_len, size=1)[0]
+                     mutation_block2 = mutation_block1 + length
+                     if mutation_block2 > num_logical:
+                         mutation_block2 = num_logical
+                
+                for b_idx in range(mutation_block1, mutation_block2):
+                    start = self.boundaries[b_idx]
+                    end = self.boundaries[b_idx+1]
+                    
+                    # Invert content of this block
+                    genes_to_scramble = numpy.flip(offspring[idx, start:end])
+                    offspring[idx, start:end] = genes_to_scramble
         return offspring
 
     def scramble_mutation(self, offspring):
@@ -294,16 +416,48 @@ class Mutation:
         It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
+        
+        When 'gene_structure' is used:
+            - This method performs 'Intra-Block Scramble'.
+            - It selects a range of logical blocks.
+            - It shuffles the internal genes of EACH selected block individually.
+            - It does NOT shuffle the blocks with each other, preserving the global structure.
         """
 
         for idx in range(offspring.shape[0]):
-            mutation_gene1 = numpy.random.randint(low=0, high=numpy.ceil(offspring.shape[1]/2 + 1), size=1)[0]
-            mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
-            genes_range = numpy.arange(start=mutation_gene1, stop=mutation_gene2)
-            numpy.random.shuffle(genes_range)
-            
-            genes_to_scramble = numpy.flip(offspring[idx, genes_range])
-            offspring[idx, genes_range] = genes_to_scramble
+            if self.gene_structure is None:
+                mutation_gene1 = numpy.random.randint(low=0, high=numpy.ceil(offspring.shape[1]/2 + 1), size=1)[0]
+                mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
+                genes_range = numpy.arange(start=mutation_gene1, stop=mutation_gene2)
+                numpy.random.shuffle(genes_range)
+                
+                genes_to_scramble = numpy.flip(offspring[idx, genes_range])
+                offspring[idx, genes_range] = genes_to_scramble
+            else:
+                num_logical = len(self.gene_structure)
+                
+                # Intra-Block Scramble Logic
+                # Similar to inversion, we select logical blocks and shuffle ONLY the genes INSIDE them.
+                
+                mutation_block1 = numpy.random.randint(low=0, high=num_logical, size=1)[0]
+                mutation_block2 = mutation_block1 + 1
+                
+                max_len = num_logical
+                if max_len > 1:
+                     length = numpy.random.randint(low=1, high=max_len, size=1)[0]
+                     mutation_block2 = mutation_block1 + length
+                     if mutation_block2 > num_logical:
+                         mutation_block2 = num_logical
+
+                for b_idx in range(mutation_block1, mutation_block2):
+                    start = self.boundaries[b_idx]
+                    end = self.boundaries[b_idx+1]
+                    
+                    # Extract genes, shuffle them, and put them back
+                    # Note: We must work on a COPY or index carefully to shuffle in place
+                    block_genes = offspring[idx, start:end].copy()
+                    numpy.random.shuffle(block_genes)
+                    offspring[idx, start:end] = block_genes
         return offspring
 
     def adaptive_mutation_population_fitness(self, offspring):
@@ -532,33 +686,41 @@ class Mutation:
                 else:
                     adaptive_mutation_num_genes = self.mutation_num_genes[1]
 
-            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
-            for gene_idx in mutation_indices:
+            if self.gene_structure is None:
+                mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
+                logical_to_flat = [(idx, idx + 1) for idx in mutation_indices]
+            else:
+                num_logical_genes = len(self.gene_structure)
+                mutation_indices = numpy.array(random.sample(range(0, num_logical_genes), adaptive_mutation_num_genes))
+                logical_to_flat = [(self.boundaries[i], self.boundaries[i+1]) for i in mutation_indices]
 
-                value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
-                                                                    gene_idx=gene_idx,
-                                                                    sample_size=self.sample_size)
+            for start, end in logical_to_flat:
+                for gene_idx in range(start, end):
 
-                # Assigning the selected value from the space to the gene.
-                if self.gene_type_single == True:
-                    if not self.gene_type[1] is None:
-                        offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
-                                                                         self.gene_type[1])
+                    value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
+                                                                        gene_idx=gene_idx,
+                                                                        sample_size=self.sample_size)
+
+                    # Assigning the selected value from the space to the gene.
+                    if self.gene_type_single == True:
+                        if not self.gene_type[1] is None:
+                            offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
+                                                                             self.gene_type[1])
+                        else:
+                            offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
                     else:
-                        offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
-                else:
-                    if not self.gene_type[gene_idx][1] is None:
-                        offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
-                                                                         self.gene_type[gene_idx][1])
-                    else:
-                        offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
+                        if not self.gene_type[gene_idx][1] is None:
+                            offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
+                                                                             self.gene_type[gene_idx][1])
+                        else:
+                            offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
 
-                if self.allow_duplicate_genes == False:
-                    offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
-                                                                                         gene_type=self.gene_type,
-                                                                                         sample_size=self.sample_size,
-                                                                                         mutation_by_replacement=self.mutation_by_replacement,
-                                                                                         build_initial_pop=False)
+                    if self.allow_duplicate_genes == False:
+                        offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
+                                                                                             gene_type=self.gene_type,
+                                                                                             sample_size=self.sample_size,
+                                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                                             build_initial_pop=False)
         return offspring
 
     def adaptive_mutation_randomly(self, offspring):
@@ -602,27 +764,35 @@ class Mutation:
                 else:
                     adaptive_mutation_num_genes = self.mutation_num_genes[1]
 
-            mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
-            for gene_idx in mutation_indices:
+            if self.gene_structure is None:
+                mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
+                logical_to_flat = [(idx, idx + 1) for idx in mutation_indices]
+            else:
+                num_logical_genes = len(self.gene_structure)
+                mutation_indices = numpy.array(random.sample(range(0, num_logical_genes), adaptive_mutation_num_genes))
+                logical_to_flat = [(self.boundaries[i], self.boundaries[i+1]) for i in mutation_indices]
 
-                range_min, range_max = self.get_random_mutation_range(gene_idx)
+            for start, end in logical_to_flat:
+                for gene_idx in range(start, end):
 
-                # Generate a random value fpr mutation that meet the gene constraint if exists.
-                random_value = self.mutation_process_gene_value(range_min=range_min,
-                                                                range_max=range_max,
-                                                                solution=offspring[offspring_idx],
-                                                                gene_idx=gene_idx,
-                                                                sample_size=self.sample_size)
+                    range_min, range_max = self.get_random_mutation_range(gene_idx)
 
-                offspring[offspring_idx, gene_idx] = random_value
+                    # Generate a random value fpr mutation that meet the gene constraint if exists.
+                    random_value = self.mutation_process_gene_value(range_min=range_min,
+                                                                    range_max=range_max,
+                                                                    solution=offspring[offspring_idx],
+                                                                    gene_idx=gene_idx,
+                                                                    sample_size=self.sample_size)
 
-                if self.allow_duplicate_genes == False:
-                    offspring[offspring_idx], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[offspring_idx],
-                                                                                         min_val=range_min,
-                                                                                         max_val=range_max,
-                                                                                         mutation_by_replacement=self.mutation_by_replacement,
-                                                                                         gene_type=self.gene_type,
-                                                                                         sample_size=self.sample_size)
+                    offspring[offspring_idx, gene_idx] = random_value
+
+                    if self.allow_duplicate_genes == False:
+                        offspring[offspring_idx], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[offspring_idx],
+                                                                                             min_val=range_min,
+                                                                                             max_val=range_max,
+                                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                                             gene_type=self.gene_type,
+                                                                                             sample_size=self.sample_size)
         return offspring
 
     def adaptive_mutation_probs_by_space(self, offspring):
@@ -668,35 +838,67 @@ class Mutation:
                 else:
                     adaptive_mutation_probability = self.mutation_probability[1]
 
-            probs = numpy.random.random(size=offspring.shape[1])
-            for gene_idx in range(offspring.shape[1]):
+            if self.gene_structure is None:
+                probs = numpy.random.random(size=offspring.shape[1])
+                for gene_idx in range(offspring.shape[1]):
 
-                if probs[gene_idx] <= adaptive_mutation_probability:
+                    if probs[gene_idx] <= adaptive_mutation_probability:
 
-                    value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
-                                                                        gene_idx=gene_idx,
-                                                                        sample_size=self.sample_size)
+                        value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
+                                                                            gene_idx=gene_idx,
+                                                                            sample_size=self.sample_size)
 
-                    # Assigning the selected value from the space to the gene.
-                    if self.gene_type_single == True:
-                        if not self.gene_type[1] is None:
-                            offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
-                                                                             self.gene_type[1])
+                        # Assigning the selected value from the space to the gene.
+                        if self.gene_type_single == True:
+                            if not self.gene_type[1] is None:
+                                offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
+                                                                                 self.gene_type[1])
+                            else:
+                                offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
                         else:
-                            offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
-                    else:
-                        if not self.gene_type[gene_idx][1] is None:
-                            offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
-                                                                             self.gene_type[gene_idx][1])
-                        else:
-                            offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
+                            if not self.gene_type[gene_idx][1] is None:
+                                offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
+                                                                                 self.gene_type[gene_idx][1])
+                            else:
+                                offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
 
-                    if self.allow_duplicate_genes == False:
-                        offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
-                                                                                             gene_type=self.gene_type,
-                                                                                             sample_size=self.sample_size,
-                                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                                             build_initial_pop=False)
+                        if self.allow_duplicate_genes == False:
+                            offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
+                                                                                                 gene_type=self.gene_type,
+                                                                                                 sample_size=self.sample_size,
+                                                                                                 mutation_by_replacement=self.mutation_by_replacement,
+                                                                                                 build_initial_pop=False)
+            else:
+                num_logical_genes = len(self.gene_structure)
+                probs = numpy.random.random(size=num_logical_genes)
+                for logical_idx in range(num_logical_genes):
+                    if probs[logical_idx] <= adaptive_mutation_probability:
+                        start, end = self.boundaries[logical_idx], self.boundaries[logical_idx+1]
+                        for gene_idx in range(start, end):
+                            value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
+                                                                                gene_idx=gene_idx,
+                                                                                sample_size=self.sample_size)
+
+                            # Assigning the selected value from the space to the gene.
+                            if self.gene_type_single == True:
+                                if not self.gene_type[1] is None:
+                                    offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
+                                                                                     self.gene_type[1])
+                                else:
+                                    offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
+                            else:
+                                if not self.gene_type[gene_idx][1] is None:
+                                    offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
+                                                                                     self.gene_type[gene_idx][1])
+                                else:
+                                    offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
+
+                            if self.allow_duplicate_genes == False:
+                                offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
+                                                                                                     gene_type=self.gene_type,
+                                                                                                     sample_size=self.sample_size,
+                                                                                                     mutation_by_replacement=self.mutation_by_replacement,
+                                                                                                     build_initial_pop=False)
         return offspring
 
     def adaptive_mutation_probs_randomly(self, offspring):
@@ -740,26 +942,52 @@ class Mutation:
                 else:
                     adaptive_mutation_probability = self.mutation_probability[1]
 
-            probs = numpy.random.random(size=offspring.shape[1])
-            for gene_idx in range(offspring.shape[1]):
+            if self.gene_structure is None:
+                probs = numpy.random.random(size=offspring.shape[1])
+                for gene_idx in range(offspring.shape[1]):
 
-                range_min, range_max = self.get_random_mutation_range(gene_idx)
+                    range_min, range_max = self.get_random_mutation_range(gene_idx)
 
-                if probs[gene_idx] <= adaptive_mutation_probability:
-                    # Generate a random value fpr mutation that meet the gene constraint if exists.
-                    random_value = self.mutation_process_gene_value(range_min=range_min,
-                                                                    range_max=range_max,
-                                                                    solution=offspring[offspring_idx],
-                                                                    gene_idx=gene_idx,
-                                                                    sample_size=self.sample_size)
+                    if probs[gene_idx] <= adaptive_mutation_probability:
+                        # Generate a random value fpr mutation that meet the gene constraint if exists.
+                        random_value = self.mutation_process_gene_value(range_min=range_min,
+                                                                        range_max=range_max,
+                                                                        solution=offspring[offspring_idx],
+                                                                        gene_idx=gene_idx,
+                                                                        sample_size=self.sample_size)
 
-                    offspring[offspring_idx, gene_idx] = random_value
+                        offspring[offspring_idx, gene_idx] = random_value
 
-                    if self.allow_duplicate_genes == False:
-                        offspring[offspring_idx], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[offspring_idx],
-                                                                                             min_val=range_min,
-                                                                                             max_val=range_max,
-                                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                                             gene_type=self.gene_type,
-                                                                                             sample_size=self.sample_size)
+                        if self.allow_duplicate_genes == False:
+                            offspring[offspring_idx], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[offspring_idx],
+                                                                                                 min_val=range_min,
+                                                                                                 max_val=range_max,
+                                                                                                 mutation_by_replacement=self.mutation_by_replacement,
+                                                                                                 gene_type=self.gene_type,
+                                                                                                 sample_size=self.sample_size)
+            else:
+                num_logical_genes = len(self.gene_structure)
+                probs = numpy.random.random(size=num_logical_genes)
+                for logical_idx in range(num_logical_genes):
+                    if probs[logical_idx] <= adaptive_mutation_probability:
+                        start, end = self.boundaries[logical_idx], self.boundaries[logical_idx+1]
+                        for gene_idx in range(start, end):
+                            range_min, range_max = self.get_random_mutation_range(gene_idx)
+
+                            # Generate a random value fpr mutation that meet the gene constraint if exists.
+                            random_value = self.mutation_process_gene_value(range_min=range_min,
+                                                                            range_max=range_max,
+                                                                            solution=offspring[offspring_idx],
+                                                                            gene_idx=gene_idx,
+                                                                            sample_size=self.sample_size)
+
+                            offspring[offspring_idx, gene_idx] = random_value
+
+                            if self.allow_duplicate_genes == False:
+                                offspring[offspring_idx], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[offspring_idx],
+                                                                                                     min_val=range_min,
+                                                                                                     max_val=range_max,
+                                                                                                     mutation_by_replacement=self.mutation_by_replacement,
+                                                                                                     gene_type=self.gene_type,
+                                                                                                     sample_size=self.sample_size)
         return offspring
