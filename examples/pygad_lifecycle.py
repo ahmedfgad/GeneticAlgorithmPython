@@ -37,12 +37,15 @@ ga_instance = pygad.GA(num_generations=3,
                        fitness_func=fitness_function,
                        sol_per_pop=10,
                        num_genes=len(function_inputs),
+
                        on_start=on_start,
                        on_fitness=on_fitness,
                        on_parents=on_parents,
                        on_crossover=on_crossover,
                        on_mutation=on_mutation,
                        on_generation=on_generation,
-                       on_stop=on_stop)
+                       on_stop=on_stop,
+                       
+                       suppress_warnings=True)
 
 ga_instance.run()

@@ -73,12 +73,12 @@ class GA(utils.parent_selection.ParentSelection,
         num_generations: Number of generations.
         num_parents_mating: Number of solutions to be selected as parents in the mating pool.
 
-        fitness_func: Accepts a function/method and returns the fitness value of the solution. In PyGAD 2.20.0, a third parameter is passed referring to the 'pygad.GA' instance. If method, then it must accept 4 parameters where the fourth one refers to the method's object.
+        fitness_func: Accepts a function/method and returns the fitness value of the solution. In PyGAD 2.20.0, a third parameter is passed referring to the 'pygad.GA' instance.
         fitness_batch_size: Added in PyGAD 2.19.0. Supports calculating the fitness in batches. If the value is 1 or None, then the fitness function is called for each individual solution. If given another value X where X is neither 1 nor None (e.g. X=3), then the fitness function is called once for each X (3) solutions.
 
         initial_population: A user-defined initial population. It is useful when the user wants to start the generations with a custom initial population. It defaults to None which means no initial population is specified by the user. In this case, PyGAD creates an initial population using the 'sol_per_pop' and 'num_genes' parameters. An exception is raised if the 'initial_population' is None while any of the 2 parameters ('sol_per_pop' or 'num_genes') is also None.
         sol_per_pop: Number of solutions in the population. 
-        num_genes: Number of parameters in the function.
+        num_genes: Number of genes in the solution.
 
         init_range_low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
         init_range_high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
@@ -87,7 +87,7 @@ class GA(utils.parent_selection.ParentSelection,
         gene_type: The type of the gene. It is assigned to any of these types (int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, float, numpy.float16, numpy.float32, numpy.float64) and forces all the genes to be of that type.
 
         parent_selection_type: Type of parent selection.
-        keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. Some parent selection operators such as rank selection, favor population diversity and therefore keeping the parents in the next generation can be beneficial. However, some other parent selection operators, such as roulette wheel selection (RWS), have higher selection pressure and keeping more than one parent in the next generation can seriously harm population diversity. This parameter have an effect only when the keep_elitism parameter is 0. Thanks to Prof. Fernando Jiménez (http://webs.um.es/fernan) for editing this sentence.
+        keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. Some parent selection operators such as rank selection, favor population diversity and therefore keeping the parents in the next generation can be beneficial. However, some other parent selection operators, such as roulette wheel selection (RWS), have higher selection pressure and keeping more than one parent in the next generation can seriously harm population diversity. This parameter has an effect only when the keep_elitism parameter is 0. Thanks to Prof. Fernando Jiménez (http://webs.um.es/fernan) for editing this sentence.
         K_tournament: When the value of 'parent_selection_type' is 'tournament', the 'K_tournament' parameter specifies the number of solutions from which a parent is selected randomly.
 
         keep_elitism: Added in PyGAD 2.18.0. It can take the value 0 or a positive integer that satisfies (0 <= keep_elitism <= sol_per_pop). It defaults to 1 which means only the best solution in the current generation is kept in the next generation. If assigned 0, this means it has no effect. If assigned a positive integer K, then the best K solutions are kept in the next generation. It cannot be assigned a value greater than the value assigned to the sol_per_pop parameter. If this parameter has a value different from 0, then the keep_parents parameter will have no effect.
@@ -110,13 +110,13 @@ class GA(utils.parent_selection.ParentSelection,
         gene_constraint: It accepts a list of constraints for the genes. Each constraint is a Python function. Added in PyGAD 3.5.0.
         sample_size: To select a gene value that respects a constraint, this variable defines the size of the sample from which a value is selected randomly. Useful if either allow_duplicate_genes or gene_constraint is used. Added in PyGAD 3.5.0.
 
-        on_start: Accepts a function/method to be called only once before the genetic algorithm starts its evolution. If functioned, then it must accept a single parameter representing the instance of the genetic algorithm. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
-        on_fitness: Accepts a function/method to be called after calculating the fitness values of all solutions in the population. If functioned, then it must accept 2 parameters: 1) a list of all solutions' fitness values 2) the instance of the genetic algorithm. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
-        on_parents: Accepts a function/method to be called after selecting the parents that mates. If functioned, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the selected parents. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
-        on_crossover: Accepts a function/method to be called each time the crossover operation is applied. If functioned, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring generated using crossover. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
-        on_mutation: Accepts a function/method to be called each time the mutation operation is applied. If functioned, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring after applying the mutation. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
-        on_generation: Accepts a function/method to be called after each generation. If functioned, then it must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
-        on_stop: Accepts a function/method to be called only once exactly before the genetic algorithm stops or when it completes all the generations. If functioned, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of fitness values of the last population's solutions. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
+        on_start: Accepts a function/method to be called only once before the genetic algorithm starts its evolution. If function, then it must accept a single parameter representing the instance of the genetic algorithm. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
+        on_fitness: Accepts a function/method to be called after calculating the fitness values of all solutions in the population. If function, then it must accept 2 parameters: 1) a list of all solutions' fitness values 2) the instance of the genetic algorithm. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
+        on_parents: Accepts a function/method to be called after selecting the parents that mate. If function, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the selected parents. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
+        on_crossover: Accepts a function/method to be called each time the crossover operation is applied. If function, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring generated using crossover. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
+        on_mutation: Accepts a function/method to be called each time the mutation operation is applied. If function, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one represents the offspring after applying the mutation. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
+        on_generation: Accepts a function/method to be called after each generation. If function, then it must accept a single parameter representing the instance of the genetic algorithm. If the function returned "stop", then the run() method stops without completing the other generations. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
+        on_stop: Accepts a function/method to be called only once exactly before the genetic algorithm stops or when it completes all the generations. If function, then it must accept 2 parameters: the first one represents the instance of the genetic algorithm and the second one is a list of fitness values of the last population's solutions. If method, then it must accept 3 parameters where the third one refers to the method's object. Added in PyGAD 2.6.0.
 
         save_best_solutions: Added in PyGAD 2.9.0 and its type is bool. If True, then the best solution in each generation is saved into the 'best_solutions' attribute. Use this parameter with caution as it may cause memory overflow when either the number of generations or the number of genes is large.
         save_solutions: Added in PyGAD 2.15.0 and its type is bool. If True, then all solutions in each generation are saved into the 'solutions' attribute. Use this parameter with caution as it may cause memory overflow when either the number of generations, number of genes, or number of solutions in population is large.
@@ -236,7 +236,6 @@ class GA(utils.parent_selection.ParentSelection,
                             self.gene_space_nested = True
                         elif type(el) == type(None):
                             pass
-                            # self.gene_space_nested = True
                         elif type(el) is dict:
                             if len(el.items()) == 2:
                                 if ('low' in el.keys()) and ('high' in el.keys()):
@@ -436,7 +435,7 @@ class GA(utils.parent_selection.ParentSelection,
                     raise TypeError(f"The expected type of both the sol_per_pop and num_genes parameters is int but {type(sol_per_pop)} and {type(num_genes)} found.")
             elif not type(initial_population) in [list, tuple, numpy.ndarray]:
                 self.valid_parameters = False
-                raise TypeError(f"The value assigned to the 'initial_population' parameter is expected to by of type list, tuple, or ndarray but {type(initial_population)} found.")
+                raise TypeError(f"The value assigned to the 'initial_population' parameter is expected to be of type list, tuple, or ndarray but {type(initial_population)} found.")
             elif numpy.array(initial_population).ndim != 2:
                 self.valid_parameters = False
                 raise ValueError(f"A 2D list is expected to the initial_population parameter but a ({numpy.array(initial_population).ndim}-D) list found.")
@@ -584,21 +583,34 @@ class GA(utils.parent_selection.ParentSelection,
             if crossover_type is None:
                 self.crossover = None
             elif inspect.ismethod(crossover_type):
-                # Check if the crossover_type is a method that accepts 4 parameters.
-                if crossover_type.__code__.co_argcount == 4:
+                # Check if the crossover_type is a method that accepts 3 parameters.
+                if len(inspect.signature(crossover_type).parameters) == 3:
                     # The crossover method assigned to the crossover_type parameter is validated.
                     self.crossover = crossover_type
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"When 'crossover_type' is assigned to a method, then this crossover method must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The selected parents.\n3) The size of the offspring to be produced.\n4) The instance from the pygad.GA class.\n\nThe passed crossover method named '{crossover_type.__code__.co_name}' accepts {crossover_type.__code__.co_argcount} parameter(s).")
-            elif callable(crossover_type):
-                # Check if the crossover_type is a function that accepts 2 parameters.
-                if crossover_type.__code__.co_argcount == 3:
+                    raise ValueError(f"When 'crossover_type' is assigned to a method, then this crossover method must accept 3 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.\n3) The instance from the pygad.GA class.\n\nThe passed crossover method named '{crossover_type.__code__.co_name}' accepts {len(inspect.signature(crossover_type).parameters)} parameter(s).")
+            elif inspect.isfunction(crossover_type):
+                # Check if the crossover_type is a function that accepts 3 parameters.
+                if len(inspect.signature(crossover_type).parameters) == 3:
                     # The crossover function assigned to the crossover_type parameter is validated.
                     self.crossover = crossover_type
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"When 'crossover_type' is assigned to a function, then this crossover function must accept 3 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed crossover function named '{crossover_type.__code__.co_name}' accepts {crossover_type.__code__.co_argcount} parameter(s).")
+                    raise ValueError(f"When 'crossover_type' is assigned to a function, then this crossover function must accept 3 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed crossover function named '{crossover_type.__code__.co_name}' accepts {len(inspect.signature(crossover_type).parameters)} parameter(s).")
+            elif callable(crossover_type) and not inspect.isclass(crossover_type):
+                # The object must have the __call__() method.
+                if hasattr(crossover_type, '__call__'):
+                    # Check if the __call__() method accepts 3 parameters.
+                    if len(inspect.signature(crossover_type).parameters) == 3:
+                        # The crossover class instance assigned to the crossover_type parameter is validated.
+                        self.crossover = crossover_type
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError(f"When 'crossover_type' is assigned a class instance, then its __call__ method must accept 3 parameters:\n1) The selected parents.\n2) The size of the offspring to be produced.\n3) The instance from the pygad.GA class.\n\nThe passed instance of the class named '{crossover_type.__class__.__name__}' accepts {len(inspect.signature(crossover_type).parameters)} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("When 'crossover_type' is assigned a class instance, then its __call__ method must be implemented and accept 3 parameters.")
             elif not (type(crossover_type) is str):
                 self.valid_parameters = False
                 raise TypeError(f"The expected type of the 'crossover_type' parameter is either callable or str but {type(crossover_type)} found.")
@@ -637,21 +649,34 @@ class GA(utils.parent_selection.ParentSelection,
             if mutation_type is None:
                 self.mutation = None
             elif inspect.ismethod(mutation_type):
-                # Check if the mutation_type is a method that accepts 3 parameters.
-                if (mutation_type.__code__.co_argcount == 3):
+                # Check if the mutation_type is a method that accepts 2 parameters.
+                if (len(inspect.signature(mutation_type).parameters) == 2):
                     # The mutation method assigned to the mutation_type parameter is validated.
                     self.mutation = mutation_type
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"When 'mutation_type' is assigned to a method, then it must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The offspring to be mutated.\n3) The instance from the pygad.GA class.\n\nThe passed mutation method named '{mutation_type.__code__.co_name}' accepts {mutation_type.__code__.co_argcount} parameter(s).")
-            elif callable(mutation_type):
+                    raise ValueError(f"When 'mutation_type' is assigned to a method, then it must accept 2 parameters:\n1) The offspring to be mutated.\n2) The instance from the pygad.GA class.\n\nThe passed mutation method named '{mutation_type.__code__.co_name}' accepts {len(inspect.signature(mutation_type).parameters)} parameter(s).")
+            elif inspect.isfunction(mutation_type):
                 # Check if the mutation_type is a function that accepts 2 parameters.
-                if (mutation_type.__code__.co_argcount == 2):
+                if (len(inspect.signature(mutation_type).parameters) == 2):
                     # The mutation function assigned to the mutation_type parameter is validated.
                     self.mutation = mutation_type
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"When 'mutation_type' is assigned to a function, then this mutation function must accept 2 parameters:\n1) The offspring to be mutated.\n2) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed mutation function named '{mutation_type.__code__.co_name}' accepts {mutation_type.__code__.co_argcount} parameter(s).")
+                    raise ValueError(f"When 'mutation_type' is assigned to a function, then this mutation function must accept 2 parameters:\n1) The offspring to be mutated.\n2) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed mutation function named '{mutation_type.__code__.co_name}' accepts {len(inspect.signature(mutation_type).parameters)} parameter(s).")
+            elif callable(mutation_type) and not inspect.isclass(mutation_type):
+                # The object must have the __call__() method.
+                if hasattr(mutation_type, '__call__'):
+                    # Check if the __call__() method accepts 2 parameters.
+                    if len(inspect.signature(mutation_type).parameters) == 2:
+                        # The mutation class instance assigned to the mutation_type parameter is validated.
+                        self.mutation = mutation_type
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError(f"When 'mutation_type' is assigned a class instance, then its __call__ method must accept 2 parameters:\n1) The offspring to be mutated.\n2) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed instance of the class named '{mutation_type.__class__.__name__}' accepts {len(inspect.signature(mutation_type).parameters)} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("When 'mutation_type' is assigned a class instance, then its __call__ method must be implemented and accept 2 parameters.")
             elif not (type(mutation_type) is str):
                 self.valid_parameters = False
                 raise TypeError(f"The expected type of the 'mutation_type' parameter is either callable or str but {type(mutation_type)} found.")
@@ -844,26 +869,39 @@ class GA(utils.parent_selection.ParentSelection,
             # select_parents: Refers to a method that selects the parents based on the parent selection type specified in the parent_selection_type attribute.
             # Validating the selected type of parent selection: parent_selection_type
             if inspect.ismethod(parent_selection_type):
-                # Check if the parent_selection_type is a method that accepts 4 parameters.
-                if parent_selection_type.__code__.co_argcount == 4:
+                # Check if the parent_selection_type is a method that accepts 3 parameters.
+                if len(inspect.signature(parent_selection_type).parameters) == 3:
                     # population: Added in PyGAD 2.16.0. It should use only to support custom parent selection functions. Otherwise, it should be left to None to retrieve the population by self.population.
                     # The parent selection method assigned to the parent_selection_type parameter is validated.
                     self.select_parents = parent_selection_type
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"When 'parent_selection_type' is assigned to a method, then it must accept 4 parameters:\n1) Expected to be the 'self' object.\n2) The fitness values of the current population.\n3) The number of parents needed.\n4) The instance from the pygad.GA class.\n\nThe passed parent selection method named '{parent_selection_type.__code__.co_name}' accepts {parent_selection_type.__code__.co_argcount} parameter(s).")
-            elif callable(parent_selection_type):
-                # Check if the parent_selection_type is a function that accepts 3 parameters.
-                if parent_selection_type.__code__.co_argcount == 3:
+                    raise ValueError(f"When 'parent_selection_type' is assigned to a method, then it must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class.\n\nThe passed parent selection method named '{parent_selection_type.__code__.co_name}' accepts {len(inspect.signature(parent_selection_type).parameters)} parameter(s).")
+            elif inspect.isfunction(parent_selection_type):
+                # Check if the parent_selection_type is a function that accepts 2 parameters.
+                if len(inspect.signature(parent_selection_type).parameters) == 3:
                     # population: Added in PyGAD 2.16.0. It should use only to support custom parent selection functions. Otherwise, it should be left to None to retrieve the population by self.population.
                     # The parent selection function assigned to the parent_selection_type parameter is validated.
                     self.select_parents = parent_selection_type
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"When 'parent_selection_type' is assigned to a user-defined function, then this parent selection function must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed parent selection function named '{parent_selection_type.__code__.co_name}' accepts {parent_selection_type.__code__.co_argcount} parameter(s).")
+                    raise ValueError(f"When 'parent_selection_type' is assigned to a user-defined function, then this parent selection function must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed parent selection function named '{parent_selection_type.__code__.co_name}' accepts {len(inspect.signature(parent_selection_type).parameters)} parameter(s).")
+            elif callable(parent_selection_type) and not inspect.isclass(parent_selection_type):
+                # The object must have the __call__() method.
+                if hasattr(parent_selection_type, '__call__'):
+                    # Check if the __call__() method accepts 3 parameters.
+                    if len(inspect.signature(parent_selection_type).parameters) == 3:
+                        # The parent selection class instance assigned to the parent_selection_type parameter is validated.
+                        self.select_parents = parent_selection_type
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError(f"When 'parent_selection_type' is assigned a class instance, then its __call__ method must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class to retrieve any property like population, gene data type, gene space, etc.\n\nThe passed instance of the class named '{parent_selection_type.__class__.__name__}' accepts {len(inspect.signature(parent_selection_type).parameters)} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("When 'parent_selection_type' is assigned a class instance, then its __call__ method must be implemented and accept 3 parameters.")
             elif not (type(parent_selection_type) is str):
                 self.valid_parameters = False
-                
+
                 raise TypeError(f"The expected type of the 'parent_selection_type' parameter is either callable or str but {type(parent_selection_type)} found.")
             else:
                 parent_selection_type = parent_selection_type.lower()
@@ -945,23 +983,36 @@ class GA(utils.parent_selection.ParentSelection,
             # In PyGAD 2.19.0, a method can be passed to the fitness function. If function is passed, then it accepts 2 parameters. If method, then it accepts 3 parameters.
             # In PyGAD 2.20.0, a new parameter is passed referring to the instance of the `pygad.GA` class. So, the function accepts 3 parameters and the method accepts 4 parameters.
             if inspect.ismethod(fitness_func):
-                # If the fitness is calculated through a method, not a function, then there is a fourth 'self` parameters.
-                if fitness_func.__code__.co_argcount == 4:
+                # Check if the fitness method accepts 3 parameters.
+                if len(inspect.signature(fitness_func).parameters) == 3:
                     self.fitness_func = fitness_func
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"In PyGAD 2.20.0, if a method is used to calculate the fitness value, then it must accept 4 parameters\n1) Expected to be the 'self' object.\n2) The instance of the 'pygad.GA' class.\n3) A solution to calculate its fitness value.\n4) The solution's index within the population.\n\nThe passed fitness method named '{fitness_func.__code__.co_name}' accepts {fitness_func.__code__.co_argcount} parameter(s).")
-            elif callable(fitness_func):
-                # Check if the fitness function accepts 2 parameters.
-                if fitness_func.__code__.co_argcount == 3:
+                    raise ValueError(f"In PyGAD 2.20.0, if a method is used to calculate the fitness value, then it must accept 3 parameters\n1) The instance of the 'pygad.GA' class.\n2) A solution to calculate its fitness value.\n3) The solution's index within the population.\n\nThe passed fitness method named '{fitness_func.__code__.co_name}' accepts {len(inspect.signature(fitness_func).parameters)} parameter(s).")
+            elif inspect.isfunction(fitness_func):
+                # Check if the fitness function accepts 3 parameters.
+                if len(inspect.signature(fitness_func).parameters) == 3:
                     self.fitness_func = fitness_func
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"In PyGAD 2.20.0, the fitness function must accept 3 parameters:\n1) The instance of the 'pygad.GA' class.\n2) A solution to calculate its fitness value.\n3) The solution's index within the population.\n\nThe passed fitness function named '{fitness_func.__code__.co_name}' accepts {fitness_func.__code__.co_argcount} parameter(s).")
+                    raise ValueError(f"In PyGAD 2.20.0, the fitness function must accept 3 parameters:\n1) The instance of the 'pygad.GA' class.\n2) A solution to calculate its fitness value.\n3) The solution's index within the population.\n\nThe passed fitness function named '{fitness_func.__code__.co_name}' accepts {len(inspect.signature(fitness_func).parameters)} parameter(s).")
+            elif callable(fitness_func) and not inspect.isclass(fitness_func):
+                # The object must have the __call__() method.
+                if hasattr(fitness_func, '__call__'):
+                    # Check if the __call__() method accepts 3 parameters.
+                    if len(inspect.signature(fitness_func).parameters) == 3:
+                        # The fitness class instance assigned to the fitness_func parameter is validated.
+                        self.fitness_func = fitness_func
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError(f"When 'fitness_func' is assigned a class instance, then its __call__ method must accept 3 parameters:\n1) The instance of the 'pygad.GA' class.\n2) A solution to calculate its fitness value.\n3) The solution's index within the population.\n\nThe passed instance of the class named '{fitness_func.__class__.__name__}' accepts {len(inspect.signature(fitness_func).parameters)} parameter(s).")
+                else:
+                    self.valid_parameters = False
+                    raise ValueError("When 'fitness_func' is assigned a class instance, then its __call__ method must be implemented and accept 3 parameters.")
             else:
                 self.valid_parameters = False
                 
-                raise TypeError(f"The value assigned to the fitness_func parameter is expected to be of type function but {type(fitness_func)} found.")
+                raise TypeError(f"The value assigned to the fitness_func parameter is expected to be a function or a method but {type(fitness_func)} found.")
 
             if fitness_batch_size is None:
                 pass
@@ -977,20 +1028,33 @@ class GA(utils.parent_selection.ParentSelection,
             # Check if the on_start exists.
             if not (on_start is None):
                 if inspect.ismethod(on_start):
-                    # Check if the on_start method accepts 2 parameters.
-                    if on_start.__code__.co_argcount == 2:
+                    # Check if the on_start method accepts 1 parameter.
+                    if len(inspect.signature(on_start).parameters) == 1:
                         self.on_start = on_start
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The method assigned to the on_start parameter must accept only 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{on_start.__code__.co_name}' accepts {on_start.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The method assigned to the on_start parameter must accept only 2 parameters:\n1) The instance of the genetic algorithm.\nThe passed method named '{on_start.__code__.co_name}' accepts {len(inspect.signature(on_start).parameters)} parameter(s).")
                 # Check if the on_start is a function.
-                elif callable(on_start):
+                elif inspect.isfunction(on_start):
                     # Check if the on_start function accepts only a single parameter.
-                    if on_start.__code__.co_argcount == 1:
+                    if len(inspect.signature(on_start).parameters) == 1:
                         self.on_start = on_start
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{on_start.__code__.co_name}' accepts {on_start.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The function assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{on_start.__code__.co_name}' accepts {len(inspect.signature(on_start).parameters)} parameter(s).")
+                elif callable(on_start) and not inspect.isclass(on_start):
+                    # The object must have the __call__() method.
+                    if hasattr(on_start, '__call__'):
+                        # Check if the __call__() method accepts 1 parameter.
+                        if len(inspect.signature(on_start).parameters) == 1:
+                            # The on_start class instance assigned to the on_start parameter is validated.
+                            self.on_start = on_start
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"When 'on_start' is assigned a class instance, then its __call__ method must accept only 1 parameter representing the instance of the genetic algorithm.\n\nThe passed instance of the class named '{on_start.__class__.__name__}' accepts {len(inspect.signature(on_start).parameters)} parameter(s).")
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("When 'on_start' is assigned a class instance, then its __call__ method must be implemented and accept 1 parameter.")
                 else:
                     self.valid_parameters = False
                     
@@ -1002,20 +1066,33 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_fitness is None):
                 # Check if the on_fitness is a method.
                 if inspect.ismethod(on_fitness):
-                    # Check if the on_fitness method accepts 3 parameters.
-                    if on_fitness.__code__.co_argcount == 3:
+                    # Check if the on_fitness method accepts 2 parameters.
+                    if len(inspect.signature(on_fitness).parameters) == 2:
                         self.on_fitness = on_fitness
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The method assigned to the on_fitness parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.3) The fitness values of all solutions.\nThe passed method named '{on_fitness.__code__.co_name}' accepts {on_fitness.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The method assigned to the on_fitness parameter must accept 2 parameters:\n1) The instance of the genetic algorithm.\n2) The fitness values of all solutions.\nThe passed method named '{on_fitness.__code__.co_name}' accepts {len(inspect.signature(on_fitness).parameters)} parameter(s).")
                 # Check if the on_fitness is a function.
-                elif callable(on_fitness):
+                elif inspect.isfunction(on_fitness):
                     # Check if the on_fitness function accepts 2 parameters.
-                    if on_fitness.__code__.co_argcount == 2:
+                    if len(inspect.signature(on_fitness).parameters) == 2:
                         self.on_fitness = on_fitness
                     else:
                         self.valid_parameters = False
                         raise ValueError(f"The function assigned to the on_fitness parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{on_fitness.__code__.co_name}' accepts {on_fitness.__code__.co_argcount} parameter(s).")
+                elif callable(on_fitness) and not inspect.isclass(on_fitness):
+                    # The object must have the __call__() method.
+                    if hasattr(on_fitness, '__call__'):
+                        # Check if the __call__() method accepts 2 parameters.
+                        if len(inspect.signature(on_fitness).parameters) == 2:
+                            # The on_fitness class instance assigned to the on_fitness parameter is validated.
+                            self.on_fitness = on_fitness
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"When 'on_fitness' is assigned a class instance, then its __call__ method must accept 2 parameters:\n1) The instance of the genetic algorithm.\n2) The fitness values of all solutions.\n\nThe passed instance of the class named '{on_fitness.__class__.__name__}' accepts {len(inspect.signature(on_fitness).parameters)} parameter(s).")
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("When 'on_fitness' is assigned a class instance, then its __call__ method must be implemented and accept 2 parameters.")
                 else:
                     self.valid_parameters = False
                     raise TypeError(f"The value assigned to the on_fitness parameter is expected to be of type function but {type(on_fitness)} found.")
@@ -1026,20 +1103,33 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_parents is None):
                 # Check if the on_parents is a method.
                 if inspect.ismethod(on_parents):
-                    # Check if the on_parents method accepts 3 parameters.
-                    if on_parents.__code__.co_argcount == 3:
+                    # Check if the on_parents method accepts 2 parameters.
+                    if len(inspect.signature(on_parents).parameters) == 2:
                         self.on_parents = on_parents
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The method assigned to the on_parents parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n3) The fitness values of all solutions.\nThe passed method named '{on_parents.__code__.co_name}' accepts {on_parents.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The method assigned to the on_parents parameter must accept 2 parameters:\n1) The instance of the genetic algorithm.\n2) The fitness values of all solutions.\nThe passed method named '{on_parents.__code__.co_name}' accepts {len(inspect.signature(on_parents).parameters)} parameter(s).")
                 # Check if the on_parents is a function.
-                elif callable(on_parents):
+                elif inspect.isfunction(on_parents):
                     # Check if the on_parents function accepts 2 parameters.
-                    if on_parents.__code__.co_argcount == 2:
+                    if len(inspect.signature(on_parents).parameters) == 2:
                         self.on_parents = on_parents
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The function assigned to the on_parents parameter must accept 2 parameters representing the instance of the genetic algorithm and the fitness values of all solutions.\nThe passed function named '{on_parents.__code__.co_name}' accepts {on_parents.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The function assigned to the on_parents parameter must accept 2 parameters:\n1) The instance of the genetic algorithm.\n2) The fitness values of all solutions.\nThe passed function named '{on_parents.__code__.co_name}' accepts {len(inspect.signature(on_parents).parameters)} parameter(s).")
+                elif callable(on_parents) and not inspect.isclass(on_parents):
+                    # The object must have the __call__() method.
+                    if hasattr(on_parents, '__call__'):
+                        # Check if the __call__() method accepts 2 parameters.
+                        if len(inspect.signature(on_parents).parameters) == 2:
+                            # The on_parents class instance assigned to the on_parents parameter is validated.
+                            self.on_parents = on_parents
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"When 'on_parents' is assigned a class instance, then its __call__ method must accept 2 parameters:\n1) The instance of the genetic algorithm.\n2) The fitness values of all solutions.\n\nThe passed instance of the class named '{on_parents.__class__.__name__}' accepts {len(inspect.signature(on_parents).parameters)} parameter(s).")
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("When 'on_parents' is assigned a class instance, then its __call__ method must be implemented and accept 2 parameters.")
                 else:
                     self.valid_parameters = False
                     raise TypeError(f"The value assigned to the on_parents parameter is expected to be of type function but {type(on_parents)} found.")
@@ -1050,20 +1140,33 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_crossover is None):
                 # Check if the on_crossover is a method.
                 if inspect.ismethod(on_crossover):
-                    # Check if the on_crossover method accepts 3 parameters.
-                    if on_crossover.__code__.co_argcount == 3:
+                    # Check if the on_crossover method accepts 2 parameters.
+                    if len(inspect.signature(on_crossover).parameters) == 2:
                         self.on_crossover = on_crossover
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The method assigned to the on_crossover parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) The offspring generated using crossover.\nThe passed method named '{on_crossover.__code__.co_name}' accepts {on_crossover.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The method assigned to the on_crossover parameter must accept 2 parameters:\n1) The instance of the genetic algorithm.\n2) The offspring generated using crossover.\nThe passed method named '{on_crossover.__code__.co_name}' accepts {len(inspect.signature(on_crossover).parameters)} parameter(s).")
                 # Check if the on_crossover is a function.
-                elif callable(on_crossover):
+                elif inspect.isfunction(on_crossover):
                     # Check if the on_crossover function accepts 2 parameters.
-                    if on_crossover.__code__.co_argcount == 2:
+                    if len(inspect.signature(on_crossover).parameters) == 2:
                         self.on_crossover = on_crossover
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{on_crossover.__code__.co_name}' accepts {on_crossover.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The function assigned to the on_crossover parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring generated using crossover.\nThe passed function named '{on_crossover.__code__.co_name}' accepts {len(inspect.signature(on_crossover).parameters)} parameter(s).")
+                elif callable(on_crossover) and not inspect.isclass(on_crossover):
+                    # The object must have the __call__() method.
+                    if hasattr(on_crossover, '__call__'):
+                        # Check if the __call__() method accepts 2 parameters.
+                        if len(inspect.signature(on_crossover).parameters) == 2:
+                            # The on_crossover class instance assigned to the on_crossover parameter is validated.
+                            self.on_crossover = on_crossover
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"When 'on_crossover' is assigned a class instance, then its __call__ method must accept 2 parameters:\n1) The instance of the genetic algorithm.\n2) The offspring generated using crossover.\n\nThe passed instance of the class named '{on_crossover.__class__.__name__}' accepts {len(inspect.signature(on_crossover).parameters)} parameter(s).")
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("When 'on_crossover' is assigned a class instance, then its __call__ method must be implemented and accept 2 parameters.")
                 else:
                     self.valid_parameters = False
                     raise TypeError(f"The value assigned to the on_crossover parameter is expected to be of type function but {type(on_crossover)} found.")
@@ -1074,20 +1177,33 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_mutation is None):
                 # Check if the on_mutation is a method.
                 if inspect.ismethod(on_mutation):
-                    # Check if the on_mutation method accepts 3 parameters.
-                    if on_mutation.__code__.co_argcount == 3:
+                    # Check if the on_mutation method accepts 2 parameters.
+                    if len(inspect.signature(on_mutation).parameters) == 2:
                         self.on_mutation = on_mutation
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The method assigned to the on_mutation parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) The offspring after applying the mutation operation.\nThe passed method named '{on_mutation.__code__.co_name}' accepts {on_mutation.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The method assigned to the on_mutation parameter must accept 2 parameters:\n1) The instance of the genetic algorithm.\n2) The offspring after applying the mutation operation.\nThe passed method named '{on_mutation.__code__.co_name}' accepts {len(inspect.signature(on_mutation).parameters)} parameter(s).")
                 # Check if the on_mutation is a function.
-                elif callable(on_mutation):
+                elif inspect.isfunction(on_mutation):
                     # Check if the on_mutation function accepts 2 parameters.
-                    if on_mutation.__code__.co_argcount == 2:
+                    if len(inspect.signature(on_mutation).parameters) == 2:
                         self.on_mutation = on_mutation
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{on_mutation.__code__.co_name}' accepts {on_mutation.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The function assigned to the on_mutation parameter must accept 2 parameters representing the instance of the genetic algorithm and the offspring after applying the mutation operation.\nThe passed function named '{on_mutation.__code__.co_name}' accepts {len(inspect.signature(on_mutation).parameters)} parameter(s).")
+                elif callable(on_mutation) and not inspect.isclass(on_mutation):
+                    # The object must have the __call__() method.
+                    if hasattr(on_mutation, '__call__'):
+                        # Check if the __call__() method accepts 2 parameters.
+                        if len(inspect.signature(on_mutation).parameters) == 2:
+                            # The on_mutation class instance assigned to the on_mutation parameter is validated.
+                            self.on_mutation = on_mutation
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"When 'on_mutation' is assigned a class instance, then its __call__ method must accept 2 parameters:\n1) The instance of the genetic algorithm.\n2) The offspring after applying the mutation operation.\n\nThe passed instance of the class named '{on_mutation.__class__.__name__}' accepts {len(inspect.signature(on_mutation).parameters)} parameter(s).")
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("When 'on_mutation' is assigned a class instance, then its __call__ method must be implemented and accept 2 parameters.")
                 else:
                     self.valid_parameters = False
                     raise TypeError(f"The value assigned to the on_mutation parameter is expected to be of type function but {type(on_mutation)} found.")
@@ -1098,20 +1214,33 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_generation is None):
                 # Check if the on_generation is a method.
                 if inspect.ismethod(on_generation):
-                    # Check if the on_generation method accepts 2 parameters.
-                    if on_generation.__code__.co_argcount == 2:
+                    # Check if the on_generation method accepts 1 parameter.
+                    if len(inspect.signature(on_generation).parameters) == 1:
                         self.on_generation = on_generation
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The method assigned to the on_generation parameter must accept 2 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\nThe passed method named '{on_generation.__code__.co_name}' accepts {on_generation.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The method assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed method named '{on_generation.__code__.co_name}' accepts {len(inspect.signature(on_generation).parameters)} parameter(s).")
                 # Check if the on_generation is a function.
-                elif callable(on_generation):
+                elif inspect.isfunction(on_generation):
                     # Check if the on_generation function accepts only a single parameter.
-                    if on_generation.__code__.co_argcount == 1:
+                    if len(inspect.signature(on_generation).parameters) == 1:
                         self.on_generation = on_generation
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{on_generation.__code__.co_name}' accepts {on_generation.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The function assigned to the on_generation parameter must accept only 1 parameter representing the instance of the genetic algorithm.\nThe passed function named '{on_generation.__code__.co_name}' accepts {len(inspect.signature(on_generation).parameters)} parameter(s).")
+                elif callable(on_generation) and not inspect.isclass(on_generation):
+                    # The object must have the __call__() method.
+                    if hasattr(on_generation, '__call__'):
+                        # Check if the __call__() method accepts 1 parameter.
+                        if len(inspect.signature(on_generation).parameters) == 1:
+                            # The on_generation class instance assigned to the on_generation parameter is validated.
+                            self.on_generation = on_generation
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"When 'on_generation' is assigned a class instance, then its __call__ method must accept only 1 parameter representing the instance of the genetic algorithm.\n\nThe passed instance of the class named '{on_generation.__class__.__name__}' accepts {len(inspect.signature(on_generation).parameters)} parameter(s).")
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("When 'on_generation' is assigned a class instance, then its __call__ method must be implemented and accept 1 parameter.")
                 else:
                     self.valid_parameters = False
                     raise TypeError(f"The value assigned to the on_generation parameter is expected to be of type function but {type(on_generation)} found.")
@@ -1122,20 +1251,33 @@ class GA(utils.parent_selection.ParentSelection,
             if not (on_stop is None):
                 # Check if the on_stop is a method.
                 if inspect.ismethod(on_stop):
-                    # Check if the on_stop method accepts 3 parameters.
-                    if on_stop.__code__.co_argcount == 3:
+                    # Check if the on_stop method accepts 2 parameters.
+                    if len(inspect.signature(on_stop).parameters) == 2:
                         self.on_stop = on_stop
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The method assigned to the on_stop parameter must accept 3 parameters:\n1) Expected to be the 'self' object.\n2) The instance of the genetic algorithm.\n2) A list of the fitness values of the solutions in the last population.\nThe passed method named '{on_stop.__code__.co_name}' accepts {on_stop.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The method assigned to the on_stop parameter must accept 2 parameters:\n1) The instance of the genetic algorithm.\n2) A list of the fitness values of the solutions in the last population.\n\nThe passed method named '{on_stop.__code__.co_name}' accepts {len(inspect.signature(on_stop).parameters)} parameter(s).")
                 # Check if the on_stop is a function.
-                elif callable(on_stop):
+                elif inspect.isfunction(on_stop):
                     # Check if the on_stop function accepts 2 parameters.
-                    if on_stop.__code__.co_argcount == 2:
+                    if len(inspect.signature(on_stop).parameters) == 2:
                         self.on_stop = on_stop
                     else:
                         self.valid_parameters = False
-                        raise ValueError(f"The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{on_stop.__code__.co_name}' accepts {on_stop.__code__.co_argcount} parameter(s).")
+                        raise ValueError(f"The function assigned to the on_stop parameter must accept 2 parameters representing the instance of the genetic algorithm and a list of the fitness values of the solutions in the last population.\nThe passed function named '{on_stop.__code__.co_name}' accepts {len(inspect.signature(on_stop).parameters)} parameter(s).")
+                elif callable(on_stop) and not inspect.isclass(on_stop):
+                    # The object must have the __call__() method.
+                    if hasattr(on_stop, '__call__'):
+                        # Check if the __call__() method accepts 2 parameters.
+                        if len(inspect.signature(on_stop).parameters) == 2:
+                            # The on_stop class instance assigned to the on_stop parameter is validated.
+                            self.on_stop = on_stop
+                        else:
+                            self.valid_parameters = False
+                            raise ValueError(f"When 'on_stop' is assigned a class instance, then its __call__ method must accept 2 parameters: \n1) The instance of the genetic algorithm.\n2) A list of the fitness values of the solutions in the last population.\n\nThe passed instance of the class named '{on_stop.__class__.__name__}' accepts {len(inspect.signature(on_stop).parameters)} parameter(s).")
+                    else:
+                        self.valid_parameters = False
+                        raise ValueError("When 'on_stop' is assigned a class instance, then its __call__ method must be implemented and accept 2 parameters.")
                 else:
                     self.valid_parameters = False
                     raise TypeError(f"The value assigned to the 'on_stop' parameter is expected to be of type function but {type(on_stop)} found.")
@@ -1300,7 +1442,7 @@ class GA(utils.parent_selection.ParentSelection,
             self.mutation_percent_genes = mutation_percent_genes
             self.mutation_num_genes = mutation_num_genes
 
-            # Even such this parameter is declared in the class header, it is assigned to the object here to access it after saving the object.
+            # Even though this parameter is declared in the class header, it is assigned to the object here to access it after saving the object.
             # A list holding the fitness value of the best solution for each generation.
             self.best_solutions_fitness = []
 
@@ -1863,7 +2005,7 @@ class GA(utils.parent_selection.ParentSelection,
                                     else:
                                         # Unexpected to be reached, but it is safer to handle it.
                                         self.valid_parameters = False
-                                        raise ValueError(f"The number of values does not equal the number of objectives.")
+                                        raise ValueError(f"The number of values {len(criterion[1:])} does not equal the number of objectives {len(self.last_generation_fitness[0])}.")
 
                                     if max(self.last_generation_fitness[:, obj_idx]) >= reach_fitness_value:
                                         pass
