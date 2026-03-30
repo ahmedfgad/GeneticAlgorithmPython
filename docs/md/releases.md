@@ -608,6 +608,28 @@ Release Date 08 July 2025
 17. Fixed a bug while applying the non-dominated sorting in the `get_non_dominated_set()` method inside the `pygad/utils/nsga2.py` script. It was swapping the non-dominated and dominated sets. In other words, it used the non-dominated set as if it is the dominated set and vice versa. All the calls to this method were edited accordingly. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/320.
 18. Fix a bug retrieving in the `best_solution()` method when retrieving the best solution for multi-objective problems. https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/331
 
+## PyGAD 3.6.0
+
+1. Support passing a class to the fitness, crossover, and mutation. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/342
+2. A new class called `Validation` is created in the new `pygad/utils/validation.py` script. It has a method called `validate_parameters()` to validate all the parameters passed while instantiating the `pygad.GA` class.
+3. Refactoring the `pygad.py` script by moving a lot of functions and methods to other classes in other scripts. 
+  1. The `summary()` method was moved to `Helper` class in the `pygad/helper/misc.py` script.
+  2. The validation code in the `__init__()` method of the `pygad.GA` class is moved to the new `validate_parameters()` method in the new `Validation` class in the new `pygad/utils/validation.py` script. Moreover, the `validate_multi_stop_criteria()` method is also moved to the same class.
+  3. The GA main workflow is moved into the new `GAEngine` class in the new `pygad/utils/engine.py` script. Specifically, these methods are moved from the `pygad.GA` class to the new `GAEngine` class:
+    1. run()
+    2. run_loop_head()
+    3. run_select_parents()
+    4. run_crossover()
+    5. run_mutation()
+    6. run_update_population()
+    7. initialize_population()
+    8. cal_pop_fitness()
+    9. best_solution()
+    10. round_genes()
+4. The `pygad.GA` class now extends the two new classes `utils.validation.Validation` and `utils.engine.GAEngine`.
+5. The version of the `pygad.utils` submodule is upgraded from `1.3.0` to `1.4.0`.
+6. The version of the `pygad.helper` submodule is upgraded from `1.2.0` to `1.3.0`.
+
 # PyGAD Projects at GitHub
 
 The PyGAD library is available at PyPI at this page https://pypi.org/project/pygad. PyGAD is built out of a number of open-source GitHub projects. A brief note about these projects is given in the next subsections.
