@@ -3,6 +3,10 @@
 # policy, and support documentation.
 
 name: Scorecard supply-chain security
+
+permissions:
+  contents: read
+
 on:
   # This allows you to run the workflow manually from the Actions tab
   workflow_dispatch:
