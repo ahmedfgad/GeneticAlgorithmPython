@@ -1,5 +1,8 @@
 name: PyGAD PyTest / Python 3.8
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
