@@ -9,6 +9,235 @@ import pygad
 
 class Helper:
 
+    def summary(self,
+                line_length=70,
+                fill_character=" ",
+                line_character="-",
+                line_character2="=",
+                columns_equal_len=False,
+                print_step_parameters=True,
+                print_parameters_summary=True):
+        """
+        The summary() method prints a summary of the PyGAD lifecycle in a Keras style.
+        The parameters are:
+            line_length: An integer representing the length of the single line in characters.
+            fill_character: A character to fill the lines.
+            line_character: A character for creating a line separator.
+            line_character2: A secondary character to create a line separator.
+            columns_equal_len: The table rows are split into equal-sized columns or split subjective to the width needed.
+            print_step_parameters: Whether to print extra parameters about each step inside the step. If print_step_parameters=False and print_parameters_summary=True, then the parameters of each step are printed at the end of the table.
+            print_parameters_summary: Whether to print parameters summary at the end of the table. If print_step_parameters=False, then the parameters of each step are printed at the end of the table too.
+        """
+
+        summary_output = ""
+
+        def fill_message(msg, line_length=line_length, fill_character=fill_character):
+            num_spaces = int((line_length - len(msg))/2)
+            num_spaces = int(num_spaces / len(fill_character))
+            msg = "{spaces}{msg}{spaces}".format(
+                msg=msg, spaces=fill_character * num_spaces)
+            return msg
+
+        def line_separator(line_length=line_length, line_character=line_character):
+            num_characters = int(line_length / len(line_character))
+            return line_character * num_characters
+
+        def create_row(columns, line_length=line_length, fill_character=fill_character, split_percentages=None):
+            filled_columns = []
+            if split_percentages is None:
+                split_percentages = [int(100/len(columns))] * 3
+            columns_lengths = [int((split_percentages[idx] * line_length) / 100)
+                               for idx in range(len(split_percentages))]
+            for column_idx, column in enumerate(columns):
+                current_column_length = len(column)
+                extra_characters = columns_lengths[column_idx] - \
+                    current_column_length
+                filled_column = column + fill_character * extra_characters
+                filled_columns.append(filled_column)
+
+            return "".join(filled_columns)
+
+        def print_parent_selection_params():
+            nonlocal summary_output
+            m = f"Number of Parents: {self.num_parents_mating}"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+            if self.parent_selection_type == "tournament":
+                m = f"K Tournament: {self.K_tournament}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+
+        def print_fitness_params():
+            nonlocal summary_output
+            if not self.fitness_batch_size is None:
+                m = f"Fitness batch size: {self.fitness_batch_size}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+
+        def print_crossover_params():
+            nonlocal summary_output
+            if not self.crossover_probability is None:
+                m = f"Crossover probability: {self.crossover_probability}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+
+        def print_mutation_params():
+            nonlocal summary_output
+            if not self.mutation_probability is None:
+                m = f"Mutation Probability: {self.mutation_probability}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+            if self.mutation_percent_genes == "default":
+                m = f"Mutation Percentage: {self.mutation_percent_genes}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+            # Number of mutation genes is already showed above.
+            m = f"Mutation Genes: {self.mutation_num_genes}"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+            m = f"Random Mutation Range: ({self.random_mutation_min_val}, {self.random_mutation_max_val})"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+            if not self.gene_space is None:
+                m = f"Gene Space: {self.gene_space}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+            m = f"Mutation by Replacement: {self.mutation_by_replacement}"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+            m = f"Allow Duplicated Genes: {self.allow_duplicate_genes}"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+
+        def print_on_generation_params():
+            nonlocal summary_output
+            if not self.stop_criteria is None:
+                m = f"Stop Criteria: {self.stop_criteria}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+
+        def print_params_summary():
+            nonlocal summary_output
+            m = f"Population Size: ({self.sol_per_pop}, {self.num_genes})"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+            m = f"Number of Generations: {self.num_generations}"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+            m = f"Initial Population Range: ({self.init_range_low}, {self.init_range_high})"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+
+            if not print_step_parameters:
+                print_fitness_params()
+
+            if not print_step_parameters:
+                print_parent_selection_params()
+
+            if self.keep_elitism != 0:
+                m = f"Keep Elitism: {self.keep_elitism}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+            else:
+                m = f"Keep Parents: {self.keep_parents}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+            m = f"Gene DType: {self.gene_type}"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+
+            if not print_step_parameters:
+                print_crossover_params()
+
+            if not print_step_parameters:
+                print_mutation_params()
+
+            if not print_step_parameters:
+                print_on_generation_params()
+
+            if not self.parallel_processing is None:
+                m = f"Parallel Processing: {self.parallel_processing}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+            if not self.random_seed is None:
+                m = f"Random Seed: {self.random_seed}"
+                self.logger.info(m)
+                summary_output = summary_output + m + "\n"
+            m = f"Save Best Solutions: {self.save_best_solutions}"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+            m = f"Save Solutions: {self.save_solutions}"
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+
+        m = line_separator(line_character=line_character)
+        self.logger.info(m)
+        summary_output = summary_output + m + "\n"
+        m = fill_message("PyGAD Lifecycle")
+        self.logger.info(m)
+        summary_output = summary_output + m + "\n"
+        m = line_separator(line_character=line_character2)
+        self.logger.info(m)
+        summary_output = summary_output + m + "\n"
+
+        lifecycle_steps = ["on_start()", "Fitness Function", "On Fitness", "Parent Selection", "On Parents",
+                           "Crossover", "On Crossover", "Mutation", "On Mutation", "On Generation", "On Stop"]
+        lifecycle_functions = [self.on_start, self.fitness_func, self.on_fitness, self.select_parents, self.on_parents,
+                               self.crossover, self.on_crossover, self.mutation, self.on_mutation, self.on_generation, self.on_stop]
+        lifecycle_functions = [getattr(
+            lifecycle_func, '__name__', "None") for lifecycle_func in lifecycle_functions]
+        lifecycle_functions = [lifecycle_func + "()" if lifecycle_func !=
+                               "None" else "None" for lifecycle_func in lifecycle_functions]
+        lifecycle_output = ["None", "(1)", "None", f"({self.num_parents_mating}, {self.num_genes})", "None",
+                            f"({self.num_parents_mating}, {self.num_genes})", "None", f"({self.num_parents_mating}, {self.num_genes})", "None", "None", "None"]
+        lifecycle_step_parameters = [None, print_fitness_params, None, print_parent_selection_params, None,
+                                     print_crossover_params, None, print_mutation_params, None, print_on_generation_params, None]
+
+        if not columns_equal_len:
+            max_lengthes = [max(list(map(len, lifecycle_steps))), max(
+                list(map(len, lifecycle_functions))), max(list(map(len, lifecycle_output)))]
+            split_percentages = [
+                int((column_len / sum(max_lengthes)) * 100) for column_len in max_lengthes]
+        else:
+            split_percentages = None
+
+        header_columns = ["Step", "Handler", "Output Shape"]
+        header_row = create_row(
+            header_columns, split_percentages=split_percentages)
+        m = header_row
+        self.logger.info(m)
+        summary_output = summary_output + m + "\n"
+        m = line_separator(line_character=line_character2)
+        self.logger.info(m)
+        summary_output = summary_output + m + "\n"
+
+        for lifecycle_idx in range(len(lifecycle_steps)):
+            lifecycle_column = [lifecycle_steps[lifecycle_idx],
+                                lifecycle_functions[lifecycle_idx], lifecycle_output[lifecycle_idx]]
+            if lifecycle_column[1] == "None":
+                continue
+            lifecycle_row = create_row(
+                lifecycle_column, split_percentages=split_percentages)
+            m = lifecycle_row
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+            if print_step_parameters:
+                if not lifecycle_step_parameters[lifecycle_idx] is None:
+                    lifecycle_step_parameters[lifecycle_idx]()
+            m = line_separator(line_character=line_character)
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+
+        m = line_separator(line_character=line_character2)
+        self.logger.info(m)
+        summary_output = summary_output + m + "\n"
+        if print_parameters_summary:
+            print_params_summary()
+            m = line_separator(line_character=line_character2)
+            self.logger.info(m)
+            summary_output = summary_output + m + "\n"
+        return summary_output
+
     def change_population_dtype_and_round(self,
                                           population):
         """
