@@ -32,7 +32,7 @@ def test_gann_regression():
         # To avoid updating all, we can update just the one we need.
         
         # However, for simplicity and to test GANN's intended flow:
-        population_matrices = pygad.gann.population_as_matrices(num_networks=ga_instance.sol_per_pop,
+        population_matrices = pygad.gann.population_as_matrices(population_networks=gann_instance.population_networks,
                                                                population_vectors=ga_instance.population)
         gann_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
@@ -40,7 +40,7 @@ def test_gann_regression():
                                        data_inputs=data_inputs)
         
         # Mean Absolute Error
-        abs_error = numpy.mean(numpy.abs(predictions.flatten() - data_outputs)) + 0.00000001
+        abs_error = numpy.mean(numpy.abs(predictions - data_outputs)) + 0.00000001
         fitness = 1.0 / abs_error
         return fitness
 
@@ -65,8 +65,8 @@ def test_nn_direct_usage():
     data_inputs = numpy.array([[0.1, 0.2, 0.3]])
     predictions = pygad.nn.predict(last_layer=output_layer, data_inputs=data_inputs)
     
-    assert predictions.shape == (1, 1)
-    assert 0 <= predictions[0, 0] <= 1
+    assert len(predictions) == 1
+    assert 0 <= predictions[0] <= 1
     print("test_nn_direct_usage passed.")
 
 if __name__ == "__main__":
