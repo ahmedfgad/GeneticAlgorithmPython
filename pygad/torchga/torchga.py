@@ -10,7 +10,7 @@ def model_weights_as_vector(model):
         # cpu() is called for making shore the data is moved from GPU to cpu
         # numpy() is called for converting the tensor into a NumPy array.
         curr_weights = curr_weights.cpu().detach().numpy()
-        vector = numpy.reshape(curr_weights, newshape=(curr_weights.size))
+        vector = numpy.reshape(curr_weights, (curr_weights.size))
         weights_vector.extend(vector)
 
     return numpy.array(weights_vector)
@@ -28,7 +28,7 @@ def model_weights_as_dict(model, weights_vector):
         layer_weights_size = w_matrix.size
 
         layer_weights_vector = weights_vector[start:start + layer_weights_size]
-        layer_weights_matrix = numpy.reshape(layer_weights_vector, newshape=(layer_weights_shape))
+        layer_weights_matrix = numpy.reshape(layer_weights_vector, (layer_weights_shape))
         weights_dict[key] = torch.from_numpy(layer_weights_matrix)
 
         start = start + layer_weights_size

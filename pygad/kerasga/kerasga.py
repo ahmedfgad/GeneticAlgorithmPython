@@ -23,7 +23,7 @@ def model_weights_as_vector(model):
         if layer.trainable:
             layer_weights = layer.get_weights()
             for l_weights in layer_weights:
-                vector = numpy.reshape(l_weights, newshape=(l_weights.size))
+                vector = numpy.reshape(l_weights, (l_weights.size))
                 weights_vector.extend(vector)
 
     return numpy.array(weights_vector)
@@ -57,7 +57,7 @@ def model_weights_as_matrix(model, weights_vector):
                 layer_weights_size = l_weights.size
         
                 layer_weights_vector = weights_vector[start:start + layer_weights_size]
-                layer_weights_matrix = numpy.reshape(layer_weights_vector, newshape=(layer_weights_shape))
+                layer_weights_matrix = numpy.reshape(layer_weights_vector, (layer_weights_shape))
                 weights_matrix.append(layer_weights_matrix)
         
                 start = start + layer_weights_size

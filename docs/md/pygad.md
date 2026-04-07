@@ -863,13 +863,13 @@ import functools
 import operator
 
 def img2chromosome(img_arr):
-    return numpy.reshape(a=img_arr, newshape=(functools.reduce(operator.mul, img_arr.shape)))
+    return numpy.reshape(img_arr, (functools.reduce(operator.mul, img_arr.shape)))
 
 def chromosome2img(vector, shape):
     if len(vector) != functools.reduce(operator.mul, shape):
         raise ValueError(f"A vector of length {len(vector)} into an array of shape {shape}.")
 
-    return numpy.reshape(a=vector, newshape=shape)
+    return numpy.reshape(vector, shape)
  ```
 
 ### Create an Instance of the `pygad.GA` Class
