@@ -76,6 +76,7 @@ class Validation:
             if isinstance(logger, logging.Logger):
                 pass
             else:
+                self.valid_parameters = False
                 raise TypeError(f"The expected type of the 'logger' parameter is 'logging.Logger' but {type(logger)} found.")
 
         # Create the 'self.logger' attribute to hold the logger.

@@ -552,7 +552,13 @@ Release Date 29 January 2024
 Release Date 17 February 2024
 
 1. After the last generation and before the `run()` method completes, update the 2 instance attributes: 1) `last_generation_parents` 2) `last_generation_parents_indices`. This is to keep the list of parents up-to-date with the latest population fitness `last_generation_fitness`.  https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/275
-2. 4 methods with names starting with `run_`. Their purpose is to keep the main loop inside the `run()` method clean. Check the [Other Methods](https://pygad.readthedocs.io/en/latest/pygad.html#other-methods) section for more information.
+2. 5 methods with names starting with `run_`. Their purpose is to keep the main loop inside the `run()` method clean. Check the [Other Methods](https://pygad.readthedocs.io/en/latest/pygad.html#other-methods) section for more information.
+   1. `run_loop_head()`: The code before the loop starts.
+   2. `run_select_parents()`: The parent selection-related code.
+   3. `run_crossover()`: The crossover-related code.
+   4. `run_mutation()`: The mutation-related code.
+   5. `run_update_population()`: Update the `population` instance attribute after completing the processes of crossover and mutation.
+
 
 ## PyGAD 3.4.0
 
@@ -616,16 +622,16 @@ Release Date 08 July 2025
   4. The `summary()` method was moved to `Helper` class in the `pygad/helper/misc.py` script.
   5. The validation code in the `__init__()` method of the `pygad.GA` class is moved to the new `validate_parameters()` method in the new `Validation` class in the new `pygad/utils/validation.py` script. Moreover, the `validate_multi_stop_criteria()` method is also moved to the same class.
   6. The GA main workflow is moved into the new `GAEngine` class in the new `pygad/utils/engine.py` script. Specifically, these methods are moved from the `pygad.GA` class to the new `GAEngine` class:
-           1. run()
-           2. run_loop_head()
-           3. run_select_parents()
-           4. run_crossover()
-           5. run_mutation()
-           6. run_update_population()
-           7. initialize_population()
-           8. cal_pop_fitness()
-           9. best_solution()
-           10. round_genes()
+             1. `run()`
+                  1. `run_loop_head()`
+                  2. `run_select_parents()`
+                  3. `run_crossover()`
+                  4. `run_mutation()`
+                  5. `run_update_population()`
+             2. `initialize_population()`
+             3. `cal_pop_fitness()`
+             4. `best_solution()`
+             5. `round_genes()`
 7. The `pygad.GA` class now extends the two new classes `utils.validation.Validation` and `utils.engine.GAEngine`.
 8. The version of the `pygad.utils` submodule is upgraded from `1.3.0` to `1.4.0`.
 9. The version of the `pygad.helper` submodule is upgraded from `1.2.0` to `1.3.0`.

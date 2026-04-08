@@ -6,14 +6,120 @@ PyGAD supports different types of operators for selecting the parents, applying 
 
 The submodules in the `pygad.utils` module are:
 
-1. `crossover`: Has the `Crossover` class that implements the crossover operators.
-2. `mutation`: Has the `Mutation` class that implements the mutation operators.
-3. `parent_selection`: Has the `ParentSelection` class that implements the parent selection operators.
-4. `nsga2`: Has the `NSGA2` class that implements the Non-Dominated Sorting Genetic Algorithm II (NSGA-II).
+1. `engine`: The core engine of the library. It has the `GAEngine` class implementing the main loop and related functions.
+2. `crossover`: Has the `Crossover` class that implements the crossover operators.
+3. `mutation`: Has the `Mutation` class that implements the mutation operators.
+4. `parent_selection`: Has the `ParentSelection` class that implements the parent selection operators.
+5. `nsga2`: Has the `NSGA2` class that implements the Non-Dominated Sorting Genetic Algorithm II (NSGA-II).
 
 Note that the `pygad.GA` class extends all of these classes. So, the user can access any of the methods in such classes directly by the instance/object of the `pygad.GA` class.
 
 The next sections discuss each submodule.
+
+# `pygad.utils.engine` Submodule
+
+The `pygad.utils.engine` module has the `GAEngine` class that implements the engine of the library. The methods in this class are:
+
+1. `initialize_population()`
+2. `cal_pop_fitness()`
+3. `run()`
+   1. `run_loop_head()`
+   2. `run_select_parents()`
+   3. `run_crossover()`
+   4. `run_mutation()`
+   5. `run_update_population()`
+4. `best_solution()`
+5. `round_genes()`
+
+## `initialize_population()`
+
+It creates an initial population randomly as a NumPy array. The array is saved in the instance attribute named `population`.
+
+Accepts the following parameters:
+
+- `low`: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
+- `high`: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
+
+This method assigns the values of the following 3 instance attributes:
+
+1. `pop_size`: Size of the population.
+2. `population`: Initially, it holds the initial population and later updated after each generation.
+3. `initial_population`: Keeping the initial population.
+
+## `cal_pop_fitness()`
+
+The `cal_pop_fitness()` method calculates and returns the fitness values of the solutions in the current population. 
+
+This function is optimized to save time by making fewer calls the fitness function. It follows this process:
+
+1. If the `save_solutions` parameter is set to `True`, then it checks if the solution is already explored and saved in the `solutions` instance attribute. If so, then it just retrieves its fitness from the `solutions_fitness` instance attribute without calling the fitness function.
+2. If `save_solutions` is set to `False` or if it is `True` but the solution was not explored yet, then the `cal_pop_fitness()` method checks if the `keep_elitism` parameter is set to a positive integer. If so, then it checks if the solution is saved into the `last_generation_elitism` instance attribute. If so, then it retrieves its fitness from the `previous_generation_fitness` instance attribute.
+3. If neither of the above 3 conditions apply (1. `save_solutions` is set to `False` or 2. if it is `True` but the solution was not explored yet or 3. `keep_elitism` is set to zero), then the `cal_pop_fitness()` method checks if the `keep_parents` parameter is set to `-1` or a positive integer. If so, then it checks if the solution is saved into the `last_generation_parents` instance attribute. If so, then it retrieves its fitness from the `previous_generation_fitness` instance attribute.
+4. If neither of the above 4 conditions apply, then we have to call the fitness function to calculate the fitness for the solution. This is by calling the function assigned to the `fitness_func` parameter. 
+
+This function takes into consideration:
+
+1. The `parallel_processing` parameter to check whether parallel processing is in effect.
+2. The `fitness_batch_size` parameter to check if the fitness should be calculated in batches of solutions.
+
+It returns a vector of the solutions' fitness values.
+
+## `run()`
+
+Runs the genetic algorithm. This is the main method in which the genetic algorithm is evolved through some generations. It accepts no parameters as it uses the instance to access all of its requirements.
+
+For each generation, the fitness values of all solutions within the population are calculated according to the `cal_pop_fitness()` method which internally just calls the function assigned to the `fitness_func` parameter in the `pygad.GA` class constructor for each solution.
+
+According to the fitness values of all solutions, the parents are selected using the `select_parents()` method. This method behavior is determined according to the parent selection type in the `parent_selection_type` parameter in the `pygad.GA` class constructor
+
+Based on the selected parents, offspring are generated by applying the crossover and mutation operations using the `crossover()` and `mutation()` methods. The behavior of such 2 methods is defined according to the `crossover_type` and `mutation_type` parameters in the `pygad.GA` class constructor.
+
+After the generation completes, the following takes place:
+
+- The `population` attribute is updated by the new population.
+- The `generations_completed` attribute is assigned by the number of the last completed generation.
+- If there is a callback function assigned to the `on_generation` attribute, then it will be called.
+
+After the `run()` method completes, the following takes place:
+
+- The `best_solution_generation` is assigned the generation number at which the best fitness value is reached.
+- The `run_completed` attribute is set to `True`.
+
+Note that the `run()` method is calling 5 different methods during the loop:
+
+1. `run_loop_head()`
+2. `run_select_parents()`
+3. `run_crossover()`
+4. `run_mutation()`
+5. `run_update_population()`
+
+## `best_solution()`
+
+Returns information about the best solution found by the genetic algorithm. 
+
+It accepts the following parameters:
+
+* `pop_fitness=None`: An optional parameter that accepts a list of the fitness values of the solutions in the population. If `None`, then the `cal_pop_fitness()` method is called to calculate the fitness values of the population.
+
+It returns the following:
+
+* `best_solution`: Best solution in the current population.
+
+* `best_solution_fitness`: Fitness value of the best solution.
+
+* `best_match_idx`: Index of the best solution in the current population.
+
+## `round_genes()`
+
+A method to round the genes in the passed solutions. It loops through each gene across all the passed solutions and rounds their values if applicable. 
+
+# `pygad.utils.validation` Submodule
+
+The `pygad.utils.validation` module has the `Validation` class that validates the arguments passed while instantiating the `pygad.GA` class. The methods in this class are:
+
+1. `validate_parameters()`: A method that accepts the same list of arguments accepted by the constructor of the `pygad.GA` class. It validates all the parameters. If everything is validated, the instance attribute `valid_parameters` will be set to `True`. Otherwise, it will be `False` and an exception is raised indicating the invalid criteria.
+
+An inner method called `validate_multi_stop_criteria()` exists to validate the `stop_criteria` argument.
 
 # `pygad.utils.crossover` Submodule
 
@@ -29,6 +135,33 @@ All crossover methods accept this parameter:
 1. `parents`: The parents to mate for producing the offspring.
 2. `offspring_size`: The size of the offspring to produce.
 
+## Crossover Methods
+
+The `Crossover` class in the `pygad.utils.crossover` module supports several methods for applying crossover between the selected parents. All of these methods accept the same parameters which are:
+
+* `parents`: The parents to mate for producing the offspring.
+* `offspring_size`: The size of the offspring to produce.
+
+All of such methods return an array of the produced offspring.
+
+The next subsections list the supported methods for crossover.
+
+### `single_point_crossover()`
+
+Applies the single-point crossover. It selects a point randomly at which crossover takes place between the pairs of parents.
+
+### `two_points_crossover()`
+
+Applies the 2 points crossover. It selects the 2 points randomly at which crossover takes place between the pairs of parents.
+
+### `uniform_crossover()`
+
+Applies the uniform crossover. For each gene, a parent out of the 2 mating parents is selected randomly and the gene is copied from it.
+
+### `scattered_crossover()`
+
+Applies the scattered crossover. It randomly selects the gene from one of the 2 parents. 
+
 # `pygad.utils.mutation` Submodule
 
 The `pygad.utils.mutation` module has a class named `Mutation` with the supported mutation operations which are:
@@ -42,6 +175,40 @@ The `pygad.utils.mutation` module has a class named `Mutation` with the supporte
 All mutation methods accept this parameter:
 
 1. `offspring`: The offspring to mutate.
+
+## Mutation Methods
+
+The `Mutation` class in the `pygad.utils.mutation` module supports several methods for applying mutation. All of these methods accept the same parameter which is:
+
+* `offspring`: The offspring to mutate.
+
+All of such methods return an array of the mutated offspring.
+
+The next subsections list the supported methods for mutation.
+
+### `random_mutation()`
+
+Applies the random mutation which changes the values of some genes randomly. The number of genes is specified according to either the `mutation_num_genes` or the `mutation_percent_genes` attributes.
+
+For each gene, a random value is selected according to the range specified by the 2 attributes `random_mutation_min_val` and `random_mutation_max_val`. The random value is added to the selected gene.
+
+### `swap_mutation()`
+
+Applies the swap mutation which interchanges the values of 2 randomly selected genes.
+
+### `inversion_mutation()`
+
+Applies the inversion mutation which selects a subset of genes and inverts them.
+
+### `scramble_mutation()`
+
+Applies the scramble mutation which selects a subset of genes and shuffles their order randomly.
+
+### `adaptive_mutation()`
+
+Applies the adaptive mutation which selects the number/percentage of genes to mutate based on the solution's fitness. If the fitness is high (i.e. solution quality is high), then small number/percentage of genes is mutated compared to a solution with a low fitness.
+
+## Mutation Helper Methods
 
 The `pygad.utils.mutation` module has some helper methods to assist applying the mutation operation:
 
@@ -184,6 +351,49 @@ All parent selection methods accept these parameters:
 It has the following helper methods:
 
 1. `wheel_cumulative_probs()`: A helper function to calculate the wheel probabilities for these 2 methods: 1) `roulette_wheel_selection()` 2) `rank_selection()`
+
+## Parent Selection Methods
+
+The `ParentSelection` class in the `pygad.utils.parent_selection` module has several methods for selecting the parents that will mate to produce the offspring. All of such methods accept the same parameters which are:
+
+* `fitness`: The fitness values of the solutions in the current population.
+* `num_parents`: The number of parents to be selected.
+
+All of such methods return an array of the selected parents.
+
+The next subsections list the supported methods for parent selection.
+
+### `steady_state_selection()`
+
+Selects the parents using the steady-state selection technique.
+
+### `rank_selection()`
+
+Selects the parents using the rank selection technique.
+
+### `random_selection()`
+
+Selects the parents randomly.
+
+### `tournament_selection()`
+
+Selects the parents using the tournament selection technique.
+
+### `roulette_wheel_selection()`
+
+Selects the parents using the roulette wheel selection technique.
+
+### `stochastic_universal_selection()`
+
+Selects the parents using the stochastic universal selection technique.
+
+### `nsga2_selection()`
+
+Selects the parents for the NSGA-II algorithm to solve multi-objective optimization problems. It selects the parents by ranking them based on non-dominated sorting and crowding distance.
+
+### `tournament_selection_nsga2()`
+
+Selects the parents for the NSGA-II algorithm to solve multi-objective optimization problems. It selects the parents using the tournament selection technique applied based on non-dominated sorting and crowding distance.
 
 # `pygad.utils.nsga2` Submodule
 

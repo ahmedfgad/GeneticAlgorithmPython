@@ -14,16 +14,19 @@ section.
 
 The submodules in the ``pygad.utils`` module are:
 
-1. ``crossover``: Has the ``Crossover`` class that implements the
+1. ``engine``: The core engine of the library. It has the ``GAEngine``
+   class implementing the main loop and related functions.
+
+2. ``crossover``: Has the ``Crossover`` class that implements the
    crossover operators.
 
-2. ``mutation``: Has the ``Mutation`` class that implements the mutation
+3. ``mutation``: Has the ``Mutation`` class that implements the mutation
    operators.
 
-3. ``parent_selection``: Has the ``ParentSelection`` class that
+4. ``parent_selection``: Has the ``ParentSelection`` class that
    implements the parent selection operators.
 
-4. ``nsga2``: Has the ``NSGA2`` class that implements the Non-Dominated
+5. ``nsga2``: Has the ``NSGA2`` class that implements the Non-Dominated
    Sorting Genetic Algorithm II (NSGA-II).
 
 Note that the ``pygad.GA`` class extends all of these classes. So, the
@@ -31,6 +34,193 @@ user can access any of the methods in such classes directly by the
 instance/object of the ``pygad.GA`` class.
 
 The next sections discuss each submodule.
+
+.. _pygadutilsengine-submodule:
+
+``pygad.utils.engine`` Submodule
+================================
+
+The ``pygad.utils.engine`` module has the ``GAEngine`` class that
+implements the engine of the library. The methods in this class are:
+
+1. ``initialize_population()``
+
+2. ``cal_pop_fitness()``
+
+3. ``run()``
+
+   1. ``run_loop_head()``
+
+   2. ``run_select_parents()``
+
+   3. ``run_crossover()``
+
+   4. ``run_mutation()``
+
+   5. ``run_update_population()``
+
+4. ``best_solution()``
+
+5. ``round_genes()``
+
+.. _initializepopulation:
+
+``initialize_population()``
+---------------------------
+
+It creates an initial population randomly as a NumPy array. The array is
+saved in the instance attribute named ``population``.
+
+Accepts the following parameters:
+
+- ``low``: The lower value of the random range from which the gene
+  values in the initial population are selected. It defaults to -4.
+  Available in PyGAD 1.0.20 and higher.
+
+- ``high``: The upper value of the random range from which the gene
+  values in the initial population are selected. It defaults to -4.
+  Available in PyGAD 1.0.20.
+
+This method assigns the values of the following 3 instance attributes:
+
+1. ``pop_size``: Size of the population.
+
+2. ``population``: Initially, it holds the initial population and later
+   updated after each generation.
+
+3. ``initial_population``: Keeping the initial population.
+
+.. _calpopfitness:
+
+``cal_pop_fitness()``
+---------------------
+
+The ``cal_pop_fitness()`` method calculates and returns the fitness
+values of the solutions in the current population.
+
+This function is optimized to save time by making fewer calls the
+fitness function. It follows this process:
+
+1. If the ``save_solutions`` parameter is set to ``True``, then it
+   checks if the solution is already explored and saved in the
+   ``solutions`` instance attribute. If so, then it just retrieves its
+   fitness from the ``solutions_fitness`` instance attribute without
+   calling the fitness function.
+
+2. If ``save_solutions`` is set to ``False`` or if it is ``True`` but
+   the solution was not explored yet, then the ``cal_pop_fitness()``
+   method checks if the ``keep_elitism`` parameter is set to a positive
+   integer. If so, then it checks if the solution is saved into the
+   ``last_generation_elitism`` instance attribute. If so, then it
+   retrieves its fitness from the ``previous_generation_fitness``
+   instance attribute.
+
+3. If neither of the above 3 conditions apply (1. ``save_solutions`` is
+   set to ``False`` or 2. if it is ``True`` but the solution was not
+   explored yet or 3. ``keep_elitism`` is set to zero), then the
+   ``cal_pop_fitness()`` method checks if the ``keep_parents`` parameter
+   is set to ``-1`` or a positive integer. If so, then it checks if the
+   solution is saved into the ``last_generation_parents`` instance
+   attribute. If so, then it retrieves its fitness from the
+   ``previous_generation_fitness`` instance attribute.
+
+4. If neither of the above 4 conditions apply, then we have to call the
+   fitness function to calculate the fitness for the solution. This is
+   by calling the function assigned to the ``fitness_func`` parameter.
+
+This function takes into consideration:
+
+1. The ``parallel_processing`` parameter to check whether parallel
+   processing is in effect.
+
+2. The ``fitness_batch_size`` parameter to check if the fitness should
+   be calculated in batches of solutions.
+
+It returns a vector of the solutions' fitness values.
+
+``run()``
+---------
+
+Runs the genetic algorithm. This is the main method in which the genetic
+algorithm is evolved through some generations. It accepts no parameters
+as it uses the instance to access all of its requirements.
+
+For each generation, the fitness values of all solutions within the
+population are calculated according to the ``cal_pop_fitness()`` method
+which internally just calls the function assigned to the
+``fitness_func`` parameter in the ``pygad.GA`` class constructor for
+each solution.
+
+According to the fitness values of all solutions, the parents are
+selected using the ``select_parents()`` method. This method behavior is
+determined according to the parent selection type in the
+``parent_selection_type`` parameter in the ``pygad.GA`` class
+constructor
+
+Based on the selected parents, offspring are generated by applying the
+crossover and mutation operations using the ``crossover()`` and
+``mutation()`` methods. The behavior of such 2 methods is defined
+according to the ``crossover_type`` and ``mutation_type`` parameters in
+the ``pygad.GA`` class constructor.
+
+After the generation completes, the following takes place:
+
+- The ``population`` attribute is updated by the new population.
+
+- The ``generations_completed`` attribute is assigned by the number of
+  the last completed generation.
+
+- If there is a callback function assigned to the ``on_generation``
+  attribute, then it will be called.
+
+After the ``run()`` method completes, the following takes place:
+
+- The ``best_solution_generation`` is assigned the generation number at
+  which the best fitness value is reached.
+
+- The ``run_completed`` attribute is set to ``True``.
+
+Note that the ``run()`` method is calling 5 different methods during the
+loop:
+
+1. ``run_loop_head()``
+
+2. ``run_select_parents()``
+
+3. ``run_crossover()``
+
+4. ``run_mutation()``
+
+5. ``run_update_population()``
+
+.. _bestsolution:
+
+``best_solution()``
+-------------------
+
+Returns the following information about the best solution in the latest
+population:
+
+1. Solution
+
+2. Fitness
+
+3. Index within the population
+
+The best solution is determined based on the fitness values. To save
+time calling the fitness function, the user is allowed to pass the
+fitness based on which the best solution is determined. If not passed,
+it will call the fitness function to calculate the fitness of all
+solutions within the latest population.
+
+.. _roundgenes:
+
+``round_genes()``
+-----------------
+
+A method to round the genes in the passed solutions. It loops through
+each gene across all the passed solutions and rounds their values if
+applicable.
 
 .. _pygadutilscrossover-submodule:
 
@@ -339,8 +529,10 @@ implements NSGA-II. The methods inside this class are:
 1. ``non_dominated_sorting()``: Returns all the pareto fronts by
    applying non-dominated sorting over the solutions.
 
-2. ``get_non_dominated_set()``: Returns the set of non-dominated
-   solutions from the passed solutions.
+2. ``get_non_dominated_set()``: Returns the 2 sets of non-dominated
+   solutions and dominated solutions from the passed solutions. Note
+   that the Pareto front consists of the solutions in the non-dominated
+   set.
 
 3. ``crowding_distance()``: Calculates the crowding distance for all
    solutions in the current pareto front.

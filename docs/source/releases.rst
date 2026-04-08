@@ -1545,10 +1545,22 @@ Release Date 17 February 2024
    ``last_generation_fitness``.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/275
 
-2. 4 methods with names starting with ``run_``. Their purpose is to keep
+2. 5 methods with names starting with ``run_``. Their purpose is to keep
    the main loop inside the ``run()`` method clean. Check the `Other
    Methods <https://pygad.readthedocs.io/en/latest/pygad.html#other-methods>`__
    section for more information.
+
+   1. ``run_loop_head()``: The code before the loop starts.
+
+   2. ``run_select_parents()``: The parent selection-related code.
+
+   3. ``run_crossover()``: The crossover-related code.
+
+   4. ``run_mutation()``: The mutation-related code.
+
+   5. ``run_update_population()``: Update the ``population`` instance
+      attribute after completing the processes of crossover and
+      mutation.
 
 .. _pygad-340:
 
@@ -1803,25 +1815,25 @@ PyGAD 3.6.0
     new ``pygad/utils/engine.py`` script. Specifically, these methods
     are moved from the ``pygad.GA`` class to the new ``GAEngine`` class:
 
-    1.  run()
+    1. ``run()``
 
-    2.  run_loop_head()
+       1. ``run_loop_head()``
 
-    3.  run_select_parents()
+       2. ``run_select_parents()``
 
-    4.  run_crossover()
+       3. ``run_crossover()``
 
-    5.  run_mutation()
+       4. ``run_mutation()``
 
-    6.  run_update_population()
+       5. ``run_update_population()``
 
-    7.  initialize_population()
+    2. ``initialize_population()``
 
-    8.  cal_pop_fitness()
+    3. ``cal_pop_fitness()``
 
-    9.  best_solution()
+    4. ``best_solution()``
 
-    10. round_genes()
+    5. ``round_genes()``
 
 7.  The ``pygad.GA`` class now extends the two new classes
     ``utils.validation.Validation`` and ``utils.engine.GAEngine``.
