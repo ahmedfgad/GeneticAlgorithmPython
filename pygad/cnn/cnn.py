@@ -126,7 +126,7 @@ def layers_weights_as_matrix(model, vector_weights):
     
             weights_vector=vector_weights[start:start + layer_weights_size]
     #        matrix = pygad.nn.DenseLayer.to_array(vector=weights_vector, shape=layer_weights_shape)
-            matrix = numpy.reshape(weights_vector, newshape=(layer_weights_shape))
+            matrix = numpy.reshape(weights_vector, (layer_weights_shape))
             network_weights.append(matrix)
     
             start = start + layer_weights_size
@@ -163,11 +163,11 @@ def layers_weights_as_vector(model, initial=True):
         if type(layer) in [Conv2D, Dense]:
             # If the 'initial' parameter is True, append the initial weights. Otherwise, append the trained weights.
             if initial == True:
-                vector = numpy.reshape(layer.initial_weights, newshape=(layer.initial_weights.size))
+                vector = numpy.reshape(layer.initial_weights, (layer.initial_weights.size))
     #            vector = pygad.nn.DenseLayer.to_vector(matrix=layer.initial_weights)
                 network_weights.extend(vector)
             elif initial == False:
-                vector = numpy.reshape(layer.trained_weights, newshape=(layer.trained_weights.size))
+                vector = numpy.reshape(layer.trained_weights, (layer.trained_weights.size))
     #            vector = pygad.nn.DenseLayer.to_vector(array=layer.trained_weights)
                 network_weights.extend(vector)
             else:

@@ -10,12 +10,14 @@ visualization in PyGAD.
 This section discusses the different options to visualize the results in
 PyGAD through these methods:
 
-1. ``plot_fitness()``: Creates plots for the fitness.
+1. ``plot_fitness()``: Creates plots for the fitness to show how the
+   fitness evolves by generation. .
 
-2. ``plot_genes()``: Creates plots for the genes.
+2. ``plot_genes()``: Creates plots for the genes to show how the gene
+   value changes for each generation.
 
-3. ``plot_new_solution_rate()``: Creates plots for the new solution
-   rate.
+3. ``plot_new_solution_rate()``: Creates plots for the new solution rate
+   to show how the number of new solutions explored in each solution.
 
 4. ``plot_pareto_front_curve()``: Creates plots for the pareto front for
    multi-objective problems.
@@ -91,7 +93,7 @@ This method accepts the following parameters:
 
 9. ``save_dir``: Directory to save the figure.
 
-.. _plottype=plot:
+.. _plottypeplot:
 
 ``plot_type="plot"``
 ~~~~~~~~~~~~~~~~~~~~
@@ -107,7 +109,7 @@ line connecting the fitness values across all generations:
 
 |image1|
 
-.. _plottype=scatter:
+.. _plottypescatter:
 
 ``plot_type="scatter"``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -122,7 +124,7 @@ these dots can be changed using the ``linewidth`` parameter.
 
 |image2|
 
-.. _plottype=bar:
+.. _plottypebar:
 
 ``plot_type="bar"``
 ~~~~~~~~~~~~~~~~~~~
@@ -175,7 +177,7 @@ in the ``plot_fitness()`` method (it also have 3 possible values for
 
 8. ``save_dir``: Directory to save the figure.
 
-.. _plottype=plot-2:
+.. _plottypeplot-2:
 
 ``plot_type="plot"``
 ~~~~~~~~~~~~~~~~~~~~
@@ -195,7 +197,7 @@ the constructor of the ``pygad.GA`` class) which is 10 in this example.
 
 |image4|
 
-.. _plottype=scatter-2:
+.. _plottypescatter-2:
 
 ``plot_type="scatter"``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -209,7 +211,7 @@ The previous graph can be represented as scattered points by setting
 
 |image5|
 
-.. _plottype=bar-2:
+.. _plottypebar-2:
 
 ``plot_type="bar"``
 ~~~~~~~~~~~~~~~~~~~
@@ -311,7 +313,7 @@ An exception is raised if:
 - ``solutions="best"`` while ``save_best_solutions=False`` in the
   constructor of the ``pygad.GA`` class. .
 
-.. _graphtype=plot:
+.. _graphtypeplot:
 
 ``graph_type="plot"``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -320,7 +322,7 @@ When ``graph_type="plot"``, then the figure creates a normal graph where
 the relationship between the gene values and the generation numbers is
 represented as a continuous plot, scattered points, or bars.
 
-.. _plottype=plot-3:
+.. _plottypeplot-3:
 
 ``plot_type="plot"``
 ^^^^^^^^^^^^^^^^^^^^
@@ -362,7 +364,7 @@ the following method calls generate the same plot.
                           plot_type="plot",
                           solutions="all")
 
-.. _plottype=scatter-3:
+.. _plottypescatter-3:
 
 ``plot_type="scatter"``
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -380,7 +382,7 @@ scatter plot.
 
 |image8|
 
-.. _plottype=bar-3:
+.. _plottypebar-3:
 
 ``plot_type="bar"``
 ^^^^^^^^^^^^^^^^^^^
@@ -395,7 +397,7 @@ scatter plot.
 
 |image9|
 
-.. _graphtype=boxplot:
+.. _graphtypeboxplot:
 
 ``graph_type="boxplot"``
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -416,7 +418,7 @@ figure as the default value for the ``solutions`` parameter is
 
 |image10|
 
-.. _graphtype=histogram:
+.. _graphtypehistogram:
 
 ``graph_type="histogram"``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

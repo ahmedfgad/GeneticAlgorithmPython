@@ -38,4 +38,5 @@ The `pygad.helper.misc` module has a class called `Helper` with some methods to 
 10. `generate_gene_value()`: Generates a value for the gene. It checks whether `gene_space` is `None` and calls either `generate_gene_value_randomly()` or `generate_gene_value_from_space()`.
 11. `filter_gene_values_by_constraint()`: Receives a list of values for a gene. Then it filters such values using the gene constraint.
 12. `get_valid_gene_constraint_values()`: Selects one valid gene value that satisfy the gene constraint. It simply calls `generate_gene_value()` to generate some gene values then it filters such values using `filter_gene_values_by_constraint()`.
+13. `initialize_parents_array()`: Usually called from the methods in the `ParentSelection` class in the `pygad/utils/parent_selection.py` script to initialize the parents array.
 

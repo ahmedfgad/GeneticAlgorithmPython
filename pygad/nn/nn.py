@@ -56,11 +56,11 @@ def layers_weights_as_vector(last_layer, initial=True):
     while "previous_layer" in layer.__init__.__code__.co_varnames:
         # If the 'initial' parameter is True, append the initial weights. Otherwise, append the trained weights.
         if initial == True:
-            vector = numpy.reshape(layer.initial_weights, newshape=(layer.initial_weights.size))
+            vector = numpy.reshape(layer.initial_weights, (layer.initial_weights.size))
 #            vector = DenseLayer.to_vector(matrix=layer.initial_weights)
             network_weights.extend(vector)
         elif initial == False:
-            vector = numpy.reshape(layer.trained_weights, newshape=(layer.trained_weights.size))
+            vector = numpy.reshape(layer.trained_weights, (layer.trained_weights.size))
 #            vector = DenseLayer.to_vector(array=layer.trained_weights)
             network_weights.extend(vector)
         else:
@@ -98,7 +98,7 @@ def layers_weights_as_matrix(last_layer, vector_weights):
 
         weights_vector=vector_weights[start:start + layer_weights_size]
 #        matrix = DenseLayer.to_array(vector=weights_vector, shape=layer_weights_shape)
-        matrix = numpy.reshape(weights_vector, newshape=(layer_weights_shape))
+        matrix = numpy.reshape(weights_vector, (layer_weights_shape))
         network_weights.append(matrix)
 
         start = start + layer_weights_size
@@ -338,7 +338,7 @@ def to_vector(array):
     """
     if not (type(array) is numpy.ndarray):
         raise TypeError(f"An input of type numpy.ndarray is expected but an input of type {type(array)} found.")
-    return numpy.reshape(array, newshape=(array.size))
+    return numpy.reshape(array, (array.size))
 
 def to_array(vector, shape):
     """
@@ -357,7 +357,7 @@ def to_array(vector, shape):
         raise ValueError(f"A 1D NumPy array is expected but an array of {vector.ndim} dimensions found.")
     if vector.size != functools.reduce(lambda x,y:x*y, shape, 1): # (operator.mul == lambda x,y:x*y
         raise ValueError(f"Mismatch between the vector length and the array shape. A vector of length {vector.size} cannot be converted into a array of shape ({shape}).")
-    return numpy.reshape(vector, newshape=shape)
+    return numpy.reshape(vector, shape)
 
 class InputLayer:
     """

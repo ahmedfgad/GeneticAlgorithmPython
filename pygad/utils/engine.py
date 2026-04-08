@@ -572,6 +572,11 @@ class GAEngine:
             # Set 'call_on_parents=False' to avoid calling the callable 'on_parents' because this step is not part of the cycle.
             self.run_select_parents(call_on_parents=False)
 
+            # Update the elitism according to the 'last_generation_fitness' attribute.
+            if self.keep_elitism > 0:
+                self.last_generation_elitism, self.last_generation_elitism_indices = self.steady_state_selection(self.last_generation_fitness,
+                                                                                                                 num_parents=self.keep_elitism)
+
             # Save the fitness value of the best solution.
             _, best_solution_fitness, _ = self.best_solution(
                 pop_fitness=self.last_generation_fitness)

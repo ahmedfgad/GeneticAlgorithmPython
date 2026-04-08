@@ -117,7 +117,10 @@ class Plot:
         matplt.xlabel(xlabel, fontsize=font_size)
         matplt.ylabel(ylabel, fontsize=font_size)
         # Create a legend out of the labels.
-        matplt.legend()
+        # Check if there is at least 1 labeled artist.
+        # If not, the matplt.legend() method will raise a warning.
+        if not (matplt.gca().get_legend_handles_labels()[0] == []):
+            matplt.legend()
 
         if not save_dir is None:
             matplt.savefig(fname=save_dir, 

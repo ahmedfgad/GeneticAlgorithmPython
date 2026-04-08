@@ -4,9 +4,9 @@ This section of the PyGAD's library documentation discusses the **pygad.visualiz
 
 This section discusses the different options to visualize the results in PyGAD through these methods:
 
-1. `plot_fitness()`: Creates plots for the fitness.
-2. `plot_genes()`: Creates plots for the genes.
-3. `plot_new_solution_rate()`: Creates plots for the new solution rate.
+1. `plot_fitness()`: Creates plots for the fitness to show how the fitness evolves by generation. .
+2. `plot_genes()`: Creates plots for the genes to show how the gene value changes for each generation.
+3. `plot_new_solution_rate()`: Creates plots for the new solution rate to show how the number of new solutions explored in each solution.
 4. `plot_pareto_front_curve()`: Creates plots for the pareto front for multi-objective problems.
 
 In the following code, the `save_solutions` flag is set to `True` which means all solutions are saved in the `solutions` attribute. The code runs for only 10 generations.
@@ -41,7 +41,7 @@ Let's explore how to visualize the results by the above mentioned methods.
 
 ## `plot_fitness()`
 
-The `plot_fitness()` method shows the fitness value for each generation. It creates, shows, and returns a figure that summarizes how the fitness value(s) evolve(s) by generation.
+The `plot_fitness()` method shows the fitness value for each generation. It creates, shows, and returns a figure that summarizes how the fitness value(s) evolve(s) by generation. It was previously named `plot_result()`.
 
 It works only after completing at least 1 generation. If no generation is completed (at least 1), an exception is raised.
 

@@ -1,0 +1,72 @@
+# PyGAD GitHub Actions Workflow
+# This workflow uses a Matrix Strategy to test PyGAD across multiple Python versions in parallel.
+name: PyGAD PyTest Matrix
+
+permissions:
+  contents: read
+
+on:
+  push:
+    # Trigger the workflow on pushes to the 'github-actions' branch.
+    branches:
+      - github-actions
+      # - master
+    # Only run the workflow if changes are made in these directories.
+    paths:
+      - 'pygad/**'
+      - 'tests/**'
+      - 'examples/**'
+  # Allows manual triggering of the workflow from the GitHub Actions tab.
+  workflow_dispatch:
+
+jobs:
+  pytest:
+    # Use the latest Ubuntu runner for all jobs.
+    runs-on: ubuntu-latest
+    
+    # The Strategy Matrix defines the environments to test.
+    # GitHub Actions will spawn a separate, parallel job for each version in the list.
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+
+    # Dynamic name that appears in the GitHub Actions UI for each parallel job.
+    name: PyTest / Python ${{ matrix.python-version }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Setup the specific Python version defined in the current matrix iteration.
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Install project dependencies from requirements.txt.
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Build the PyGAD package distribution (generating .tar.gz and .whl files).
+      # This ensures the package build process is valid on this Python version.
+      - name: Build PyGAD
+        run: |
+          python3 -m pip install --upgrade build
+          python3 -m build
+
+      # Install the newly built .whl file to verify the package is installable.
+      - name: Install PyGAD from Wheel
+        run: |
+          find ./dist/*.whl | xargs pip install
+
+      - name: Install PyTest
+        run: pip install pytest
+
+      # Run the entire test suite using PyTest.
+      # PyTest automatically discovers all test files in the 'tests/' directory.
+      # This includes our new tests for visualization, operators, parallel processing, etc.
+      - name: Run Tests
+        run: |
+          pytest

@@ -1545,10 +1545,22 @@ Release Date 17 February 2024
    ``last_generation_fitness``.
    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/275
 
-2. 4 methods with names starting with ``run_``. Their purpose is to keep
+2. 5 methods with names starting with ``run_``. Their purpose is to keep
    the main loop inside the ``run()`` method clean. Check the `Other
    Methods <https://pygad.readthedocs.io/en/latest/pygad.html#other-methods>`__
    section for more information.
+
+   1. ``run_loop_head()``: The code before the loop starts.
+
+   2. ``run_select_parents()``: The parent selection-related code.
+
+   3. ``run_crossover()``: The crossover-related code.
+
+   4. ``run_mutation()``: The mutation-related code.
+
+   5. ``run_update_population()``: Update the ``population`` instance
+      attribute after completing the processes of crossover and
+      mutation.
 
 .. _pygad-340:
 
@@ -1773,6 +1785,125 @@ Release Date 08 July 2025
 18. Fix a bug retrieving in the ``best_solution()`` method when
     retrieving the best solution for multi-objective problems.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/331
+
+.. _pygad-360:
+
+PyGAD 3.6.0
+-----------
+
+1.  Support passing a class to the fitness, crossover, and mutation.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/342
+
+2.  A new class called ``Validation`` is created in the new
+    ``pygad/utils/validation.py`` script. It has a method called
+    ``validate_parameters()`` to validate all the parameters passed
+    while instantiating the ``pygad.GA`` class.
+
+3.  Refactoring the ``pygad.py`` script by moving a lot of functions and
+    methods to other classes in other scripts.
+
+4.  The ``summary()`` method was moved to ``Helper`` class in the
+    ``pygad/helper/misc.py`` script.
+
+5.  The validation code in the ``__init__()`` method of the ``pygad.GA``
+    class is moved to the new ``validate_parameters()`` method in the
+    new ``Validation`` class in the new ``pygad/utils/validation.py``
+    script. Moreover, the ``validate_multi_stop_criteria()`` method is
+    also moved to the same class.
+
+6.  The GA main workflow is moved into the new ``GAEngine`` class in the
+    new ``pygad/utils/engine.py`` script. Specifically, these methods
+    are moved from the ``pygad.GA`` class to the new ``GAEngine`` class:
+
+    1. ``run()``
+
+       1. ``run_loop_head()``
+
+       2. ``run_select_parents()``
+
+       3. ``run_crossover()``
+
+       4. ``run_mutation()``
+
+       5. ``run_update_population()``
+
+    2. ``initialize_population()``
+
+    3. ``cal_pop_fitness()``
+
+    4. ``best_solution()``
+
+    5. ``round_genes()``
+
+7.  The ``pygad.GA`` class now extends the two new classes
+    ``utils.validation.Validation`` and ``utils.engine.GAEngine``.
+
+8.  The version of the ``pygad.utils`` submodule is upgraded from
+    ``1.3.0`` to ``1.4.0``.
+
+9.  The version of the ``pygad.helper`` submodule is upgraded from
+    ``1.2.0`` to ``1.3.0``.
+
+10. The version of the ``pygad.visualize`` submodule is upgraded from
+    ``1.1.0`` to ``1.1.1``.
+
+11. The version of the ``pygad.nn`` submodule is upgraded from ``1.2.1``
+    to ``1.2.2``.
+
+12. The version of the ``pygad.cnn`` submodule is upgraded from
+    ``1.1.0`` to ``1.1.1``.
+
+13. The version of the ``pygad.torchga`` submodule is upgraded from
+    ``1.4.0`` to ``1.4.1``.
+
+14. The version of the ``pygad.kerasga`` submodule is upgraded from
+    ``1.3.0`` to ``1.3.1``.
+
+15. Update the elitism after the evolution ends to fix issue where the
+    best solution returned by the ``best_solution()`` method is not
+    correct.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/337
+
+16. Fix a bug in calling the ``numpy.reshape()`` function. The parameter
+    ``newshape`` is removed since it is no longer supported started from
+    NumPy ``2.4.0``.
+    https://numpy.org/doc/stable/release/2.4.0-notes.html#removed-newshape-parameter-from-numpy-reshape
+
+17. A minor change in the documentation is made to replace the
+    ``newshape`` parameter when calling ``numpy.reshape()``.
+
+18. Fix a bug in the ``visualize/plot.py`` script that causes a warning
+    to be given when the plot leged is used with single-objective
+    problems.
+
+19. A new method called ``initialize_parents_array()`` is added to the
+    ``Helper`` class in the ``pygad/helper/misc.py`` script. It is
+    usually called from the methods in the ``ParentSelection`` class in
+    the ``pygad/utils/parent_selection.py`` script to initialize the
+    parents array.
+
+20. Add more tests about:
+
+    1. Operators (crossover, mutation, and parent selection).
+
+    2. The ``best_solution()`` method.
+
+    3. Parallel processing.
+
+    4. The ``GANN`` module.
+
+    5. The plots created by the ``visualize``.
+
+21. Instead of using repeated code for converting the data type and
+    rounding the genes during crossover and mutation, the
+    ``change_gene_dtype_and_round()`` method is called from the
+    ``pygad.helper.misc.Helper`` class.
+
+22. Fix some documentation issues.
+    https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/336
+
+23. Update the documentation to reflect the recent additions and changes
+    to the library structure.
 
 PyGAD Projects at GitHub
 ========================

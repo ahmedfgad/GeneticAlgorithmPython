@@ -29,15 +29,11 @@ class ParentSelection:
         fitness_sorted = self.sort_solutions_nsga2(fitness=fitness)
 
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
-        if self.gene_type_single == True:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
-        else:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
+        parents = self.initialize_parents_array((num_parents, self.population.shape[1]))
+        parents_indices = numpy.array(fitness_sorted[:num_parents])
+        parents[:, :] = self.population[parents_indices, :].copy()
 
-        for parent_num in range(num_parents):
-            parents[parent_num, :] = self.population[fitness_sorted[parent_num], :].copy()
-
-        return parents, numpy.array(fitness_sorted[:num_parents])
+        return parents, parents_indices
 
     def rank_selection(self, fitness, num_parents):
 
@@ -91,15 +87,9 @@ class ParentSelection:
             -The indices of the selected solutions.
         """
 
-        if self.gene_type_single == True:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
-        else:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
-
+        parents = self.initialize_parents_array((num_parents, self.population.shape[1]))
         rand_indices = numpy.random.randint(low=0.0, high=fitness.shape[0], size=num_parents)
-
-        for parent_num in range(num_parents):
-            parents[parent_num, :] = self.population[rand_indices[parent_num], :].copy()
+        parents[:, :] = self.population[rand_indices, :].copy()
 
         return parents, rand_indices
 
@@ -119,11 +109,7 @@ class ParentSelection:
         # This function works with both single- and multi-objective optimization problems.
         fitness_sorted = self.sort_solutions_nsga2(fitness=fitness)
 
-        if self.gene_type_single == True:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
-        else:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
-
+        parents = self.initialize_parents_array((num_parents, self.population.shape[1]))
         parents_indices = []
 
         for parent_num in range(num_parents):
@@ -137,10 +123,11 @@ class ParentSelection:
 
             # Append the index of the selected parent.
             parents_indices.append(rand_indices[selected_parent_idx])
-            # Insert the selected parent.
-            parents[parent_num, :] = self.population[rand_indices[selected_parent_idx], :].copy()
 
-        return parents, numpy.array(parents_indices)
+        parents_indices = numpy.array(parents_indices)
+        parents[:, :] = self.population[parents_indices, :].copy()
+
+        return parents, parents_indices
 
     def roulette_wheel_selection(self, fitness, num_parents):
     
@@ -186,11 +173,13 @@ class ParentSelection:
             rand_prob = numpy.random.rand()
             for idx in range(probs.shape[0]):
                 if (rand_prob >= probs_start[idx] and rand_prob < probs_end[idx]):
-                    parents[parent_num, :] = self.population[idx, :].copy()
                     parents_indices.append(idx)
                     break
 
-        return parents, numpy.array(parents_indices)
+        parents_indices = numpy.array(parents_indices)
+        parents[:, :] = self.population[parents_indices, :].copy()
+
+        return parents, parents_indices
 
     def wheel_cumulative_probs(self, probs, num_parents):
         """
@@ -220,10 +209,7 @@ class ParentSelection:
             probs[min_probs_idx] = float('inf')
 
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
-        if self.gene_type_single == True:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
-        else:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
+        parents = self.initialize_parents_array((num_parents, self.population.shape[1]))
 
         return probs_start, probs_end, parents
 
@@ -281,10 +267,7 @@ class ParentSelection:
                                              size=1)[0] # Location of the first pointer.
 
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
-        if self.gene_type_single == True:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
-        else:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
+        parents = self.initialize_parents_array((num_parents, self.population.shape[1]))
 
         parents_indices = []
 
@@ -292,11 +275,13 @@ class ParentSelection:
             rand_pointer = first_pointer + parent_num*pointers_distance
             for idx in range(probs.shape[0]):
                 if (rand_pointer >= probs_start[idx] and rand_pointer < probs_end[idx]):
-                    parents[parent_num, :] = self.population[idx, :].copy()
                     parents_indices.append(idx)
                     break
 
-        return parents, numpy.array(parents_indices)
+        parents_indices = numpy.array(parents_indices)
+        parents[:, :] = self.population[parents_indices, :].copy()
+
+        return parents, parents_indices
 
     def tournament_selection_nsga2(self,
                                    fitness,

@@ -238,6 +238,15 @@ class Helper:
             summary_output = summary_output + m + "\n"
         return summary_output
 
+    def initialize_parents_array(self, shape):
+        """
+        Standardize array initialization for parents and offspring.
+        """
+        if self.gene_type_single:
+            return numpy.empty(shape, dtype=self.gene_type[0])
+        else:
+            return numpy.empty(shape, dtype=object)
+
     def change_population_dtype_and_round(self,
                                           population):
         """
