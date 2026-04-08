@@ -64,6 +64,33 @@ If the 2 parameters `mutation_type` and `crossover_type` are `None`, this disabl
 
 The parameters are validated by calling the `validate_parameters()` method of the `utils.validation.Validation` class within the constructor. If at least a parameter is not correct, an exception is thrown and the `valid_parameters` attribute is set to `False`.
 
+# Extended Classes
+
+To make the library modular and structured, different scripts are created where each script has one or more classes. Each class has its own objective.
+
+This is the list of scripts and classes within them where the `pygad.GA` class extends:
+
+1. `utils/engine.py`:
+   1. `utils.engine.GAEngine`: 
+2. `utils/validation.py`
+   1. `utils.validation.Validation`
+3. `utils/parent_selection.py`
+   1. `utils.parent_selection.ParentSelection`
+4. `utils/crossover.py`
+   1. `utils.crossover.Crossover`
+5. `utils/mutation.py`
+   1. `utils.mutation.Mutation`
+6. `utils/nsga2.py`
+   1. `utils.nsga2.NSGA2`
+7. `helper/unique.py`
+   1. `helper.unique.Unique` 
+8. `helper/misc.py`
+   1. `helper.misc.Helper`
+9. `visualize/plot.py`
+   1. `visualize.plot.Plot` 
+
+Since the `pygad.GA` class extends such classes, the attributes and methods inside them can be retrieved by instances of the `pygad.GA` class.
+
 ## Class Attributes
 
 * `supported_int_types`: A list of the supported types for the integer numbers.
@@ -75,6 +102,8 @@ The parameters are validated by calling the `validate_parameters()` method of th
 All the parameters and functions passed to the `pygad.GA` class constructor are used as class attributes and methods in the instances of the `pygad.GA` class. In addition to such attributes, there are other attributes and methods added to the instances of the `pygad.GA` class:
 
 The next 2 subsections list such attributes and methods.
+
+> The `GA` class gains the attributes of its parent classes via inheritance, making them accessible through the `GA` object even if they are defined externally to its specific class body.
 
 ### Other Attributes
 
@@ -141,33 +170,6 @@ Accepts the following parameter:
 * `filename`: Name of the file holding the saved instance of the genetic algorithm. No extension is needed.
 
 Returns the genetic algorithm instance.
-
-# Extended Classes
-
-To make the library modular and structured, different scripts are created where each script has one or more classes. Each class has its own objective.
-
-This is the list of scripts and classes within them where the `pygad.GA` class extends:
-
-1. `utils/engine.py`:
-   1. `utils.engine.GAEngine`: 
-2. `utils/validation.py`
-   1. `utils.validation.Validation`
-3. `utils/parent_selection.py`
-   1. `utils.parent_selection.ParentSelection`
-4. `utils/crossover.py`
-   1. `utils.crossover.Crossover`
-5. `utils/mutation.py`
-   1. `utils.mutation.Mutation`
-6. `utils/nsga2.py`
-   1. `utils.nsga2.NSGA2`
-7. `helper/unique.py`
-   1. `helper.unique.Unique` 
-8. `helper/misc.py`
-   1. `helper.misc.Helper`
-9. `visualize/plot.py`
-   1. `visualize.plot.Plot` 
-
-Since the `pygad.GA` class extends such classes, the attributes and methods inside them can be retrieved by instances of the `pygad.GA` class.
 
 # Steps to Use `pygad`
 
