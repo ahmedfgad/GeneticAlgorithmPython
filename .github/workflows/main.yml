@@ -11,6 +11,11 @@ on:
     branches:
       - github-actions
       # - master
+    # Only run the workflow if changes are made in these directories.
+    paths:
+      - 'pygad/**'
+      - 'tests/**'
+      - 'examples/**'
   # Allows manual triggering of the workflow from the GitHub Actions tab.
   workflow_dispatch:
 
