@@ -85,7 +85,7 @@ The next 2 subsections list such attributes and methods.
 ### Other Attributes
 
 - `generations_completed`:  Holds the number of the last completed generation.
-- `population`: A NumPy array holding the initial population.
+- `population`: A NumPy array that initially holds the initial population and is later updated after each generation.
 - `valid_parameters`: Set to `True` when all the parameters passed in the `GA` class constructor are valid.
 - `run_completed`: Set to `True` only after the `run()` method completes gracefully.
 - `pop_size`: The population size.
@@ -93,7 +93,7 @@ The next 2 subsections list such attributes and methods.
 - `best_solution_generation`: The generation number at which the best fitness value is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
 - `best_solutions`: A NumPy array holding the best solution per each generation. It only exists when the `save_best_solutions` parameter in the `pygad.GA` class constructor is set to `True`.
 - `last_generation_fitness`: The fitness values of the solutions in the last generation. [Added in PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
-- `previous_generation_fitness`: At the end of each generation, the fitness of the most recent population is saved in the `last_generation_fitness` attribute. The fitness of the population exactly preceding this most recent population is saved in the `last_generation_fitness` attribute. This `previous_generation_fitness` attribute is used to fetch the pre-calculated fitness instead of calling the fitness function for already explored solutions. [Added in PyGAD 2.16.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-2).
+- `previous_generation_fitness`: At the end of each generation, the fitness of the most recent population is saved in the `last_generation_fitness` attribute. The fitness of the population exactly preceding this most recent population is saved in the `previous_generation_fitness` attribute. This `previous_generation_fitness` attribute is used to fetch the pre-calculated fitness instead of calling the fitness function for already explored solutions. [Added in PyGAD 2.16.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-2).
 - `last_generation_parents`: The parents selected from the last generation. [Added in PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
 - `last_generation_offspring_crossover`: The offspring generated after applying the crossover in the last generation. [Added in PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
 - `last_generation_offspring_mutation`: The offspring generated after applying the mutation in the last generation. [Added in PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
