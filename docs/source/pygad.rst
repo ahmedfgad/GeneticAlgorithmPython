@@ -496,7 +496,8 @@ Other Attributes
 - ``generations_completed``: Holds the number of the last completed
   generation.
 
-- ``population``: A NumPy array holding the initial population.
+- ``population``: A NumPy array that initially holds the initial
+  population and is later updated after each generation.
 
 - ``valid_parameters``: Set to ``True`` when all the parameters passed
   in the ``GA`` class constructor are valid.
@@ -525,7 +526,7 @@ Other Attributes
   fitness of the most recent population is saved in the
   ``last_generation_fitness`` attribute. The fitness of the population
   exactly preceding this most recent population is saved in the
-  ``last_generation_fitness`` attribute. This
+  ``previous_generation_fitness`` attribute. This
   ``previous_generation_fitness`` attribute is used to fetch the
   pre-calculated fitness instead of calling the fitness function for
   already explored solutions. `Added in PyGAD
