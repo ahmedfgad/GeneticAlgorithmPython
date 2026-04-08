@@ -1791,6 +1791,8 @@ Release Date 08 July 2025
 PyGAD 3.6.0
 -----------
 
+Release Date April 8, 2026
+
 1.  Support passing a class to the fitness, crossover, and mutation.
     https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/342
 
@@ -1882,17 +1884,12 @@ PyGAD 3.6.0
     the ``pygad/utils/parent_selection.py`` script to initialize the
     parents array.
 
-20. Add more tests about:
-
-    1. Operators (crossover, mutation, and parent selection).
-
-    2. The ``best_solution()`` method.
-
-    3. Parallel processing.
-
-    4. The ``GANN`` module.
-
-    5. The plots created by the ``visualize``.
+20. | Add more tests about:
+    |  1. Operators (crossover, mutation, and parent selection).
+    |  2. The ``best_solution()`` method.
+    |  3. Parallel processing.
+    |  4. The ``GANN`` module.
+    |  5. The plots created by the ``visualize``.
 
 21. Instead of using repeated code for converting the data type and
     rounding the genes during crossover and mutation, the

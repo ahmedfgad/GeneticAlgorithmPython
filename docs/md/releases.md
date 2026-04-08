@@ -616,6 +616,8 @@ Release Date 08 July 2025
 
 ## PyGAD 3.6.0
 
+Release Date April 8, 2026
+
 1. Support passing a class to the fitness, crossover, and mutation. https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/342
 2. A new class called `Validation` is created in the new `pygad/utils/validation.py` script. It has a method called `validate_parameters()` to validate all the parameters passed while instantiating the `pygad.GA` class.
 3. Refactoring the `pygad.py` script by moving a lot of functions and methods to other classes in other scripts. 
