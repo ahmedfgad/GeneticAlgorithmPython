@@ -66,18 +66,7 @@ class Mutation:
                                                                     sample_size=self.sample_size)
 
                 # Before assigning the selected value from the space to the gene, change its data type and round it.
-                if self.gene_type_single == True:
-                    if not self.gene_type[1] is None:
-                        offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
-                                                                         self.gene_type[1])
-                    else:
-                        offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
-                else:
-                    if not self.gene_type[gene_idx][1] is None:
-                        offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
-                                                                         self.gene_type[gene_idx][1])
-                    else:
-                        offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
+                offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
 
                 if self.allow_duplicate_genes == False:
                     offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
@@ -107,18 +96,7 @@ class Mutation:
                                                                         sample_size=self.sample_size)
 
                     # Assigning the selected value from the space to the gene.
-                    if self.gene_type_single == True:
-                        if not self.gene_type[1] is None:
-                            offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
-                                                                             self.gene_type[1])
-                        else:
-                            offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
-                    else:
-                        if not self.gene_type[gene_idx][1] is None:
-                            offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
-                                                                             self.gene_type[gene_idx][1])
-                        else:
-                            offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
+                    offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
 
                     if self.allow_duplicate_genes == False:
                         offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
@@ -540,18 +518,7 @@ class Mutation:
                                                                     sample_size=self.sample_size)
 
                 # Assigning the selected value from the space to the gene.
-                if self.gene_type_single == True:
-                    if not self.gene_type[1] is None:
-                        offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
-                                                                         self.gene_type[1])
-                    else:
-                        offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
-                else:
-                    if not self.gene_type[gene_idx][1] is None:
-                        offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
-                                                                         self.gene_type[gene_idx][1])
-                    else:
-                        offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
+                offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
 
                 if self.allow_duplicate_genes == False:
                     offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
@@ -678,18 +645,7 @@ class Mutation:
                                                                         sample_size=self.sample_size)
 
                     # Assigning the selected value from the space to the gene.
-                    if self.gene_type_single == True:
-                        if not self.gene_type[1] is None:
-                            offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[0](value_from_space),
-                                                                             self.gene_type[1])
-                        else:
-                            offspring[offspring_idx, gene_idx] = self.gene_type[0](value_from_space)
-                    else:
-                        if not self.gene_type[gene_idx][1] is None:
-                            offspring[offspring_idx, gene_idx] = numpy.round(self.gene_type[gene_idx][0](value_from_space),
-                                                                             self.gene_type[gene_idx][1])
-                        else:
-                            offspring[offspring_idx, gene_idx] = self.gene_type[gene_idx][0](value_from_space)
+                    offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
 
                     if self.allow_duplicate_genes == False:
                         offspring[offspring_idx], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[offspring_idx],
