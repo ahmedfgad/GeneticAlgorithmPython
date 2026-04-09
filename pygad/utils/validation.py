@@ -5,49 +5,14 @@ import inspect
 import logging
 
 class Validation:
-    def validate_parameters(self,
-                            num_generations,
-                            num_parents_mating,
-                            fitness_func,
-                            fitness_batch_size,
-                            initial_population,
-                            sol_per_pop,
-                            num_genes,
-                            init_range_low,
-                            init_range_high,
-                            gene_type,
-                            parent_selection_type,
-                            keep_parents,
-                            keep_elitism,
-                            K_tournament,
-                            crossover_type,
-                            crossover_probability,
-                            mutation_type,
-                            mutation_probability,
-                            mutation_by_replacement,
-                            mutation_percent_genes,
-                            mutation_num_genes,
-                            random_mutation_min_val,
-                            random_mutation_max_val,
-                            gene_space,
-                            gene_constraint,
-                            sample_size,
-                            allow_duplicate_genes,
-                            on_start,
-                            on_fitness,
-                            on_parents,
-                            on_crossover,
-                            on_mutation,
-                            on_generation,
-                            on_stop,
-                            save_best_solutions,
-                            save_solutions,
-                            suppress_warnings,
-                            stop_criteria,
-                            parallel_processing,
-                            random_seed,
-                            logger):
-        
+    
+    def _validate_header(self, 
+                         logger,
+                         random_seed,
+                         suppress_warnings,
+                         mutation_by_replacement,
+                         sample_size,
+                         allow_duplicate_genes):
         # If no logger is passed, then create a logger that logs only the messages to the console.
         if logger is None:
             # Create a logger named with the module name.
@@ -122,7 +87,9 @@ class Validation:
             raise TypeError(f"The expected type of the 'allow_duplicate_genes' parameter is bool but {type(allow_duplicate_genes)} found.")
 
         self.allow_duplicate_genes = allow_duplicate_genes
-
+    
+    def _validate_gene_space(self,
+                             gene_space):
         # Validate gene_space
         self.gene_space_nested = False
         if type(gene_space) is type(None):
@@ -192,6 +159,11 @@ class Validation:
 
         self.gene_space = gene_space
 
+    def _validate_init_range(self,
+                             init_range_low,
+                             init_range_high,
+                             num_genes,
+                             initial_population):
         # Validate init_range_low and init_range_high
         if type(init_range_low) in self.supported_int_float_types:
             if type(init_range_high) in self.supported_int_float_types:
@@ -245,7 +217,11 @@ class Validation:
 
         self.init_range_low = init_range_low
         self.init_range_high = init_range_high
-
+    
+    def _validate_gene_type(self,
+                            gene_type,
+                            num_genes,
+                            initial_population):
         # Validate gene_type
         if gene_type in self.supported_int_float_types:
             self.gene_type = [gene_type, None]
@@ -308,11 +284,15 @@ class Validation:
         else:
             self.valid_parameters = False
             raise ValueError(f"The value passed to the 'gene_type' parameter must be either a single integer, floating-point, list, tuple, or numpy.ndarray but ({gene_type}) of type {type(gene_type)} found.")
-
-        # Call the unpack_gene_space() method in the pygad.helper.unique.Unique class.
-        self.gene_space_unpacked = self.unpack_gene_space(range_min=self.init_range_low,
-                                                          range_max=self.init_range_high)
-
+    
+    
+    def _build_initial_population(self,
+                                  initial_population,
+                                  sol_per_pop,
+                                  num_genes,
+                                  gene_space,
+                                  allow_duplicate_genes,
+                                  gene_constraint):
         # Build the initial population
         if initial_population is None:
             if (sol_per_pop is None) or (num_genes is None):
@@ -393,13 +373,10 @@ class Validation:
         # Change the data type and round all genes within the initial population.
         self.initial_population = self.change_population_dtype_and_round(self.initial_population)
         self.population = self.initial_population.copy()
-
-        # In case the 'gene_space' parameter is nested, then make sure the number of its elements equals to the number of genes.
-        if self.gene_space_nested:
-            if len(gene_space) != self.num_genes:
-                self.valid_parameters = False
-                raise ValueError(f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
-
+    
+    def _validate_mutation_range(self,
+                                 random_mutation_min_val,
+                                 random_mutation_max_val):
         # Validate random_mutation_min_val and random_mutation_max_val
         if type(random_mutation_min_val) in self.supported_int_float_types:
             if type(random_mutation_max_val) in self.supported_int_float_types:
@@ -446,7 +423,10 @@ class Validation:
 
         self.random_mutation_min_val = random_mutation_min_val
         self.random_mutation_max_val = random_mutation_max_val
-
+    
+    
+    def _validate_gene_constraint(self,
+                                  gene_constraint):
         # Validate that gene_constraint is a list or tuple and every element inside it is either None or callable.
         if gene_constraint:
             if type(gene_constraint) in [list, tuple]:
@@ -477,19 +457,10 @@ class Validation:
             pass
 
         self.gene_constraint = gene_constraint
-
-        # Validating the number of parents to be selected for mating (num_parents_mating)
-        if num_parents_mating <= 0:
-            self.valid_parameters = False
-            raise ValueError(f"The number of parents mating (num_parents_mating) parameter must be > 0 but ({num_parents_mating}) found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n")
-
-        # Validating the number of parents to be selected for mating: num_parents_mating
-        if num_parents_mating > self.sol_per_pop:
-            self.valid_parameters = False
-            raise ValueError(f"The number of parents to select for mating ({num_parents_mating}) cannot be greater than the number of solutions in the population ({self.sol_per_pop}) (i.e., num_parents_mating must always be <= sol_per_pop).\n")
-
-        self.num_parents_mating = num_parents_mating
-
+    
+    def _validate_crossover(self,
+                            crossover_type,
+                            crossover_probability):
         # crossover: Refers to the method that applies the crossover operator based on the selected type of crossover in the crossover_type property.
         # Validating the crossover type: crossover_type
         if crossover_type is None:
@@ -554,7 +525,12 @@ class Validation:
         else:
             self.valid_parameters = False
             raise TypeError(f"Unexpected type for the 'crossover_probability' parameter. Float is expected but ({crossover_probability}) of type {type(crossover_probability)} found.")
-
+    
+    def _validate_mutation(self,
+                           mutation_type,
+                           mutation_probability,
+                           mutation_num_genes,
+                           mutation_percent_genes):
         # mutation: Refers to the method that applies the mutation operator based on the selected type of mutation in the mutation_type property.
         # Validating the mutation type: mutation_type
         # "adaptive" mutation is supported starting from PyGAD 2.10.0
@@ -777,7 +753,12 @@ class Validation:
         if (self.mutation_type is None) and (self.crossover_type is None):
             if not self.suppress_warnings:
                 warnings.warn("The 2 parameters mutation_type and crossover_type are None. This disables any type of evolution the genetic algorithm can make. As a result, the genetic algorithm cannot find a better solution that the best solution in the initial population.")
-
+    
+    def _validate_parent_selection(self,
+                                   parent_selection_type,
+                                   K_tournament,
+                                   keep_parents,
+                                   keep_elitism):
         # select_parents: Refers to a method that selects the parents based on the parent selection type specified in the parent_selection_type attribute.
         # Validating the selected type of parent selection: parent_selection_type
         if inspect.ismethod(parent_selection_type):
@@ -888,7 +869,10 @@ class Validation:
                 self.num_offspring = self.sol_per_pop - self.keep_parents
         else:
             self.num_offspring = self.sol_per_pop - self.keep_elitism
-
+    
+    def _validate_fitness_func(self,
+                               fitness_func,
+                               fitness_batch_size):
         # Check if the fitness_func is a method.
         if inspect.ismethod(fitness_func):
             # Check if the fitness method accepts 3 parameters.
@@ -932,7 +916,15 @@ class Validation:
             raise ValueError(f"The value assigned to the fitness_batch_size parameter must be:\n1) Greater than 0.\n2) Less than or equal to sol_per_pop ({self.sol_per_pop}).\nBut the value ({fitness_batch_size}) found.")
 
         self.fitness_batch_size = fitness_batch_size
-
+    
+    def _validate_callbacks(self,
+                            on_start,
+                            on_fitness,
+                            on_parents,
+                            on_crossover,
+                            on_mutation,
+                            on_generation,
+                            on_stop):
         # Check if the on_start exists.
         if not (on_start is None):
             if inspect.ismethod(on_start):
@@ -1192,24 +1184,8 @@ class Validation:
         else:
             self.on_stop = None
 
-        # Validate save_best_solutions
-        if type(save_best_solutions) is bool:
-            if save_best_solutions == True:
-                if not self.suppress_warnings:
-                    warnings.warn("Use the 'save_best_solutions' parameter with caution as it may cause memory overflow when either the number of generations or number of genes is large.")
-        else:
-            self.valid_parameters = False
-            raise TypeError(f"The value passed to the 'save_best_solutions' parameter must be of type bool but {type(save_best_solutions)} found.")
-
-        # Validate save_solutions
-        if type(save_solutions) is bool:
-            if save_solutions == True:
-                if not self.suppress_warnings:
-                    warnings.warn("Use the 'save_solutions' parameter with caution as it may cause memory overflow when either the number of generations, number of genes, or number of solutions in population is large.")
-        else:
-            self.valid_parameters = False
-            raise TypeError(f"The value passed to the 'save_solutions' parameter must be of type bool but {type(save_solutions)} found.")
-
+    def _validate_stop_criteria(self,
+                                stop_criteria):
         self.stop_criteria = []
         self.supported_stop_words = ["reach", "saturate"]
         if stop_criteria is None:
@@ -1281,7 +1257,10 @@ class Validation:
         else:
             self.valid_parameters = False
             raise TypeError(f"The expected value of the 'stop_criteria' is a single string or a list/tuple/numpy.ndarray of strings but the value ({stop_criteria}) of type {type(stop_criteria)} found.")
-
+    
+    def _validate_parallel_processing(self,
+                                      parallel_processing):
+        # Validate the parallel_processing parameter.
         if parallel_processing is None:
             self.parallel_processing = None
         elif type(parallel_processing) in self.supported_int_types:
@@ -1317,6 +1296,24 @@ class Validation:
             self.valid_parameters = False
             raise ValueError(f"Unexpected value ({parallel_processing}) of type ({type(parallel_processing)}) assigned to the 'parallel_processing' parameter. The accepted values for this parameter are:\n1) None: (Default) It means no parallel processing is used.\n2) A positive integer referring to the number of threads to be used (i.e. threads, not processes, are used.\n3) list/tuple: If a list or a tuple of exactly 2 elements is assigned, then:\n\t*1) The first element can be either 'process' or 'thread' to specify whether processes or threads are used, respectively.\n\t*2) The second element can be:\n\t\t**1) A positive integer to select the maximum number of processes or threads to be used.\n\t\t**2) 0 to indicate that parallel processing is not used. This is identical to setting 'parallel_processing=None'.\n\t\t**3) None to use the default value as calculated by the concurrent.futures module.")
 
+    def _validate_footer(self,
+                         num_generations,
+                         parent_selection_type,
+                         mutation_percent_genes,
+                         mutation_num_genes,
+                         save_best_solutions,
+                         save_solutions):
+
+        # In case the 'gene_space' parameter is nested, then make sure the number of its elements equals to the number of genes.
+        if type(num_generations) in self.supported_int_types:
+            if num_generations > 0:
+                self.num_generations = num_generations
+            else:
+                raise ValueError(f"The value assigned to the 'num_generations' parameter must be a positive integer > 0. But the value {num_generations} found.")
+        else:
+            self.valid_parameters = False
+            raise ValueError(f"Unexpected value ({num_generations}) of type ({type(num_generations)}) assigned to the 'num_generations' parameter. It must be assigned a positive integer.")
+
         # Set the `run_completed` property to False. It is set to `True` only after the `run()` method is complete.
         self.run_completed = False
 
@@ -1328,7 +1325,6 @@ class Validation:
         self.valid_parameters = True
 
         # Parameters of the genetic algorithm.
-        self.num_generations = abs(num_generations)
         self.parent_selection_type = parent_selection_type
 
         # Parameters of the mutation operation.
@@ -1366,6 +1362,154 @@ class Validation:
         self.last_generation_elitism_indices = None
         # Supported in PyGAD 3.2.0. It holds the pareto fronts when solving a multi-objective problem.
         self.pareto_fronts = None
+    
+    def validate_parameters(self,
+                            num_generations,
+                            num_parents_mating,
+                            fitness_func,
+                            fitness_batch_size,
+                            initial_population,
+                            sol_per_pop,
+                            num_genes,
+                            init_range_low,
+                            init_range_high,
+                            gene_type,
+                            parent_selection_type,
+                            keep_parents,
+                            keep_elitism,
+                            K_tournament,
+                            crossover_type,
+                            crossover_probability,
+                            mutation_type,
+                            mutation_probability,
+                            mutation_by_replacement,
+                            mutation_percent_genes,
+                            mutation_num_genes,
+                            random_mutation_min_val,
+                            random_mutation_max_val,
+                            gene_space,
+                            gene_constraint,
+                            sample_size,
+                            allow_duplicate_genes,
+                            on_start,
+                            on_fitness,
+                            on_parents,
+                            on_crossover,
+                            on_mutation,
+                            on_generation,
+                            on_stop,
+                            save_best_solutions,
+                            save_solutions,
+                            suppress_warnings,
+                            stop_criteria,
+                            parallel_processing,
+                            random_seed,
+                            logger):
+
+        self._validate_header(logger,
+                              random_seed,
+                              suppress_warnings,
+                              mutation_by_replacement,
+                              sample_size,
+                              allow_duplicate_genes)
+
+        self._validate_gene_space(gene_space)
+
+        self._validate_init_range(init_range_low,
+                                  init_range_high,
+                                  num_genes,
+                                  initial_population)
+
+        self._validate_gene_type(gene_type,
+                                 num_genes,
+                                 initial_population)
+
+        # Call the unpack_gene_space() method in the pygad.helper.unique.Unique class.
+        self.gene_space_unpacked = self.unpack_gene_space(range_min=self.init_range_low,
+                                                          range_max=self.init_range_high)
+
+        self._build_initial_population(initial_population,
+                                       sol_per_pop,
+                                       num_genes,
+                                       gene_space,
+                                       allow_duplicate_genes,
+                                       gene_constraint)
+
+        # In case the 'gene_space' parameter is nested, then make sure the number of its elements equals to the number of genes.
+        if self.gene_space_nested:
+            if len(gene_space) != self.num_genes:
+                self.valid_parameters = False
+                raise ValueError(f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
+
+        self._validate_mutation_range(random_mutation_min_val,
+                                      random_mutation_max_val)
+
+        self._validate_gene_constraint(gene_constraint)
+
+        # Validating the number of parents to be selected for mating (num_parents_mating)
+        if num_parents_mating <= 0:
+            self.valid_parameters = False
+            raise ValueError(f"The number of parents mating (num_parents_mating) parameter must be > 0 but ({num_parents_mating}) found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n")
+
+        # Validating the number of parents to be selected for mating: num_parents_mating
+        if num_parents_mating > self.sol_per_pop:
+            self.valid_parameters = False
+            raise ValueError(f"The number of parents to select for mating ({num_parents_mating}) cannot be greater than the number of solutions in the population ({self.sol_per_pop}) (i.e., num_parents_mating must always be <= sol_per_pop).\n")
+
+        self.num_parents_mating = num_parents_mating
+
+        self._validate_crossover(crossover_type,
+                                 crossover_probability)
+
+        self._validate_mutation(mutation_type,
+                                mutation_probability,
+                                mutation_num_genes,
+                                mutation_percent_genes)
+
+        self._validate_parent_selection(parent_selection_type,
+                                        K_tournament,
+                                        keep_parents,
+                                        keep_elitism)
+
+        self._validate_fitness_func(fitness_func,
+                                    fitness_batch_size)
+
+        self._validate_callbacks(on_start,
+                                 on_fitness,
+                                 on_parents,
+                                 on_crossover,
+                                 on_mutation,
+                                 on_generation,
+                                 on_stop)
+
+        # Validate save_best_solutions
+        if type(save_best_solutions) is bool:
+            if save_best_solutions == True:
+                if not self.suppress_warnings:
+                    warnings.warn("Use the 'save_best_solutions' parameter with caution as it may cause memory overflow when either the number of generations or number of genes is large.")
+        else:
+            self.valid_parameters = False
+            raise TypeError(f"The value passed to the 'save_best_solutions' parameter must be of type bool but {type(save_best_solutions)} found.")
+
+        # Validate save_solutions
+        if type(save_solutions) is bool:
+            if save_solutions == True:
+                if not self.suppress_warnings:
+                    warnings.warn("Use the 'save_solutions' parameter with caution as it may cause memory overflow when either the number of generations, number of genes, or number of solutions in population is large.")
+        else:
+            self.valid_parameters = False
+            raise TypeError(f"The value passed to the 'save_solutions' parameter must be of type bool but {type(save_solutions)} found.")
+
+        self._validate_stop_criteria(stop_criteria)
+
+        self._validate_parallel_processing(parallel_processing)
+
+        self._validate_footer(num_generations,
+                              parent_selection_type,
+                              mutation_percent_genes,
+                              mutation_num_genes,
+                              save_best_solutions,
+                              save_solutions)
 
     def validate_multi_stop_criteria(self, stop_word, number):
         if stop_word == 'reach':
