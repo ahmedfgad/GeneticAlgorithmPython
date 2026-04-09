@@ -1307,15 +1307,33 @@ class Validation:
                          save_best_solutions,
                          save_solutions):
 
-        # In case the 'gene_space' parameter is nested, then make sure the number of its elements equals to the number of genes.
+        # Validate num_generations
         if type(num_generations) in self.supported_int_types:
-            if num_generations > 0:
+            if num_generations >= 0:
                 self.num_generations = num_generations
             else:
-                raise ValueError(f"The value assigned to the 'num_generations' parameter must be a positive integer > 0. But the value {num_generations} found.")
+                raise ValueError(f"The value assigned to the 'num_generations' parameter must be a non-negative integer >= 0. But the value {num_generations} found.")
         else:
             self.valid_parameters = False
-            raise ValueError(f"Unexpected value ({num_generations}) of type ({type(num_generations)}) assigned to the 'num_generations' parameter. It must be assigned a positive integer.")
+            raise ValueError(f"Unexpected value ({num_generations}) of type ({type(num_generations)}) assigned to the 'num_generations' parameter. It must be assigned a non-negative integer.")
+
+        # Validate save_best_solutions
+        if type(save_best_solutions) is bool:
+            if save_best_solutions == True:
+                if not self.suppress_warnings:
+                    warnings.warn("Use the 'save_best_solutions' parameter with caution as it may cause memory overflow when either the number of generations or number of genes is large.")
+        else:
+            self.valid_parameters = False
+            raise TypeError(f"The value passed to the 'save_best_solutions' parameter must be of type bool but {type(save_best_solutions)} found.")
+
+        # Validate save_solutions
+        if type(save_solutions) is bool:
+            if save_solutions == True:
+                if not self.suppress_warnings:
+                    warnings.warn("Use the 'save_solutions' parameter with caution as it may cause memory overflow when either the number of generations, number of genes, or number of solutions in population is large.")
+        else:
+            self.valid_parameters = False
+            raise TypeError(f"The value passed to the 'save_solutions' parameter must be of type bool but {type(save_solutions)} found.")
 
         # Set the `run_completed` property to False. It is set to `True` only after the `run()` method is complete.
         self.run_completed = False
@@ -1484,24 +1502,6 @@ class Validation:
                                  on_mutation,
                                  on_generation,
                                  on_stop)
-
-        # Validate save_best_solutions
-        if type(save_best_solutions) is bool:
-            if save_best_solutions == True:
-                if not self.suppress_warnings:
-                    warnings.warn("Use the 'save_best_solutions' parameter with caution as it may cause memory overflow when either the number of generations or number of genes is large.")
-        else:
-            self.valid_parameters = False
-            raise TypeError(f"The value passed to the 'save_best_solutions' parameter must be of type bool but {type(save_best_solutions)} found.")
-
-        # Validate save_solutions
-        if type(save_solutions) is bool:
-            if save_solutions == True:
-                if not self.suppress_warnings:
-                    warnings.warn("Use the 'save_solutions' parameter with caution as it may cause memory overflow when either the number of generations, number of genes, or number of solutions in population is large.")
-        else:
-            self.valid_parameters = False
-            raise TypeError(f"The value passed to the 'save_solutions' parameter must be of type bool but {type(save_solutions)} found.")
 
         self._validate_stop_criteria(stop_criteria)
 
