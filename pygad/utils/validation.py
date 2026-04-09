@@ -936,7 +936,7 @@ class Validation:
                     self.on_start = on_start
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"The method assigned to the on_start parameter must accept only 2 parameters:\n1) The instance of the genetic algorithm.\nThe passed method named '{on_start.__code__.co_name}' accepts {len(inspect.signature(on_start).parameters)} parameter(s).")
+                    raise ValueError(f"The method assigned to the on_start parameter must accept only 1 parameter representing the instance of the genetic algorithm. The passed method named '{on_start.__code__.co_name}' accepts {len(inspect.signature(on_start).parameters)} parameter(s).")
             # Check if the on_start is a function.
             elif inspect.isfunction(on_start):
                 # Check if the on_start function accepts only a single parameter.
