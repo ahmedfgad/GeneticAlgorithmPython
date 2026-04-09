@@ -870,7 +870,9 @@ class Validation:
                 self.num_offspring = self.sol_per_pop - self.keep_parents
         else:
             self.num_offspring = self.sol_per_pop - self.keep_elitism
-    
+
+        return parent_selection_type
+
     def _validate_fitness_func(self,
                                fitness_func,
                                fitness_batch_size):
@@ -1326,7 +1328,7 @@ class Validation:
         self.valid_parameters = True
 
         # Parameters of the genetic algorithm.
-        self.parent_selection_type = parent_selection_type.lower()
+        self.parent_selection_type = parent_selection_type
 
         # Parameters of the mutation operation.
         self.mutation_percent_genes = mutation_percent_genes
@@ -1467,10 +1469,10 @@ class Validation:
                                                                              mutation_num_genes,
                                                                              mutation_percent_genes)
 
-        self._validate_parent_selection(parent_selection_type,
-                                        K_tournament,
-                                        keep_parents,
-                                        keep_elitism)
+        parent_selection_type = self._validate_parent_selection(parent_selection_type,
+                                                                K_tournament,
+                                                                keep_parents,
+                                                                keep_elitism)
 
         self._validate_fitness_func(fitness_func,
                                     fitness_batch_size)
