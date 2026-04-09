@@ -753,7 +753,8 @@ class Validation:
         if (self.mutation_type is None) and (self.crossover_type is None):
             if not self.suppress_warnings:
                 warnings.warn("The 2 parameters mutation_type and crossover_type are None. This disables any type of evolution the genetic algorithm can make. As a result, the genetic algorithm cannot find a better solution that the best solution in the initial population.")
-    
+        return mutation_num_genes, mutation_percent_genes
+
     def _validate_parent_selection(self,
                                    parent_selection_type,
                                    K_tournament,
@@ -1325,7 +1326,7 @@ class Validation:
         self.valid_parameters = True
 
         # Parameters of the genetic algorithm.
-        self.parent_selection_type = parent_selection_type
+        self.parent_selection_type = parent_selection_type.lower()
 
         # Parameters of the mutation operation.
         self.mutation_percent_genes = mutation_percent_genes
@@ -1461,10 +1462,10 @@ class Validation:
         self._validate_crossover(crossover_type,
                                  crossover_probability)
 
-        self._validate_mutation(mutation_type,
-                                mutation_probability,
-                                mutation_num_genes,
-                                mutation_percent_genes)
+        mutation_num_genes, mutation_percent_genes = self._validate_mutation(mutation_type,
+                                                                             mutation_probability,
+                                                                             mutation_num_genes,
+                                                                             mutation_percent_genes)
 
         self._validate_parent_selection(parent_selection_type,
                                         K_tournament,
