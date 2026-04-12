@@ -55,7 +55,7 @@ dependencies = [
 "Donation Paypal" = "http://paypal.me/ahmedfgad"
 
 [project.optional-dependencies]
-deep_learning = ["keras", "torch"]
+deep_learning = ["keras", "tensorflow", "torch"]
 
 # PyTest Configuration. Later, PyTest will support the [tool.pytest] table.
 [tool.pytest.ini_options]
