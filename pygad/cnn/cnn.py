@@ -78,7 +78,7 @@ def layers_weights_as_matrix(model, vector_weights):
             layer_weights_size = layer.initial_weights.size
     
             weights_vector=vector_weights[start:start + layer_weights_size]
-    #        matrix = pygad.nn.DenseLayer.to_array(vector=weights_vector, shape=layer_weights_shape)
+            # matrix = pygad.nn.DenseLayer.to_array(vector=weights_vector, shape=layer_weights_shape)
             matrix = numpy.reshape(weights_vector, (layer_weights_shape))
             network_weights.append(matrix)
     
