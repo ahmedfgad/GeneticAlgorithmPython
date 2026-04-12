@@ -6,12 +6,12 @@ import concurrent.futures
 class GAEngine:
 
     def round_genes(self, solutions):
-        for gene_idx in range(self.num_genes):
-            if self.gene_type_single:
-                if not self.gene_type[1] is None:
-                    solutions[:, gene_idx] = numpy.round(solutions[:, gene_idx],
-                                                         self.gene_type[1])
-            else:
+        if self.gene_type_single:
+            if not self.gene_type[1] is None:
+                solutions = numpy.round(numpy.asarray(solutions, dtype=self.gene_type[0]),
+                                        self.gene_type[1])
+        else:
+            for gene_idx in range(self.num_genes):
                 if not self.gene_type[gene_idx][1] is None:
                     solutions[:, gene_idx] = numpy.round(numpy.asarray(solutions[:, gene_idx],
                                                                        dtype=self.gene_type[gene_idx][0]),
@@ -77,6 +77,7 @@ class GAEngine:
                                                                                              sample_size=1)
 
         # 2) Change the data type and round all genes within the initial population.
+        # This step is necessary before applying the gene constraints since the right gene value must be used for accuracy.
         self.population = self.change_population_dtype_and_round(self.population)
 
         # Note that gene_constraint is not validated yet.

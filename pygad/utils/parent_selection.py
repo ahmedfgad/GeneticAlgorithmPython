@@ -112,12 +112,14 @@ class ParentSelection:
         parents = self.initialize_parents_array((num_parents, self.population.shape[1]))
         parents_indices = []
 
+        rank_lookup = {sol_idx: rank for rank, sol_idx in enumerate(fitness_sorted)}
+
         for parent_num in range(num_parents):
             # Generate random indices for the candidate solutions.
             rand_indices = numpy.random.randint(low=0, high=len(fitness), size=self.K_tournament)
 
             # Find the rank of the candidate solutions. The lower the rank, the better the solution.
-            rand_indices_rank = [fitness_sorted.index(rand_idx) for rand_idx in rand_indices]
+            rand_indices_rank = [rank_lookup[rand_idx] for rand_idx in rand_indices]
             # Select the solution with the lowest rank as a parent.
             selected_parent_idx = rand_indices_rank.index(min(rand_indices_rank))
 
@@ -196,17 +198,10 @@ class ParentSelection:
         probs_start = numpy.zeros(probs.shape, dtype=float) # An array holding the start values of the ranges of probabilities.
         probs_end = numpy.zeros(probs.shape, dtype=float) # An array holding the end values of the ranges of probabilities.
 
-        curr = 0.0
-
-        # Calculating the probabilities of the solutions to form a roulette wheel.
-        for _ in range(probs.shape[0]):
-            min_probs_idx = numpy.where(probs == numpy.min(probs))[0][0]
-            probs_start[min_probs_idx] = curr
-            curr = curr + probs[min_probs_idx]
-            probs_end[min_probs_idx] = curr
-            # Replace 99999999999 by float('inf')
-            # probs[min_probs_idx] = 99999999999
-            probs[min_probs_idx] = float('inf')
+        sorted_indices = numpy.argsort(probs)
+        cumulative = numpy.cumsum(probs[sorted_indices])
+        probs_start[sorted_indices] = numpy.concatenate([[0.0], cumulative[:-1]])
+        probs_end[sorted_indices] = cumulative
 
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
         parents = self.initialize_parents_array((num_parents, self.population.shape[1]))
@@ -248,18 +243,8 @@ class ParentSelection:
 
         probs = fitness / fitness_sum
 
-        probs_start = numpy.zeros(probs.shape, dtype=float) # An array holding the start values of the ranges of probabilities.
-        probs_end = numpy.zeros(probs.shape, dtype=float) # An array holding the end values of the ranges of probabilities.
-
-        curr = 0.0
-
-        # Calculating the probabilities of the solutions to form a roulette wheel.
-        for _ in range(probs.shape[0]):
-            min_probs_idx = numpy.where(probs == numpy.min(probs))[0][0]
-            probs_start[min_probs_idx] = curr
-            curr = curr + probs[min_probs_idx]
-            probs_end[min_probs_idx] = curr
-            probs[min_probs_idx] = float('inf')
+        probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(), 
+                                                                      num_parents=num_parents)
 
         pointers_distance = 1.0 / self.num_parents_mating # Distance between different pointers.
         first_pointer = numpy.random.uniform(low=0.0, 
