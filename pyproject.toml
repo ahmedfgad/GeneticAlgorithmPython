@@ -13,9 +13,9 @@ version = "3.6.0"
 description = "PyGAD: A Python Library for Building the Genetic Algorithm and Training Machine Learning Algoithms (Keras & PyTorch)."
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3"
-# license = {file = "LICENSE"}
-license = "BSD-3-Clause"
-license-files = ["LICENSE"]
+license = {file = "LICENSE"}
+# license = "BSD-3-Clause"
+# license-files = ["LICENSE"]
 authors = [
   {name = "Ahmed Gad", email = "ahmed.f.gad@gmail.com"},
 ]

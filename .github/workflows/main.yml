@@ -52,14 +52,25 @@ jobs:
           pip install --default-timeout=100 --no-cache-dir -r requirements.txt
           
           if [ "${{ matrix.python-version }}" != "3.14" ] && [ "${{ matrix.python-version }}" != "3.8" ]; then
+            # This block runs if the version IS NOT 3.14 or 3.8
             # Using a retry loop for large DL frameworks to handle transient network issues
+            echo "Installing deep learning libraries."
             for i in {1..3}; do
               pip install --default-timeout=100 --no-cache-dir tensorflow && break || \
               (echo "Retry $i failed, waiting 10s..." && sleep 10)
             done
             pip install --upgrade keras
             pip install torch
+          else
+            # This block runs if the version IS 3.14 or 3.8
+            echo "Skipping heavy deep learning libraries for Python ${{ matrix.python-version }}."
           fi
+
+          # Verify the core deep learning frameworks
+          echo "Verifying installations..."
+          python -c "import tensorflow; print('TensorFlow version:', tensorflow.__version__)" || echo "TensorFlow not installed"
+          python -c "import keras; print('Keras version:', keras.__version__)" || echo "Keras not installed"
+          python -c "import torch; print('PyTorch version:', torch.__version__)" || echo "PyTorch not installed"
 
       # Build the PyGAD package distribution (generating .tar.gz and .whl files).
       # This ensures the package build process is valid on this Python version.
