@@ -1,4 +1,5 @@
 import pygad
+import pygad.torchga
 import torch
 
 def test_torchga_evolution():

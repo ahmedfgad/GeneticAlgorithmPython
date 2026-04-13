@@ -10,7 +10,7 @@ def test_kerasga_evolution():
     data_inputs = numpy.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     data_outputs = numpy.array([[1, 0], [0, 1], [0, 1], [1, 0]]) # One-hot encoded
 
-    input_layer = tensorflow.keras.layers.Input(2)
+    input_layer = tensorflow.keras.layers.Input(shape=(2,))
     dense_layer = tensorflow.keras.layers.Dense(4, activation="relu")(input_layer)
     output_layer = tensorflow.keras.layers.Dense(2, activation="softmax")(dense_layer)
 
