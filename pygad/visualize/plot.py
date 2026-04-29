@@ -322,9 +322,19 @@ class Plot:
 
             # Create an axes instance
             ax = fig.add_subplot(111)
-            boxeplots = ax.boxplot(solutions_to_plot, 
-                                   labels=range(self.num_genes),
-                                   patch_artist=True)
+            # Matplotlib 3.9 renamed the boxplot `labels=` kwarg to
+            # `tick_labels=` and will drop the old name in 3.11. Use whichever
+            # name this matplotlib supports so we work on either side of the
+            # rename without forcing users to upgrade matplotlib.
+            import inspect
+            _tick_kw = (
+                "tick_labels"
+                if "tick_labels" in inspect.signature(ax.boxplot).parameters
+                else "labels"
+            )
+            boxeplots = ax.boxplot(solutions_to_plot,
+                                   patch_artist=True,
+                                   **{_tick_kw: range(self.num_genes)})
             # adding horizontal grid lines
             ax.yaxis.grid(True)
     
