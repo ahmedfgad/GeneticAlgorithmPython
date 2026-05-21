@@ -8,7 +8,11 @@ setuptools.setup(
     version="3.6.0",
     author="Ahmed Fawzy Gad",
     install_requires=["numpy", "matplotlib", "cloudpickle",],
-    author_email="ahmed.f.gad@gmail.com",  
+    extras_require={
+        "deep_learning": ["keras", "tensorflow", "torch"],
+    },
+    author_email="ahmed.f.gad@gmail.com",
+  
     description="PyGAD: A Python Library for Building the Genetic Algorithm and Training Machine Learning Algoithms (Keras & PyTorch).",
     long_description=long_description,
     long_description_content_type="text/markdown",

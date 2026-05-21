@@ -1,10 +1,10 @@
-# PyGAD:  Genetic Algorithm in Python
+# PyGAD: Genetic Algorithm in Python
 
 [PyGAD](https://pypi.org/project/pygad) is an open-source easy-to-use Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. It supports Keras and PyTorch. PyGAD supports optimizing both single-objective and multi-objective problems.
 
-> Try the [Optimization Gadget](https://optimgadget.com), a free cloud-based tool powered by PyGAD. It simplifies optimization by reducing or eliminating the need for coding while providing insightful visualizations.
+> Try the [Optimization Gadget](https://optimgadget.com), a free cloud-based tool powered by PyGAD. It makes optimization easier by reducing or removing the need for coding, and it shows helpful visualizations.
 
-Check documentation of the [PyGAD](https://pygad.readthedocs.io/en/latest).
+Read the [PyGAD documentation](https://pygad.readthedocs.io/en/latest).
 
 [![PyPI Downloads](https://pepy.tech/badge/pygad)](https://pepy.tech/project/pygad) [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/pygad.svg?label=Conda%20Downloads)](
 https://anaconda.org/conda-forge/PyGAD) [![PyPI version](https://badge.fury.io/py/pygad.svg)](https://badge.fury.io/py/pygad)![Docs](https://readthedocs.org/projects/pygad/badge)[![PyGAD PyTest / Python 3.13](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py313.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py313.yml) [![PyGAD PyTest / Python 3.12](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py312.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py312.yml) [![PyGAD PyTest / Python 3.11](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py311.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py311.yml) [![PyGAD PyTest / Python 3.10](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py310.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py310.yml) [![PyGAD PyTest / Python 3.9](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py39.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py39.yml) [![PyGAD PyTest / Python 3.8](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py38.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py38.yml) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Translation](https://hosted.weblate.org/widgets/weblate/-/svg-badge.svg)](https://hosted.weblate.org/engage/weblate/) [![REUSE](https://api.reuse.software/badge/github.com/WeblateOrg/weblate)](https://api.reuse.software/info/github.com/WeblateOrg/weblate) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-Ask%20questions-blue.svg)](
@@ -12,7 +12,7 @@ https://stackoverflow.com/questions/tagged/pygad) [![OpenSSF Scorecard](https://
 
 ![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
 
-[PyGAD](https://pypi.org/project/pygad) supports different types of crossover, mutation, and parent selection. [PyGAD](https://pypi.org/project/pygad) allows different types of problems to be optimized using the genetic algorithm by customizing the fitness function. 
+[PyGAD](https://pypi.org/project/pygad) supports different types of crossover, mutation, and parent selection. It lets you optimize many types of problems with the genetic algorithm by writing your own fitness function.
 
 The library is under active development and more features are added regularly. If you want a feature to be supported, please check the **Contact Us** section to send a request.
 
@@ -25,19 +25,19 @@ The library is under active development and more features are added regularly. I
 
 # Installation
 
-To install [PyGAD](https://pypi.org/project/pygad), simply use pip to download and install the library from [PyPI](https://pypi.org/project/pygad) (Python Package Index). The library is at PyPI at this page https://pypi.org/project/pygad.
+To install [PyGAD](https://pypi.org/project/pygad), use pip to download and install the library from [PyPI](https://pypi.org/project/pygad) (Python Package Index). The library is available on PyPI at this page: https://pypi.org/project/pygad.
 
 Install PyGAD with the following command:
 
-```python
+```
 pip install pygad
 ```
 
-To get started with PyGAD, please read the documentation at [Read The Docs](https://pygad.readthedocs.io/) https://pygad.readthedocs.io.
+To get started with PyGAD, read the documentation at [Read the Docs](https://pygad.readthedocs.io).
 
 # PyGAD Source Code
 
-The source code of the PyGAD' modules is found in the following GitHub projects:
+The source code of the PyGAD modules is in the following GitHub projects:
 
 - [pygad](https://github.com/ahmedfgad/GeneticAlgorithmPython): (https://github.com/ahmedfgad/GeneticAlgorithmPython)
 - [pygad.nn](https://github.com/ahmedfgad/NumPyANN): https://github.com/ahmedfgad/NumPyANN
@@ -47,13 +47,11 @@ The source code of the PyGAD' modules is found in the following GitHub projects:
 - [pygad.kerasga](https://github.com/ahmedfgad/KerasGA): https://github.com/ahmedfgad/KerasGA
 - [pygad.torchga](https://github.com/ahmedfgad/TorchGA): https://github.com/ahmedfgad/TorchGA
 
-The documentation of PyGAD is available at [Read The Docs](https://pygad.readthedocs.io/) https://pygad.readthedocs.io.
-
 # PyGAD Documentation
 
-The documentation of the PyGAD library is available at [Read The Docs](https://pygad.readthedocs.io) at this link: https://pygad.readthedocs.io. It discusses the modules supported by PyGAD, all its classes, methods, attribute, and functions. For each module, a number of examples are given.
+The PyGAD documentation is available at [Read the Docs](https://pygad.readthedocs.io) at this link: https://pygad.readthedocs.io. It explains the modules supported by PyGAD and all its classes, methods, attributes, and functions. For each module, several examples are given.
 
-If there is an issue using PyGAD, feel free to post at issue in this [GitHub repository](https://github.com/ahmedfgad/GeneticAlgorithmPython) https://github.com/ahmedfgad/GeneticAlgorithmPython or by sending an e-mail to ahmed.f.gad@gmail.com. 
+If you have an issue using PyGAD, feel free to post an issue in this [GitHub repository](https://github.com/ahmedfgad/GeneticAlgorithmPython) or send an e-mail to ahmed.f.gad@gmail.com.
 
 If you built a project that uses PyGAD, then please drop an e-mail to ahmed.f.gad@gmail.com with the following information so that your project is included in the documentation.
 
@@ -65,7 +63,7 @@ Please check the **Contact Us** section for more contact details.
 
 # Life Cycle of PyGAD
 
-The next figure lists the different stages in the lifecycle of an instance of the `pygad.GA` class. Note that PyGAD stops when either all generations are completed or when the function passed to the `on_generation` parameter returns the string `stop`.
+The next figure shows the main stages in the life cycle of a `pygad.GA` instance. PyGAD stops when all generations are completed or when the function passed to the `on_generation` parameter returns the string `stop`.
 
 ![PyGAD Lifecycle](https://user-images.githubusercontent.com/16560492/220486073-c5b6089d-81e4-44d9-a53c-385f479a7273.jpg)
 
@@ -122,7 +120,7 @@ ga_instance = pygad.GA(num_generations=3,
 ga_instance.run()
 ```
 
-Based on the used 3 generations as assigned to the `num_generations` argument, here is the output.
+Because `num_generations` is set to 3, here is the output.
 
 ```
 on_start()
@@ -158,7 +156,7 @@ import numpy
 
 """
 Given the following function:
-    y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
+    y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + w6x6
     where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
 What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize this function.
 """
@@ -168,7 +166,7 @@ desired_output = 44 # Function output.
 
 def fitness_func(ga_instance, solution, solution_idx):
     # Calculating the fitness value of each solution in the current population.
-    # The fitness function calulates the sum of products between each input and its corresponding weight.
+    # The fitness function calculates the sum of products between each input and its corresponding weight.
     output = numpy.sum(solution*function_inputs)
     fitness = 1.0 / numpy.abs(output - desired_output)
     return fitness
@@ -203,7 +201,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 # Running the GA to optimize the parameters of the function.
 ga_instance.run()
 
-# After the generations complete, some plots are showed that summarize the how the outputs/fitenss values evolve over generations.
+# After the generations complete, a plot is shown that summarizes how the fitness values evolve over the generations.
 ga_instance.plot_fitness()
 
 # Returning the details of the best solution.
@@ -229,7 +227,7 @@ loaded_ga_instance.plot_fitness()
 
 # For More Information
 
-There are different resources that can be used to get started with the genetic algorithm and building it in Python. 
+Here are some resources to help you get started with the genetic algorithm and build it in Python.
 
 ## Tutorial: Implementing Genetic Algorithm in Python
 
@@ -239,7 +237,7 @@ To start with coding the genetic algorithm, you can check the tutorial titled [*
 - [Towards Data Science](https://towardsdatascience.com/genetic-algorithm-implementation-in-python-5ab67bb124a6)
 - [KDnuggets](https://www.kdnuggets.com/2018/07/genetic-algorithm-implementation-python.html)
 
-[This tutorial](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad) is prepared based on a previous version of the project but it still a good resource to start with coding the genetic algorithm.
+[This tutorial](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad) is based on an earlier version of the project, but it is still a good resource to start coding the genetic algorithm.
 
 [![Genetic Algorithm Implementation in Python](https://user-images.githubusercontent.com/16560492/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png)](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad)
 

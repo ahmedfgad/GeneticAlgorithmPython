@@ -4,7 +4,7 @@ from pygad import utils
 from pygad import helper
 from pygad import visualize
 
-# Extend all the classes so that they can be referenced by just the `self` object of the `pygad.GA` class.
+# Inherit from all these classes so that their methods can be accessed through the `self` object of the `pygad.GA` class.
 class GA(utils.parent_selection.ParentSelection,
          utils.crossover.Crossover,
          utils.mutation.Mutation,
@@ -78,8 +78,8 @@ class GA(utils.parent_selection.ParentSelection,
         num_genes: Number of genes in the solution.
 
         init_range_low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
-        init_range_high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20.
-        # It is OK to set the value of the 2 parameters ('init_range_low' and 'init_range_high') to be equal, higher or lower than the other parameter (i.e. init_range_low is not needed to be lower than init_range_high).
+        init_range_high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to 4. Available in PyGAD 1.0.20.
+        It is OK for the 2 parameters ('init_range_low' and 'init_range_high') to be equal, or for one to be higher or lower than the other (i.e. 'init_range_low' does not need to be lower than 'init_range_high').
 
         gene_type: The type of the gene. It is assigned to any of these types (int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, float, numpy.float16, numpy.float32, numpy.float64) and forces all the genes to be of that type.
 
@@ -102,7 +102,7 @@ class GA(utils.parent_selection.ParentSelection,
         random_mutation_min_val: The minimum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to -1.0.
         random_mutation_max_val: The maximum value of the range from which a random value is selected to be added to the selected gene(s) to mutate. It defaults to 1.0.
 
-        gene_space: It accepts a list of all possible values of the gene. This list is used in the mutation step. Should be used only if the gene space is a set of discrete values. No need for the 2 parameters (random_mutation_min_val and random_mutation_max_val) if the parameter gene_space exists. Added in PyGAD 2.5.0. In PyGAD 2.11.0, the gene_space can be assigned a dict.
+        gene_space: It accepts a list of all possible values of the gene. This list is used in the mutation step. It should be used only if the gene space is a set of discrete values. No need for the 2 parameters (random_mutation_min_val and random_mutation_max_val) if the parameter gene_space exists. Added in PyGAD 2.5.0. In PyGAD 2.11.0, the gene_space can be assigned a dict.
 
         gene_constraint: It accepts a list of constraints for the genes. Each constraint is a Python function. Added in PyGAD 3.5.0.
         sample_size: To select a gene value that respects a constraint, this variable defines the size of the sample from which a value is selected randomly. Useful if either allow_duplicate_genes or gene_constraint is used. Added in PyGAD 3.5.0.

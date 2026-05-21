@@ -6,12 +6,12 @@ import concurrent.futures
 class GAEngine:
 
     def round_genes(self, solutions):
-        for gene_idx in range(self.num_genes):
-            if self.gene_type_single:
-                if not self.gene_type[1] is None:
-                    solutions[:, gene_idx] = numpy.round(solutions[:, gene_idx],
-                                                         self.gene_type[1])
-            else:
+        if self.gene_type_single:
+            if not self.gene_type[1] is None:
+                solutions = numpy.round(numpy.asarray(solutions, dtype=self.gene_type[0]),
+                                        self.gene_type[1])
+        else:
+            for gene_idx in range(self.num_genes):
                 if not self.gene_type[gene_idx][1] is None:
                     solutions[:, gene_idx] = numpy.round(numpy.asarray(solutions[:, gene_idx],
                                                                        dtype=self.gene_type[gene_idx][0]),
@@ -77,6 +77,7 @@ class GAEngine:
                                                                                              sample_size=1)
 
         # 2) Change the data type and round all genes within the initial population.
+        # This step is necessary before applying the gene constraints since the right gene value must be used for accuracy.
         self.population = self.change_population_dtype_and_round(self.population)
 
         # Note that gene_constraint is not validated yet.
@@ -99,7 +100,7 @@ class GAEngine:
                         if result:
                             pass
                         else:
-                            raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is subset of the passed values (second argument).")
+                            raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is a subset of the passed values (second argument).")
 
                         if len(filtered_values) ==1 and filtered_values[0] != solution[gene_idx]:
                             # Error by the user's defined gene constraint callable.
@@ -424,7 +425,7 @@ class GAEngine:
                 generation_first_idx = self.generations_completed
                 generation_last_idx = self.num_generations + self.generations_completed
             else:
-                # If the 'self.generations_completed' parameter is '0', then stat from scratch.
+                # If the 'self.generations_completed' parameter is '0', then start from scratch.
                 generation_first_idx = 0
                 generation_last_idx = self.num_generations
 
@@ -487,14 +488,11 @@ class GAEngine:
                 if self.save_best_solutions:
                     self.best_solutions.append(list(best_solution))
 
-                # Note: Any code that has loop-dependant statements (e.g. continue, break, etc.) must be kept inside the loop of the 'run()' method. It can be moved to another method to clean the run() method.
-                # If the on_generation attribute is not None, then cal the callback function after the generation.
+                # Note: Any code that has loop-dependent statements (e.g. continue, break, etc.) must be kept inside the loop of the 'run()' method. It cannot be moved to another method to clean up the run() method.
+                # If the on_generation attribute is not None, then call the callback function after the generation.
                 if not (self.on_generation is None):
                     r = self.on_generation(self)
                     if type(r) is str and r.lower() == "stop":
-                        # Before aborting the loop, save the fitness value of the best solution.
-                        # _, best_solution_fitness, _ = self.best_solution()
-                        self.best_solutions_fitness.append(best_solution_fitness)
                         break
 
                 if not self.stop_criteria is None:
@@ -517,7 +515,7 @@ class GAEngine:
                                         pass
                                     else:
                                         self.valid_parameters = False
-                                        raise ValueError(f"When the the 'reach' keyword is used with the 'stop_criteria' parameter for solving a multi-objective problem, then the number of numeric values following the keyword can be:\n1) A single numeric value to be used across all the objective functions.\n2) A number of numeric values equal to the number of objective functions.\nBut the value {criterion} found with {len(criterion)-1} numeric values which is not equal to the number of objective functions {len(self.last_generation_fitness[0])}.")
+                                        raise ValueError(f"When the 'reach' keyword is used with the 'stop_criteria' parameter for solving a multi-objective problem, then the number of numeric values following the keyword can be:\n1) A single numeric value to be used across all the objective functions.\n2) A number of numeric values equal to the number of objective functions.\nBut the value {criterion} found with {len(criterion)-1} numeric values which is not equal to the number of objective functions {len(self.last_generation_fitness[0])}.")
 
                                 stop_run = True
                                 for obj_idx in range(len(self.last_generation_fitness[0])):
@@ -876,7 +874,7 @@ class GAEngine:
         """
         Returns information about the best solution found by the genetic algorithm.
         Accepts the following parameters:
-            pop_fitness: An optional parameter holding the fitness values of the solutions in the latest population. If passed, then it save time calculating the fitness. If None, then the 'cal_pop_fitness()' method is called to calculate the fitness of the latest population.
+            pop_fitness: An optional parameter holding the fitness values of the solutions in the latest population. If passed, then it saves time calculating the fitness. If None, then the 'cal_pop_fitness()' method is called to calculate the fitness of the latest population.
         The following are returned:
             -best_solution: Best solution in the current population.
             -best_solution_fitness: Fitness value of the best solution.
@@ -885,7 +883,7 @@ class GAEngine:
 
         try:
             if pop_fitness is None:
-                # If the 'pop_fitness' parameter is not passed, then we have to call the 'cal_pop_fitness()' method to calculate the fitness of all solutions in the lastest population.
+                # If the 'pop_fitness' parameter is not passed, then we have to call the 'cal_pop_fitness()' method to calculate the fitness of all solutions in the latest population.
                 pop_fitness = self.cal_pop_fitness()
             # Verify the type of the 'pop_fitness' parameter.
             elif type(pop_fitness) in [tuple, list, numpy.ndarray]:

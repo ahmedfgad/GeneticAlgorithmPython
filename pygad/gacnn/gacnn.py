@@ -14,7 +14,7 @@ def population_as_vectors(population_networks):
 
     population_vectors = []
     for solution in population_networks:
-        # Converting the weights of single layer from the current CNN (i.e. solution) to a vector.
+        # Converting the weights of the current CNN (i.e. solution) into a vector.
         solution_weights_vector = cnn.layers_weights_as_vector(solution)
         # Appending the weights vector of the current layer of a CNN (i.e. solution) to the weights of the previous layers of the same CNN (i.e. solution).
         population_vectors.append(solution_weights_vector)
@@ -35,7 +35,7 @@ def population_as_matrices(population_networks, population_vectors):
 
     population_matrices = []
     for solution, solution_weights_vector in zip(population_networks, population_vectors):
-        # Converting the weights of single layer from the current CNN (i.e. solution) from a vector to a matrix.
+        # Converting the weights of the current CNN (i.e. solution) from a vector into a matrix.
         solution_weights_matrix = cnn.layers_weights_as_matrix(solution, solution_weights_vector)
         # Appending the weights matrix of the current layer of a CNN (i.e. solution) to the weights of the previous layers of the same network (i.e. solution).
         population_matrices.append(solution_weights_matrix)
@@ -89,7 +89,7 @@ class GACNN:
         """
 
         idx = 0
-        # Fetches all layers weights matrices for a single solution (i.e. CNN)
+        # Loop through each solution (i.e. CNN) to update its weights.
         for solution in self.population_networks:
             # Calling the cnn.update_layers_trained_weights() function for updating the 'trained_weights' attribute for all layers in the current solution (i.e. CNN).
             cnn.update_layers_trained_weights(model=solution, 

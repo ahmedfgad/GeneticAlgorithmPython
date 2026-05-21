@@ -58,9 +58,9 @@ class Crossover:
                 # Index of the second parent to mate.
                 parent2_idx = (k+1) % parents.shape[0]
 
-            # The new offspring has its first half of its genes from the first parent.
+            # The first half of the offspring's genes comes from the first parent.
             offspring[k, 0:crossover_points[k]] = parents[parent1_idx, 0:crossover_points[k]]
-            # The new offspring has its second half of its genes from the second parent.
+            # The second half of the offspring's genes comes from the second parent.
             offspring[k, crossover_points[k]:] = parents[parent2_idx, crossover_points[k]:]
 
             if self.allow_duplicate_genes == False:
@@ -87,7 +87,7 @@ class Crossover:
         It accepts 2 parameters:
             -parents: The parents to mate for producing the offspring.
             -offspring_size: The size of the offspring to produce.
-        It returns an array the produced offspring.
+        It returns an array of the produced offspring.
         """
 
         if self.gene_type_single == True:
@@ -160,7 +160,7 @@ class Crossover:
         It accepts 2 parameters:
             -parents: The parents to mate for producing the offspring.
             -offspring_size: The size of the offspring to produce.
-        It returns an array the produced offspring.
+        It returns an array of the produced offspring.
         """
 
         if self.gene_type_single == True:
@@ -198,13 +198,11 @@ class Crossover:
                 # Index of the second parent to mate.
                 parent2_idx = (k+1) % parents.shape[0]
 
-            for gene_idx in range(offspring_size[1]):
-                if (genes_sources[k, gene_idx] == 0):
-                    # The gene will be copied from the first parent if the current gene index is 0.
-                    offspring[k, gene_idx] = parents[parent1_idx, gene_idx]
-                elif (genes_sources[k, gene_idx] == 1):
-                    # The gene will be copied from the second parent if the current gene index is 1.
-                    offspring[k, gene_idx] = parents[parent2_idx, gene_idx]
+            # The gene will be copied from the first parent if the current gene index is 0.
+            # The gene will be copied from the second parent if the current gene index is 1.
+            offspring[k, :] = numpy.where(genes_sources[k] == 0, 
+                                          parents[parent1_idx, :], 
+                                          parents[parent2_idx, :])
 
             if self.allow_duplicate_genes == False:
                 if self.gene_space is None:
@@ -230,7 +228,7 @@ class Crossover:
         It accepts 2 parameters:
             -parents: The parents to mate for producing the offspring.
             -offspring_size: The size of the offspring to produce.
-        It returns an array the produced offspring.
+        It returns an array of the produced offspring.
         """
 
         if self.gene_type_single == True:
@@ -268,6 +266,8 @@ class Crossover:
                 # Index of the second parent to mate.
                 parent2_idx = (k+1) % parents.shape[0]
 
+            # The gene will be copied from the first parent if the current gene index is 0.
+            # The gene will be copied from the second parent if the current gene index is 1.
             offspring[k, :] = numpy.where(genes_sources[k] == 0, 
                                           parents[parent1_idx, :], 
                                           parents[parent2_idx, :])

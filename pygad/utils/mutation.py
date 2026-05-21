@@ -40,7 +40,7 @@ class Mutation:
         else:
             # When the 'mutation_probability' parameter exists (i.e. not None), then it is used in the mutation.
             if not (self.gene_space is None):
-                # When the attribute 'gene_space' does not exist (i.e. None), the mutation values are selected randomly based on the continuous range specified by the 2 attributes 'random_mutation_min_val' and 'random_mutation_max_val'.
+                # When the attribute 'gene_space' exists (i.e. not None), the mutation values are selected from the space of values of each gene.
                 offspring = self.mutation_probs_by_space(offspring)
             else:
                 offspring = self.mutation_probs_randomly(offspring)
@@ -79,7 +79,7 @@ class Mutation:
     def mutation_probs_by_space(self, offspring):
 
         """
-        Applies the random mutation using the mutation values' space and the mutation probability. For each gene, if its probability is <= that the mutation probability, then it will be mutated based on the mutation space.
+        Applies the random mutation using the mutation values' space and the mutation probability. For each gene, if its probability is <= the mutation probability, then it will be mutated based on the mutation space.
         It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring using the mutation space.
@@ -121,7 +121,7 @@ class Mutation:
             -solution: The solution where the target gene exists.
             -gene_idx: The index of the gene in the solution.
             -sample_size: The number of random values to generate from which a value is selected. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values.
-        It returns a single numeric value the satisfies the gene constraint if exists in the gene_constraint parameter. 
+        It returns a single numeric value that satisfies the gene constraint, if one exists in the gene_constraint parameter.
         """
 
         # Check if the gene has a constraint.
@@ -152,7 +152,7 @@ class Mutation:
                                                       solution=solution,
                                                       mutation_by_replacement=self.mutation_by_replacement,
                                                       sample_size=1)
-        # Even that its name is singular, it might have a multiple values.
+        # Even though its name is singular, it might hold multiple values.
         return value_selected
 
     def mutation_randomly(self, offspring):
@@ -173,7 +173,7 @@ class Mutation:
 
                 range_min, range_max = self.get_random_mutation_range(gene_idx)
 
-                # Generate a random value for mutation that meet the gene constraint if exists.
+                # Generate a random value for mutation that meets the gene constraint, if one exists.
                 random_value = self.mutation_process_gene_value(range_min=range_min,
                                                                 range_max=range_max,
                                                                 solution=offspring[offspring_idx],
@@ -195,7 +195,7 @@ class Mutation:
     def mutation_probs_randomly(self, offspring):
 
         """
-        Applies the random mutation using the mutation probability. For each gene, if its probability is <= that mutation probability, then it will be mutated randomly.
+        Applies the random mutation using the mutation probability. For each gene, if its probability is <= the mutation probability, then it will be mutated randomly.
         It accepts:
             -offspring: The offspring to mutate.
         It returns an array of the mutated offspring.
@@ -212,7 +212,7 @@ class Mutation:
                 # A gene is mutated only if its mutation probability is less than or equal to the threshold.
                 if probs[gene_idx] <= self.mutation_probability:
 
-                    # Generate a random value fpr mutation that meet the gene constraint if exists.
+                    # Generate a random value for mutation that meets the gene constraint, if one exists.
                     random_value = self.mutation_process_gene_value(range_min=range_min,
                                                                     range_max=range_max,
                                                                     solution=offspring[offspring_idx],
@@ -471,7 +471,7 @@ class Mutation:
 
         """
         Applies the adaptive mutation based on the 2 parameters 'mutation_num_genes' and 'gene_space'. 
-        A number of genes equal are selected randomly for mutation. This number depends on the fitness of the solution.
+        A number of genes are selected randomly for mutation. This number depends on the fitness of the solution.
         The random values are selected from the 'gene_space' parameter.
         It accepts:
             -offspring: The offspring to mutate.
@@ -532,7 +532,7 @@ class Mutation:
 
         """
         Applies the adaptive mutation based on the 'mutation_num_genes' parameter. 
-        A number of genes equal are selected randomly for mutation. This number depends on the fitness of the solution.
+        A number of genes are selected randomly for mutation. This number depends on the fitness of the solution.
         The random values are selected based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
         It accepts:
             -offspring: The offspring to mutate.
@@ -596,7 +596,7 @@ class Mutation:
 
         """
         Applies the adaptive mutation based on the 2 parameters 'mutation_probability' and 'gene_space'.
-        Based on whether the solution fitness is above or below a threshold, the mutation is applied diffrently by mutating high or low number of genes.
+        Based on whether the solution fitness is above or below a threshold, the mutation is applied differently by mutating a high or low number of genes.
         The random values are selected based on space of values for each gene.
         It accepts:
             -offspring: The offspring to mutate.
@@ -659,7 +659,7 @@ class Mutation:
 
         """
         Applies the adaptive mutation based on the 'mutation_probability' parameter. 
-        Based on whether the solution fitness is above or below a threshold, the mutation is applied diffrently by mutating high or low number of genes.
+        Based on whether the solution fitness is above or below a threshold, the mutation is applied differently by mutating a high or low number of genes.
         The random values are selected based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
         It accepts:
             -offspring: The offspring to mutate.
@@ -702,7 +702,7 @@ class Mutation:
                 range_min, range_max = self.get_random_mutation_range(gene_idx)
 
                 if probs[gene_idx] <= adaptive_mutation_probability:
-                    # Generate a random value fpr mutation that meet the gene constraint if exists.
+                    # Generate a random value for mutation that meets the gene constraint, if one exists.
                     random_value = self.mutation_process_gene_value(range_min=range_min,
                                                                     range_max=range_max,
                                                                     solution=offspring[offspring_idx],

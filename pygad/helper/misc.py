@@ -91,7 +91,7 @@ class Helper:
                 m = f"Mutation Percentage: {self.mutation_percent_genes}"
                 self.logger.info(m)
                 summary_output = summary_output + m + "\n"
-            # Number of mutation genes is already showed above.
+            # Number of mutation genes is already shown above.
             m = f"Mutation Genes: {self.mutation_num_genes}"
             self.logger.info(m)
             summary_output = summary_output + m + "\n"
@@ -194,10 +194,10 @@ class Helper:
                                      print_crossover_params, None, print_mutation_params, None, print_on_generation_params, None]
 
         if not columns_equal_len:
-            max_lengthes = [max(list(map(len, lifecycle_steps))), max(
+            max_lengths = [max(list(map(len, lifecycle_steps))), max(
                 list(map(len, lifecycle_functions))), max(list(map(len, lifecycle_output)))]
             split_percentages = [
-                int((column_len / sum(max_lengthes)) * 100) for column_len in max_lengthes]
+                int((column_len / sum(max_lengths)) * 100) for column_len in max_lengths]
         else:
             split_percentages = None
 
@@ -409,7 +409,7 @@ class Helper:
         if result:
             pass
         else:
-            raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is subset of the passed values (second argument).")
+            raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is a subset of the passed values (second argument).")
 
         # After going through all the values, check if any value satisfies the constraint.
         if len(filtered_values) > 0:

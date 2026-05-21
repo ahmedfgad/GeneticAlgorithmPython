@@ -14,6 +14,8 @@ description = "PyGAD: A Python Library for Building the Genetic Algorithm and Tr
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3"
 license = {file = "LICENSE"}
+# license = "BSD-3-Clause"
+# license-files = ["LICENSE"]
 authors = [
   {name = "Ahmed Gad", email = "ahmed.f.gad@gmail.com"},
 ]
@@ -21,7 +23,7 @@ maintainers = [
 {name = "Ahmed Gad", email = "ahmed.f.gad@gmail.com"}
 ]
 classifiers = [
-  "License :: OSI Approved :: BSD License",
+  # "License :: OSI Approved :: BSD License",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Natural Language :: English",
@@ -55,7 +57,7 @@ dependencies = [
 "Donation Paypal" = "http://paypal.me/ahmedfgad"
 
 [project.optional-dependencies]
-deep_learning = ["keras", "torch"]
+deep_learning = ["keras", "tensorflow", "torch"]
 
 # PyTest Configuration. Later, PyTest will support the [tool.pytest] table.
 [tool.pytest.ini_options]
