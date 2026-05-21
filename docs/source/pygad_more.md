@@ -40,11 +40,11 @@ Parallel processing, batch fitness, reusing fitness, and non-deterministic probl
 Print a Keras-like summary and log the outputs.
 :::
 
-:::{grid-item-card} User-Defined Functions and Callbacks
+:::{grid-item-card} User-Defined Functions, Methods, and Classes
 :link: custom_functions
 :link-type: doc
 
-Pass your own functions or methods for the fitness and callbacks.
+Pass your own functions, methods, or classes for the fitness and callbacks.
 :::
 
 ::::

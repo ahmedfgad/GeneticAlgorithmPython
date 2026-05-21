@@ -1,4 +1,4 @@
-# Use Functions and Methods to Build Fitness and Callbacks
+# Use Functions, Methods, and Classes to Build Fitness and Callbacks
 
 In PyGAD 2.19.0, it is possible to pass user-defined functions or methods to the following parameters:
 
