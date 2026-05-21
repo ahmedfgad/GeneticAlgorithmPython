@@ -442,13 +442,13 @@ class Validation:
                                 pass
                             else:
                                 self.valid_parameters = False
-                                raise ValueError(f"Every callable inside the gene_constraint parameter must accept 2 arguments representing 1) The solution/chromosome where the gene exists 2) A list of NumPy array of values to check if they meet the constraint. But the callable at index {constraint_idx} named '{item.__code__.co_name}' accepts {item.__code__.co_argcount} argument(s).")
+                                raise ValueError(f"Every callable inside the gene_constraint parameter must accept 2 arguments representing 1) The solution/chromosome where the gene exists 2) A list or NumPy array of values to check if they meet the constraint. But the callable at index {constraint_idx} named '{item.__code__.co_name}' accepts {item.__code__.co_argcount} argument(s).")
                         else:
                             self.valid_parameters = False
                             raise TypeError(f"The expected type of an element in the 'gene_constraint' parameter is None or a callable (e.g. function). But {item} at index {constraint_idx} of type {type(item)} found.")
                 else:
                     self.valid_parameters = False
-                    raise ValueError(f"The number of constrains ({len(gene_constraint)}) in the 'gene_constraint' parameter must be equal to the number of genes ({self.num_genes}).")
+                    raise ValueError(f"The number of constraints ({len(gene_constraint)}) in the 'gene_constraint' parameter must be equal to the number of genes ({self.num_genes}).")
             else:
                 self.valid_parameters = False
                 raise TypeError(f"The expected type of the 'gene_constraint' parameter is either a list or tuple. But the value {gene_constraint} of type {type(gene_constraint)} found.")
@@ -752,7 +752,7 @@ class Validation:
         # Check if crossover and mutation are both disabled.
         if (self.mutation_type is None) and (self.crossover_type is None):
             if not self.suppress_warnings:
-                warnings.warn("The 2 parameters mutation_type and crossover_type are None. This disables any type of evolution the genetic algorithm can make. As a result, the genetic algorithm cannot find a better solution that the best solution in the initial population.")
+                warnings.warn("The 2 parameters mutation_type and crossover_type are None. This disables any type of evolution the genetic algorithm can make. As a result, the genetic algorithm cannot find a better solution than the best solution in the initial population.")
         return mutation_num_genes, mutation_percent_genes
 
     def _validate_parent_selection(self,
@@ -1222,7 +1222,7 @@ class Validation:
                 self.stop_criteria.append([stop_word] + number)
             else:
                 self.valid_parameters = False
-                raise ValueError(f"For format of a single criterion in the 'stop_criteria' parameter is 'word_number' but '{stop_criteria}' found.")
+                raise ValueError(f"The format of a single criterion in the 'stop_criteria' parameter is 'word_number' but '{stop_criteria}' found.")
 
         elif type(stop_criteria) in [list, tuple, numpy.ndarray]:
             # Remove duplicate criteria by converting the list to a set then back to a list.

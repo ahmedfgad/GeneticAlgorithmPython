@@ -100,7 +100,7 @@ class GAEngine:
                         if result:
                             pass
                         else:
-                            raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is subset of the passed values (second argument).")
+                            raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is a subset of the passed values (second argument).")
 
                         if len(filtered_values) ==1 and filtered_values[0] != solution[gene_idx]:
                             # Error by the user's defined gene constraint callable.
@@ -515,7 +515,7 @@ class GAEngine:
                                         pass
                                     else:
                                         self.valid_parameters = False
-                                        raise ValueError(f"When the the 'reach' keyword is used with the 'stop_criteria' parameter for solving a multi-objective problem, then the number of numeric values following the keyword can be:\n1) A single numeric value to be used across all the objective functions.\n2) A number of numeric values equal to the number of objective functions.\nBut the value {criterion} found with {len(criterion)-1} numeric values which is not equal to the number of objective functions {len(self.last_generation_fitness[0])}.")
+                                        raise ValueError(f"When the 'reach' keyword is used with the 'stop_criteria' parameter for solving a multi-objective problem, then the number of numeric values following the keyword can be:\n1) A single numeric value to be used across all the objective functions.\n2) A number of numeric values equal to the number of objective functions.\nBut the value {criterion} found with {len(criterion)-1} numeric values which is not equal to the number of objective functions {len(self.last_generation_fitness[0])}.")
 
                                 stop_run = True
                                 for obj_idx in range(len(self.last_generation_fitness[0])):

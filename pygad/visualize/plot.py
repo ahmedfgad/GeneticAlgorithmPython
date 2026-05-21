@@ -332,23 +332,23 @@ class Plot:
                 if "tick_labels" in inspect.signature(ax.boxplot).parameters
                 else "labels"
             )
-            boxeplots = ax.boxplot(solutions_to_plot,
+            boxplots = ax.boxplot(solutions_to_plot,
                                    patch_artist=True,
                                    **{_tick_kw: range(self.num_genes)})
             # adding horizontal grid lines
             ax.yaxis.grid(True)
     
-            for box in boxeplots['boxes']:
+            for box in boxplots['boxes']:
                 # change outline color
                 box.set(color='black', linewidth=linewidth)
                 # change fill color https://color.adobe.com/create/color-wheel
                 box.set_facecolor(fill_color)
 
-            for whisker in boxeplots['whiskers']:
+            for whisker in boxplots['whiskers']:
                 whisker.set(color=color, linewidth=linewidth)
-            for median in boxeplots['medians']:
+            for median in boxplots['medians']:
                 median.set(color=color, linewidth=linewidth)
-            for cap in boxeplots['caps']:
+            for cap in boxplots['caps']:
                 cap.set(color=color, linewidth=linewidth)
     
             matplt.title(title, fontsize=font_size)
