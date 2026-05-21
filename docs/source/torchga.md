@@ -292,7 +292,7 @@ The sixth and last step is to run the genetic algorithm by calling the `run()` m
 ga_instance.run()
 ```
 
-After the PyGAD completes its execution, then there is a figure that shows how the fitness value changes by generation. Call the `plot_fitness()` method to show the figure.
+After PyGAD completes its execution, a figure shows how the fitness value changes by generation. Call the `plot_fitness()` method to show the figure.
 
 ```python
 ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
