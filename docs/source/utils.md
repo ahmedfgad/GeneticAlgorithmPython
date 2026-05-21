@@ -2,7 +2,7 @@
 
 This section of the documentation discusses the **pygad.utils** module.
 
-PyGAD supports different types of operators for selecting the parents, applying the crossover, and mutation. More features will be added in the future. To ask for a new feature, please check the [Ask for Feature](https://pygad.readthedocs.io/en/latest/releases.html#ask-for-feature) section.
+PyGAD supports different types of operators for selecting the parents, applying the crossover, and mutation. More features will be added in the future. To ask for a new feature, please check the [Ask for Feature](https://pygad.readthedocs.io/en/latest/help.html#ask-for-feature) section.
 
 The submodules in the `pygad.utils` module are:
 

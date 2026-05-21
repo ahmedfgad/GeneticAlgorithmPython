@@ -205,3 +205,10 @@ torchga
 
 releases
 ```
+
+```{toctree}
+:maxdepth: 1
+:caption: Help & Resources
+
+help
+```
