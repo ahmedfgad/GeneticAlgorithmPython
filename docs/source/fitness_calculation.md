@@ -6,7 +6,7 @@ This page covers how PyGAD calculates the fitness efficiently: parallel processi
 
 Starting from [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), parallel processing is supported. This section explains how to use parallel processing in PyGAD.
 
-According to the [PyGAD life cycle](https://pygad.readthedocs.io/en/latest/pygad.html#life-cycle-of-pygad), the computation can be parallelized in only 2 operations:
+According to the [PyGAD life cycle](https://pygad.readthedocs.io/en/latest/lifecycle.html#life-cycle-of-pygad), the computation can be parallelized in only 2 operations:
 
 1. Population fitness calculation.
 2. Mutation.

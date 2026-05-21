@@ -11,7 +11,7 @@ In PyGAD 2.19.0, it is possible to pass user-defined functions or methods to the
 7. `on_generation`
 8. `on_stop`
 
-You can also pass a class instance for any of these parameters. The same 3 options (function, method, or class) work for the operator parameters `crossover_type`, `mutation_type`, and `parent_selection_type`. See the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/utils.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more about the operators.
+You can also pass a class instance for any of these parameters. The same 3 options (function, method, or class) work for the operator parameters `crossover_type`, `mutation_type`, and `parent_selection_type`. See the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/user_defined_operators.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more about the operators.
 
 This section gives 3 examples of how to build these handlers using:
 

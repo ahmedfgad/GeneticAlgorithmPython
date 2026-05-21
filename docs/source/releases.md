@@ -178,7 +178,7 @@ Release Date: 06 December 2020
 Release Date: 03 January 2021
 
 1. Support of a new module `pygad.torchga` to train PyTorch models using PyGAD. Check [its documentation](https://pygad.readthedocs.io/en/latest/torchga.html).
-2. Support of adaptive mutation where the mutation rate is determined by the fitness value of each solution. Read the [Adaptive Mutation](https://pygad.readthedocs.io/en/latest/utils.html#adaptive-mutation) section for more details. Also, read this paper: [Libelli, S. Marsili, and P. Alba. "Adaptive mutation in genetic algorithms." Soft computing 4.2 (2000): 76-80.](https://www.researchgate.net/publication/225642916_Adaptive_mutation_in_genetic_algorithms)
+2. Support of adaptive mutation where the mutation rate is determined by the fitness value of each solution. Read the [Adaptive Mutation](https://pygad.readthedocs.io/en/latest/adaptive_mutation.html#adaptive-mutation) section for more details. Also, read this paper: [Libelli, S. Marsili, and P. Alba. "Adaptive mutation in genetic algorithms." Soft computing 4.2 (2000): 76-80.](https://www.researchgate.net/publication/225642916_Adaptive_mutation_in_genetic_algorithms)
 3. Before the `run()` method completes or exits, the fitness value of the best solution in the current population is appended to the `best_solution_fitness` list attribute. Note that the fitness value of the best solution in the initial population is already saved at the beginning of the list. So, the fitness value of the best solution is saved before the genetic algorithm starts and after it ends.
 4. When the parameter `parent_selection_type` is set to `sss` (steady-state selection), then a warning message is printed if the value of the `keep_parents` parameter is set to 0.
 5. More validations to the user input parameters.
@@ -293,7 +293,7 @@ Release Date: 18 June 2021
 
 Release Date: 19 June 2021
 
-1. A user-defined function can be passed to the `mutation_type`, `crossover_type`, and `parent_selection_type` parameters in the `pygad.GA` class to create a custom mutation, crossover, and parent selection operators. Check the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/utils.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more details. https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50
+1. A user-defined function can be passed to the `mutation_type`, `crossover_type`, and `parent_selection_type` parameters in the `pygad.GA` class to create a custom mutation, crossover, and parent selection operators. Check the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/user_defined_operators.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more details. https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50
 
 ## PyGAD 2.16.1
 
