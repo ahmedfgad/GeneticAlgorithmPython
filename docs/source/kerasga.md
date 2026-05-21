@@ -1,8 +1,8 @@
 # `pygad.kerasga` Module
 
-This section of the PyGAD's library documentation discusses the [**pygad.kerasga**](https://pygad.readthedocs.io/en/latest/kerasga.html) module. 
+This section of the documentation discusses the [**pygad.kerasga**](https://pygad.readthedocs.io/en/latest/kerasga.html) module. 
 
-The `pygad.kerarsga` module has helper a class and 2 functions to train Keras models using the genetic algorithm (PyGAD). The Keras model can be built either using the [Sequential Model](https://keras.io/guides/sequential_model) or the [Functional API](https://keras.io/guides/functional_api).
+The `pygad.kerasga` module has a helper class and 2 functions to train Keras models using the genetic algorithm (PyGAD). The Keras model can be built using either the [Sequential Model](https://keras.io/guides/sequential_model) or the [Functional API](https://keras.io/guides/functional_api).
 
 The contents of this module are:
 
@@ -15,14 +15,14 @@ More details are given in the next sections.
 
 ## Steps Summary
 
-The summary of the steps used to train a Keras model using PyGAD is as follows:
+The steps used to train a Keras model using PyGAD are summarized as follows:
 
 1. Create a Keras model.
 2. Create an instance of the `pygad.kerasga.KerasGA` class.
-4. Prepare the training data.
-5. Build the fitness function.
-6. Create an instance of the `pygad.GA` class.
-8. Run the genetic algorithm.
+3. Prepare the training data.
+4. Build the fitness function.
+5. Create an instance of the `pygad.GA` class.
+6. Run the genetic algorithm.
 
 ## Create Keras Model
 

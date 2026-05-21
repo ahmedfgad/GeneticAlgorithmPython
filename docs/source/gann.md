@@ -1,6 +1,6 @@
 # `pygad.gann` Module
 
-This section of the PyGAD's library documentation discusses the **pygad.gann** module. 
+This section of the documentation discusses the **pygad.gann** module. 
 
 The `pygad.gann` module trains neural networks (for either classification or regression) using the genetic algorithm. It makes use of the 2 modules `pygad` and `pygad.nn`.
 
@@ -56,7 +56,7 @@ Accepts the following parameters:
 This section discusses the functions in the `pygad.gann` module.
 
 ### `pygad.gann.validate_network_parameters()`
-Validates the parameters passed to the constructor of the `pygad.gann.GANN` class. If at least one an invalid parameter exists, an exception is raised and the execution stops.
+Validates the parameters passed to the constructor of the `pygad.gann.GANN` class. If at least one invalid parameter exists, an exception is raised and execution stops.
 
 The function accepts the same parameters passed to the constructor of the `pygad.gann.GANN` class. Please check the documentation of such parameters in the section discussing the class constructor.
 

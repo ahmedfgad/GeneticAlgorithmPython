@@ -1,8 +1,8 @@
 # `pygad.nn` Module
 
-This section of the PyGAD's library documentation discusses the **pygad.nn** module. 
+This section of the documentation discusses the **pygad.nn** module.
 
-Using the **pygad.nn** module, artificial neural networks are created. The purpose of this module is to only implement the **forward pass** of a neural network without using a training algorithm. The **pygad.nn** module builds the network layers, implements the activations functions, trains the network, makes predictions, and more. 
+Using the **pygad.nn** module, artificial neural networks are created. The purpose of this module is to only implement the **forward pass** of a neural network without using a training algorithm. The **pygad.nn** module builds the network layers, implements the activation functions, trains the network, makes predictions, and more.
 
 Later, the **pygad.gann** module is used to train the **pygad.nn** network using the genetic algorithm built in the **pygad** module.
 

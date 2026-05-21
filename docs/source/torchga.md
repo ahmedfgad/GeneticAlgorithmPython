@@ -1,6 +1,6 @@
 # `pygad.torchga` Module
 
-This section of the PyGAD's library documentation discusses the **pygad.torchga** module. 
+This section of the documentation discusses the **pygad.torchga** module. 
 
 The `pygad.torchga` module has a helper class and 2 functions to train PyTorch models using the genetic algorithm (PyGAD). 
 
@@ -15,14 +15,14 @@ More details are given in the next sections.
 
 ## Steps Summary
 
-The summary of the steps used to train a PyTorch model using PyGAD is as follows:
+The steps used to train a PyTorch model using PyGAD are summarized as follows:
 
 1. Create a PyTorch model.
 2. Create an instance of the `pygad.torchga.TorchGA` class.
-4. Prepare the training data.
-5. Build the fitness function.
-6. Create an instance of the `pygad.GA` class.
-8. Run the genetic algorithm.
+3. Prepare the training data.
+4. Build the fitness function.
+5. Create an instance of the `pygad.GA` class.
+6. Run the genetic algorithm.
 
 ## Create PyTorch Model
 
