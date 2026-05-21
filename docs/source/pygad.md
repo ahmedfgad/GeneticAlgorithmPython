@@ -628,7 +628,7 @@ Predicted output 1 based on the best solution : 50.59491545442283
 Predicted output 2 based on the best solution : 29.99714270722312
 ```
 
-This is the figure created by the `plot_fitness()` method. The fitness of the first objective has the green color. The blue color is used for the second objective fitness.
+This is the figure created by the `plot_fitness()` method. The fitness of the first objective is shown in green, and the fitness of the second objective is shown in blue.
 
 ![multi-objective-pygad](https://github.com/ahmedfgad/GeneticAlgorithmPython/assets/16560492/7896f8d8-01c5-4ff9-8d15-52191c309b63)
 
@@ -652,7 +652,7 @@ The steps to follow in order to reproduce an image are as follows:
 - Plot results
 - Calculate some statistics
 
-The next sections discusses the code of each of these steps.
+The next sections discuss the code of each step.
 
 #### Read an Image
 
@@ -670,9 +670,9 @@ Here is the read image.
 
 ![fruit](https://user-images.githubusercontent.com/16560492/36948808-f0ac882e-1fe8-11e8-8d07-1307e3477fd0.jpg)
 
-Based on the chromosome representation used in the example, the pixel values can be either in the 0-255, 0-1, or any other ranges. 
+Based on the chromosome representation used in the example, the pixel values can be in the 0-255 range, the 0-1 range, or any other range.
 
-Note that the range of pixel values affect other parameters like the range from which the random values are selected during mutation and also the range of the values used in the initial population. So, be consistent.
+Note that the range of pixel values affects other parameters, like the range from which random values are selected during mutation and the range of values used in the initial population. So, be consistent.
 
 #### Prepare the Fitness Function
 
@@ -780,13 +780,13 @@ The solution reached after the 20,000 generations is shown below.
 
 ![solution](https://user-images.githubusercontent.com/16560492/82232405-e0f63a80-992e-11ea-984f-b6ed76465bd1.png)
 
-After more generations, the result can be enhanced like what shown below.
+After more generations, the result can be improved, as shown below.
 
 ![solution](https://user-images.githubusercontent.com/16560492/82232345-cf149780-992e-11ea-8390-bf1a57a19de7.png)
 
 The results can also be enhanced by changing the parameters passed to the constructor of the `pygad.GA` class.
 
-Here is how the image is evolved from generation 0 to generation 20,000s.
+Here is how the image evolves from generation 0 to generation 20,000.
 
 Generation 0
 
@@ -824,7 +824,7 @@ Soon a tutorial will be published at [Paperspace](https://blog.paperspace.com/au
 
 ### CoinTex Game Playing using PyGAD
 
-The code is available the [CoinTex GitHub project](https://github.com/ahmedfgad/CoinTex/tree/master/PlayerGA). CoinTex is an Android game written in Python using the Kivy framework. Find CoinTex at [Google Play](https://play.google.com/store/apps/details?id=coin.tex.cointexreactfast): https://play.google.com/store/apps/details?id=coin.tex.cointexreactfast
+The code is available at the [CoinTex GitHub project](https://github.com/ahmedfgad/CoinTex/tree/master/PlayerGA). CoinTex is an Android game written in Python using the Kivy framework. Find CoinTex at [Google Play](https://play.google.com/store/apps/details?id=coin.tex.cointexreactfast): https://play.google.com/store/apps/details?id=coin.tex.cointexreactfast
 
 Check this [Paperspace tutorial](https://blog.paperspace.com/building-agent-for-cointex-using-genetic-algorithm) for how the genetic algorithm plays CoinTex: https://blog.paperspace.com/building-agent-for-cointex-using-genetic-algorithm. Check also this [YouTube video](https://youtu.be/Sp_0RGjaL-0) showing the genetic algorithm while playing CoinTex.
 
