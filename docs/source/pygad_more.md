@@ -122,9 +122,9 @@ This is the figure created by the `plot_fitness()` method. The fitness of the fi
 
 ## Limit the Gene Value Range using the `gene_space` Parameter
 
-In [PyGAD 2.11.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-11-0), the `gene_space` parameter supported a new feature to allow customizing the range of accepted values for each gene. Let's take a quick review of the `gene_space` parameter to build over it.
+In [PyGAD 2.11.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-11-0), the `gene_space` parameter added a new feature that lets you customize the range of accepted values for each gene. Let us first review the `gene_space` parameter and build on it.
 
-The `gene_space` parameter allows the user to feed the space of values of each gene. This way the accepted values for each gene is retracted to the user-defined values. Assume there is a problem that has 3 genes where each gene has different set of values as follows:
+The `gene_space` parameter lets you set the space of values for each gene. This way, the accepted values for each gene are restricted to the user-defined values. Assume there is a problem with 3 genes, where each gene has a different set of values:
 
 1. Gene 1: `[0.4, 12, -5, 21.2]`
 2. Gene 2: `[-2, 0.3]`
@@ -138,15 +138,15 @@ gene_space = [[0.4, 12, -5, 21.2],
               [1.2, 63.2, 7.4]]
 ```
 
-In case all genes share the same set of values, then simply feed a single list to the `gene_space` parameter as follows. In this case, all genes can only take values from this list of 6 values.
+If all genes share the same set of values, then pass a single list to the `gene_space` parameter as follows. In this case, all genes can only take values from this list of 6 values.
 
 ```python
-gene_space = [33, 7, 0.5, 95. 6.3, 0.74]
+gene_space = [33, 7, 0.5, 95, 6.3, 0.74]
 ```
 
-The previous example restricts the gene values to just a set of fixed number of discrete values. In case you want to use a range of discrete values to the gene, then you can use the `range()` function. For example, `range(1, 7)` means the set of allowed values for the gene are `1, 2, 3, 4, 5, and 6`. You can also use the `numpy.arange()` or `numpy.linspace()` functions for the same purpose.
+The previous example restricts the gene values to a fixed set of discrete values. If you want to use a range of discrete values for the gene, then you can use the `range()` function. For example, `range(1, 7)` means the allowed values for the gene are `1, 2, 3, 4, 5, and 6`. You can also use the `numpy.arange()` or `numpy.linspace()` functions for the same purpose.
 
-The previous discussion only works with a range of discrete values not continuous values. In [PyGAD 2.11.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-11-0), the `gene_space` parameter can be assigned a dictionary that allows the gene to have values from a continuous range.
+The previous examples only work with discrete values, not continuous ones. In [PyGAD 2.11.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-11-0), the `gene_space` parameter can be assigned a dictionary that allows the gene to take values from a continuous range.
 
 Assuming you want to restrict the gene within this half-open range [1 to 5) where 1 is included and 5 is not. Then simply create a dictionary with 2 items where the keys of the 2 items are:
 
@@ -219,7 +219,7 @@ gene_space = {"low": 4, "high": 30, "step": 2.5}
 
 > Setting a `dict` like `{"low": 0, "high": 10}` in the `gene_space` means that random values from the continuous range [0, 10) are sampled. Note that `0` is included but `10` is not included while sampling. Thus, the maximum value that could be returned is less than `10` like `9.9999`. But if the user decided to round the genes using, for example, `[float, 2]`, then this value will become 10. So, the user should be careful to the inputs.
 
-If a `None` is assigned to only a single gene, then its value will be randomly generated initially using the `init_range_low` and `init_range_high` parameters in the `pygad.GA` class's constructor. During mutation, the value are sampled from the range defined by the 2 parameters `random_mutation_min_val` and `random_mutation_max_val`. This is an example where the second gene is given a `None` value.
+If a `None` is assigned to only a single gene, then its value will be randomly generated initially using the `init_range_low` and `init_range_high` parameters in the `pygad.GA` class's constructor. During mutation, the value is sampled from the range defined by the 2 parameters `random_mutation_min_val` and `random_mutation_max_val`. This is an example where the second gene is given a `None` value.
 
 ```python
 gene_space = [range(5), None, numpy.linspace(10, 20, 300)]
@@ -259,7 +259,7 @@ Gene space: {'low': 1, 'high': 5}
 Solution: [1.5, 3.4]
 ```
 
-Assuming `random_mutation_min_val=-1` and `random_mutation_max_val=1`, then a random value such as `0.3` can be added to the gene(s) participating in mutation. If only the first gene is mutated, then its new value changes from `1.5` to `1.5+0.3=1.8`. Note that PyGAD verifies that the new value is within the range. In the worst scenarios, the value will be set to either boundary of the continuous range. For example, if the gene value is 1.5 and the random value is -0.55, then the new value is 0.95 which smaller than the lower boundary 1. Thus, the gene value will be rounded to 1.
+Assuming `random_mutation_min_val=-1` and `random_mutation_max_val=1`, then a random value such as `0.3` can be added to the gene(s) participating in mutation. If only the first gene is mutated, then its new value changes from `1.5` to `1.5+0.3=1.8`. Note that PyGAD verifies that the new value is within the range. In the worst scenarios, the value will be set to either boundary of the continuous range. For example, if the gene value is 1.5 and the random value is -0.55, then the new value is 0.95, which is smaller than the lower boundary 1. So, the gene value will be set to 1.
 
 If the dictionary has a step like the example below, then it is considered a discrete range and mutation occurs by randomly selecting a value from the set of values. In other words, no random value is added to the gene value.
 
@@ -273,7 +273,7 @@ In [PyGAD 3.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-
 
 The `gene_constraint` parameter allows the users to define constraints to be enforced (as much as possible) when selecting a value for a gene. For example, this constraint is enforced when applying mutation to make sure the new gene value after mutation meets the gene constraint.
 
-The default value of this parameter is `None` which means no genes have constraints. It can be assigned a list but the length of this list must be equal to the number of genes as specified by the `num_gene` parameter.
+The default value of this parameter is `None` which means no genes have constraints. It can be assigned a list but the length of this list must be equal to the number of genes as specified by the `num_genes` parameter.
 
 When assigned a list, the allowed values for each element are:
 
@@ -282,7 +282,7 @@ When assigned a list, the allowed values for each element are:
    1. The solution where the gene exists.
    2. A list or NumPy array of candidate values for the gene.
 
-It is the user's responsibility to build such callables to filter the passed list of values and return a new list with the values that meets the gene constraint. If no value meets the constraint, return an empty list or NumPy array.
+It is the user's responsibility to build such callables to filter the passed list of values and return a new list with the values that meet the gene constraint. If no value meets the constraint, return an empty list or NumPy array.
 
 For example, if the gene must be smaller than 5, then use this callable:
 
@@ -375,21 +375,21 @@ Sometimes 100 values is not enough and PyGAD sometimes fails to find a good valu
 
 ## Stop at Any Generation
 
-In [PyGAD 2.4.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-4-0), it is possible to stop the genetic algorithm after any generation. All you need to do it to return the string `"stop"` in the callback function `on_generation`. When this callback function is implemented and assigned to the `on_generation` parameter in the constructor of the `pygad.GA` class, then the algorithm immediately stops after completing its current generation. Let's discuss an example.
+In [PyGAD 2.4.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-4-0), it is possible to stop the genetic algorithm after any generation. All you need to do is return the string `"stop"` in the `on_generation` callback function. When this callback function is implemented and assigned to the `on_generation` parameter in the constructor of the `pygad.GA` class, the algorithm stops right after it completes its current generation. Here is an example.
 
-Assume that the user wants to stop algorithm either after the 100 generations or if a condition is met. The user may assign a value of 100 to the `num_generations` parameter of the `pygad.GA` class constructor.  
+Assume the user wants to stop the algorithm either after 100 generations or when a condition is met. The user can assign a value of 100 to the `num_generations` parameter of the `pygad.GA` class constructor.
 
 The condition that stops the algorithm is written in a callback function like the one in the next code. If the fitness value of the best solution exceeds 70, then the string `"stop"` is returned.
 
-   ```python
+```python
 def func_generation(ga_instance):
     if ga_instance.best_solution()[1] >= 70:
         return "stop"
-   ```
+```
 
 ## Stop Criteria
 
-In [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0), a new parameter named `stop_criteria` is added to the constructor of the `pygad.GA` class. It helps to stop the evolution based on some criteria. It can be assigned to one or more criterion.
+In [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0), a new parameter named `stop_criteria` is added to the constructor of the `pygad.GA` class. It helps to stop the evolution based on some criteria. It can be assigned one or more criteria.
 
 Each criterion is passed as `str` that consists of 2 parts:
 
@@ -442,9 +442,9 @@ When multi-objective is used, then there are 2 options to use the `stop_criteria
 1. Pass a single value to use along the `reach` keyword to use across all the objectives.
 2. Pass multiple values along the `reach` keyword. But the number of values must equal the number of objectives.  
 
-For the `saturate` keyword, it is independent to the number of objectives.
+For the `saturate` keyword, it is independent of the number of objectives.
 
-Suppose there are 3 objectives, this is a working example. It stops when the fitness value of the 3 objectives reach or exceed 10, 20, and 30, respectively.
+Suppose there are 3 objectives. Here is a working example. It stops when the fitness values of the 3 objectives reach or exceed 10, 20, and 30, respectively.
 
 ```python
 stop_criteria='reach_10_20_30'
@@ -657,23 +657,23 @@ Note that the 2 attributes (`self.best_solutions` and `self.best_solutions_fitne
 
 ## Change Population Size during Runtime
 
-Starting from [PyGAD 3.3.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-0), the population size can changed during runtime. In other words, the number of solutions/chromosomes and number of genes can be changed. 
+Starting from [PyGAD 3.3.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-0), the population size can be changed during runtime. In other words, the number of solutions/chromosomes and the number of genes can be changed.
 
 The user has to carefully arrange the list of *parameters* and *instance attributes* that have to be changed to keep the GA consistent before and after changing the population size. Generally, change everything that would be used during the GA evolution.
 
-> CAUTION: If the user failed to change a parameter or an instance attributes necessary to keep the GA running after the population size changed, errors will arise.
+> CAUTION: If the user fails to change a parameter or an instance attribute that is needed to keep the GA running after the population size changes, errors will arise.
 
 These are examples of the parameters that the user should decide whether to change. The user should check the [list of parameters](https://pygad.readthedocs.io/en/latest/pygad.html#init) and decide what to change.
 
 1. `population`: The population. It *must* be changed.
-2. `num_offspring`: The number of offspring to produce out of the crossover and mutation operations. Change this parameter if the number of offspring have to be changed to be consistent with the new population size.
-3. `num_parents_mating`: The number of solutions to select as parents. Change this parameter if the number of parents have to be changed to be consistent with the new population size.
-4. `fitness_func`: If the way of calculating the fitness changes after the new population size, then the fitness function have to be changed.
+2. `num_offspring`: The number of offspring to produce from the crossover and mutation operations. Change this parameter if the number of offspring has to change to match the new population size.
+3. `num_parents_mating`: The number of solutions to select as parents. Change this parameter if the number of parents has to change to match the new population size.
+4. `fitness_func`: If the way of calculating the fitness changes with the new population size, then the fitness function has to be changed.
 5. `sol_per_pop`: The number of solutions per population. It is not critical to change it but it is recommended to keep this number consistent with the number of solutions in the `population` parameter. 
 
 These are examples of the instance attributes that might be changed. The user should check the [list of instance attributes](https://pygad.readthedocs.io/en/latest/pygad.html#other-instance-attributes-methods) and decide what to change.
 
-1. All the `last_generation_*` parameters
+1. All the `last_generation_*` attributes
    1. `last_generation_fitness`: A 1D NumPy array of fitness values of the population.
    2. `last_generation_parents` and `last_generation_parents_indices`: Two NumPy arrays: 2D array representing the parents and 1D array of the parents indices.
    3. `last_generation_elitism` and `last_generation_elitism_indices`: Must be changed if `keep_elitism != 0`. The default value of `keep_elitism` is 1. Two NumPy arrays: 2D array representing the elitism and 1D array of the elitism indices.
