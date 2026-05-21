@@ -149,7 +149,7 @@ Within the constructor, the accepted parameters are used as instance attributes.
 
 ### `pygad.cnn.AveragePooling2D` Class
 
-The `pygad.cnn.AveragePooling2D` class is similar to the `pygad.cnn.MaxPooling2D` class except that it applies the max pooling operation rather than average pooling.
+The `pygad.cnn.AveragePooling2D` class is similar to the `pygad.cnn.MaxPooling2D` class except that it applies the average pooling operation rather than max pooling.
 
 ### `pygad.cnn.Flatten` Class
 
@@ -297,7 +297,7 @@ train_inputs = numpy.load("dataset_inputs.npy")
 train_outputs = numpy.load("dataset_outputs.npy")
 ```
 
-After the data is prepared, next is to create the network architecture.
+After the data is prepared, the next step is to create the network architecture.
 
 ### Building the Network Architecture
 
@@ -310,7 +310,7 @@ sample_shape = train_inputs.shape[1:]
 input_layer = pygad.cnn.Input2D(input_shape=sample_shape)
 ```
 
-After the input layer is created, next is to create a number of layers layers according to the next code. Normally, the last dense layer is regarded as the output layer. Note that the output layer has a number of neurons equal to the number of classes in the dataset which is 4.
+After the input layer is created, the next step is to create a number of layers according to the next code. Normally, the last dense layer is regarded as the output layer. Note that the output layer has a number of neurons equal to the number of classes in the dataset which is 4.
 
 ```python
 conv_layer1 = pygad.cnn.Conv2D(num_filters=2,

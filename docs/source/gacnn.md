@@ -180,7 +180,7 @@ GACNN_instance = pygad.gacnn.GACNN(model=model,
                                    num_solutions=4)
 ```
 
-After creating the instance of the `pygad.gacnn.GACNN` class, next is to fetch the weights of the population as a list of vectors.
+After creating the instance of the `pygad.gacnn.GACNN` class, the next step is to fetch the weights of the population as a list of vectors.
 
 ### Fetch the Population Weights as Vectors
 
@@ -200,7 +200,7 @@ Such population of vectors is used as the initial population.
 initial_population = population_vectors.copy()
 ```
 
-After preparing the population weights as a set of vectors, next is to prepare 2 functions which are:
+After preparing the population weights as a set of vectors, the next step is to prepare 2 functions which are:
 
 1. Fitness function.
 2. Callback function after each generation.
@@ -255,7 +255,7 @@ def callback_generation(ga_instance):
     print(f"Generation = {ga_instance.generations_completed}")
 ```
 
-After preparing the fitness and callback function, next is to create an instance of the `pygad.GA` class. 
+After preparing the fitness and callback function, the next step is to create an instance of the `pygad.GA` class. 
 
 ### Create an Instance of the `pygad.GA` Class
 

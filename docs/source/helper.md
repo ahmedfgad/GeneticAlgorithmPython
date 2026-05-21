@@ -1,6 +1,6 @@
 # `pygad.helper` Module
 
-This section of the PyGAD's library documentation discusses the `pygad.helper` module. 
+This section of the documentation discusses the `pygad.helper` module. 
 
 The `pygad.helper` module has 2 submodules:
 

@@ -364,7 +364,7 @@ data_inputs = numpy.load("dataset_features.npy")
 data_outputs = numpy.load("outputs.npy")
 ```
 
-After the data is prepared, next is to create the network architecture.
+After the data is prepared, the next step is to create the network architecture.
 
 ### Building the Network Architecture
 
@@ -377,7 +377,7 @@ num_inputs = data_inputs.shape[1]
 input_layer = pygad.nn.InputLayer(num_inputs)
 ```
 
-After the input layer is created, next is to create a number of dense layers according to the next code. Normally, the last dense layer is regarded as the output layer. Note that the output layer has a number of neurons equal to the number of classes in the dataset which is 4.
+After the input layer is created, the next step is to create a number of dense layers according to the next code. Normally, the last dense layer is regarded as the output layer. Note that the output layer has a number of neurons equal to the number of classes in the dataset which is 4.
 
 ```python
 hidden_layer = pygad.nn.DenseLayer(num_neurons=HL2_neurons, previous_layer=input_layer, activation_function="relu")

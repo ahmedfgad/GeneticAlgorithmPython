@@ -333,7 +333,7 @@ Sometimes it is normal for PyGAD to fail to find a gene value that satisfies the
 
 For some other cases, the constraint can be met but with some changes. For example, increasing the range from which a value is sampled. If the `gene_space` is used and assigned `range(10)`, then the gene constraint can be met by using `range(50)` so that we can find values greater than 50.
 
-Even if the the gene space is already assigned `range(1000)`, it might still not find values meeting the constraints This is because PyGAD samples a number of values equal to the `sample_size` parameter which defaults to *100*. 
+Even if the gene space is already assigned `range(1000)`, it might still not find values that meet the constraints. This is because PyGAD samples a number of values equal to the `sample_size` parameter which defaults to *100*. 
 
 Out of the range of *1000* numbers, all the 100 values might not be satisfying the constraint. This issue could be solved by simply assigning a larger value for the `sample_size` parameter.
 
