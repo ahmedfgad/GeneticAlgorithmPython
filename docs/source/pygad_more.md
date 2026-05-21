@@ -747,7 +747,7 @@ Generation 5
  [-4  2 -1  1]]
 ```
 
-The `allow_duplicate_genes` parameter is configured with use with the `gene_space` parameter. Here is an example where each of the 4 genes has the same space of values that consists of 4 values (1, 2, 3, and 4).
+The `allow_duplicate_genes` parameter can be used together with the `gene_space` parameter. Here is an example where each of the 4 genes has the same space of 4 values (1, 2, 3, and 4).
 
 ```python
 import pygad
@@ -772,7 +772,7 @@ ga_instance = pygad.GA(num_generations=1,
 ga_instance.run()
 ```
 
-Even that all the genes share the same space of values, no 2 genes duplicate their values as provided by the next output.
+Even though all the genes share the same space of values, no 2 genes have the same value, as shown in the next output.
 
 ```python
 Generation 1
@@ -807,19 +807,19 @@ Generation 5
  [1 2 4 3]]
 ```
 
-You should care of giving enough values for the genes so that PyGAD is able to find alternatives for the gene value in case it duplicates with another gene. 
+You should give enough values for the genes so that PyGAD can find an alternative when a gene value duplicates another gene.
 
-If PyGAD failed to find a unique gene while there is still room to find a unique value, one possible option is to set the `sample_size` parameter to a larger value. Check the [sample_size Parameter](https://pygad.readthedocs.io/en/latest/pygad_more.html#sample-size-parameter) section for more information.
+If PyGAD fails to find a unique gene value while there is still room to find one, then set the `sample_size` parameter to a larger value. Check the [sample_size Parameter](https://pygad.readthedocs.io/en/latest/pygad_more.html#sample-size-parameter) section for more information.
 
 ### Limitation
 
 There might be 2 duplicate genes where changing either of the 2 duplicating genes will not solve the problem. For example, if `gene_space=[[3, 0, 1], [4, 1, 2], [0, 2], [3, 2, 0]]` and the solution is `[3 2 0 0]`, then the values of the last 2 genes duplicate. There are no possible changes in the last 2 genes to solve the problem. 
 
-This problem can be solved by randomly changing one of the non-duplicating genes that may make a room for a unique value in one the 2 duplicating genes. For example, by changing the second gene from 2 to 4, then any of the last 2 genes can take the value 2 and solve the duplicates. The resultant gene is then `[3 4 2 0]`. But this option is not yet supported in PyGAD.
+This problem can be solved by randomly changing one of the non-duplicating genes to make room for a unique value in one of the 2 duplicating genes. For example, by changing the second gene from 2 to 4, then any of the last 2 genes can take the value 2 and solve the duplicates. The resultant gene is then `[3 4 2 0]`. But this option is not yet supported in PyGAD.
 
 ### Solve Duplicates using a Third Gene
 
-When `allow_duplicate_genes=False` and a user-defined `gene_space` is used, it sometimes happen that there is no room to solve the duplicates between the 2 genes by simply replacing the value of one gene by another gene. In [PyGAD 3.1.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-0-1), the duplicates are solved by looking for a third gene that will help in solving the duplicates. The following examples explain how it works.
+When `allow_duplicate_genes=False` and a user-defined `gene_space` is used, it sometimes happens that there is no room to solve the duplicates between the 2 genes by simply replacing the value of one gene with another. In [PyGAD 3.1.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-1-0), the duplicates are solved by looking for a third gene that helps solve them. The following examples explain how it works.
 
 Example 1:
 
@@ -833,9 +833,9 @@ Gene space: [[2, 3],
 Solution: [3, 4, 4, 5]
 ```
 
-By checking the gene space, the second gene can have the values `[3, 4]` and the third gene can have the values `[4, 5]`. To solve the duplicates, we have the value of any of these 2 genes.
+By checking the gene space, the second gene can have the values `[3, 4]` and the third gene can have the values `[4, 5]`. To solve the duplicates, we change the value of one of these 2 genes.
 
-If the value of the second gene changes from 4 to 3, then it will be duplicate with the first gene. If we are to change the value of the third gene from 4 to 5, then it will duplicate with the fourth gene. As a conclusion, trying to just selecting a different gene value for either the second or third genes will introduce new duplicating genes.
+If the value of the second gene changes from 4 to 3, then it will duplicate the first gene. If we change the value of the third gene from 4 to 5, then it will duplicate the fourth gene. In short, simply selecting a different value for either the second or third gene will introduce new duplicate genes.
 
 When there are 2 duplicate genes but there is no way to solve their duplicates, then the solution is to change a third gene that makes a room to solve the duplicates between the 2 genes.
 
@@ -851,14 +851,14 @@ Generally, this is how to solve such duplicates:
 3. Find if **GENEX** can have another value that will not cause any more duplicates. If so, go to step 7.
 4. If all the other values of **GENEX** will cause duplicates, then try another gene **GENEY**.
 5. Repeat steps 3 and 4 until exploring all the genes. 
-6. If there is no possibility to solve the duplicates, then there is not way to solve the duplicates and we have to keep the duplicate value.
+6. If there is no way to solve the duplicates, then we have to keep the duplicate value.
 7. If a value for a gene **GENEM** is found that will not cause more duplicates, then use this value for the gene **GENEM**.
 8. Replace the value of the gene **GENE1** by the old value of the gene **GENEM**. This solves the duplicates.
 
 This is an example to solve the duplicate for the solution `[3, 4, 4, 5]`:
 
 1. Let's use the second gene with value 4. Because the space of this gene is `[3, 4]`, then the only other value we can select is 3.
-2. The first gene also have the value 3.
+2. The first gene also has the value 3.
 3. The first gene has another value 2 that will not cause more duplicates in the solution. Then go to step 7.
 4. Skip.
 5. Skip.
@@ -888,7 +888,7 @@ The `gene_type` parameter allows the user to control the data type for all genes
 1. Select a data type for all genes with or without precision. 
 2. Select a data type for each individual gene with or without precision. 
 
-Let's discuss things by examples.
+Let us look at some examples.
 
 ### Data Type for All Genes without Precision
 
@@ -956,7 +956,7 @@ A precision can only be specified for a `float` data type and cannot be specifie
 gene_type=[float, 3]
 ```
 
-The next code uses prints the initial and final population where the genes are of type `float` with precision 3.
+The next code prints the initial and final population where the genes are of type `float` with precision 3.
 
 ```python
 import pygad
@@ -1115,9 +1115,9 @@ Final Population
 
 ## Parallel Processing in PyGAD
 
-Starting from [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), parallel processing becomes supported. This section explains how to use parallel processing in PyGAD. 
+Starting from [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), parallel processing is supported. This section explains how to use parallel processing in PyGAD.
 
-According to the [PyGAD lifecycle](https://pygad.readthedocs.io/en/latest/pygad.html#life-cycle-of-pygad), parallel processing can be parallelized in only 2 operations:
+According to the [PyGAD life cycle](https://pygad.readthedocs.io/en/latest/pygad.html#life-cycle-of-pygad), the computation can be parallelized in only 2 operations:
 
 1. Population fitness calculation.
 2. Mutation.
@@ -1126,13 +1126,13 @@ The reason is that the calculations in these 2 operations are independent (i.e. 
 
 For the mutation operation, it does not do intensive calculations on the CPU. Its calculations are simple like flipping the values of some genes from 0 to 1 or adding a random value to some genes. So, it does not take much CPU processing time. Experiments proved that parallelizing the mutation operation across the solutions increases the time instead of reducing it. This is because running multiple processes or threads adds overhead to manage them. Thus, parallel processing cannot be applied on the mutation operation.
 
-For the population fitness calculation, parallel processing can help make a difference and reduce the processing time. But this is conditional on the type of calculations done in the fitness function. If the fitness function makes intensive calculations and takes much processing time from the CPU, then it is probably that parallel processing will help to cut down the overall time.
+For the population fitness calculation, parallel processing can make a difference and reduce the processing time. But this depends on the type of calculations done in the fitness function. If the fitness function makes intensive calculations and takes much CPU time, then parallel processing will probably help cut down the overall time.
 
-This section explains how parallel processing works in PyGAD and how to use parallel processing in PyGAD
+This section explains how parallel processing works in PyGAD and how to use it.
 
 ### How to Use Parallel Processing in PyGAD
 
-Starting from [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), a new parameter called `parallel_processing` added to the constructor of the `pygad.GA` class. 
+Starting from [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), a new parameter called `parallel_processing` was added to the constructor of the `pygad.GA` class.
 
 ```python
 import pygad
@@ -1151,13 +1151,13 @@ This parameter allows the user to do the following:
 These are 3 possible values for the `parallel_processing` parameter:
 
 1) `None`: (Default) It means no parallel processing is used.
-2) A positive integer referring to the number of threads to be used (i.e. threads, not processes, are used.
+2) A positive integer referring to the number of threads to be used (threads, not processes).
 3) `list`/`tuple`: If a list or a tuple of exactly 2 elements is assigned, then:
    1) The first element can be either `'process'` or `'thread'` to specify whether processes or threads are used, respectively.
    2) The second element can be:
       1) A positive integer to select the maximum number of processes or threads to be used
       2) `0` to indicate that 0 processes or threads are used. It means no parallel processing. This is identical to setting `parallel_processing=None`.
-      3) `None` to use the default value as calculated by the `concurrent.futures module`.
+      3) `None` to use the default value as calculated by the `concurrent.futures` module.
 
 These are examples of the values assigned to the `parallel_processing` parameter:
 
@@ -1168,7 +1168,7 @@ These are examples of the values assigned to the `parallel_processing` parameter
 
 ### Examples
 
-The examples will help you know the difference between using processes and threads. Moreover, it will give an idea when parallel processing would make a difference and reduce the time. These are dummy examples where the fitness function is made to always return 0.
+These examples will help you see the difference between using processes and threads. They also give an idea of when parallel processing makes a difference and reduces the time. These are dummy examples where the fitness function always returns 0.
 
 The first example uses 10 genes, 5 solutions in the population where only 3 solutions mate, and 9999 generations. The fitness function uses a `for` loop with 100 iterations just to have some calculations. In the constructor of the `pygad.GA` class, `parallel_processing=None` means no parallel processing is used.
 
@@ -1200,7 +1200,7 @@ if __name__ == '__main__':
 
 When parallel processing is not used, the time it takes to run the genetic algorithm is `1.5` seconds.
 
-In the comparison, let's do a second experiment where parallel processing is used with 5 threads. In this case, it take `5` seconds.
+For comparison, let us run a second experiment where parallel processing is used with 5 threads. In this case, it takes `5` seconds.
 
 ```python
 ...
@@ -1271,7 +1271,7 @@ ga_instance = pygad.GA(...,
 ...
 ```
 
-Based on the second example, using parallel processing with 10 processes takes the least time because there is much CPU work done. Generally, processes are preferred over threads when most of the work in on the CPU. Threads are preferred over processes in some situations like doing input/output operations.
+Based on the second example, using parallel processing with 10 processes takes the least time because there is a lot of CPU work. Generally, processes are preferred over threads when most of the work is on the CPU. Threads are preferred over processes in some situations, like doing input/output operations.
 
 *Before releasing [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), [László Fazekas](https://www.linkedin.com/in/l%C3%A1szl%C3%B3-fazekas-2429a912) wrote an article to parallelize the fitness function with PyGAD. Check it: [How Genetic Algorithms Can Compete with Gradient Descent and Backprop](https://hackernoon.com/how-genetic-algorithms-can-compete-with-gradient-descent-and-backprop-9m9t33bq)*.
 
@@ -1289,7 +1289,7 @@ In [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-1
 - `print_step_parameters=True`: Whether to print extra parameters about each step inside the step. If `print_step_parameters=False` and `print_parameters_summary=True`, then the parameters of each step are printed at the end of the table.
 - `print_parameters_summary=True`: Whether to print parameters summary at the end of the table. If `print_step_parameters=False`, then the parameters of each step are printed at the end of the table too.
 
-This is a quick example to create a PyGAD example.
+Here is a quick example.
 
 ```python
 import pygad
@@ -1322,7 +1322,7 @@ ga_instance = pygad.GA(num_generations=100,
                        fitness_func=genetic_fitness)
 ```
 
-Then call the `summary()` method to print the summary with the default parameters. Note that entries for the crossover and generation callback function are created because their callback functions are implemented through the `on_crossover_callback()` and `on_gen()`, respectively.
+Then call the `summary()` method to print the summary with the default parameters. Note that entries for the crossover and generation callbacks are created because they are implemented through `on_crossover_callback()` and `on_gen()`, respectively.
 
 ```python
 ga_instance.summary()
@@ -1396,7 +1396,7 @@ On Generation          on_gen()                           None
 
 ## Logging Outputs
 
-In [PyGAD 3.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-0-0), the `print()` statement is no longer used and the outputs are printed using the [logging](https://docs.python.org/3/library/logging.html) module. A a new parameter called `logger` is supported to accept the user-defined logger. 
+In [PyGAD 3.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-0-0), the `print()` statement is no longer used and the outputs are printed using the [logging](https://docs.python.org/3/library/logging.html) module. A new parameter called `logger` is supported to accept a user-defined logger.
 
 ```python
 import logging
@@ -1410,10 +1410,10 @@ ga_instance = pygad.GA(...,
 
 The default value for this parameter is `None`. If there is no logger passed (i.e. `logger=None`), then a default logger is created to log the messages to the console exactly like how the `print()` statement works.
 
-Some advantages of using the the [logging](https://docs.python.org/3/library/logging.html) module instead of the `print()` statement are:
+Some advantages of using the [logging](https://docs.python.org/3/library/logging.html) module instead of the `print()` statement are:
 
-1. The user has more control over the printed messages specially if there is a project that uses multiple modules where each module prints its messages. A logger can organize the outputs.
-2. Using the proper `Handler`, the user can log the output messages to files and not only restricted to printing it to the console. So, it is much easier to record the outputs.
+1. The user has more control over the printed messages, especially in a project that uses multiple modules where each module prints its messages. A logger can organize the outputs.
+2. Using the proper `Handler`, the user can log the output messages to files, not only to the console. So, it is much easier to record the outputs.
 3. The format of the printed messages can be changed by customizing the `Formatter` assigned to the Logger.
 
 This section gives some quick examples to use the `logging` module and then gives an example to use the logger with PyGAD.
@@ -1497,7 +1497,7 @@ This is another example to log the messages to a file named `logfile.txt`. The f
 2. The log level.
 3. The message.
 4. The path of the file.
-5. The lone number of the log message.
+5. The line number of the log message.
 
 ```python
 import logging
@@ -1515,7 +1515,7 @@ file_handler.setFormatter(file_format)
 logger.addHandler(file_handler)
 ```
 
-This is how the outputs look like.
+This is what the outputs look like.
 
 ```python
 2023-04-03 18:54:03 DEBUG: Debug message. - c:\users\agad069\desktop\logger\example2.py:46
@@ -1647,9 +1647,9 @@ By executing this code, the logged messages are printed to the console and also 
 
 ## Solve Non-Deterministic Problems
 
-PyGAD can be used to solve both deterministic and non-deterministic problems. Deterministic are those that return the same fitness for the same solution. For non-deterministic problems, a different fitness value would be returned for the same solution.
+PyGAD can be used to solve both deterministic and non-deterministic problems. Deterministic problems are those that return the same fitness for the same solution. For non-deterministic problems, a different fitness value may be returned for the same solution.
 
-By default, PyGAD settings are set to solve deterministic problems. PyGAD can save the explored solutions and their fitness to reuse in the future. These instances attributes can save the solutions:
+By default, PyGAD settings are set to solve deterministic problems. PyGAD can save the explored solutions and their fitness to reuse them in the future. These instance attributes can save the solutions:
 
 1. `solutions`: Exists if `save_solutions=True`.
 2. `best_solutions`: Exists if `save_best_solutions=True`.
@@ -1660,8 +1660,8 @@ To configure PyGAD for non-deterministic problems, we have to disable saving the
 
 1. `keep_elitism=0`
 2. `keep_parents=0`
-3. `keep_solutions=False`
-4. `keep_best_solutions=False`
+3. `save_solutions=False`
+4. `save_best_solutions=False`
 
 ```python
 import pygad
@@ -1674,13 +1674,13 @@ ga_instance = pygad.GA(...,
                        ...)
 ```
 
-This way PyGAD will not save any explored solution and thus the fitness function have to be called for each individual solution.
+This way, PyGAD will not save any explored solution, so the fitness function has to be called for each individual solution.
 
 ## Reuse the Fitness instead of Calling the Fitness Function
 
 It may happen that a previously explored solution in generation X is explored again in another generation Y (where Y > X). For some problems, calling the fitness function takes much time. 
 
-For deterministic problems, it is better to not call the fitness function for an already explored solutions. Instead, reuse the fitness of the old solution. PyGAD supports some options to help you save time calling the fitness function for a previously explored solution. 
+For deterministic problems, it is better not to call the fitness function for an already explored solution. Instead, reuse the fitness of the old solution. PyGAD supports some options to help you save the time of calling the fitness function for a previously explored solution.
 
 The parameters explored in this section can be set in the constructor of the `pygad.GA` class.
 
@@ -1700,7 +1700,7 @@ It accepts an integer and defaults to 1. If set to a positive integer, then it k
 
 ### 4. `keep_parents`
 
-It accepts an integer and defaults to -1. It set to `-1` or a positive integer, then it keeps the parents of one generation available in the next generation. 
+It accepts an integer and defaults to -1. If set to `-1` or a positive integer, then it keeps the parents of one generation available in the next generation.
 
 ## Why the Fitness Function is not Called for Solution at Index 0?
 
@@ -1712,9 +1712,9 @@ ga_instance = pygad.GA(...,
                        ...)
 ```
 
-The best solutions are copied at the beginning of the population. If `keep_elitism=1`, this means the best solution in generation X is kept in the next generation X+1 at index 0 of the population. If `keep_elitism=2`, this means the 2 best solutions in generation X are kept in the next generation X+1 at indices 0 and 1 of the population of generation 1. 
+The best solutions are copied at the beginning of the population. If `keep_elitism=1`, this means the best solution in generation X is kept in the next generation X+1 at index 0 of the population. If `keep_elitism=2`, this means the 2 best solutions in generation X are kept in the next generation X+1 at indices 0 and 1 of the population.
 
-Because the fitness of these best solutions are already calculated in generation X, then their fitness values will not be recalculated at generation X+1 (i.e. the fitness function will not be called for these solutions again). Instead, their fitness values are just reused. This is why you see that no solution with index 0 is passed to the fitness function.
+Because the fitness values of these best solutions are already calculated in generation X, they are not recalculated at generation X+1 (the fitness function is not called for these solutions again). Instead, their fitness values are reused. This is why no solution with index 0 is passed to the fitness function.
 
 To force calling the fitness function for each solution in every generation, consider setting `keep_elitism` and `keep_parents` to 0. Moreover, keep the 2 parameters `save_solutions` and `save_best_solutions` to their default value `False`.
 
@@ -1731,7 +1731,7 @@ ga_instance = pygad.GA(...,
 
 ## Batch Fitness Calculation
 
-In [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0), a new optional parameter called `fitness_batch_size` is supported. A new optional parameter called `fitness_batch_size` is supported to calculate the fitness function in batches. Thanks to [Linan Qiu](https://github.com/linanqiu) for opening the [GitHub issue #136](https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/136).
+In [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0), a new optional parameter called `fitness_batch_size` is supported to calculate the fitness function in batches. Thanks to [Linan Qiu](https://github.com/linanqiu) for opening the [GitHub issue #136](https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/136).
 
 Its values can be:
 
@@ -1789,7 +1789,7 @@ print(number_of_calls)
 
 ### Example with `fitness_batch_size` Parameter
 
-This is an example where the `fitness_batch_size` parameter is used and assigned the value `4`. This means the solutions will be grouped into batches of `4` solutions. The fitness function will be called once for each patch (i.e. called once for each 4 solutions). 
+This is an example where the `fitness_batch_size` parameter is used and assigned the value `4`. This means the solutions will be grouped into batches of `4` solutions. The fitness function will be called once for each batch (called once for every 4 solutions).
 
 This is an example of the arguments passed to it:
 
@@ -1803,7 +1803,7 @@ solutions_indices:
     [16, 17, 18, 19]
 ```
 
-As we have 20 solutions, then there are `20/4 = 5` patches. As a result, the fitness function is called only 5 times per generation instead of 20. For each call to the fitness function, it receives a batch of 4 solutions. 
+As we have 20 solutions, then there are `20/4 = 5` batches. As a result, the fitness function is called only 5 times per generation instead of 20. For each call, the fitness function receives a batch of 4 solutions.
 
 As we have 5 generations, then the function will be called `5*5 = 25` times. Given the call to the fitness function after the last generation, then the total number of calls is `5*5 + 5 = 30`.
 
@@ -1858,7 +1858,7 @@ In PyGAD 2.19.0, it is possible to pass user-defined functions or methods to the
 7. `on_generation`
 8. `on_stop`
 
-This section gives 2 examples to assign these parameters user-defined:
+This section gives 2 examples of how to build these handlers using:
 
 1. Functions.
 2. Methods.
@@ -1871,28 +1871,28 @@ This is a dummy example where the fitness function returns a random value. Note 
 import pygad
 import numpy
 
-def fitness_func(ga_instanse, solution, solution_idx):
+def fitness_func(ga_instance, solution, solution_idx):
     return numpy.random.rand()
 
-def on_start(ga_instanse):
+def on_start(ga_instance):
     print("on_start")
 
-def on_fitness(ga_instanse, last_gen_fitness):
+def on_fitness(ga_instance, last_gen_fitness):
     print("on_fitness")
 
-def on_parents(ga_instanse, last_gen_parents):
+def on_parents(ga_instance, last_gen_parents):
     print("on_parents")
 
-def on_crossover(ga_instanse, last_gen_offspring):
+def on_crossover(ga_instance, last_gen_offspring):
     print("on_crossover")
 
-def on_mutation(ga_instanse, last_gen_offspring):
+def on_mutation(ga_instance, last_gen_offspring):
     print("on_mutation")
 
-def on_generation(ga_instanse):
+def on_generation(ga_instance):
     print("on_generation\n")
 
-def on_stop(ga_instanse, last_gen_fitness):
+def on_stop(ga_instance, last_gen_fitness):
     print("on_stop")
 
 ga_instance = pygad.GA(num_generations=5,
@@ -1913,7 +1913,7 @@ ga_instance.run()
 
 ### Assign Methods
 
-The next example has all the method defined inside the class `Test`. All of the methods accept an additional parameter representing the method's object of the class `Test`.
+The next example has all the methods defined inside the class `Test`. All of the methods accept an additional parameter representing the method's object of the class `Test`.
 
 All methods accept `self` as the first parameter and the instance of the `pygad.GA` class as the last parameter.
 
@@ -1922,28 +1922,28 @@ import pygad
 import numpy
 
 class Test:
-    def fitness_func(self, ga_instanse, solution, solution_idx):
+    def fitness_func(self, ga_instance, solution, solution_idx):
         return numpy.random.rand()
 
-    def on_start(self, ga_instanse):
+    def on_start(self, ga_instance):
         print("on_start")
 
-    def on_fitness(self, ga_instanse, last_gen_fitness):
+    def on_fitness(self, ga_instance, last_gen_fitness):
         print("on_fitness")
 
-    def on_parents(self, ga_instanse, last_gen_parents):
+    def on_parents(self, ga_instance, last_gen_parents):
         print("on_parents")
 
-    def on_crossover(self, ga_instanse, last_gen_offspring):
+    def on_crossover(self, ga_instance, last_gen_offspring):
         print("on_crossover")
 
-    def on_mutation(self, ga_instanse, last_gen_offspring):
+    def on_mutation(self, ga_instance, last_gen_offspring):
         print("on_mutation")
 
-    def on_generation(self, ga_instanse):
+    def on_generation(self, ga_instance):
         print("on_generation\n")
 
-    def on_stop(self, ga_instanse, last_gen_fitness):
+    def on_stop(self, ga_instance, last_gen_fitness):
         print("on_stop")
 
 ga_instance = pygad.GA(num_generations=5,
