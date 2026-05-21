@@ -146,7 +146,7 @@ Accepts the following parameters:
 - `last_layer`: A reference to the last (output) layer in the network architecture.
 - `initial`: When `True` (default), the function returns the **initial** weights of the layers using the layers' `initial_weights` attribute. When `False`, it returns the **trained** weights of the layers using the layers' `trained_weights` attribute. The initial weights are only needed before network training starts. The trained weights are needed to predict the network outputs.
 
-The function uses a `while` loop to iterate through the layers using their `previous_layer` attribute. For each layer, either the initial weights or the trained weights are returned based on where the `initial` parameter is `True` or `False`.
+The function uses a `while` loop to iterate through the layers using their `previous_layer` attribute. For each layer, either the initial weights or the trained weights are returned based on whether the `initial` parameter is `True` or `False`.
 
 ### `pygad.nn.layers_weights_as_vector()`
 
@@ -159,7 +159,7 @@ Accepts the following parameters:
 - `last_layer`: A reference to the last (output) layer in the network architecture.
 - `initial`: When `True` (default), the function returns the **initial** weights of the layers using the layers' `initial_weights` attribute. When `False`, it returns the **trained** weights of the layers using the layers' `trained_weights` attribute. The initial weights are only needed before network training starts. The trained weights are needed to predict the network outputs.
 
-The function uses a `while` loop to iterate through the layers using their `previous_layer` attribute. For each layer, either the initial weights or the trained weights are returned based on where the `initial` parameter is `True` or `False`.
+The function uses a `while` loop to iterate through the layers using their `previous_layer` attribute. For each layer, either the initial weights or the trained weights are returned based on whether the `initial` parameter is `True` or `False`.
 
 ### `pygad.nn.layers_weights_as_matrix()`
 
@@ -225,7 +225,7 @@ For each epoch, all the data samples are fed to the network to return their pred
 
 ### `pygad.nn.update_weights()`
 
-Calculates and returns the updated weights. Even no training algorithm is used in this project, the weights are updated using the learning rate. It is not the best way to update the weights but it is better than keeping it as it is by making some small changes to the weights.
+Calculates and returns the updated weights. Even though no training algorithm is used in this project, the weights are updated using the learning rate. It is not the best way to update the weights, but making small changes is better than keeping them as they are.
 
 Accepts the following parameters:
 
@@ -260,11 +260,11 @@ All the data samples are fed to the network to return their predictions.
 
 ## Helper Functions
 
-There are functions in the `pygad.nn` module that does not directly manipulate the neural networks.
+There are functions in the `pygad.nn` module that do not directly manipulate the neural networks.
 
 ### `pygad.nn.to_vector()`
 
-Converts a passed NumPy array (of any dimensionality) to its `array`  parameter into a 1D vector and returns the vector.
+Converts a NumPy array (of any dimensionality) passed to its `array` parameter into a 1D vector and returns the vector.
 
 Accepts the following parameters:
 
@@ -272,7 +272,7 @@ Accepts the following parameters:
 
 ### `pygad.nn.to_array()`
 
-Converts a passed vector to its `vector`  parameter into a NumPy array and returns the array.
+Converts a vector passed to its `vector` parameter into a NumPy array and returns the array.
 
 Accepts the following parameters:
 
@@ -289,7 +289,7 @@ The supported activation functions are:
 
 ## Steps to Build a Neural Network
 
-This section discusses how to use the `pygad.nn` module for building a neural network. The summary of the steps are as follows:
+This section discusses how to use the `pygad.nn` module to build a neural network. The steps are summarized as follows:
 
 - Reading the Data
 - Building the Network Architecture
