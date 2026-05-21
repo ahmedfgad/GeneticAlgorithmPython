@@ -11,10 +11,13 @@ In PyGAD 2.19.0, it is possible to pass user-defined functions or methods to the
 7. `on_generation`
 8. `on_stop`
 
-This section gives 2 examples of how to build these handlers using:
+You can also pass a class instance for any of these parameters. The same 3 options (function, method, or class) work for the operator parameters `crossover_type`, `mutation_type`, and `parent_selection_type`. See the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/utils.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more about the operators.
+
+This section gives 3 examples of how to build these handlers using:
 
 1. Functions.
 2. Methods.
+3. Classes.
 
 ## Assign Functions
 
@@ -112,5 +115,79 @@ ga_instance = pygad.GA(num_generations=5,
                        on_stop=Test().on_stop,
                        fitness_func=Test().fitness_func)
     
+ga_instance.run()
+```
+
+## Assign a Class
+
+Besides functions and methods, you can pass an instance of a class. The class must implement the `__call__()` method, which makes its instances callable like a function. PyGAD calls the instance the same way it calls a function.
+
+The `__call__()` method must accept the same parameters as the matching function. The `self` parameter does not count. For example, the `__call__()` method of a fitness class accepts `self` plus the same 3 parameters as a fitness function: the instance of the `pygad.GA` class, a solution, and its index.
+
+A class is useful when the handler needs to keep state across generations. Because the same instance is reused for every call, any data you store in its attributes (for example, in the `__init__()` method) stays available across all the generations.
+
+The next example builds the fitness function, the crossover and mutation operators, and all the callbacks as classes. An instance of each class is passed to the matching parameter.
+
+```python
+import pygad
+import numpy
+
+class Fitness:
+    def __call__(self, ga_instance, solution, solution_idx):
+        fitness = numpy.sum(solution)
+        return fitness
+
+class Crossover:
+    def __call__(self, parents, offspring_size, ga_instance):
+        return numpy.random.rand(offspring_size[0], offspring_size[1])
+
+class Mutation:
+    def __call__(self, offspring, ga_instance):
+        return offspring
+
+class OnStart:
+    def __call__(self, ga_instance):
+        print("on_start")
+
+class OnFitness:
+    def __call__(self, ga_instance, fitness):
+        print("on_fitness")
+
+class OnParents:
+    def __call__(self, ga_instance, parents):
+        print("on_parents")
+
+class OnCrossover:
+    def __call__(self, ga_instance, offspring):
+        print("on_crossover")
+
+class OnMutation:
+    def __call__(self, ga_instance, offspring):
+        print("on_mutation")
+
+class OnGeneration:
+    def __call__(self, ga_instance):
+        print("on_generation")
+
+class OnStop:
+    def __call__(self, ga_instance, fitness):
+        print("on_stop")
+
+ga_instance = pygad.GA(num_generations=10,
+                       num_parents_mating=5,
+                       sol_per_pop=10,
+                       num_genes=5,
+                       fitness_func=Fitness(),
+                       crossover_type=Crossover(),
+                       mutation_type=Mutation(),
+                       on_start=OnStart(),
+                       on_fitness=OnFitness(),
+                       on_parents=OnParents(),
+                       on_crossover=OnCrossover(),
+                       on_mutation=OnMutation(),
+                       on_generation=OnGeneration(),
+                       on_stop=OnStop(),
+                       suppress_warnings=True)
+
 ga_instance.run()
 ```
