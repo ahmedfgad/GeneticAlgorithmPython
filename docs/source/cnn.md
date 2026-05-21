@@ -1,8 +1,8 @@
 # `pygad.cnn` Module
 
-This section of the PyGAD's library documentation discusses the **pygad.cnn** module. 
+This section of the documentation discusses the **pygad.cnn** module.
 
-Using the **pygad.cnn** module, convolutional neural networks (CNNs) are created. The purpose of this module is to only implement the **forward pass** of a convolutional neural network without using a training algorithm. The **pygad.cnn** module builds the network layers, implements the activations functions, trains the network, makes predictions, and more. 
+Using the **pygad.cnn** module, convolutional neural networks (CNNs) are created. The purpose of this module is to only implement the **forward pass** of a convolutional neural network without using a training algorithm. The **pygad.cnn** module builds the network layers, implements the activation functions, trains the network, makes predictions, and more.
 
 Later, the **pygad.gacnn** module is used to train the **pygad.cnn** network using the genetic algorithm built in the **pygad** module.
 
@@ -21,12 +21,12 @@ Each layer supported by the **pygad.cnn** module has a corresponding class. The 
 
 In the future, more layers will be added. 
 
-Except for the input layer, all of listed layers has 4 instance attributes that do the same function which are:
+Except for the input layer, all of the listed layers have 4 instance attributes that do the same job:
 
 1. `previous_layer`: A reference to the previous layer in the CNN architecture.
 2. `layer_input_size`: The size of the input to the layer.
 3. `layer_output_size`: The size of the output from the layer.
-4. `layer_output`: The latest output generated from the layer. It default to `None`.
+4. `layer_output`: The latest output generated from the layer. It defaults to `None`.
 
 In addition to such attributes, the layers may have some additional attributes. The next subsections discuss such layers.
 
@@ -207,11 +207,11 @@ Within the constructor, the accepted parameters are used as instance attributes.
 
 There are a number of methods in the `pygad.cnn.Model` class which serves in training, testing, and retrieving information about the model. These methods are discussed in the next subsections.
 
-#### `get_layers()`
+### `get_layers()`
 
-Creates a  list of all layers in the CNN model. It accepts no parameters.
+Creates a list of all layers in the CNN model. It accepts no parameters.
 
-#### `train()`
+### `train()`
 
 Trains the CNN model.
 
@@ -223,17 +223,17 @@ Accepts the following parameters:
 
 This method trains the CNN model according to the number of epochs specified in the constructor of the `pygad.cnn.Model` class.
 
-It is important to note that no learning algorithm is used for training the pygad.cnn. Just the learning rate is used for making some changes which is better than leaving the weights unchanged.
+It is important to note that no learning algorithm is used for training `pygad.cnn`. The learning rate is just used to make some changes, which is better than leaving the weights unchanged.
 
-#### `feed_sample()`
+### `feed_sample()`
 
-Feeds a sample in the CNN layers and returns results of the last layer in the pygad.cnn.
+Feeds a sample into the CNN layers and returns the results of the last layer in `pygad.cnn`.
 
-#### `update_weights()`
+### `update_weights()`
 
-Updates the CNN weights using the learning rate. It is important to note that no learning algorithm is used for training the pygad.cnn. Just the learning rate is used for making some changes which is better than leaving the weights unchanged.
+Updates the CNN weights using the learning rate. It is important to note that no learning algorithm is used for training `pygad.cnn`. The learning rate is just used to make some changes, which is better than leaving the weights unchanged.
 
-#### `predict()`
+### `predict()`
 
 Uses the trained CNN for making predictions.
 
@@ -241,9 +241,9 @@ Accepts the following parameter:
 
 * `data_inputs`: The inputs to predict their label.
 
-It returns a list holding the samples predictions.
+It returns a list holding the samples' predictions.
 
-#### `summary()`
+### `summary()`
 
 Prints a summary of the CNN architecture.
 
@@ -258,7 +258,7 @@ The dense layer supports these functions besides the `softmax` function implemen
 
 ## Steps to Build a Neural Network
 
-This section discusses how to use the `pygad.cnn` module for building a neural network. The summary of the steps are as follows:
+This section discusses how to use the `pygad.cnn` module to build a neural network. The steps are summarized as follows:
 
 - Reading the Data
 - Building the CNN Architecture
@@ -371,7 +371,7 @@ The `summary()` method in the `pygad.cnn.Model` class prints a summary of the CN
 model.summary()
 ```
 
-```python
+```text
 ----------Network Architecture----------
 <class 'pygad.cnn.Conv2D'>
 <class 'pygad.cnn.Sigmoid'>
@@ -390,7 +390,7 @@ model.summary()
 
 ### Training the Network
 
-After the model and the data are prepared, then the model can be trained using the the `pygad.cnn.train()` method.
+After the model and the data are prepared, then the model can be trained using the `pygad.cnn.train()` method.
 
 ```python
 model.train(train_inputs=train_inputs, 

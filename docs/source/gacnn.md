@@ -1,6 +1,6 @@
 # `pygad.gacnn` Module
 
-This section of the PyGAD's library documentation discusses the **pygad.gacnn** module. 
+This section of the documentation discusses the **pygad.gacnn** module.
 
 The `pygad.gacnn` module trains convolutional neural networks using the genetic algorithm. It makes use of the 2 modules `pygad` and `pygad.cnn`.
 
@@ -14,7 +14,7 @@ In order to train a CNN using the genetic algorithm, the first thing to do is to
 
 The `pygad.gacnn.GACNN` class constructor accepts the following parameters:
 
-- `model`: model: An instance of the pygad.cnn.Model class representing the architecture of all solutions in the population.
+- `model`: An instance of the `pygad.cnn.Model` class that represents the architecture of all solutions in the population.
 - `num_solutions`: Number of CNNs (i.e. solutions) in the population. Based on the value passed to this parameter, a number of identical CNNs are created where their parameters are optimized using the genetic algorithm.
 
 ### Instance Attributes
@@ -156,7 +156,7 @@ The `summary()` method in the `pygad.cnn.Model` class prints a summary of the CN
 model.summary()
 ```
 
-```python
+```text
 ----------Network Architecture----------
 <class 'cnn.Conv2D'>
 <class 'cnn.AveragePooling2D'>
@@ -171,7 +171,7 @@ The next step is to create an instance of the `pygad.gacnn.GACNN` class.
 
 After preparing the input data and building the CNN model, an instance of the `pygad.gacnn.GACNN` class is created by passing the appropriate parameters.
 
-Here is an example where the `num_solutions` parameter is set to 4 which means the genetic algorithm population will have 6 solutions (i.e. networks). All of these 6 CNNs will have the same architectures as specified by the `model` parameter. 
+Here is an example where the `num_solutions` parameter is set to 4, which means the genetic algorithm population will have 4 solutions (i.e. networks). All of these 4 CNNs will have the same architecture as specified by the `model` parameter.
 
 ```python
 import pygad.gacnn
