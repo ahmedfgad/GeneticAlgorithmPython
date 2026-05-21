@@ -68,7 +68,7 @@ Returns a list holding the name(s) of the activation function(s) of the hidden l
 
 ### `pygad.gann.create_network()`
 
-Creates a neural network as a linked list between the input, hidden, and output layers where the layer at index N (which is the last/output layer) references the layer at index N-1 (which is a hidden layer) using its previous_layer attribute. The input layer does not reference any layer because it is the last layer in the linked list.
+Creates a neural network as a linked list between the input, hidden, and output layers, where the layer at index N (the last/output layer) references the layer at index N-1 (a hidden layer) using its `previous_layer` attribute. The input layer does not reference any layer because it is the first layer in the linked list.
 
 In addition to the `parameters_validated` parameter, this function accepts the same parameters passed to the constructor of the `pygad.gann.GANN` class except for the `num_solutions` parameter because only a single network is created out of the `create_network()` function.
 
@@ -112,12 +112,12 @@ The steps to use this project for building and training a neural network using t
 - Prepare the generation callback function.
 - Create an instance of the `pygad.GA` class.
 - Run the created instance of the `pygad.GA` class.
-- Plot the Fitness Values
-- Information about the best solution.
-- Making predictions using the trained weights.
-- Calculating some statistics.
+- Plot the fitness values.
+- Get information about the best solution.
+- Make predictions using the trained weights.
+- Calculate some statistics.
 
-Let's start covering all of these steps.
+The next sections cover each step.
 
 ### Prepare the Training Data
 
@@ -181,7 +181,7 @@ The weights of the network are as follows:
 
 The activation function used for the output layer is `softmax`. The `relu` activation function is used for the hidden layer.
 
-After creating the instance of the `pygad.gann.GANN` class next is to fetch the weights of the population as a list of vectors.
+After creating the instance of the `pygad.gann.GANN` class, the next step is to fetch the weights of the population as a list of vectors.
 
 ### Fetch the Population Weights as Vectors
 
@@ -195,7 +195,7 @@ To create a list holding the population weights as vectors, one for each network
 population_vectors = pygad.gann.population_as_vectors(population_networks=GANN_instance.population_networks)
 ```
 
-After preparing the population weights as a set of vectors, next is to prepare 2 functions which are:
+After preparing the population weights as a set of vectors, the next step is to prepare 2 functions:
 
 1. Fitness function.
 2. Callback function after each generation.
@@ -235,7 +235,7 @@ This callback function can be used to update the `trained_weights` attribute of 
 
 Here is the implementation for a function that updates the `trained_weights` attribute of the layers of the population networks. 
 
-It works by converting the current population from the vector form to the matric form using the `pygad.gann.population_as_matrices()` function. It accepts the population as vectors and returns it as matrices.
+It works by converting the current population from the vector form to the matrix form using the `pygad.gann.population_as_matrices()` function. It accepts the population as vectors and returns it as matrices.
 
 The population matrices are then passed to the `update_population_trained_weights()` method in the `pygad.gann` module to update the `trained_weights` attribute of all layers for all solutions within the population.
 
@@ -250,7 +250,7 @@ def callback_generation(ga_instance):
     print(f"Fitness    = {ga_instance.best_solution()[1]}")
 ```
 
-After preparing the fitness and callback function, next is to create an instance of the `pygad.GA` class. 
+After preparing the fitness and callback functions, the next step is to create an instance of the `pygad.GA` class.
 
 ### Create an Instance of the `pygad.GA` Class
 
@@ -312,7 +312,7 @@ ga_instance.plot_fitness()
 
 ![XOR_Fitness](https://user-images.githubusercontent.com/16560492/82078638-c11e0700-96e1-11ea-8aa9-c36761c5e9c7.png)
 
-By running the code again, a different initial population is created and thus a classification accuracy of 100 can be reached using a less number of generations. On the other hand, a different initial population might cause 100% accuracy to be reached using more generations or not reached at all.
+By running the code again, a different initial population is created, so a classification accuracy of 100 can be reached using fewer generations. On the other hand, a different initial population might cause 100% accuracy to be reached using more generations or not reached at all.
 
 ### Information about the Best Solution
 
@@ -337,7 +337,7 @@ Fitness value of the best solution = 100.0
 Index of the best solution : 0
 ```
 
-Using the `best_solution_generation` attribute of the instance from the `pygad.GA` class, the generation number at which the **best fitness** is reached could be fetched. According to the result, the best fitness value is reached after 182 generations. 
+Using the `best_solution_generation` attribute of the `pygad.GA` instance, you can get the generation number at which the best fitness was reached. In this run, the best fitness value is reached after 182 generations.
 
 ```python
 if ga_instance.best_solution_generation != -1:
@@ -375,9 +375,9 @@ print(f"Classification accuracy : {accuracy}.")
 ```
 
 ```
-Number of correct classifications : 4
-print("Number of wrong classifications : 0
-Classification accuracy : 100
+Number of correct classifications : 4.
+Number of wrong classifications : 0.
+Classification accuracy : 100.0.
 ```
 
 ## Examples
@@ -493,7 +493,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 
 ga_instance.run()
 
-# After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+# After the generations complete, a plot is shown that summarizes how the fitness values evolve over the generations.
 ga_instance.plot_fitness()
 
 # Returning the details of the best solution.
@@ -625,7 +625,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 
 ga_instance.run()
 
-# After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+# After the generations complete, a plot is shown that summarizes how the fitness values evolve over the generations.
 ga_instance.plot_fitness()
 
 # Returning the details of the best solution.
@@ -793,7 +793,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 
 ga_instance.run()
 
-# After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+# After the generations complete, a plot is shown that summarizes how the fitness values evolve over the generations.
 ga_instance.plot_fitness()
 
 # Returning the details of the best solution.
@@ -942,7 +942,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 
 ga_instance.run()
 
-# After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+# After the generations complete, a plot is shown that summarizes how the fitness values evolve over the generations.
 ga_instance.plot_fitness()
 
 # Returning the details of the best solution.

@@ -35,7 +35,7 @@ The list of networks is assigned to the `population_networks` attribute of the i
 
 #### `update_population_trained_weights()`
 
-The `update_population_trained_weights()` method updates the `trained_weights` attribute of the layers of each network (check the documentation of the `pygad.cnn` module) for more information) according to the weights passed in the `population_trained_weights` parameter.
+The `update_population_trained_weights()` method updates the `trained_weights` attribute of the layers of each network (check the documentation of the `pygad.cnn` module for more information) according to the weights passed in the `population_trained_weights` parameter.
 
 Accepts the following parameters:
 
@@ -72,7 +72,7 @@ Returns a list holding the weights matrices for all solutions (i.e. networks).
 
 ## Steps to Build and Train CNN using Genetic Algorithm
 
-The steps to use this project for building and training a neural network using the genetic algorithm are as follows:
+The steps to use this project for building and training a CNN using the genetic algorithm are as follows:
 
 - Prepare the training data.
 - Create an instance of the `pygad.gacnn.GACNN` class.
@@ -81,12 +81,12 @@ The steps to use this project for building and training a neural network using t
 - Prepare the generation callback function.
 - Create an instance of the `pygad.GA` class.
 - Run the created instance of the `pygad.GA` class.
-- Plot the Fitness Values
-- Information about the best solution.
-- Making predictions using the trained weights.
-- Calculating some statistics.
+- Plot the fitness values.
+- Get information about the best solution.
+- Make predictions using the trained weights.
+- Calculate some statistics.
 
-Let's start covering all of these steps.
+The next sections cover each step.
 
 ### Prepare the Training Data
 
@@ -108,9 +108,9 @@ train_inputs = numpy.load("dataset_inputs.npy")
 train_outputs = numpy.load("dataset_outputs.npy")
 ```
 
-For the output array, each element must be a single number representing the class label of the sample. The class labels must start at `0`. So, if there are 80 samples, then the shape of the output array is `(80)`. If there are 5 classes in the data, then the values of all the 200 elements in the output array must range from 0 to 4 inclusive. Generally, the class labels start from `0` to `N-1` where `N` is the number of classes.
+For the output array, each element must be a single number representing the class label of the sample. The class labels must start at `0`. So, if there are 80 samples, then the shape of the output array is `(80,)`. If there are 5 classes in the data, then the values of all the 80 elements in the output array must range from 0 to 4 inclusive. Generally, the class labels start from `0` to `N-1` where `N` is the number of classes.
 
-Note that the project only supports that each sample is assigned to only one class.
+Note that the project only supports assigning each sample to one class.
 
 ### Building the Network Architecture
 
@@ -452,7 +452,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 
 ga_instance.run()
 
-# After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+# After the generations complete, a plot is shown that summarizes how the fitness values evolve over the generations.
 ga_instance.plot_fitness()
 
 # Returning the details of the best solution.

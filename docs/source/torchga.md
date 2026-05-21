@@ -87,7 +87,7 @@ The function accepts the following parameters:
 
 It returns a 1D vector holding the model weights.
 
-### `pygad.torch.model_weights_as_dict()`
+### `pygad.torchga.model_weights_as_dict()`
 
 The `model_weights_as_dict()` function accepts the following parameters: 
 
@@ -177,7 +177,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 
 ga_instance.run()
 
-# After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+# After the generations complete, a plot is shown that summarizes how the fitness values evolve over the generations.
 ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
 # Returning the details of the best solution.
@@ -413,7 +413,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 # Start the genetic algorithm evolution.
 ga_instance.run()
 
-# After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+# After the generations complete, a plot is shown that summarizes how the fitness values evolve over the generations.
 ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
 # Returning the details of the best solution.
@@ -563,7 +563,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 # Start the genetic algorithm evolution.
 ga_instance.run()
 
-# After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+# After the generations complete, a plot is shown that summarizes how the fitness values evolve over the generations.
 ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
 # Returning the details of the best solution.
@@ -706,7 +706,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 # Start the genetic algorithm evolution.
 ga_instance.run()
 
-# After the generations complete, some plots are showed that summarize how the outputs/fitness values evolve over generations.
+# After the generations complete, a plot is shown that summarizes how the fitness values evolve over the generations.
 ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewidth=4)
 
 # Returning the details of the best solution.
