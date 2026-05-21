@@ -1,21 +1,21 @@
 # `pygad` Module
 
-This section of the PyGAD's library documentation discusses the `pygad` module. 
+This section of the documentation discusses the `pygad` module.
 
-Using the `pygad` module, instances of the genetic algorithm can be created, run, saved, and loaded. Single-objective and multi-objective optimization problems can be solved.
+With the `pygad` module, you can create, run, save, and load instances of the genetic algorithm. It solves both single-objective and multi-objective optimization problems.
 
-# `pygad.GA` Class
+## `pygad.GA` Class
 
-The first module available in PyGAD is named `pygad` and contains a class named `GA` for building the genetic algorithm. The constructor, methods, function, and attributes within the class are discussed in this section.
+The `pygad` module has a class named `GA` for building the genetic algorithm. This section explains the class constructor, its methods, functions, and attributes.
 
-## `__init__()`
+### `__init__()`
 
-For creating an instance of the `pygad.GA` class, the constructor accepts several parameters that allow the user to customize the genetic algorithm to different types of applications. 
+To create an instance of the `pygad.GA` class, the constructor accepts several parameters. These let you adjust the genetic algorithm for different types of applications.
 
 The `pygad.GA` class constructor supports the following parameters:
 
 - `num_generations`: Number of generations.
-- `num_parents_mating `: Number of solutions to be selected as parents.
+- `num_parents_mating`: Number of solutions to be selected as parents.
 - `fitness_func`: Accepts a function/method and returns the fitness value(s) of the solution. If a function is passed, then it must accept 3 parameters (1. the instance of the `pygad.GA` class, 2. a single solution, and 3. its index in the population). If method, then it accepts a fourth parameter representing the method's class instance. Check the [Preparing the fitness_func Parameter](https://pygad.readthedocs.io/en/latest/pygad.html#preparing-the-fitness-func-parameter) section for information about creating such a function. In [PyGAD 3.2.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-2-0), multi-objective optimization is supported. To consider the problem as multi-objective, just return a `list`, `tuple`, or `numpy.ndarray` from the fitness function.
 - `fitness_batch_size=None`: A new optional parameter called `fitness_batch_size` is supported to calculate the fitness function in batches. If it is assigned the value `1` or `None` (default), then the normal flow is used where the fitness function is called for each individual solution. If the `fitness_batch_size` parameter is assigned a value satisfying this condition `1 < fitness_batch_size <= sol_per_pop`, then the solutions are grouped into batches of size `fitness_batch_size` and the fitness function is called once for each batch. Check the [Batch Fitness Calculation](https://pygad.readthedocs.io/en/latest/pygad_more.html#batch-fitness-calculation) section for more details and examples. Added in from [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0).
 - `initial_population`: A user-defined initial population. It is useful when the user wants to start the generations with a custom initial population. It defaults to `None` which means no initial population is specified by the user. In this case, [PyGAD](https://pypi.org/project/pygad) creates an initial population using the `sol_per_pop` and `num_genes` parameters. An exception is raised if the `initial_population` is `None` while any of the 2 parameters (`sol_per_pop` or `num_genes`) is also `None`. Introduced in [PyGAD 2.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-0-0) and higher.
@@ -25,12 +25,12 @@ The `pygad.GA` class constructor supports the following parameters:
 - `init_range_low=-4`: The lower value of the random range from which the gene values in the initial population are selected. `init_range_low` defaults to `-4`. Available in [PyGAD 1.0.20](https://pygad.readthedocs.io/en/latest/releases.html#pygad-1-0-20) and higher. This parameter has no action if the `initial_population` parameter exists.
 - `init_range_high=4`: The upper value of the random range from which the gene values in the initial population are selected. `init_range_high` defaults to `+4`. Available in [PyGAD 1.0.20](https://pygad.readthedocs.io/en/latest/releases.html#pygad-1-0-20) and higher. This parameter has no action if the `initial_population` parameter exists.
 - `parent_selection_type="sss"`: The parent selection type. Supported types are `sss` (for steady-state selection), `rws` (for roulette wheel selection), `sus` (for stochastic universal selection), `rank` (for rank selection), `random` (for random selection), and `tournament` (for tournament selection). A custom parent selection function can be passed starting from [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0). Check the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/utils.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more details about building a user-defined parent selection function.
-- `keep_parents=-1`: Number of parents to keep in the current population. `-1` (default) means to keep all parents in the next population. `0` means keep no parents in the next population. A value `greater than 0` means keeps the specified number of parents in the next population. Note that the value assigned to `keep_parents` cannot be `< - 1` or greater than the number of solutions within the population `sol_per_pop`. Starting from [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0), this parameter have an effect only when the `keep_elitism` parameter is `0`. Starting from [PyGAD 2.20.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-20-0), the parents' fitness from the last generation will not be re-used if `keep_parents=0`. 
-- `keep_elitism=1`: Added in [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0). It can take the value `0` or a positive integer that satisfies (`0 <= keep_elitism <= sol_per_pop`). It defaults to `1` which means only the best solution in the current generation is kept in the next generation. If assigned `0`, this means it has no effect. If assigned a positive integer `K`, then the best `K` solutions are kept in the next generation. It cannot be assigned a value greater than the value assigned to the `sol_per_pop` parameter. If this parameter has a value different than `0`, then the `keep_parents` parameter will have no effect.
+- `keep_parents=-1`: The number of parents to keep in the next population. `-1` (default) means keep all the parents. `0` means keep no parents. A value greater than `0` means keep that number of parents. The value of `keep_parents` cannot be less than `-1` or greater than the number of solutions in the population (`sol_per_pop`). Starting from [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0), this parameter has an effect only when the `keep_elitism` parameter is `0`. Starting from PyGAD 2.20.0, the parents' fitness from the last generation is not re-used if `keep_parents=0`. To see how `keep_parents` and `keep_elitism` work together, check the [How the Number of Offspring Is Decided](https://pygad.readthedocs.io/en/latest/pygad_more.html#how-the-number-of-offspring-is-decided) section.
+- `keep_elitism=1`: Added in [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0). It takes the value `0` or a positive integer that meets the condition `0 <= keep_elitism <= sol_per_pop`. It defaults to `1`, which means only the best solution in the current generation is kept in the next generation. If set to `0`, it has no effect. If set to a positive integer `K`, then the best `K` solutions are kept in the next generation. It cannot be greater than the value of the `sol_per_pop` parameter. If this parameter is not `0`, then the `keep_parents` parameter has no effect. To see how `keep_elitism` and `keep_parents` work together, check the [How the Number of Offspring Is Decided](https://pygad.readthedocs.io/en/latest/pygad_more.html#how-the-number-of-offspring-is-decided) section.
 - `K_tournament=3`: In case that the parent selection type is `tournament`, the `K_tournament` specifies the number of parents participating in the tournament selection. It defaults to `3`.
-- `crossover_type="single_point"`: Type of the crossover operation. Supported types are `single_point` (for single-point crossover), `two_points` (for two points crossover), `uniform` (for uniform crossover), and `scattered` (for scattered crossover). Scattered crossover is supported from PyGAD [2.9.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-9-0) and higher. It defaults to `single_point`. A custom crossover function can be passed starting from [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0). Check the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/pygad_more.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more details about creating a user-defined crossover function. Starting from [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) and higher, if  `crossover_type=None`, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
+- `crossover_type="single_point"`: Type of the crossover operation. Supported types are `single_point` (for single-point crossover), `two_points` (for two points crossover), `uniform` (for uniform crossover), and `scattered` (for scattered crossover). Scattered crossover is supported from PyGAD [2.9.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-9-0) and higher. It defaults to `single_point`. A custom crossover function can be passed starting from [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0). Check the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/utils.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more details about creating a user-defined crossover function. Starting from [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) and higher, if  `crossover_type=None`, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
 - `crossover_probability=None`: The probability of selecting a parent for applying the crossover operation. Its value must be between 0.0 and 1.0 inclusive. For each parent, a random value between 0.0 and 1.0 is generated. If this random value is less than or equal to the value assigned to the `crossover_probability` parameter, then the parent is selected. Added in [PyGAD 2.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-5-0) and higher.
-- `mutation_type="random"`: Type of the mutation operation. Supported types are `random` (for random mutation), `swap` (for swap mutation), `inversion` (for inversion mutation), `scramble` (for scramble mutation), and `adaptive` (for adaptive mutation). It defaults to `random`. A custom mutation function can be passed starting from [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0). Check the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/pygad_more.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more details about creating a user-defined mutation function. Starting from [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) and higher, if `mutation_type=None`, then the mutation step is bypassed which means no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation. `Adaptive` mutation is supported starting from [PyGAD 2.10.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-10-0). For more information about adaptive mutation, go the the [Adaptive Mutation](https://pygad.readthedocs.io/en/latest/pygad_more.html#adaptive-mutation) section. For example about using adaptive mutation, check the [Use Adaptive Mutation in PyGAD](https://pygad.readthedocs.io/en/latest/pygad_more.html#use-adaptive-mutation-in-pygad) section.
+- `mutation_type="random"`: Type of the mutation operation. Supported types are `random` (for random mutation), `swap` (for swap mutation), `inversion` (for inversion mutation), `scramble` (for scramble mutation), and `adaptive` (for adaptive mutation). It defaults to `random`. A custom mutation function can be passed starting from [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0). Check the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/utils.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more details about creating a user-defined mutation function. Starting from [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) and higher, if `mutation_type=None`, then the mutation step is bypassed which means no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation. `Adaptive` mutation is supported starting from [PyGAD 2.10.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-10-0). For more information about adaptive mutation, go the the [Adaptive Mutation](https://pygad.readthedocs.io/en/latest/utils.html#adaptive-mutation) section. For example about using adaptive mutation, check the [Use Adaptive Mutation in PyGAD](https://pygad.readthedocs.io/en/latest/utils.html#use-adaptive-mutation-in-pygad) section.
 - `mutation_probability=None`: The probability of selecting a gene for applying the mutation operation. Its value must be between 0.0 and 1.0 inclusive. For each gene in a solution, a random value between 0.0 and 1.0 is generated. If this random value is less than or equal to the value assigned to the `mutation_probability` parameter, then the gene is selected. If this parameter exists, then there is no need for the 2 parameters `mutation_percent_genes` and `mutation_num_genes`. Added in [PyGAD 2.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-5-0) and higher.
 - `mutation_by_replacement=False`: An optional bool parameter. It works only when the selected type of mutation is random (`mutation_type="random"`). In this case, `mutation_by_replacement=True` means replace the gene by the randomly generated value. If False, then it has no effect and random mutation works by adding the random value to the gene. Supported in [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) and higher. Check the changes in [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) under the Release History section for an example.
 - `mutation_percent_genes="default"`: Percentage of genes to mutate. It defaults to the string `"default"` which is later translated into the integer `10` which means 10% of the genes will be mutated. It must be `>0` and `<=100`. Out of this percentage, the number of genes to mutate is deduced which is assigned to the `mutation_num_genes` parameter. The `mutation_percent_genes` parameter has no action if `mutation_probability` or `mutation_num_genes` exist. Starting from [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) and higher, this parameter has no action if `mutation_type` is `None`.
@@ -56,19 +56,19 @@ The `pygad.GA` class constructor supports the following parameters:
 - `random_seed=None`: Added in [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0). It defines the random seed to be used by the random function generators (we use random functions in the NumPy and random modules). This helps to reproduce the same results by setting the same random seed (e.g. `random_seed=2`). If given the value `None`, then it has no effect. 
 - `logger=None`: Accepts an instance of the `logging.Logger` class to log the outputs. Any message is no longer printed using `print()` but logged. If `logger=None`, then a logger is created that uses `StreamHandler` to logs the messages to the console. Added in [PyGAD 3.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-0-0). Check the [Logging Outputs](https://pygad.readthedocs.io/en/latest/pygad_more.html#logging-outputs) for more information.
 
-The user doesn't have to specify all of such parameters while creating an instance of the GA class. A very important parameter you must care about is `fitness_func` which defines the fitness function.
+You do not have to set all of these parameters when you create an instance of the `GA` class. The most important one is `fitness_func`, which defines the fitness function.
 
 It is OK to set the value of any of the 2 parameters `init_range_low` and `init_range_high` to be equal, higher, or lower than the other parameter (i.e. `init_range_low` is not needed to be lower than `init_range_high`). The same holds for the `random_mutation_min_val` and `random_mutation_max_val` parameters.
 
-If the 2 parameters `mutation_type` and `crossover_type` are `None`, this disables any type of evolution the genetic algorithm can make. As a result, the genetic algorithm cannot find a better solution that the best solution in the initial population.
+If both the `mutation_type` and `crossover_type` parameters are `None`, then the genetic algorithm cannot evolve at all. As a result, it cannot find a solution better than the best solution in the initial population.
 
-The parameters are validated by calling the `validate_parameters()` method of the `utils.validation.Validation` class within the constructor. If at least a parameter is not correct, an exception is thrown and the `valid_parameters` attribute is set to `False`.
+The parameters are validated by calling the `validate_parameters()` method of the `utils.validation.Validation` class inside the constructor. If any parameter is not correct, an exception is raised and the `valid_parameters` attribute is set to `False`.
 
-# Extended Classes
+## Extended Classes
 
-To make the library modular and structured, different scripts are created where each script has one or more classes. Each class has its own objective.
+To keep the library modular and structured, the code is split into several scripts, where each script has one or more classes. Each class has its own purpose.
 
-This is the list of scripts and classes within them where the `pygad.GA` class extends:
+Here is the list of scripts and the classes that the `pygad.GA` class extends:
 
 1. `utils/engine.py`:
    1. `utils.engine.GAEngine`: 
@@ -91,13 +91,13 @@ This is the list of scripts and classes within them where the `pygad.GA` class e
 
 Since the `pygad.GA` class extends such classes, the attributes and methods inside them can be retrieved by instances of the `pygad.GA` class.
 
-## Class Attributes
+### Class Attributes
 
 * `supported_int_types`: A list of the supported types for the integer numbers.
 * `supported_float_types`: A list of the supported types for the floating-point numbers.
 * `supported_int_float_types`: A list of the supported types for all numbers. It just concatenates the previous 2 lists.
 
-## Other Instance Attributes & Methods
+### Other Instance Attributes & Methods
 
 All the parameters and functions passed to the `pygad.GA` class constructor are used as class attributes and methods in the instances of the `pygad.GA` class. In addition to such attributes, there are other attributes and methods added to the instances of the `pygad.GA` class:
 
@@ -105,7 +105,7 @@ The next 2 subsections list such attributes and methods.
 
 > The `GA` class gains the attributes of its parent classes via inheritance, making them accessible through the `GA` object even if they are defined externally to its specific class body.
 
-### Other Attributes
+#### Other Attributes
 
 - `generations_completed`:  Holds the number of the last completed generation.
 - `population`: A NumPy array that initially holds the initial population and is later updated after each generation.
@@ -130,7 +130,7 @@ The next 2 subsections list such attributes and methods.
 
 Note that the attributes with names starting with `last_generation_` are updated after each generation.
 
-### Other Methods
+#### Other Methods
 
 - `cal_pop_fitness()`: A method that calculates the fitness values for all solutions within the population by calling the function passed to the `fitness_func` parameter for each solution.
 - `crossover()`: Refers to the method that applies the crossover operator based on the selected type of crossover in the `crossover_type` property.
@@ -149,7 +149,7 @@ There are many methods that are not designed for user usage. Some of them are li
 
 The next sections discuss the methods available in the `pygad.GA` class.
 
-## `save()`
+### `save()`
 
 The `save()` method in the `pygad.GA` class saves the genetic algorithm instance as a pickled object.
 
@@ -157,11 +157,11 @@ Accepts the following parameter:
 
 * `filename`: Name of the file to save the instance. No extension is needed.
 
-# Functions in `pygad`
+## Functions in `pygad`
 
 Besides the methods available in the `pygad.GA` class, this section discusses the functions available in `pygad`. Up to this time, there is only a single function named `load()`.
 
-## `pygad.load()`
+### `pygad.load()`
 
 Reads a saved instance of the genetic algorithm. This is not a method but a function that is indented under the `pygad` module. So, it could be called by the pygad module as follows: `pygad.load(filename)`.
 
@@ -171,42 +171,42 @@ Accepts the following parameter:
 
 Returns the genetic algorithm instance.
 
-# Steps to Use `pygad`
+## Steps to Use `pygad`
 
 To use the `pygad` module, here is a summary of the required steps: 
 
-1. Preparing the `fitness_func` parameter.
-2. Preparing Other Parameters.
-4. Import `pygad`.
-5. Create an Instance of the `pygad.GA` Class.
-6. Run the Genetic Algorithm.
-7. Plotting Results.
-7. Information about the Best Solution.
-8. Saving & Loading the Results.
+1. Prepare the `fitness_func` parameter.
+2. Prepare the other parameters.
+3. Import `pygad`.
+4. Create an instance of the `pygad.GA` class.
+5. Run the genetic algorithm.
+6. Plot the results.
+7. Get information about the best solution.
+8. Save and load the results.
 
-Let's discuss how to do each of these steps.
+The next sections explain each step.
 
-## Preparing the `fitness_func` Parameter 
+### Preparing the `fitness_func` Parameter 
 
-Even though some steps in the genetic algorithm pipeline can work the same regardless of the problem being solved, one critical step is the calculation of the fitness value. There is no unique way of calculating the fitness value and it changes from one problem to another. 
+Some steps in the genetic algorithm work the same way for every problem, but the fitness calculation does not. There is no single way to calculate the fitness value, and it changes from one problem to another.
 
-PyGAD has a parameter called `fitness_func` that allows the user to specify a custom function/method to use when calculating the fitness. This function/method must be a maximization function/method so that a solution with a high fitness value returned is selected compared to a solution with a low value. 
+PyGAD has a parameter called `fitness_func` that lets you pass your own function or method to calculate the fitness. This function must be a maximization function, so a solution with a higher fitness value is treated as better than a solution with a lower value.
 
 The fitness function is where the user can decide whether the optimization problem is single-objective or multi-objective. 
 
 * If the fitness function returns a numeric value, then the problem is single-objective. The numeric data types supported by PyGAD are listed in the `supported_int_float_types` variable of the `pygad.GA` class.
 * If the fitness function returns a `list`, `tuple`, or `numpy.ndarray`, then the problem is multi-objective. Even if there is only one element, the problem is still considered multi-objective. Each element represents the fitness value of its corresponding objective.
 
-Using a user-defined fitness function allows the user to freely use PyGAD to solve any problem by passing the appropriate fitness function/method. It is very important to understand the problem well before creating it.
+A user-defined fitness function lets you use PyGAD to solve any problem by passing the right fitness function. It is very important to understand the problem well before you write the fitness function.
 
-Let's discuss an example:
+Here is an example:
 
 > Given the following function:
->     y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
+>     y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + w6x6
 >     where (x1,x2,x3,x4,x5,x6)=(4, -2, 3.5, 5, -11, -4.7) and y=44
 > What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize this function.
 
-So, the task is about using the genetic algorithm to find the best values for the 6 weight `W1` to `W6`. Thinking of the problem, it is clear that the best solution is that returning an output that is close to the desired output `y=44`. So, the fitness function/method should return a value that gets higher when the solution's output is closer to `y=44`. Here is a function that does that:
+So, the task is to use the genetic algorithm to find the best values for the 6 weights `w1` to `w6`. The best solution is the one whose output is closest to the desired output `y=44`. So, the fitness function should return a higher value when the solution's output is closer to `y=44`. Here is a function that does that:
 
 ```python
 function_inputs = [4, -2, 3.5, 5, -11, -4.7] # Function inputs.
@@ -218,7 +218,7 @@ def fitness_func(ga_instance, solution, solution_idx):
     return fitness
 ```
 
-Because the fitness function returns a numeric value, then the problem is single-objective.
+Because the fitness function returns a numeric value, the problem is single-objective.
 
 Such a user-defined function must accept 3 parameters:
 
@@ -228,11 +228,11 @@ Such a user-defined function must accept 3 parameters:
 
 If a method is passed to the `fitness_func` parameter, then it accepts a fourth parameter representing the method's instance.
 
-The `__code__` object is used to check if this function accepts the required number of parameters. If more or fewer parameters are passed, an exception is thrown. 
+The `__code__` object is used to check that this function accepts the required number of parameters. If more or fewer parameters are passed, an exception is raised.
 
-By creating this function, you did a very important step towards using PyGAD. 
+By writing this function, you have completed a very important step toward using PyGAD.
 
-### Preparing Other Parameters
+#### Preparing Other Parameters
 
 Here is an example for preparing the other parameters:
 
@@ -257,9 +257,9 @@ mutation_type = "random"
 mutation_percent_genes = 10
 ```
 
-### The `on_generation` Parameter
+#### The `on_generation` Parameter
 
-An optional parameter named `on_generation` is supported which allows the user to call a function (with a single parameter) after each generation. Here is a simple function that just prints the current generation number and the fitness value of the best solution in the current generation. The `generations_completed` attribute of the GA class returns the number of the last completed generation.
+The optional `on_generation` parameter lets you call a function (with a single parameter) after each generation. Here is a simple function that prints the current generation number and the fitness value of the best solution in the current generation. The `generations_completed` attribute of the `GA` class returns the number of the last completed generation.
 
 ```python
 def on_gen(ga_instance):
@@ -277,7 +277,7 @@ ga_instance = pygad.GA(...,
 
 After the parameters are prepared, we can import PyGAD and build an instance of the `pygad.GA` class.
 
-## Import `pygad`
+### Import `pygad`
 
 The next step is to import PyGAD as follows:
 
@@ -287,7 +287,7 @@ import pygad
 
 The `pygad.GA` class holds the implementation of all methods for running the genetic algorithm.
 
-## Create an Instance of the `pygad.GA` Class
+### Create an Instance of the `pygad.GA` Class
 
 The `pygad.GA` class is instantiated where the previously prepared parameters are fed to its constructor. The constructor is responsible for creating the initial population.
 
@@ -306,7 +306,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
                        mutation_percent_genes=mutation_percent_genes)
 ```
 
-## Run the Genetic Algorithm
+### Run the Genetic Algorithm
 
 After an instance of the `pygad.GA` class is created, the next step is to call the `run()` method as follows:
 
@@ -314,14 +314,14 @@ After an instance of the `pygad.GA` class is created, the next step is to call t
 ga_instance.run()
 ```
 
-Inside this method, the genetic algorithm evolves over some generations by doing the following tasks:
+Inside this method, the genetic algorithm evolves over the generations by doing the following tasks:
 
-1. Calculating the fitness values of the solutions within the current population.
+1. Calculate the fitness values of the solutions in the current population.
 2. Select the best solutions as parents in the mating pool.
-3. Apply the crossover & mutation operation
-4. Repeat the process for the specified number of generations. 
+3. Apply the crossover and mutation operations.
+4. Repeat the process for the given number of generations.
 
-## Plotting Results
+### Plotting Results
 
 There is a method named `plot_fitness()` which creates a figure summarizing how the fitness values of the solutions change with the generations.
 
@@ -331,7 +331,7 @@ ga_instance.plot_fitness()
 
 ![Fig02](https://user-images.githubusercontent.com/16560492/78830005-93111d00-79e7-11ea-9d8e-a8d8325a6101.png)
 
-## Information about the Best Solution
+### Information about the Best Solution
 
 The following information about the best solution in the last population is returned using the `best_solution()` method. 
 
@@ -346,14 +346,14 @@ print(f"Fitness value of the best solution = {solution_fitness}")
 print(f"Index of the best solution : {solution_idx}")
 ```
 
-Using the `best_solution_generation` attribute of the instance from the `pygad.GA` class, the generation number at which the `best fitness` is reached could be fetched.
+Using the `best_solution_generation` attribute of the `pygad.GA` instance, you can get the generation number at which the best fitness was reached.
 
 ```python
 if ga_instance.best_solution_generation != -1:
     print(f"Best fitness value reached after {ga_instance.best_solution_generation} generations.")
 ```
 
-## Saving & Loading the Results
+### Saving & Loading the Results
 
 After the `run()` method completes, it is possible to save the current instance of the genetic algorithm to avoid losing the progress made. The `save()` method is available for that purpose. Just pass the file name to it without an extension. According to the next code, a file named `genetic.pkl` will be created and saved in the current directory.
 
@@ -374,9 +374,19 @@ After the instance is loaded, you can use it to run any method or access any pro
 print(loaded_ga_instance.best_solution())
 ```
 
-# Life Cycle of PyGAD
+## Life Cycle of PyGAD
 
-The next figure lists the different stages in the lifecycle of an instance of the `pygad.GA` class. Note that PyGAD stops when either all generations are completed or when the function passed to the `on_generation` parameter returns the string `stop`.
+The next figure shows the main steps in the life cycle of a `pygad.GA` instance. The genetic algorithm starts from an initial population and repeats the same steps once per generation. It measures the fitness of every solution, selects the parents, applies crossover and mutation to make offspring, and then builds the next generation. PyGAD stops when all generations are done or when the function passed to the `on_generation` parameter returns the string `stop`.
+
+:::{figure} images/ga_lifecycle.*
+:alt: The PyGAD genetic algorithm life cycle
+:width: 480px
+:align: center
+
+The main steps of the genetic algorithm in PyGAD.
+:::
+
+The next figure shows the same life cycle in more detail, including the callback functions that PyGAD calls at each stage.
 
 ![PyGAD Lifecycle](https://user-images.githubusercontent.com/16560492/220486073-c5b6089d-81e4-44d9-a53c-385f479a7273.jpg)
 
@@ -459,11 +469,11 @@ on_generation()
 on_stop()
 ```
 
-# Examples
+## Examples
 
 This section gives the complete code of some examples that use `pygad`. Each subsection builds a different example.
 
-## Linear Model Optimization - Single Objective
+### Linear Model Optimization - Single Objective
 
 This example is discussed in the [Steps to Use PyGAD](https://pygad.readthedocs.io/en/latest/pygad.html#steps-to-use-pygad) section which optimizes a linear model. Its complete code is listed below.
 
@@ -473,7 +483,7 @@ import numpy
 
 """
 Given the following function:
-    y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
+    y = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + w6x6
     where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=44
 What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize this function.
 """
@@ -533,12 +543,12 @@ loaded_ga_instance = pygad.load(filename=filename)
 loaded_ga_instance.plot_fitness()
 ```
 
-## Linear Model Optimization - Multi-Objective
+### Linear Model Optimization - Multi-Objective
 
 This is a multi-objective optimization example that optimizes these 2 functions:
 
-1. `y1 = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6`
-2. `y2 = f(w1:w6) = w1x7 + w2x8 + w3x9 + w4x10 + w5x11 + 6wx12`
+1. `y1 = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + w6x6`
+2. `y2 = f(w1:w6) = w1x7 + w2x8 + w3x9 + w4x10 + w5x11 + w6x12`
 
 Where:
 
@@ -557,8 +567,8 @@ import numpy
 
 """
 Given these 2 functions:
-    y1 = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
-    y2 = f(w1:w6) = w1x7 + w2x8 + w3x9 + w4x10 + w5x11 + 6wx12
+    y1 = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + w6x6
+    y2 = f(w1:w6) = w1x7 + w2x8 + w3x9 + w4x10 + w5x11 + w6x12
     where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=50
     and   (x7,x8,x9,x10,x11,x12)=(-2,0.7,-9,1.4,3,5) and y=30
 What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize these 2 functions.
@@ -622,7 +632,7 @@ This is the figure created by the `plot_fitness()` method. The fitness of the fi
 
 ![multi-objective-pygad](https://github.com/ahmedfgad/GeneticAlgorithmPython/assets/16560492/7896f8d8-01c5-4ff9-8d15-52191c309b63)
 
-## Reproducing Images
+### Reproducing Images
 
 This project reproduces a single image using PyGAD by evolving pixel values. This project works with both color and gray images. Check this project at [GitHub](https://github.com/ahmedfgad/GARI): https://github.com/ahmedfgad/GARI. 
 
@@ -631,7 +641,7 @@ For more information about this project, read this tutorial titled [Reproducing 
 - [Heartbeat](https://heartbeat.fritz.ai/reproducing-images-using-a-genetic-algorithm-with-python-91fc701ff84): https://heartbeat.fritz.ai/reproducing-images-using-a-genetic-algorithm-with-python-91fc701ff84
 - [LinkedIn](https://www.linkedin.com/pulse/reproducing-images-using-genetic-algorithm-python-ahmed-gad): https://www.linkedin.com/pulse/reproducing-images-using-genetic-algorithm-python-ahmed-gad
 
-### Project Steps
+#### Project Steps
 
 The steps to follow in order to reproduce an image are as follows:
 
@@ -644,7 +654,7 @@ The steps to follow in order to reproduce an image are as follows:
 
 The next sections discusses the code of each of these steps.
 
-### Read an Image
+#### Read an Image
 
 There is an image named `fruit.jpg` in the [GARI project](https://github.com/ahmedfgad/GARI) which is read according to the next code.
 
@@ -664,7 +674,7 @@ Based on the chromosome representation used in the example, the pixel values can
 
 Note that the range of pixel values affect other parameters like the range from which the random values are selected during mutation and also the range of the values used in the initial population. So, be consistent.
 
-### Prepare the Fitness Function
+#### Prepare the Fitness Function
 
 The next code creates a function that will be used as a fitness function for calculating the fitness value for each solution in the population. This function must be a maximization function that accepts 3 parameters representing the instance of the `pygad.GA` class, a solution, and its index. It returns a value representing the fitness value.
 
@@ -700,7 +710,7 @@ def chromosome2img(vector, shape):
     return numpy.reshape(vector, shape)
  ```
 
-### Create an Instance of the `pygad.GA` Class
+#### Create an Instance of the `pygad.GA` Class
 
 It is very important to use random mutation and set the `mutation_by_replacement` to `True`. Based on the range of pixel values, the values assigned to the `init_range_low`, `init_range_high`, `random_mutation_min_val`, and `random_mutation_max_val` parameters should be changed.
 
@@ -725,7 +735,7 @@ ga_instance = pygad.GA(num_generations=20000,
                        random_mutation_max_val=1.0)
 ```
 
-### Run PyGAD
+#### Run PyGAD
 
 Simply, call the `run()` method to run PyGAD.
 
@@ -733,7 +743,7 @@ Simply, call the `run()` method to run PyGAD.
 ga_instance.run()
 ```
 
-### Plot Results
+#### Plot Results
 
 After the `run()` method completes, the fitness values of all generations can be viewed in a plot using the `plot_fitness()` method.
 
@@ -745,7 +755,7 @@ Here is the plot after 20,000 generations.
 
 ![Fitness Values](https://user-images.githubusercontent.com/16560492/82232124-77762c00-992e-11ea-9fc6-14a1cd7a04ff.png)
 
-### Calculate Some Statistics
+#### Calculate Some Statistics
 
 Here is some information about the best solution. 
 
@@ -764,7 +774,7 @@ matplotlib.pyplot.title("PyGAD & GARI for Reproducing Images")
 matplotlib.pyplot.show()
 ```
 
-### Evolution by Generation
+#### Evolution by Generation
 
 The solution reached after the 20,000 generations is shown below.
 
@@ -806,13 +816,13 @@ Generation 20,000
 
 ![solution](https://user-images.githubusercontent.com/16560492/82232405-e0f63a80-992e-11ea-984f-b6ed76465bd1.png)
 
-## Clustering
+### Clustering
 
 For a 2-cluster problem, the code is available [here](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/example_clustering_2.py). For a 3-cluster problem, the code is [here](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/example_clustering_3.py). The 2 examples are using artificial samples.
 
 Soon a tutorial will be published at [Paperspace](https://blog.paperspace.com/author/ahmed) to explain how clustering works using the genetic algorithm with examples in PyGAD.
 
-## CoinTex Game Playing using PyGAD
+### CoinTex Game Playing using PyGAD
 
 The code is available the [CoinTex GitHub project](https://github.com/ahmedfgad/CoinTex/tree/master/PlayerGA). CoinTex is an Android game written in Python using the Kivy framework. Find CoinTex at [Google Play](https://play.google.com/store/apps/details?id=coin.tex.cointexreactfast): https://play.google.com/store/apps/details?id=coin.tex.cointexreactfast
 

@@ -1,8 +1,10 @@
 # More About PyGAD
 
-# Multi-Objective Optimization
+This section covers the more advanced features of the `pygad` module.
 
-In [PyGAD 3.2.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-2-0), the library supports multi-objective optimization using the non-dominated sorting genetic algorithm II (NSGA-II). The code is exactly similar to the regular code used for single-objective optimization except for 1 difference. It is the return value of the fitness function.
+## Multi-Objective Optimization
+
+In [PyGAD 3.2.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-2-0), the library added support for multi-objective optimization using the non-dominated sorting genetic algorithm II (NSGA-II). The code is almost the same as the code for single-objective optimization, except for one difference: the return value of the fitness function.
 
 In single-objective optimization, the fitness function returns a single numeric value. In this example, the variable `fitness` is expected to be a numeric value.
 
@@ -35,8 +37,8 @@ But it is recommended to use one of these 2 parent selection operators to solve 
 
 This is a multi-objective optimization example that optimizes these 2 linear functions:
 
-1. `y1 = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6`
-2. `y2 = f(w1:w6) = w1x7 + w2x8 + w3x9 + w4x10 + w5x11 + 6wx12`
+1. `y1 = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + w6x6`
+2. `y2 = f(w1:w6) = w1x7 + w2x8 + w3x9 + w4x10 + w5x11 + w6x12`
 
 Where:
 
@@ -53,8 +55,8 @@ import numpy
 
 """
 Given these 2 functions:
-    y1 = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + 6wx6
-    y2 = f(w1:w6) = w1x7 + w2x8 + w3x9 + w4x10 + w5x11 + 6wx12
+    y1 = f(w1:w6) = w1x1 + w2x2 + w3x3 + w4x4 + w5x5 + w6x6
+    y2 = f(w1:w6) = w1x7 + w2x8 + w3x9 + w4x10 + w5x11 + w6x12
     where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7) and y=50
     and   (x7,x8,x9,x10,x11,x12)=(-2,0.7,-9,1.4,3,5) and y=30
 What are the best values for the 6 weights (w1 to w6)? We are going to use the genetic algorithm to optimize these 2 functions.
@@ -118,7 +120,7 @@ This is the figure created by the `plot_fitness()` method. The fitness of the fi
 
 ![multi-objective-pygad](https://github.com/ahmedfgad/GeneticAlgorithmPython/assets/16560492/7896f8d8-01c5-4ff9-8d15-52191c309b63)
 
-# Limit the Gene Value Range using the `gene_space` Parameter
+## Limit the Gene Value Range using the `gene_space` Parameter
 
 In [PyGAD 2.11.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-11-0), the `gene_space` parameter supported a new feature to allow customizing the range of accepted values for each gene. Let's take a quick review of the `gene_space` parameter to build over it.
 
@@ -166,7 +168,7 @@ For a 3-gene problem, the next code creates a dictionary for each gene to restri
 gene_space = [{'low': 1, 'high': 5}, {'low': 0.3, 'high': 1.4}, {'low': -0.2, 'high': 4.5}]
 ```
 
-# More about the `gene_space` Parameter
+## More about the `gene_space` Parameter
 
 The `gene_space` parameter customizes the space of values of each gene.  
 
@@ -225,7 +227,7 @@ gene_space = [range(5), None, numpy.linspace(10, 20, 300)]
 
 If the user did not assign the initial population to the `initial_population` parameter, the initial population is created randomly based on the `gene_space` parameter. Moreover, the mutation is applied based on this parameter.
 
-## How Mutation Works with the `gene_space` Parameter?
+### How Mutation Works with the `gene_space` Parameter?
 
 Mutation changes based on whether the `gene_space` has a continuous range or discrete set of values.
 
@@ -265,7 +267,7 @@ If the dictionary has a step like the example below, then it is considered a dis
 Gene space: {'low': 1, 'high': 5, 'step': 0.5}
 ```
 
-# Gene Constraint
+## Gene Constraint
 
 In [PyGAD 3.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0), a new parameter called `gene_constraint` is added to the constructor of the `pygad.GA` class. An instance attribute of the same name is created for any instance of the `pygad.GA` class.
 
@@ -349,11 +351,11 @@ Out of the range of *1000* numbers, all the 100 values might not be satisfying t
 >
 > PyGAD applies constraints sequentially, starting from the first gene to the last. To ensure correct behavior when genes depend on each other, structure your GA problem so that if gene X depends on gene Y, then gene Y appears earlier in the chromosome (solution) than gene X. As a result, its gene constraint will be earlier in the list.
 
-## Full Example
+### Full Example
 
 For a full example, please check the [`examples/example_gene_constraint.py` script](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_gene_constraint.py).
 
-# `sample_size` Parameter
+## `sample_size` Parameter
 
 In [PyGAD 3.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0), a new parameter called `sample_size`. It is used in some situations where PyGAD seeks a single value for a gene out of a range. Two of the important use cases are:
 
@@ -371,7 +373,7 @@ If the objective is to find a unique value or enforce the gene constraint, then 
 
 Sometimes 100 values is not enough and PyGAD sometimes fails to find a good value. In this case, it is highly recommended to increase the `sample_size` parameter. This is to create a larger sample to increase the chance of finding a value that meets our objectives.
 
-# Stop at Any Generation
+## Stop at Any Generation
 
 In [PyGAD 2.4.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-4-0), it is possible to stop the genetic algorithm after any generation. All you need to do it to return the string `"stop"` in the callback function `on_generation`. When this callback function is implemented and assigned to the `on_generation` parameter in the constructor of the `pygad.GA` class, then the algorithm immediately stops after completing its current generation. Let's discuss an example.
 
@@ -385,7 +387,7 @@ def func_generation(ga_instance):
         return "stop"
    ```
 
-# Stop Criteria
+## Stop Criteria
 
 In [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0), a new parameter named `stop_criteria` is added to the constructor of the `pygad.GA` class. It helps to stop the evolution based on some criteria. It can be assigned to one or more criterion.
 
@@ -433,7 +435,7 @@ ga_instance.run()
 print(f"Number of generations passed is {ga_instance.generations_completed}")
 ```
 
-## Multi-Objective Stop Criteria
+### Multi-Objective Stop Criteria
 
 When multi-objective is used, then there are 2 options to use the `stop_criteria` parameter with the `reach` keyword:
 
@@ -457,11 +459,13 @@ More than one criterion can be used together. In this case, pass the `stop_crite
 stop_criteria=['reach_10_20_30', 'reach_90_-5.7_10']
 ```
 
-# Elitism Selection
+## Elitism Selection
 
-In [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0), a new parameter called `keep_elitism` is supported. It accepts an integer to define the number of elitism (i.e. best solutions) to keep in the next generation. This parameter defaults to `1` which means only the best solution is kept in the next generation.
+Starting from [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0), there is a parameter called `keep_elitism`. It takes an integer that sets how many of the best solutions (the elitism) are kept in the next generation. It defaults to `1`, so only the best solution is kept by default.
 
-In the next example, the `keep_elitism` parameter in the constructor of the `pygad.GA` class is set to 2. Thus, the best 2 solutions in each generation are kept in the next generation.
+The best solutions are copied to the next generation without any change. Crossover and mutation do not touch them. This makes sure the best solutions found so far are never lost.
+
+In the next example, the `keep_elitism` parameter in the constructor of the `pygad.GA` class is set to `2`. So, the best 2 solutions in each generation are kept in the next generation.
 
 ```python
 import numpy
@@ -485,12 +489,12 @@ ga_instance = pygad.GA(num_generations=2,
 ga_instance.run()
 ```
 
-The value passed to the `keep_elitism` parameter must satisfy 2 conditions:
+The value passed to the `keep_elitism` parameter must meet 2 conditions:
 
 1. It must be `>= 0`.
-2. It must be `<= sol_per_pop`. That is its value cannot exceed the number of solutions in the current population.
+2. It must be `<= sol_per_pop`. Its value cannot be more than the number of solutions in the population.
 
-In the previous example, if the `keep_elitism` parameter is set equal to the value passed to the `sol_per_pop` parameter, which is 5, then there will be no evolution at all as in the next figure. This is because all the 5 solutions are used as elitism in the next generation and no offspring will be created. 
+In the previous example, if `keep_elitism` is set equal to `sol_per_pop` (which is `5`), then there is no evolution at all, as shown in the next figure. This is because all the 5 solutions are kept as elitism in the next generation, so no offspring are created.
 
 ```python
 ...
@@ -506,9 +510,51 @@ ga_instance.run()
 
 ![elitism_kills_evolution](https://user-images.githubusercontent.com/16560492/189273225-67ffad41-97ab-45e1-9324-429705e17b20.png)
 
-Note that if the `keep_elitism` parameter is effective (i.e. is assigned a positive integer, not zero), then the `keep_parents` parameter will have no effect. Because the default value of the `keep_elitism` parameter is 1, then the `keep_parents` parameter has no effect by default. The `keep_parents` parameter is only effective when `keep_elitism=0`.
+### How the Number of Offspring Is Decided
 
-# Random Seed
+PyGAD has two parameters that decide how many solutions are carried over to the next generation:
+
+- `keep_elitism`: keeps the best solutions (the elitism).
+- `keep_parents`: keeps the selected parents.
+
+Only one of them is used at a time, and `keep_elitism` has priority. If `keep_elitism` is not zero, then `keep_parents` is ignored. Because `keep_elitism` defaults to `1`, the `keep_parents` parameter has no effect by default. To use `keep_parents`, set `keep_elitism=0`.
+
+The number of kept solutions decides how many offspring are created. The rest of the population is filled with new offspring:
+
+```
+number of offspring = sol_per_pop - (number of kept solutions)
+```
+
+The next tree shows how the two parameters decide the number of offspring.
+
+:::{figure} images/offspring_decision_tree.*
+:alt: Decision tree showing how keep_elitism and keep_parents decide the number of offspring
+:width: 680px
+:align: center
+
+How `keep_elitism` and `keep_parents` decide the number of offspring.
+:::
+
+There are four cases:
+
+| `keep_elitism` | `keep_parents` | What is kept | Number of offspring |
+| --- | --- | --- | --- |
+| `> 0` | ignored | the best `keep_elitism` solutions | `sol_per_pop - keep_elitism` |
+| `0` | `-1` | all the parents | `sol_per_pop - num_parents_mating` |
+| `0` | `0` | nothing | `sol_per_pop` |
+| `0` | `> 0` | the best `keep_parents` parents | `sol_per_pop - keep_parents` |
+
+The kept solutions are placed at the top of the next population, starting at index 0. The offspring fill the slots that remain.
+
+:::{figure} images/population_assembly.*
+:alt: The kept solutions sit at the top of the next population and the offspring fill the rest
+:width: 620px
+:align: center
+
+The kept solutions are copied to the top of the population. The offspring fill the rest.
+:::
+
+## Random Seed
 
 In [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0), a new parameter called `random_seed` is supported. Its value is used as a seed for the random function generators.
 
@@ -560,7 +606,7 @@ After running the code again, it will find the same result.
 0.04872203136549972
 ```
 
-# Continue without Losing Progress
+## Continue without Losing Progress
 
 In [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0), and thanks for [Felix Bernhard](https://github.com/FeBe95) for opening [this GitHub issue](https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/123#issuecomment-1203035106), the values of these 4 instance attributes are no longer reset after each call to the `run()` method.
 
@@ -609,7 +655,7 @@ The plot created by the `plot_fitness()` method will show the data collected fro
 
 Note that the 2 attributes (`self.best_solutions` and `self.best_solutions_fitness`) only work if the `save_best_solutions` parameter is set to `True`. Also, the 2 attributes (`self.solutions` and `self.solutions_fitness`) only work if the `save_solutions` parameter is `True`.
 
-# Change Population Size during Runtime
+## Change Population Size during Runtime
 
 Starting from [PyGAD 3.3.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-0), the population size can changed during runtime. In other words, the number of solutions/chromosomes and number of genes can be changed. 
 
@@ -633,7 +679,7 @@ These are examples of the instance attributes that might be changed. The user sh
    3. `last_generation_elitism` and `last_generation_elitism_indices`: Must be changed if `keep_elitism != 0`. The default value of `keep_elitism` is 1. Two NumPy arrays: 2D array representing the elitism and 1D array of the elitism indices.
 2. `pop_size`: The population size.
 
-# Prevent Duplicates in Gene Values
+## Prevent Duplicates in Gene Values
 
 In [PyGAD 2.13.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-13-0), a new bool parameter called `allow_duplicate_genes` is supported to control whether duplicates are supported in the chromosome or not. In other words, whether 2 or more genes might have the same exact value. 
 
@@ -765,13 +811,13 @@ You should care of giving enough values for the genes so that PyGAD is able to f
 
 If PyGAD failed to find a unique gene while there is still room to find a unique value, one possible option is to set the `sample_size` parameter to a larger value. Check the [sample_size Parameter](https://pygad.readthedocs.io/en/latest/pygad_more.html#sample-size-parameter) section for more information.
 
-## Limitation
+### Limitation
 
 There might be 2 duplicate genes where changing either of the 2 duplicating genes will not solve the problem. For example, if `gene_space=[[3, 0, 1], [4, 1, 2], [0, 2], [3, 2, 0]]` and the solution is `[3 2 0 0]`, then the values of the last 2 genes duplicate. There are no possible changes in the last 2 genes to solve the problem. 
 
 This problem can be solved by randomly changing one of the non-duplicating genes that may make a room for a unique value in one the 2 duplicating genes. For example, by changing the second gene from 2 to 4, then any of the last 2 genes can take the value 2 and solve the duplicates. The resultant gene is then `[3 4 2 0]`. But this option is not yet supported in PyGAD.
 
-## Solve Duplicates using a Third Gene
+### Solve Duplicates using a Third Gene
 
 When `allow_duplicate_genes=False` and a user-defined `gene_space` is used, it sometimes happen that there is no room to solve the duplicates between the 2 genes by simply replacing the value of one gene by another gene. In [PyGAD 3.1.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-0-1), the duplicates are solved by looking for a third gene that will help in solving the duplicates. The following examples explain how it works.
 
@@ -835,7 +881,7 @@ The quick summary is:
 * Change the value of the first gene from 1 to 0. The solution becomes [0, 2, 2, 3].
 * Change the value of the second gene from 2 to 1. The solution becomes [0, 1, 2, 3]. The duplicate is solved.
 
-# More about the `gene_type` Parameter
+## More about the `gene_type` Parameter
 
 The `gene_type` parameter allows the user to control the data type for all genes at once or each individual gene. In [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0), the `gene_type` parameter also supports customizing the precision for `float` data types. As a result, the `gene_type` parameter helps to:
 
@@ -844,7 +890,7 @@ The `gene_type` parameter allows the user to control the data type for all genes
 
 Let's discuss things by examples.
 
-## Data Type for All Genes without Precision
+### Data Type for All Genes without Precision
 
 The data type for all genes can be specified by assigning the numeric data type directly to the `gene_type` parameter. This is an example to make all genes of `int` data types.
 
@@ -902,7 +948,7 @@ Final Population
  [ 1 -1  2  2  0]]
 ```
 
-## Data Type for All Genes with Precision
+### Data Type for All Genes with Precision
 
 A precision can only be specified for a `float` data type and cannot be specified for integers. Here is an example to use a precision of 3 for the `float` data type. In this case, all genes are of type `float` and their maximum precision is 3. 
 
@@ -957,7 +1003,7 @@ Final Population
  [ 1.714 -0.644  3.623  3.185 -2.362]]
 ```
 
-## Data Type for each Individual Gene without Precision
+### Data Type for each Individual Gene without Precision
 
 In [PyGAD 2.14.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-14-0), the `gene_type` parameter allows customizing the gene type for each individual gene. This is by using a `list`/`tuple`/`numpy.ndarray` with number of elements equal to the number of genes. For each element, a type is specified for the corresponding gene.
 
@@ -1013,7 +1059,7 @@ Final Population
  [3 3.7729827570110714 1.458 0 -0.14638754050305036]]
 ```
 
-## Data Type for each Individual Gene with Precision
+### Data Type for each Individual Gene with Precision
 
 The precision can also be specified for the `float` data types as in the next line where the second gene precision is 2 and last gene precision is 1.
 
@@ -1067,7 +1113,7 @@ Final Population
  [2 -3.73 3.47 3 -1.3]]
 ```
 
-# Parallel Processing in PyGAD
+## Parallel Processing in PyGAD
 
 Starting from [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), parallel processing becomes supported. This section explains how to use parallel processing in PyGAD. 
 
@@ -1229,7 +1275,7 @@ Based on the second example, using parallel processing with 10 processes takes t
 
 *Before releasing [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), [László Fazekas](https://www.linkedin.com/in/l%C3%A1szl%C3%B3-fazekas-2429a912) wrote an article to parallelize the fitness function with PyGAD. Check it: [How Genetic Algorithms Can Compete with Gradient Descent and Backprop](https://hackernoon.com/how-genetic-algorithms-can-compete-with-gradient-descent-and-backprop-9m9t33bq)*.
 
-# Print Lifecycle Summary
+## Print Lifecycle Summary
 
 In [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0), a new method called `summary()` is supported. It prints a Keras-like summary of the PyGAD lifecycle showing the steps, callback functions, parameters, etc.
 
@@ -1348,7 +1394,7 @@ On Generation          on_gen()                           None
 ======================================================================
 ```
 
-# Logging Outputs
+## Logging Outputs
 
 In [PyGAD 3.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-0-0), the `print()` statement is no longer used and the outputs are printed using the [logging](https://docs.python.org/3/library/logging.html) module. A a new parameter called `logger` is supported to accept the user-defined logger. 
 
@@ -1372,7 +1418,7 @@ Some advantages of using the the [logging](https://docs.python.org/3/library/log
 
 This section gives some quick examples to use the `logging` module and then gives an example to use the logger with PyGAD.
 
-## Logging to the Console
+### Logging to the Console
 
 This is an example to create a logger to log the messages to the console.
 
@@ -1443,7 +1489,7 @@ Note that you may need to clear the handlers after finishing the execution. This
 logger.handlers.clear()
 ```
 
-## Logging to a File
+### Logging to a File
 
 This is another example to log the messages to a file named `logfile.txt`. The formatter prints the following about each message:
 
@@ -1485,7 +1531,7 @@ Consider clearing the handlers if necessary.
 logger.handlers.clear()
 ```
 
-## Log to Both the Console and a File
+### Log to Both the Console and a File
 
 This is an example to create a single Logger associated with 2 handlers:
 
@@ -1522,7 +1568,7 @@ Consider clearing the handlers if necessary.
 logger.handlers.clear()
 ```
 
-## PyGAD Example
+### PyGAD Example
 
 To use the logger in PyGAD, just create your custom logger and pass it to the `logger` parameter.
 
@@ -1599,7 +1645,7 @@ By executing this code, the logged messages are printed to the console and also 
 2023-04-03 19:04:27 INFO: Fitness    = 0.000389832593101348
 ```
 
-# Solve Non-Deterministic Problems
+## Solve Non-Deterministic Problems
 
 PyGAD can be used to solve both deterministic and non-deterministic problems. Deterministic are those that return the same fitness for the same solution. For non-deterministic problems, a different fitness value would be returned for the same solution.
 
@@ -1630,7 +1676,7 @@ ga_instance = pygad.GA(...,
 
 This way PyGAD will not save any explored solution and thus the fitness function have to be called for each individual solution.
 
-# Reuse the Fitness instead of Calling the Fitness Function
+## Reuse the Fitness instead of Calling the Fitness Function
 
 It may happen that a previously explored solution in generation X is explored again in another generation Y (where Y > X). For some problems, calling the fitness function takes much time. 
 
@@ -1640,23 +1686,23 @@ The parameters explored in this section can be set in the constructor of the `py
 
 The `cal_pop_fitness()` method of the `pygad.GA` class checks these parameters to see if there is a possibility of reusing the fitness instead of calling the fitness function.
 
-## 1. `save_solutions`
+### 1. `save_solutions`
 
 It defaults to `False`. If set to `True`, then the population of each generation is saved into the `solutions` attribute of the `pygad.GA` instance. In other words, every single solution is saved in the `solutions` attribute.
 
-## 2. `save_best_solutions`
+### 2. `save_best_solutions`
 
 It defaults to `False`. If `True`, then it only saves the best solution in every generation. 
 
-## 3. `keep_elitism`
+### 3. `keep_elitism`
 
 It accepts an integer and defaults to 1. If set to a positive integer, then it keeps the elitism of one generation available in the next generation. 
 
-## 4. `keep_parents`
+### 4. `keep_parents`
 
 It accepts an integer and defaults to -1. It set to `-1` or a positive integer, then it keeps the parents of one generation available in the next generation. 
 
-# Why the Fitness Function is not Called for Solution at Index 0?
+## Why the Fitness Function is not Called for Solution at Index 0?
 
 PyGAD has a parameter called `keep_elitism` which defaults to 1. This parameter defines the number of best solutions in generation **X** to keep in the next generation **X+1**. The best solutions are just copied from generation **X** to generation **X+1** without making any change.
 
@@ -1683,7 +1729,7 @@ ga_instance = pygad.GA(...,
 
 
 
-# Batch Fitness Calculation
+## Batch Fitness Calculation
 
 In [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0), a new optional parameter called `fitness_batch_size` is supported. A new optional parameter called `fitness_batch_size` is supported to calculate the fitness function in batches. Thanks to [Linan Qiu](https://github.com/linanqiu) for opening the [GitHub issue #136](https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/136).
 
@@ -1692,7 +1738,7 @@ Its values can be:
 * `1` or `None`: If the `fitness_batch_size` parameter is assigned the value `1` or `None` (default), then the normal flow is used where the fitness function is called for each individual solution. That is if there are 15 solutions, then the fitness function is called 15 times.
 * `1 < fitness_batch_size <= sol_per_pop`: If the `fitness_batch_size` parameter is assigned a value satisfying this condition `1 < fitness_batch_size <= sol_per_pop`, then the solutions are grouped into batches of size `fitness_batch_size` and the fitness function is called once for each batch. In this case, the fitness function must return a list/tuple/numpy.ndarray with a length equal to the number of solutions passed.
 
-## Example without `fitness_batch_size` Parameter
+### Example without `fitness_batch_size` Parameter
 
 This is an example where the `fitness_batch_size` parameter is given the value `None` (which is the default value). This is equivalent to using the value `1`. In this case, the fitness function will be called for each solution. This means the fitness function `fitness_func` will receive only a single solution. This is an example of the passed arguments to the fitness function:
 
@@ -1741,7 +1787,7 @@ print(number_of_calls)
 120
 ```
 
-## Example with `fitness_batch_size` Parameter
+### Example with `fitness_batch_size` Parameter
 
 This is an example where the `fitness_batch_size` parameter is used and assigned the value `4`. This means the solutions will be grouped into batches of `4` solutions. The fitness function will be called once for each patch (i.e. called once for each 4 solutions). 
 
@@ -1799,7 +1845,7 @@ print(number_of_calls)
 
 When batch fitness calculation is used, then we saved `120 - 30 = 90` calls to the fitness function. 
 
-# Use Functions and Methods to Build Fitness and Callbacks
+## Use Functions and Methods to Build Fitness and Callbacks
 
 In PyGAD 2.19.0, it is possible to pass user-defined functions or methods to the following parameters:
 
@@ -1817,7 +1863,7 @@ This section gives 2 examples to assign these parameters user-defined:
 1. Functions.
 2. Methods.
 
-## Assign Functions
+### Assign Functions
 
 This is a dummy example where the fitness function returns a random value. Note that the instance of the `pygad.GA` class is passed as the last parameter of all functions.
 
@@ -1865,7 +1911,7 @@ ga_instance = pygad.GA(num_generations=5,
 ga_instance.run()
 ```
 
-## Assign Methods
+### Assign Methods
 
 The next example has all the method defined inside the class `Test`. All of the methods accept an additional parameter representing the method's object of the class `Test`.
 

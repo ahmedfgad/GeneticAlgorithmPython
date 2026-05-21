@@ -13,7 +13,7 @@ The contents of this module are:
 
 More details are given in the next sections.
 
-# Steps Summary
+## Steps Summary
 
 The summary of the steps used to train a PyTorch model using PyGAD is as follows:
 
@@ -24,7 +24,7 @@ The summary of the steps used to train a PyTorch model using PyGAD is as follows
 6. Create an instance of the `pygad.GA` class.
 8. Run the genetic algorithm.
 
-# Create PyTorch Model
+## Create PyTorch Model
 
 Before discussing training a PyTorch model using PyGAD, the first thing to do is to create the PyTorch model. To get started, please check the [PyTorch library documentation](https://pytorch.org/docs/stable/index.html).
 
@@ -44,18 +44,18 @@ model = torch.nn.Sequential(input_layer,
 
 Feel free to add the layers of your choice.
 
-# `pygad.torchga.TorchGA` Class
+## `pygad.torchga.TorchGA` Class
 
 The `pygad.torchga` module has a class named `TorchGA` for creating an initial population for the genetic algorithm based on a PyTorch model. The constructor, methods, and attributes within the class are discussed in this section. 
 
-## `__init__()`
+### `__init__()`
 
 The `pygad.torchga.TorchGA` class constructor accepts the following parameters:
 
 - `model`: An instance of the PyTorch model.
 - `num_solutions`: Number of solutions in the population. Each solution has different parameters of the model. 
 
-## Instance Attributes
+### Instance Attributes
 
 All parameters in the `pygad.torchga.TorchGA` class constructor are used as instance attributes in addition to adding a new attribute called `population_weights`. 
 
@@ -65,19 +65,19 @@ Here is a list of all instance attributes:
 - `num_solutions`
 - `population_weights`: A nested list holding the weights of all solutions in the population.
 
-## Methods in the `TorchGA` Class
+### Methods in the `TorchGA` Class
 
 This section discusses the methods available for instances of the `pygad.torchga.TorchGA` class.
 
-### `create_population()`
+#### `create_population()`
 
 The `create_population()` method creates the initial population of the genetic algorithm as a list of solutions where each solution represents different model parameters. The list of networks is assigned to the `population_weights` attribute of the instance.
 
-# Functions in the `pygad.torchga` Module
+## Functions in the `pygad.torchga` Module
 
 This section discusses the functions in the `pygad.torchga` module.
 
-## `pygad.torchga.model_weights_as_vector()`    
+### `pygad.torchga.model_weights_as_vector()`    
 
 The `model_weights_as_vector()` function accepts a single parameter named `model` representing the PyTorch model. It returns a vector holding all model weights. The reason for representing the model weights as a vector is that the genetic algorithm expects all parameters of any solution to be in a 1D vector form.
 
@@ -87,7 +87,7 @@ The function accepts the following parameters:
 
 It returns a 1D vector holding the model weights.
 
-## `pygad.torch.model_weights_as_dict()`
+### `pygad.torch.model_weights_as_dict()`
 
 The `model_weights_as_dict()` function accepts the following parameters: 
 
@@ -96,7 +96,7 @@ The `model_weights_as_dict()` function accepts the following parameters:
 
 It returns the restored model weights in the same form used by the `state_dict()` method. The returned dictionary is ready to be passed to the `load_state_dict()` method for setting the PyTorch model's parameters.
 
-## `pygad.torchga.predict()`
+### `pygad.torchga.predict()`
 
 The `predict()` function makes a prediction based on a solution. It accepts the following parameters:
 
@@ -106,11 +106,11 @@ The `predict()` function makes a prediction based on a solution. It accepts the 
 
 It returns the predictions for the data samples.
 
-# Examples
+## Examples
 
 This section gives the complete code of some examples that build and train a PyTorch model using PyGAD. Each subsection builds a different network.
 
-## Example 1: Regression Example
+### Example 1: Regression Example
 
 The next code builds a simple PyTorch model for regression. The next subsections discuss each part in the code. 
 
@@ -195,7 +195,7 @@ abs_error = loss_function(predictions, data_outputs)
 print("Absolute Error : ", abs_error.detach().numpy())
 ```
 
-### Create a PyTorch model
+#### Create a PyTorch model
 
 According to the steps mentioned previously, the first step is to create a PyTorch model. Here is the code that builds the model using the Functional API.
 
@@ -211,7 +211,7 @@ model = torch.nn.Sequential(input_layer,
                             output_layer)
 ```
 
-### Create an Instance of the `pygad.torchga.TorchGA` Class
+#### Create an Instance of the `pygad.torchga.TorchGA` Class
 
 The second step is to create an instance of the `pygad.torchga.TorchGA` class. There are 10 solutions per population. Change this number according to your needs.
 
@@ -222,7 +222,7 @@ torch_ga = torchga.TorchGA(model=model,
                            num_solutions=10)
 ```
 
-### Prepare the Training Data
+#### Prepare the Training Data
 
 The third step is to prepare the training data inputs and outputs. Here is an example where there are 4 samples. Each sample has 3 inputs and 1 output.
 
@@ -242,7 +242,7 @@ data_outputs = numpy.array([[0.1],
                             [2.5]])
 ```
 
-### Build the Fitness Function
+#### Build the Fitness Function
 
 The fourth step is to build the fitness function. This function must accept 2 parameters representing the solution and its index within the population.
 
@@ -265,7 +265,7 @@ def fitness_func(ga_instance, solution, sol_idx):
     return solution_fitness
 ```
 
-### Create an Instance of the `pygad.GA` Class
+#### Create an Instance of the `pygad.GA` Class
 
 The fifth step is to instantiate the `pygad.GA` class. Note how the `initial_population` parameter is assigned to the initial weights of the PyTorch models.
 
@@ -284,7 +284,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
                        on_generation=on_generation)
 ```
 
-### Run the Genetic Algorithm
+#### Run the Genetic Algorithm
 
 The sixth and last step is to run the genetic algorithm by calling the `run()` method.
 
@@ -344,7 +344,7 @@ print("Absolute Error : ", abs_error.detach().numpy())
 Absolute Error :  0.006876422
 ```
 
-## Example 2: XOR Binary Classification
+### Example 2: XOR Binary Classification
 
 The next code creates a PyTorch model to build the XOR binary classification problem. Let's highlight the changes compared to the previous example. 
 
@@ -497,7 +497,7 @@ Binary Crossentropy :  0.0
 Accuracy :  1.0
 ```
 
-## Example 3: Image Multi-Class Classification (Dense Layers)
+### Example 3: Image Multi-Class Classification (Dense Layers)
 
 Here is the code.
 
@@ -592,7 +592,7 @@ Compared to the previous binary classification example, this example has multipl
 loss_function = torch.nn.CrossEntropyLoss()
 ```
 
-### Prepare the Training Data
+#### Prepare the Training Data
 
 Before building and training neural networks, the training data (input and output) needs to be prepared. The inputs and the outputs of the training data are NumPy arrays. 
 
@@ -624,7 +624,7 @@ Crossentropy :  0.74366045
 Accuracy :  1.0
 ```
 
-## Example 4: Image Multi-Class Classification (Conv Layers)
+### Example 4: Image Multi-Class Classification (Conv Layers)
 
 Compared to the previous example that uses only dense layers, this example uses convolutional layers to classify the same dataset.
 
@@ -758,7 +758,7 @@ model = torch.nn.Sequential(input_layer,
                             output_layer)
 ```
 
-### Prepare the Training Data
+#### Prepare the Training Data
 
 The data used in this example is available as 2 files:
 

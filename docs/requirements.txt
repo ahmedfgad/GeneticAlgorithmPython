@@ -1,0 +1,8 @@
+# Dependencies for building the PyGAD documentation with Sphinx.
+# Read the Docs installs these (see .readthedocs.yaml).
+sphinx==7.4.7
+myst-parser==3.0.1
+furo==2024.8.6
+sphinx-design==0.6.1
+sphinx-copybutton==0.5.2
+linkify-it-py==2.0.3

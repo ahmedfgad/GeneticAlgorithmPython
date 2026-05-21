@@ -1,0 +1,33 @@
+/* Custom styles for the PyGAD documentation (Furo theme). */
+
+/* Center figures and keep diagrams from stretching too wide. */
+figure {
+    text-align: center;
+    margin: 1.5rem auto;
+}
+
+figure img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* The diagrams have a light card background baked in, so give them a soft
+   border and rounded corners that look right in both light and dark mode. */
+img.pygad-diagram {
+    border: 1px solid rgba(128, 128, 128, 0.25);
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+/* Figure captions: a touch smaller and muted. */
+figure figcaption {
+    font-size: 0.9rem;
+    color: var(--color-foreground-secondary);
+    margin-top: 0.5rem;
+}
+
+/* Make tables a little easier to scan. */
+table.docutils td,
+table.docutils th {
+    padding: 0.4rem 0.7rem;
+}

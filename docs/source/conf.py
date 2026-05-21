@@ -1,19 +1,7 @@
 # Configuration file for the Sphinx documentation builder.
 #
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
-
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-
+# For the full list of options, see:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 # -- Project information -----------------------------------------------------
 
@@ -21,47 +9,78 @@ project = 'PyGAD'
 copyright = '2026, Ahmed Fawzy Gad'
 author = 'Ahmed Fawzy Gad'
 
-# The full version, including alpha/beta/rc tags
+# The full version, including alpha/beta/rc tags.
 release = '3.6.0'
 
 master_doc = 'index'
+
+# -- General configuration ---------------------------------------------------
+
+# The documentation is written in Markdown and read directly by Sphinx
+# through the MyST parser. There is no Markdown-to-reStructuredText step.
+extensions = [
+    'myst_parser',
+    'sphinx_design',
+    'sphinx_copybutton',
+]
+
+# Read both Markdown and reStructuredText. Markdown is the source of truth.
+# The .rst mapping lets pages that are not migrated yet keep building.
+source_suffix = {
+    '.md': 'markdown',
+    '.rst': 'restructuredtext',
+}
+
+# _templates is not used.
+templates_path = []
+
+# Files and directories to skip when looking for source files.
+exclude_patterns = ['build', 'Thumbs.db', '.DS_Store']
+
+# -- MyST configuration ------------------------------------------------------
+
+myst_enable_extensions = [
+    'colon_fence',
+    'deflist',
+    'linkify',
+    'substitution',
+    'tasklist',
+    'dollarmath',
+]
+
+# Do NOT set myst_heading_anchors. Leaving it unset keeps Sphinx using the
+# docutils section IDs (for example "PyGAD 2.18.0" -> "pygad-2-18-0"), which
+# are the anchors the live site already links to. Turning it on would switch
+# to GitHub-style slugs and break those links.
+
+# -- Options for HTML output -------------------------------------------------
+
+html_theme = 'furo'
+html_title = 'PyGAD'
+html_static_path = ['_static']
+html_css_files = ['custom.css']
+
+html_theme_options = {
+    'light_css_variables': {
+        'color-brand-primary': '#0b6e4f',
+        'color-brand-content': '#0b6e4f',
+    },
+    'dark_css_variables': {
+        'color-brand-primary': '#27ae60',
+        'color-brand-content': '#27ae60',
+    },
+}
+
+# -- Options for LaTeX / PDF output (xelatex) --------------------------------
 
 latex_engine = 'xelatex'
 latex_elements = {
     'inputenc': '',
     'utf8extra': '',
-    'preamble': '''
-\\usepackage{kotex}
-\\usepackage{fontspec}
+    'preamble': r'''
+\usepackage{kotex}
+\usepackage{fontspec}
 \setsansfont{Arial}
 \setromanfont{Arial}
 ''',
 }
-
-# -- General configuration ---------------------------------------------------
-
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
-extensions = [] # Add 'sphinx.ext.autodoc' to enabe creeate modindex and enable automodule
-
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
-
-
-# -- Options for HTML output -------------------------------------------------
-
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-html_theme = 'alabaster'
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']

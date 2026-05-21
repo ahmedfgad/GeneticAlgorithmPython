@@ -178,7 +178,7 @@ Release Date: 06 December 2020
 Release Date: 03 January 2021
 
 1. Support of a new module `pygad.torchga` to train PyTorch models using PyGAD. Check [its documentation](https://pygad.readthedocs.io/en/latest/torchga.html).
-2. Support of adaptive mutation where the mutation rate is determined by the fitness value of each solution. Read the [Adaptive Mutation](https://pygad.readthedocs.io/en/latest/pygad_more.html#adaptive-mutation) section for more details. Also, read this paper: [Libelli, S. Marsili, and P. Alba. "Adaptive mutation in genetic algorithms." Soft computing 4.2 (2000): 76-80.](https://www.researchgate.net/publication/225642916_Adaptive_mutation_in_genetic_algorithms)
+2. Support of adaptive mutation where the mutation rate is determined by the fitness value of each solution. Read the [Adaptive Mutation](https://pygad.readthedocs.io/en/latest/utils.html#adaptive-mutation) section for more details. Also, read this paper: [Libelli, S. Marsili, and P. Alba. "Adaptive mutation in genetic algorithms." Soft computing 4.2 (2000): 76-80.](https://www.researchgate.net/publication/225642916_Adaptive_mutation_in_genetic_algorithms)
 3. Before the `run()` method completes or exits, the fitness value of the best solution in the current population is appended to the `best_solution_fitness` list attribute. Note that the fitness value of the best solution in the initial population is already saved at the beginning of the list. So, the fitness value of the best solution is saved before the genetic algorithm starts and after it ends.
 4. When the parameter `parent_selection_type` is set to `sss` (steady-state selection), then a warning message is printed if the value of the `keep_parents` parameter is set to 0.
 5. More validations to the user input parameters.
@@ -208,7 +208,7 @@ Release Date: 15 January 2021
 
 Release Date: 16 February 2021
 
-1. In the `gene_space` argument, the user can use a dictionary to specify the lower and upper limits of the gene. This dictionary must have only 2 items with keys `low` and `high` to specify the low and high limits of the gene, respectively. This way, PyGAD takes care of not exceeding the value limits of the gene. For a problem with only 2 genes, then using `gene_space=[{'low': 1, 'high': 5}, {'low': 0.2, 'high': 0.81}]` means the accepted values in the first gene start from 1 (inclusive) to 5 (exclusive) while the second one has values between 0.2 (inclusive) and 0.85 (exclusive). For more information, please check the [Limit the Gene Value Range](https://pygad.readthedocs.io/en/latest/pygad_more.html#limit-the-gene-value-range) section of the documentation.
+1. In the `gene_space` argument, the user can use a dictionary to specify the lower and upper limits of the gene. This dictionary must have only 2 items with keys `low` and `high` to specify the low and high limits of the gene, respectively. This way, PyGAD takes care of not exceeding the value limits of the gene. For a problem with only 2 genes, then using `gene_space=[{'low': 1, 'high': 5}, {'low': 0.2, 'high': 0.81}]` means the accepted values in the first gene start from 1 (inclusive) to 5 (exclusive) while the second one has values between 0.2 (inclusive) and 0.85 (exclusive). For more information, please check the [Limit the Gene Value Range](https://pygad.readthedocs.io/en/latest/pygad_more.html#limit-the-gene-value-range-using-the-gene-space-parameter) section of the documentation.
 2. The `plot_result()` method returns the figure so that the user can save it.
 3. Bug fixes in copying elements from the gene space.
 4. For a gene with a set of discrete values (more than 1 value) in the `gene_space` parameter like `[0, 1]`, it was possible that the gene value may not change after mutation. That is if the current value is 0, then the randomly selected value could also be 0. Now, it is verified that the new value is changed. So, if the current value is 0, then the new value after mutation will not be 0 but 1.
@@ -293,7 +293,7 @@ Release Date: 18 June 2021
 
 Release Date: 19 June 2021
 
-1. A user-defined function can be passed to the `mutation_type`, `crossover_type`, and `parent_selection_type` parameters in the `pygad.GA` class to create a custom mutation, crossover, and parent selection operators. Check the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/pygad_more.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more details. https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50
+1. A user-defined function can be passed to the `mutation_type`, `crossover_type`, and `parent_selection_type` parameters in the `pygad.GA` class to create a custom mutation, crossover, and parent selection operators. Check the [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/utils.html#user-defined-crossover-mutation-and-parent-selection-operators) section for more details. https://github.com/ahmedfgad/GeneticAlgorithmPython/discussions/50
 
 ## PyGAD 2.16.1
 
@@ -658,7 +658,7 @@ Release Date April 8, 2026
 22. Fix some documentation issues. https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/336
 23. Update the documentation to reflect the recent additions and changes to the library structure.
 
-# PyGAD Projects at GitHub
+## PyGAD Projects at GitHub
 
 The PyGAD library is available at PyPI at this page https://pypi.org/project/pygad. PyGAD is built out of a number of open-source GitHub projects. A brief note about these projects is given in the next subsections.
 
@@ -706,7 +706,7 @@ GitHub Link: https://github.com/ahmedfgad/TorchGA
 
 [pygad.torchga](https://github.com/ahmedfgad/TorchGA): https://github.com/ahmedfgad/TorchGA
 
-# Stackoverflow Questions about PyGAD
+## Stackoverflow Questions about PyGAD
 
 ## [How do I proceed to load a ga_instance as “.pkl” format in PyGad?](https://stackoverflow.com/questions/67424181/how-do-i-proceed-to-load-a-ga-instance-as-pkl-format-in-pygad)
 
@@ -738,27 +738,27 @@ https://blog.csdn.net/sinat_38079265/article/details/108449614
 
 
 
-# Submitting Issues
+## Submitting Issues
 
 If there is an issue using PyGAD, then use any of your preferred option to discuss that issue.
 
 One way is [submitting an issue](https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/new) into this GitHub project ([github.com/ahmedfgad/GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython)) in case something is not working properly or to ask for questions. 
 
-If this is not a proper option for you, then check the [**Contact Us**](https://pygad.readthedocs.io/en/latest/Footer.html#contact-us) section for more contact details.
+If this is not a proper option for you, then check the [**Contact Us**](https://pygad.readthedocs.io/en/latest/releases.html#contact-us) section for more contact details.
 
-# Ask for Feature
+## Ask for Feature
 
 PyGAD is actively developed with the goal of building a dynamic library for suporting a wide-range of problems to be optimized using the genetic algorithm. 
 
 To ask for a new feature, either [submit an issue](https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/new) into this GitHub project ([github.com/ahmedfgad/GeneticAlgorithmPython](https://github.com/ahmedfgad/GeneticAlgorithmPython)) or send an e-mail to ahmed.f.gad@gmail.com.
 
-Also check the [**Contact Us**](https://pygad.readthedocs.io/en/latest/Footer.html#contact-us) section for more contact details.
+Also check the [**Contact Us**](https://pygad.readthedocs.io/en/latest/releases.html#contact-us) section for more contact details.
 
-# Projects Built using PyGAD
+## Projects Built using PyGAD
 
 If you created a project that uses PyGAD, then we can support you by mentioning this project here in PyGAD's documentation. 
 
-To do that, please send a message at ahmed.f.gad@gmail.com or check the [**Contact Us**](https://pygad.readthedocs.io/en/latest/Footer.html#contact-us) section for more contact details. 
+To do that, please send a message at ahmed.f.gad@gmail.com or check the [**Contact Us**](https://pygad.readthedocs.io/en/latest/releases.html#contact-us) section for more contact details. 
 
 Within your message, please send the following details:
 
@@ -766,7 +766,7 @@ Within your message, please send the following details:
 - Brief description
 - Preferably, a link that directs the readers to your project
 
-# Tutorials about PyGAD
+## Tutorials about PyGAD
 
 ## [Adaptive Mutation in Genetic Algorithm with Python Examples](https://neptune.ai/blog/adaptive-mutation-in-genetic-algorithm-with-python-examples)
 
@@ -830,7 +830,7 @@ So, in this tutorial, we’ll explore how to use PyGAD to train PyTorch models.
 
 ## [A Guide to Genetic ‘Learning’ Algorithms for Optimization](https://towardsdatascience.com/a-guide-to-genetic-learning-algorithms-for-optimization-e1067cdc77e7)
 
-# PyGAD in Other Languages
+## PyGAD in Other Languages
 
 ## French
 
@@ -912,7 +912,7 @@ PyGAD разрабатывали на Python 3.7.3. Зависимости вк�
 
 [![](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)](https://neurohive.io/ru/frameworki/pygad-biblioteka-dlya-implementacii-geneticheskogo-algoritma)
 
-# Research Papers using PyGAD
+## Research Papers using PyGAD
 
 A number of research papers used PyGAD and here are some of them:
 
@@ -932,13 +932,13 @@ A number of research papers used PyGAD and here are some of them:
 * Zhu, Mingda. *Genetic Algorithm-based Parameter Identification for Ship Manoeuvring Model under Wind Disturbance*. MS thesis. NTNU, 2021.
 * Abdalrahman, Ahmed, and Weihua Zhuang. "Dynamic pricing for differentiated pev charging services using deep reinforcement learning." *IEEE Transactions on Intelligent Transportation Systems* (2020). 
 
-# More Links
+## More Links
 
 https://rodriguezanton.com/identifying-contact-states-for-2d-objects-using-pygad-and/
 
 https://torvaney.github.io/projects/t9-optimised
 
-# For More Information
+## For More Information
 
 There are different resources that can be used to get started with the genetic algorithm and building it in Python. 
 
@@ -1021,7 +1021,7 @@ Find the book at these links:
 
 ![Fig04](https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg)
 
-# Contact Us
+## Contact Us
 
 * E-mail: ahmed.f.gad@gmail.com
 * [LinkedIn](https://www.linkedin.com/in/ahmedfgad)

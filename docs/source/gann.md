@@ -4,11 +4,11 @@ This section of the PyGAD's library documentation discusses the **pygad.gann** m
 
 The `pygad.gann` module trains neural networks (for either classification or regression) using the genetic algorithm. It makes use of the 2 modules `pygad` and `pygad.nn`.
 
-# `pygad.gann.GANN` Class
+## `pygad.gann.GANN` Class
 
 The `pygad.gann` module has a class named `pygad.gann.GANN` for training neural networks using the genetic algorithm. The constructor, methods, function, and attributes within the class are discussed in this section. 
 
-## `__init__()`
+### `__init__()`
 
 In order to train a neural network using the genetic algorithm, the first thing to do is to create an instance of the `pygad.gann.GANN` class. 
 
@@ -23,7 +23,7 @@ The `pygad.gann.GANN` class constructor accepts the following parameters:
 
 In order to validate the parameters passed to the `pygad.gann.GANN` class constructor, the `pygad.gann.validate_network_parameters()` function is called.
 
-## Instance Attributes
+### Instance Attributes
 
 All the parameters in the `pygad.gann.GANN` class constructor are used as instance attributes. Besides such attributes, there are other attributes added to the instances from the `pygad.gann.GANN` class which are:
 
@@ -31,11 +31,11 @@ All the parameters in the `pygad.gann.GANN` class constructor are used as instan
 
 - `population_networks`: A list holding references to all the solutions (i.e. neural networks) used in the population.
 
-## Methods in the GANN Class
+### Methods in the GANN Class
 
 This section discusses the methods available for instances of the `pygad.gann.GANN` class.
 
-### `create_population()`
+#### `create_population()`
 
 The `create_population()` method creates the initial population of the genetic algorithm as a list of neural networks (i.e. solutions). For each network to be created, the `pygad.gann.create_network()` function is called.
 
@@ -43,7 +43,7 @@ Each element in the list holds a reference to the last (i.e. output) layer for t
 
 The method returns the list holding the references to the networks. This list is later assigned to the `population_networks` attribute of the instance.
 
-### `update_population_trained_weights()`
+#### `update_population_trained_weights()`
 
 The `update_population_trained_weights()` method updates the `trained_weights` attribute of the layers of each network (check the [documentation of the pygad.nn.DenseLayer class](https://github.com/ahmedfgad/NumPyANN#nndenselayer-class) for more information) according to the weights passed in the `population_trained_weights` parameter.
 
@@ -51,11 +51,11 @@ Accepts the following parameters:
 
 - `population_trained_weights`: A list holding the trained weights of all networks as matrices. Such matrices are to be assigned to the `trained_weights` attribute of all layers of all networks.
 
-# Functions in the `pygad.gann` Module
+## Functions in the `pygad.gann` Module
 
 This section discusses the functions in the `pygad.gann` module.
 
-## `pygad.gann.validate_network_parameters()`
+### `pygad.gann.validate_network_parameters()`
 Validates the parameters passed to the constructor of the `pygad.gann.GANN` class. If at least one an invalid parameter exists, an exception is raised and the execution stops.
 
 The function accepts the same parameters passed to the constructor of the `pygad.gann.GANN` class. Please check the documentation of such parameters in the section discussing the class constructor.
@@ -66,7 +66,7 @@ If the value passed to the `hidden_activations` parameter is a string, not a lis
 
 Returns a list holding the name(s) of the activation function(s) of the hidden layer(s).
 
-## `pygad.gann.create_network()`
+### `pygad.gann.create_network()`
 
 Creates a neural network as a linked list between the input, hidden, and output layers where the layer at index N (which is the last/output layer) references the layer at index N-1 (which is a hidden layer) using its previous_layer attribute. The input layer does not reference any layer because it is the last layer in the linked list.
 
@@ -76,7 +76,7 @@ In addition to the `parameters_validated` parameter, this function accepts the s
 
 Returns the reference to the last layer in the network architecture which is the output layer. Based on such a reference, all network layers can be fetched.
 
-## `pygad.gann.population_as_vectors()`    
+### `pygad.gann.population_as_vectors()`    
 
 Accepts the population as networks and returns a list holding all weights of the layers of each solution (i.e. network) in the population as a vector. 
 
@@ -88,7 +88,7 @@ Accepts the following parameters:
 
 Returns a list holding the weights vectors for all solutions (i.e. networks).
 
-## `pygad.gann.population_as_matrices()`
+### `pygad.gann.population_as_matrices()`
 
 Accepts the population as both networks and weights vectors and returns the weights of all layers of each solution (i.e. network) in the population as a matrix.
 
@@ -101,7 +101,7 @@ Accepts the following parameters:
 
 Returns a list holding the weights matrices for all solutions (i.e. networks).
 
-# Steps to Build and Train Neural Networks using Genetic Algorithm
+## Steps to Build and Train Neural Networks using Genetic Algorithm
 
 The steps to use this project for building and training a neural network using the genetic algorithm are as follows:
 
@@ -119,7 +119,7 @@ The steps to use this project for building and training a neural network using t
 
 Let's start covering all of these steps.
 
-## Prepare the Training Data
+### Prepare the Training Data
 
 Before building and training neural networks, the training data (input and output) is to be prepared. The inputs and the outputs of the training data are NumPy arrays. 
 
@@ -147,7 +147,7 @@ For the XOR example, there are 2 classes and thus their labels are 0 and 1. The 
 
 Note that the project only supports classification problems where each sample is assigned to only one class.
 
-## Create an Instance of the `pygad.gann.GANN` Class
+### Create an Instance of the `pygad.gann.GANN` Class
 
 After preparing the input data, an instance of the `pygad.gann.GANN` class is created by passing the appropriate parameters.
 
@@ -183,7 +183,7 @@ The activation function used for the output layer is `softmax`. The `relu` activ
 
 After creating the instance of the `pygad.gann.GANN` class next is to fetch the weights of the population as a list of vectors.
 
-## Fetch the Population Weights as Vectors
+### Fetch the Population Weights as Vectors
 
 For the genetic algorithm, the parameters (i.e. genes) of each solution are represented as a single vector. 
 
@@ -200,7 +200,7 @@ After preparing the population weights as a set of vectors, next is to prepare 2
 1. Fitness function.
 2. Callback function after each generation.
 
-## Prepare the Fitness Function
+### Prepare the Fitness Function
 
 The PyGAD library works by allowing the users to customize the genetic algorithm for their own problems. Because the problems differ in how the fitness values are calculated, then PyGAD allows the user to use a custom function as a maximization fitness function. This function must accept 2 positional parameters representing the following:
 
@@ -225,7 +225,7 @@ def fitness_func(ga_instance, solution, sol_idx):
     return solution_fitness
 ```
 
-## Prepare the Generation Callback Function
+### Prepare the Generation Callback Function
 
 After each generation of the genetic algorithm, the fitness function will be called to calculate the fitness value of each solution. Within the fitness function, the `pygad.nn.predict()` function is used for predicting the outputs based on the current solution's `trained_weights` attribute. Thus, it is required that such an attribute is updated by weights evolved by the genetic algorithm after each generation. 
 
@@ -252,7 +252,7 @@ def callback_generation(ga_instance):
 
 After preparing the fitness and callback function, next is to create an instance of the `pygad.GA` class. 
 
-## Create an Instance of the `pygad.GA` Class
+### Create an Instance of the `pygad.GA` Class
 
 Once the parameters of the genetic algorithm are prepared, an instance of the `pygad.GA` class can be created. 
 
@@ -294,7 +294,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
 
 The last step for training the neural networks using the genetic algorithm is calling the `run()` method.
 
-## Run the Created Instance of the `pygad.GA` Class
+### Run the Created Instance of the `pygad.GA` Class
 
 By calling the `run()` method from the `pygad.GA` instance, the genetic algorithm will iterate through the number of generations specified in its `num_generations` parameter. 
 
@@ -302,7 +302,7 @@ By calling the `run()` method from the `pygad.GA` instance, the genetic algorith
 ga_instance.run()
 ```
 
-## Plot the Fitness Values
+### Plot the Fitness Values
 
 After the `run()` method completes, the `plot_fitness()` method can be called to show how the fitness values evolve by generation. A fitness value (i.e. accuracy) of 100 is reached after around 180 generations. 
 
@@ -314,7 +314,7 @@ ga_instance.plot_fitness()
 
 By running the code again, a different initial population is created and thus a classification accuracy of 100 can be reached using a less number of generations. On the other hand, a different initial population might cause 100% accuracy to be reached using more generations or not reached at all.
 
-## Information about the Best Solution
+### Information about the Best Solution
 
 The following information about the best solution in the last population is returned using the `best_solution()` method in the `pygad.GA` class. 
 
@@ -348,7 +348,7 @@ if ga_instance.best_solution_generation != -1:
 Best solution reached after 182 generations.
 ```
 
-## Making Predictions using the Trained Weights
+### Making Predictions using the Trained Weights
 
 The `pygad.nn.predict()` function can be used to make predictions using the trained network. As printed, the network is able to predict the labels correctly. 
 
@@ -361,7 +361,7 @@ print(f"Predictions of the trained network : {predictions}")
 Predictions of the trained network : [0. 1. 1. 0.]
 ```
 
-## Calculating Some Statistics
+### Calculating Some Statistics
 
 Based on the predictions the network made, some statistics can be calculated such as the number of correct and wrong predictions in addition to the classification accuracy.
 
@@ -380,11 +380,11 @@ print("Number of wrong classifications : 0
 Classification accuracy : 100
 ```
 
-# Examples
+## Examples
 
 This section gives the complete code of some examples that build and train neural networks using the genetic algorithm. Each subsection builds a different network.
 
-## XOR Classification
+### XOR Classification
 
 This example is discussed in the **Steps to Build and Train Neural Networks using Genetic Algorithm** section that builds the XOR gate and its complete code is listed below. 
 
@@ -519,7 +519,7 @@ print(f"Number of wrong classifications : {num_wrong.size}.")
 print(f"Classification accuracy : {accuracy}.")
 ```
 
-## Image Classification
+### Image Classification
 
 In the documentation of the `pygad.nn` module, a neural network is created for classifying images from the Fruits360 dataset without being trained using an optimization algorithm. This section discusses how to train such a classifier using the genetic algorithm with the help of the `pygad.gann` module.
 
@@ -666,7 +666,7 @@ The next figure shows how fitness value evolves by generation.
 
 ![Training Neural Networks using Genetic Algorithm](https://user-images.githubusercontent.com/16560492/82152993-21898180-9865-11ea-8387-b995f88b83f7.png)
 
-## Regression Example 1
+### Regression Example 1
 
 To train a neural network for regression, follow these instructions:
 
@@ -820,7 +820,7 @@ The next figure shows how the fitness value changes for the generations used.
 
 ![example_regression](https://user-images.githubusercontent.com/16560492/92948154-3cf24b00-f459-11ea-94ea-952b66ab2145.png)
 
-## Regression Example 2 - Fish Weight Prediction
+### Regression Example 2 - Fish Weight Prediction
 
 This example uses the Fish Market Dataset available at Kaggle (https://www.kaggle.com/aungpyaeap/fish-market). Simply download the CSV dataset from [this link](https://www.kaggle.com/aungpyaeap/fish-market/download) (https://www.kaggle.com/aungpyaeap/fish-market/download). The dataset is also available at the [GitHub project of the pygad.gann module](https://github.com/ahmedfgad/NeuralGenetic): https://github.com/ahmedfgad/NeuralGenetic
 

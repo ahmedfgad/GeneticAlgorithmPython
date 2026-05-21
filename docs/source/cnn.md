@@ -6,7 +6,7 @@ Using the **pygad.cnn** module, convolutional neural networks (CNNs) are created
 
 Later, the **pygad.gacnn** module is used to train the **pygad.cnn** network using the genetic algorithm built in the **pygad** module.
 
-# Supported Layers
+## Supported Layers
 
 Each layer supported by the **pygad.cnn** module has a corresponding class. The layers and their classes are:
 
@@ -30,7 +30,7 @@ Except for the input layer, all of listed layers has 4 instance attributes that 
 
 In addition to such attributes, the layers may have some additional attributes. The next subsections discuss such layers.
 
-## `pygad.cnn.Input2D` Class
+### `pygad.cnn.Input2D` Class
 
 The `pygad.cnn.Input2D` class creates the input layer for the convolutional neural network. For each network, there is only a single input layer. The network architecture must start with an input layer.
 
@@ -59,7 +59,7 @@ print("Input2D Output shape =", layer_output_size)
 
 This is everything about the input layer.
 
-## `pygad.cnn.Conv2D` Class
+### `pygad.cnn.Conv2D` Class
 
 Using the `pygad.cnn.Conv2D` class, convolution (conv) layers can be created. To create a convolution layer, just create a new instance of the class. The constructor accepts the following parameters:
 
@@ -133,7 +133,7 @@ input_shape = input_layer.num_neurons
 print("Input shape =", input_shape)
 ```
 
-## `pygad.cnn.MaxPooling2D` Class
+### `pygad.cnn.MaxPooling2D` Class
 
 The `pygad.cnn.MaxPooling2D` class builds a max pooling layer for the CNN architecture. The constructor of this class accepts the following parameter:
 
@@ -147,11 +147,11 @@ Within the constructor, the accepted parameters are used as instance attributes.
 - `layer_output_size`
 - `layer_output`
 
-## `pygad.cnn.AveragePooling2D` Class
+### `pygad.cnn.AveragePooling2D` Class
 
 The `pygad.cnn.AveragePooling2D` class is similar to the `pygad.cnn.MaxPooling2D` class except that it applies the max pooling operation rather than average pooling.
 
-## `pygad.cnn.Flatten` Class
+### `pygad.cnn.Flatten` Class
 
 The `pygad.cnn.Flatten` class implements the flatten layer which converts the output of the previous layer into a 1D vector. The constructor accepts only the `previous_layer` parameter.
 
@@ -162,7 +162,7 @@ The following instance attributes exist:
 * `layer_output_size`
 * `layer_output`
 
-## `pygad.cnn.ReLU` Class
+### `pygad.cnn.ReLU` Class
 
 The `pygad.cnn.ReLU` class implements the ReLU layer which applies the ReLU activation function to the output of the previous layer.
 
@@ -175,11 +175,11 @@ The following instance attributes exist:
 * `layer_output_size`
 * `layer_output`
 
-## `pygad.cnn.Sigmoid` Class
+### `pygad.cnn.Sigmoid` Class
 
 The `pygad.cnn.Sigmoid` class is similar to the `pygad.cnn.ReLU` class except that it applies the sigmoid function rather than the ReLU function.
 
-## `pygad.cnn.Dense` Class
+### `pygad.cnn.Dense` Class
 
 The `pygad.cnn.Dense` class implement the dense layer. Its constructor accepts the following parameters:
 
@@ -195,7 +195,7 @@ Within the constructor, the accepted parameters are used as instance attributes.
 * `layer_output_size`
 * `layer_output`
 
-# `pygad.cnn.Model` Class
+## `pygad.cnn.Model` Class
 
 An instance of the `pygad.cnn.Model` class represents a CNN model. The constructor of this class accepts the following parameters:
 
@@ -207,11 +207,11 @@ Within the constructor, the accepted parameters are used as instance attributes.
 
 There are a number of methods in the `pygad.cnn.Model` class which serves in training, testing, and retrieving information about the model. These methods are discussed in the next subsections.
 
-### `get_layers()`
+#### `get_layers()`
 
 Creates a  list of all layers in the CNN model. It accepts no parameters.
 
-### `train()`
+#### `train()`
 
 Trains the CNN model.
 
@@ -225,15 +225,15 @@ This method trains the CNN model according to the number of epochs specified in 
 
 It is important to note that no learning algorithm is used for training the pygad.cnn. Just the learning rate is used for making some changes which is better than leaving the weights unchanged.
 
-### `feed_sample()`
+#### `feed_sample()`
 
 Feeds a sample in the CNN layers and returns results of the last layer in the pygad.cnn.
 
-### `update_weights()`
+#### `update_weights()`
 
 Updates the CNN weights using the learning rate. It is important to note that no learning algorithm is used for training the pygad.cnn. Just the learning rate is used for making some changes which is better than leaving the weights unchanged.
 
-### `predict()`
+#### `predict()`
 
 Uses the trained CNN for making predictions.
 
@@ -243,11 +243,11 @@ Accepts the following parameter:
 
 It returns a list holding the samples predictions.
 
-### `summary()`
+#### `summary()`
 
 Prints a summary of the CNN architecture.
 
-# Supported Activation Functions
+## Supported Activation Functions
 
 The supported activation functions in the convolution layer are:
 
@@ -256,7 +256,7 @@ The supported activation functions in the convolution layer are:
 
 The dense layer supports these functions besides the `softmax` function implemented in the `pygad.cnn.softmax()` function.
 
-# Steps to Build a Neural Network
+## Steps to Build a Neural Network
 
 This section discusses how to use the `pygad.cnn` module for building a neural network. The summary of the steps are as follows:
 
@@ -268,7 +268,7 @@ This section discusses how to use the `pygad.cnn` module for building a neural n
 - Making Predictions
 - Calculating Some Statistics
 
-## Reading the Data
+### Reading the Data
 
 Before building the network architecture, the first thing to do is to prepare the data that will be used for training the network. 
 
@@ -299,7 +299,7 @@ train_outputs = numpy.load("dataset_outputs.npy")
 
 After the data is prepared, next is to create the network architecture.
 
-## Building the Network Architecture
+### Building the Network Architecture
 
 The input layer is created by instantiating the `pygad.cnn.Input2D` class according to the next code. A network can only have a single input layer.
 
@@ -351,7 +351,7 @@ dense_layer2 = pygad.cnn.Dense(num_neurons=4,
 
 After the network architecture is prepared, the next step is to create a CNN model.
 
-## Building Model
+### Building Model
 
 The CNN model is created as an instance of the `pygad.cnn.Model` class. Here is an example.
 
@@ -363,7 +363,7 @@ model = pygad.cnn.Model(last_layer=dense_layer2,
 
 After the model is created, a summary of the model architecture can be printed.
 
-## Model Summary
+### Model Summary
 
 The `summary()` method in the `pygad.cnn.Model` class prints a summary of the CNN model.
 
@@ -388,7 +388,7 @@ model.summary()
 ----------------------------------------
 ```
 
-## Training the Network
+### Training the Network
 
 After the model and the data are prepared, then the model can be trained using the the `pygad.cnn.train()` method.
 
@@ -399,7 +399,7 @@ model.train(train_inputs=train_inputs,
 
 After training the network, the next step is to make predictions.
 
-## Making Predictions
+### Making Predictions
 
 The `pygad.cnn.predict()` method uses the trained network for making predictions. Here is an example.
 
@@ -409,7 +409,7 @@ predictions = model.predict(data_inputs=train_inputs)
 
 It is not expected to have high accuracy in the predictions because no training algorithm is used. 
 
-## Calculating Some Statistics
+### Calculating Some Statistics
 
 Based on the predictions the network made, some statistics can be calculated such as the number of correct and wrong predictions in addition to the classification accuracy.
 
@@ -424,11 +424,11 @@ print(f"Classification accuracy : {accuracy}.")
 
 It is very important to note that it is not expected that the classification accuracy is high because no training algorithm is used. Please check the documentation of the `pygad.gacnn` module for training the CNN using the genetic algorithm.
 
-# Examples
+## Examples
 
 This section gives the complete code of some examples that build neural networks using `pygad.cnn`. Each subsection builds a different network.
 
-## Image Classification
+### Image Classification
 
 This example is discussed in the **Steps to Build a Convolutional Neural Network** section and its complete code is listed below. 
 

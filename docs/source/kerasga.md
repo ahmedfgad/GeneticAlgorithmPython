@@ -13,7 +13,7 @@ The contents of this module are:
 
 More details are given in the next sections.
 
-# Steps Summary
+## Steps Summary
 
 The summary of the steps used to train a Keras model using PyGAD is as follows:
 
@@ -24,7 +24,7 @@ The summary of the steps used to train a Keras model using PyGAD is as follows:
 6. Create an instance of the `pygad.GA` class.
 8. Run the genetic algorithm.
 
-# Create Keras Model
+## Create Keras Model
 
 Before discussing training a Keras model using PyGAD, the first thing to do is to create the Keras model. 
 
@@ -65,18 +65,18 @@ model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
 
 Feel free to add the layers of your choice.
 
-# `pygad.kerasga.KerasGA` Class
+## `pygad.kerasga.KerasGA` Class
 
 The `pygad.kerasga` module has a class named `KerasGA` for creating an initial population for the genetic algorithm based on a Keras model. The constructor, methods, and attributes within the class are discussed in this section. 
 
-## `__init__()`
+### `__init__()`
 
 The `pygad.kerasga.KerasGA` class constructor accepts the following parameters:
 
 - `model`: An instance of the Keras model.
 - `num_solutions`: Number of solutions in the population. Each solution has different parameters of the model. 
 
-## Instance Attributes
+### Instance Attributes
 
 All parameters in the `pygad.kerasga.KerasGA` class constructor are used as instance attributes in addition to adding a new attribute called `population_weights`. 
 
@@ -86,19 +86,19 @@ Here is a list of all instance attributes:
 - `num_solutions`
 - `population_weights`: A nested list holding the weights of all solutions in the population.
 
-## Methods in the `KerasGA` Class
+### Methods in the `KerasGA` Class
 
 This section discusses the methods available for instances of the `pygad.kerasga.KerasGA` class.
 
-### `create_population()`
+#### `create_population()`
 
 The `create_population()` method creates the initial population of the genetic algorithm as a list of solutions where each solution represents different model parameters. The list of networks is assigned to the `population_weights` attribute of the instance.
 
-# Functions in the `pygad.kerasga` Module
+## Functions in the `pygad.kerasga` Module
 
 This section discusses the functions in the `pygad.kerasga` module.
 
-## `pygad.kerasga.model_weights_as_vector()`    
+### `pygad.kerasga.model_weights_as_vector()`    
 
 The `model_weights_as_vector()` function accepts a single parameter named `model` representing the Keras model. It returns a vector holding all model weights. The reason for representing the model weights as a vector is that the genetic algorithm expects all parameters of any solution to be in a 1D vector form.
 
@@ -110,7 +110,7 @@ The function accepts the following parameters:
 
 It returns a 1D vector holding the model weights. 
 
-## `pygad.kerasga.model_weights_as_matrix()`
+### `pygad.kerasga.model_weights_as_matrix()`
 
 The `model_weights_as_matrix()` function accepts the following parameters: 
 
@@ -119,7 +119,7 @@ The `model_weights_as_matrix()` function accepts the following parameters:
 
 It returns the restored model weights after reshaping the vector.
 
-## `pygad.kerasga.predict()`
+### `pygad.kerasga.predict()`
 
 The `predict()` function makes a prediction based on a solution. It accepts the following parameters:
 
@@ -134,11 +134,11 @@ Check documentation of the [Keras Model.predict()](https://keras.io/api/models/m
 
 It returns the predictions of the data samples.
 
-# Examples
+## Examples
 
 This section gives the complete code of some examples that build and train a Keras model using PyGAD. Each subsection builds a different network.
 
-## Example 1: Regression Example
+### Example 1: Regression Example
 
 The next code builds a simple Keras model for regression. The next subsections discuss each part in the code. 
 
@@ -218,7 +218,7 @@ abs_error = mae(data_outputs, predictions).numpy()
 print(f"Absolute Error : {abs_error}")
 ```
 
-### Create a Keras Model
+#### Create a Keras Model
 
 According to the steps mentioned previously, the first step is to create a Keras model. Here is the code that builds the model using the Functional API.
 
@@ -245,7 +245,7 @@ model.add(dense_layer1)
 model.add(output_layer)
 ```
 
-### Create an Instance of the `pygad.kerasga.KerasGA` Class
+#### Create an Instance of the `pygad.kerasga.KerasGA` Class
 
 The second step is to create an instance of the `pygad.kerasga.KerasGA` class. There are 10 solutions per population. Change this number according to your needs.
 
@@ -256,7 +256,7 @@ keras_ga = pygad.kerasga.KerasGA(model=model,
                                  num_solutions=10)
 ```
 
-### Prepare the Training Data
+#### Prepare the Training Data
 
 The third step is to prepare the training data inputs and outputs. Here is an example where there are 4 samples. Each sample has 3 inputs and 1 output.
 
@@ -276,7 +276,7 @@ data_outputs = numpy.array([[0.1],
                             [2.5]])
 ```
 
-### Build the Fitness Function
+#### Build the Fitness Function
 
 The fourth step is to build the fitness function. This function must accept 2 parameters representing the solution and its index within the population.
 
@@ -297,7 +297,7 @@ def fitness_func(ga_instance, solution, sol_idx):
     return solution_fitness
 ```
 
-### Create an Instance of the `pygad.GA` Class
+#### Create an Instance of the `pygad.GA` Class
 
 The fifth step is to instantiate the `pygad.GA` class. Note how the `initial_population` parameter is assigned to the initial weights of the Keras models.
 
@@ -316,7 +316,7 @@ ga_instance = pygad.GA(num_generations=num_generations,
                        on_generation=on_generation)
 ```
 
-### Run the Genetic Algorithm
+#### Run the Genetic Algorithm
 
 The sixth and last step is to run the genetic algorithm by calling the `run()` method.
 
@@ -378,7 +378,7 @@ print(f"Absolute Error : {abs_error}")
 Absolute Error :  0.013740465
 ```
 
-## Example 2: XOR Binary Classification
+### Example 2: XOR Binary Classification
 
 The next code creates a Keras model to build the XOR binary classification problem. Let's highlight the changes compared to the previous example. 
 
@@ -524,7 +524,7 @@ Binary Crossentropy :  0.0013527311
 Accuracy :  1.0
 ```
 
-## Example 3: Image Multi-Class Classification (Dense Layers)
+### Example 3: Image Multi-Class Classification (Dense Layers)
 
 Here is the code.
 
@@ -615,7 +615,7 @@ cce = tensorflow.keras.losses.CategoricalCrossentropy()
 solution_fitness = 1.0 / (cce(data_outputs, predictions).numpy() + 0.00000001)
 ```
 
-### Prepare the Training Data
+#### Prepare the Training Data
 
 Before building and training neural networks, the training data (input and output) needs to be prepared. The inputs and the outputs of the training data are NumPy arrays. 
 
@@ -650,7 +650,7 @@ Categorical Crossentropy :  0.23823906
 Accuracy :  0.9852192
 ```
 
-## Example 4: Image Multi-Class Classification (Conv Layers)
+### Example 4: Image Multi-Class Classification (Conv Layers)
 
 Compared to the previous example that uses only dense layers, this example uses convolutional layers to classify the same dataset.
 
@@ -765,7 +765,7 @@ output_layer = tensorflow.keras.layers.Dense(4, activation="softmax")(dense_laye
 model = tensorflow.keras.Model(inputs=input_layer, outputs=output_layer)
 ```
 
-### Prepare the Training Data
+#### Prepare the Training Data
 
 The data used in this example is available as 2 files:
 
@@ -805,7 +805,7 @@ To improve the model performance, you can do the following:
 - Use different parameters for the layers.
 - Use different parameters for the genetic algorithm (e.g. number of solution, number of generations, etc)
 
-## Example 5: Image Classification using Data Generator
+### Example 5: Image Classification using Data Generator
 
 This example uses the image data generator `tensorflow.keras.preprocessing.image.ImageDataGenerator` to feed data to the model. Instead of reading all the data in the memory, the data generator generates the data needed by the model and only save it in the memory instead of saving all the data. This frees the memory but adds more computational time. 
 

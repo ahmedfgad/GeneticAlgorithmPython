@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" width="760" height="360" font-family="Arial, 'Helvetica Neue', Helvetica, sans-serif">
+<defs><marker id="mu-arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#d9a441"/></marker></defs>
+<rect x="2" y="2" width="756" height="356" rx="16" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+<text x="380" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="#1f2d3d">Mutation: change a few genes at random</text>
+<text x="138" y="116" text-anchor="end" font-size="13" fill="#6b7280">Before</text>
+<text x="138" y="230" text-anchor="end" font-size="13" fill="#6b7280">After</text>
+<rect x="150" y="96" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="182" y="116" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">2.1</text>
+<rect x="150" y="210" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="182" y="230" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">2.1</text>
+<rect x="218" y="96" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="250" y="116" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">-0.5</text>
+<rect x="218" y="210" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="250" y="230" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">-0.5</text>
+<rect x="286" y="96" width="64" height="30" rx="5" fill="#fff3d6" stroke="#d9a441" stroke-width="2"/><text x="318" y="116" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#b8860b">3.0</text>
+<rect x="286" y="210" width="64" height="30" rx="5" fill="#fff3d6" stroke="#d9a441" stroke-width="2"/><text x="318" y="230" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#b8860b">0.7</text>
+<line x1="318" y1="132" x2="318" y2="204" stroke="#d9a441" stroke-width="2" marker-end="url(#mu-arrow)"/>
+<rect x="354" y="96" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="386" y="116" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">1.2</text>
+<rect x="354" y="210" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="386" y="230" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">1.2</text>
+<rect x="422" y="96" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="454" y="116" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">-2.4</text>
+<rect x="422" y="210" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="454" y="230" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">-2.4</text>
+<rect x="490" y="96" width="64" height="30" rx="5" fill="#fff3d6" stroke="#d9a441" stroke-width="2"/><text x="522" y="116" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#b8860b">0.8</text>
+<rect x="490" y="210" width="64" height="30" rx="5" fill="#fff3d6" stroke="#d9a441" stroke-width="2"/><text x="522" y="230" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#b8860b">-3.6</text>
+<line x1="522" y1="132" x2="522" y2="204" stroke="#d9a441" stroke-width="2" marker-end="url(#mu-arrow)"/>
+<rect x="558" y="96" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="590" y="116" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">4.3</text>
+<rect x="558" y="210" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="590" y="230" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">4.3</text>
+<rect x="626" y="96" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="658" y="116" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">-1.1</text>
+<rect x="626" y="210" width="64" height="30" rx="5" fill="#ffffff" stroke="#9aa4b2" stroke-width="2"/><text x="658" y="230" text-anchor="middle" font-family="'DejaVu Sans Mono', 'Courier New', monospace" font-size="13" fill="#1f2d3d">-1.1</text>
+<text x="380" y="306" text-anchor="middle" font-size="13.5" fill="#334155">Only the highlighted genes change. Mutation explores new values so the search does not get stuck.</text>
+</svg>
