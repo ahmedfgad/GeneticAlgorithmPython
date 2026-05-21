@@ -31,3 +31,13 @@ table.docutils td,
 table.docutils th {
     padding: 0.4rem 0.7rem;
 }
+
+/* Collapsible parameter list (pygad.GA constructor). Make the parameter name
+   in each dropdown title stand out, and tidy the spacing between items. */
+details.sd-dropdown {
+    margin-bottom: 0.4rem;
+}
+details.sd-dropdown > summary.sd-summary-title code,
+details.sd-dropdown > .sd-summary-title code {
+    font-weight: 600;
+}
