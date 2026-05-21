@@ -126,7 +126,7 @@ class Unique:
         # DEEP-DUPLICATE-REMOVAL-NEEDED
         # Search by this phrase to find where deep duplicates removal should be applied.
         # If there exist duplicate genes, then changing either of the 2 duplicating genes (with indices 2 and 3) will not solve the problem.
-        # This problem can be solved by randomly changing one of the non-duplicating genes that may make a room for a unique value in one the 2 duplicating genes.
+        # This problem can be solved by randomly changing one of the non-duplicating genes that may make room for a unique value in one of the 2 duplicating genes.
         # For example, if gene_space=[[3, 0, 1], [4, 1, 2], [0, 2], [3, 2, 0]] and the solution is [3 2 0 0], then the values of the last 2 genes duplicate.
         # There are no possible changes in the last 2 genes to solve the problem. But it could be solved by changing the second gene from 2 to 4.
         # As a result, any of the last 2 genes can take the value 2 and solve the duplicates.
@@ -217,7 +217,7 @@ class Unique:
             sample_size (int): The maximum number of random values to generate to find a unique value.
 
         Returns:
-            int: The new floating-point value of the gene. If no unique value can be found, the original gene value is returned.
+            float: The new floating-point value of the gene. If no unique value can be found, the original gene value is returned.
         """
 
         if self.gene_constraint and self.gene_constraint[gene_index]:
@@ -414,7 +414,7 @@ class Unique:
                 if number_alternate_values > 1:
                     return gene_idx, gene
         # This means there is no way to solve the duplicates between the genes.
-        # Because the space of the duplicates genes only has a single value and there is no alternatives.
+        # Because the space of the duplicate genes only has a single value and there are no alternatives.
         return None, gene
 
     def unpack_gene_space(self, 
@@ -433,7 +433,7 @@ class Unique:
             list: A list representing the unpacked gene space.
         """
 
-        # Copy the gene_space to keep it isolated form the changes.
+        # Copy the gene_space to keep it isolated from the changes.
         if self.gene_space is None:
             return None
 
@@ -546,7 +546,7 @@ class Unique:
                                 solution):
         """
         Sometimes it is impossible to solve the duplicate genes by simply selecting another value for either genes.
-        This function solve the duplicates between 2 genes by searching for a third gene that can make assist in the solution.
+        This function solves the duplicates between 2 genes by searching for a third gene that can assist in the solution.
 
         Args:
             solution (list): The current solution containing genes, potentially with duplicates.

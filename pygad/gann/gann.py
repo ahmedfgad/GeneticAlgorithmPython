@@ -107,10 +107,10 @@ def create_network(num_neurons_input,
     num_neurons_output: Number of neurons in the output layer.
     num_neurons_hidden_layers=[]: A list holding the number of neurons in the hidden layer(s). If empty [], then no hidden layers are used. For each int value it holds, then a hidden layer is created with number of hidden neurons specified by the corresponding int value. For example, num_neurons_hidden_layers=[10] creates a single hidden layer with 10 neurons. num_neurons_hidden_layers=[10, 5] creates 2 hidden layers with 10 neurons for the first and 5 neurons for the second hidden layer.
     output_activation="softmax": The name of the activation function of the output layer which defaults to "softmax".
-    hidden_activations="relu": The name(s) of the activation function(s) of the hidden layer(s). It defaults to "relu". If passed as a string, this means the specified activation function will be used across all the hidden layers. If passed as a list, then it must has the same length as the length of the num_neurons_hidden_layers list. An exception is raised if there lengths are different. When hidden_activations is a list, a one-to-one mapping between the num_neurons_hidden_layers and hidden_activations lists occurs.
+    hidden_activations="relu": The name(s) of the activation function(s) of the hidden layer(s). It defaults to "relu". If passed as a string, this means the specified activation function will be used across all the hidden layers. If passed as a list, then it must have the same length as the num_neurons_hidden_layers list. An exception is raised if their lengths are different. When hidden_activations is a list, a one-to-one mapping between the num_neurons_hidden_layers and hidden_activations lists occurs.
     parameters_validated=False: If False, then the parameters are not validated and a call to the validate_network_parameters() function is made.
 
-    Returns the reference to the last layer in the network architecture which is the output layer. Based on such reference, all network layer can be fetched.    
+    Returns the reference to the last layer in the network architecture which is the output layer. Based on such reference, all network layers can be fetched.    
     """
     
     # When parameters_validated is False, then the parameters are not yet validated and a call to validate_network_parameters() is required.
@@ -149,7 +149,7 @@ def create_network(num_neurons_input,
                                      previous_layer=input_layer,
                                      activation_function=output_activation)
 
-    # Returning the reference to the last layer in the network architecture which is the output layer. Based on such reference, all network layer can be fetched.
+    # Returning the reference to the last layer in the network architecture which is the output layer. Based on such reference, all network layers can be fetched.
     return output_layer
 
 def population_as_vectors(population_networks):
@@ -163,7 +163,7 @@ def population_as_vectors(population_networks):
     """
     population_vectors = []
     for solution in population_networks:
-        # Converting the weights of single layer from the current network (i.e. solution) to a vector.
+        # Converting the weights of the current network (i.e. solution) into a vector.
         solution_weights_vector = nn.layers_weights_as_vector(solution)
         # Appending the weights vector of the current layer of a network (i.e. solution) to the weights of the previous layers of the same network (i.e. solution).
         population_vectors.append(solution_weights_vector)
@@ -182,7 +182,7 @@ def population_as_matrices(population_networks, population_vectors):
     """
     population_matrices = []
     for solution, solution_weights_vector in zip(population_networks, population_vectors):
-        # Converting the weights of single layer from the current network (i.e. solution) from a vector to a matrix.
+        # Converting the weights of the current network (i.e. solution) from a vector into a matrix.
         solution_weights_matrix = nn.layers_weights_as_matrix(solution, solution_weights_vector)
         # Appending the weights matrix of the current layer of a network (i.e. solution) to the weights of the previous layers of the same network (i.e. solution).
         population_matrices.append(solution_weights_matrix)
@@ -200,7 +200,7 @@ class GANN:
         population_networks = []
         for solution in range(self.num_solutions):
             # Creating a network (i.e. solution) in the population. A network or a solution can be used interchangeably.
-            # .copy() is so important to avoid modification in the original vale passed to the 'num_neurons_hidden_layers' and 'hidden_activations' parameters.
+            # .copy() is important to avoid changing the original values passed to the 'num_neurons_hidden_layers' and 'hidden_activations' parameters.
             network = create_network(num_neurons_input=self.num_neurons_input,
                                      num_neurons_output=self.num_neurons_output,
                                      num_neurons_hidden_layers=self.num_neurons_hidden_layers.copy(),
@@ -224,17 +224,17 @@ class GANN:
         Creates an instance of the GANN class for training a neural network using the genetic algorithm.
         The constructor of the GANN class creates an initial population of multiple neural networks using the create_population() method. 
         The population returned holds references to the last (i.e. output) layers of all created networks.
-        Besides creating the initial population, the passed parameters are vaidated using the validate_network_parameters() method.
+        Besides creating the initial population, the passed parameters are validated using the validate_network_parameters() method.
     
         num_solutions: Number of neural networks (i.e. solutions) in the population. Based on the value passed to this parameter, a number of identical neural networks are created where their parameters are optimized using the genetic algorithm.
         num_neurons_input: Number of neurons in the input layer.
         num_neurons_output: Number of neurons in the output layer.
         num_neurons_hidden_layers=[]: A list holding the number of neurons in the hidden layer(s). If empty [], then no hidden layers are used. For each int value it holds, then a hidden layer is created with number of hidden neurons specified by the corresponding int value. For example, num_neurons_hidden_layers=[10] creates a single hidden layer with 10 neurons. num_neurons_hidden_layers=[10, 5] creates 2 hidden layers with 10 neurons for the first and 5 neurons for the second hidden layer.
         output_activation="softmax": The name of the activation function of the output layer which defaults to "softmax".
-        hidden_activations="relu": The name(s) of the activation function(s) of the hidden layer(s). It defaults to "relu". If passed as a string, this means the specified activation function will be used across all the hidden layers. If passed as a list, then it must has the same length as the length of the num_neurons_hidden_layers list. An exception is raised if there lengths are different. When hidden_activations is a list, a one-to-one mapping between the num_neurons_hidden_layers and hidden_activations lists occurs.
+        hidden_activations="relu": The name(s) of the activation function(s) of the hidden layer(s). It defaults to "relu". If passed as a string, this means the specified activation function will be used across all the hidden layers. If passed as a list, then it must have the same length as the num_neurons_hidden_layers list. An exception is raised if their lengths are different. When hidden_activations is a list, a one-to-one mapping between the num_neurons_hidden_layers and hidden_activations lists occurs.
         """
 
-        self.parameters_validated = False # If True, then the parameters  passed to the GANN class constructor are valid.
+        self.parameters_validated = False # If True, then the parameters passed to the GANN class constructor are valid.
 
         # Validating the passed parameters before building the initial population.
         hidden_activations = validate_network_parameters(num_solutions=num_solutions,
@@ -262,7 +262,7 @@ class GANN:
         population_trained_weights: A list holding the trained weights of all networks as matrices. Such matrices are to be assigned to the 'trained_weights' attribute of all layers of all networks.
         """
         idx = 0
-        # Fetches all layers weights matrices for a single solution (i.e. network)
+        # Loop through each solution (i.e. network) to update its weights.
         for solution in self.population_networks:
             # Calling the nn.update_layers_trained_weights() function for updating the 'trained_weights' attribute for all layers in the current solution (i.e. network).
             nn.update_layers_trained_weights(last_layer=solution, 

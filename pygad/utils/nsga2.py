@@ -20,7 +20,7 @@ class NSGA2:
         dominated_set : TYPE
             A set of the dominated solutions.
         non_dominated_set : TYPE
-            A set of the non-dominated set.
+            A set of the non-dominated solutions.
     
         """
         # List of the members of the current dominated pareto front/set.
@@ -69,12 +69,12 @@ class NSGA2:
 
     def non_dominated_sorting(self, fitness):
         """
-        Apply non-dominant sorting over the fitness to create the pareto fronts based on non-dominated sorting of the solutions.
+        Apply non-dominated sorting over the fitness to create the pareto fronts based on the non-dominated sorting of the solutions.
     
         Parameters
         ----------
         fitness : TYPE
-            An array of the population fitness across all objective function.
+            An array of the population's fitness values across all objective functions.
     
         Returns
         -------
@@ -164,7 +164,7 @@ class NSGA2:
         # Loop through the objectives to calculate the crowding distance of each solution across all objectives.
         for obj_idx in range(pareto_front_no_indices.shape[1]):
             obj = pareto_front_no_indices[:, obj_idx]
-            # This variable has a nested list where each child list zip the following together:
+            # This variable has a nested list where each child list zips the following together:
                 # 1) The index of the objective value.
                 # 2) The objective value.
                 # 3) Initialize the crowding distance by zero.
@@ -213,7 +213,7 @@ class NSGA2:
         # An array of the sum of crowding distances across all objectives. 
         # Each row has 2 elements:
             # 1) The index of the solution.
-            # 2) The sum of all crowding distances for all objective of the solution.
+            # 2) The sum of all crowding distances for all objectives of the solution.
         crowding_dist_sum = numpy.array(list(zip(obj_crowding_dist_list[0, :, 0], crowding_dist_sum)))
         crowding_dist_sum = sorted(crowding_dist_sum, key=lambda x: x[1], reverse=True)
     

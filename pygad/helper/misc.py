@@ -91,7 +91,7 @@ class Helper:
                 m = f"Mutation Percentage: {self.mutation_percent_genes}"
                 self.logger.info(m)
                 summary_output = summary_output + m + "\n"
-            # Number of mutation genes is already showed above.
+            # Number of mutation genes is already shown above.
             m = f"Mutation Genes: {self.mutation_num_genes}"
             self.logger.info(m)
             summary_output = summary_output + m + "\n"

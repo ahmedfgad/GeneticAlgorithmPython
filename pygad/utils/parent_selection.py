@@ -12,8 +12,8 @@ class ParentSelection:
     def steady_state_selection(self, fitness, num_parents):
 
         """
-        Selects the parents using the steady-state selection technique. 
-        This is by sorting the solutions based on the fitness and select the best ones as parents.
+        Selects the parents using the steady-state selection technique.
+        This works by sorting the solutions based on the fitness and selecting the best ones as parents.
         Later, these parents will mate to produce the offspring.
 
         It accepts 2 parameters:
@@ -52,7 +52,7 @@ class ParentSelection:
         # This function works with both single- and multi-objective optimization problems.
         fitness_sorted = self.sort_solutions_nsga2(fitness=fitness)
 
-        # Rank the solutions based on their fitness. The worst is gives the rank 1. The best has the rank N.
+        # Rank the solutions based on their fitness. The worst is given rank 1. The best is given rank N.
         rank = numpy.arange(1, self.sol_per_pop+1)
 
         probs = rank / numpy.sum(rank)
@@ -66,7 +66,7 @@ class ParentSelection:
             rand_prob = numpy.random.rand()
             for idx in range(probs.shape[0]):
                 if (rand_prob >= probs_start[idx] and rand_prob < probs_end[idx]):
-                    # The variable idx has the rank of solution but not its index in the population.
+                    # The variable idx holds the rank of the solution, not its index in the population.
                     # Return the correct index of the solution.
                     mapped_idx = fitness_sorted[idx]
                     parents[parent_num, :] = self.population[mapped_idx, :].copy()
@@ -158,7 +158,7 @@ class ParentSelection:
             # Single-objective optimization problem.
             pass
 
-        # Reaching this step extends that fitness is a 1D array.
+        # Reaching this step confirms that fitness is a 1D array.
         fitness_sum = numpy.sum(fitness)
         if fitness_sum == 0:
             self.logger.error("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
@@ -191,7 +191,7 @@ class ParentSelection:
         It accepts a single 1D array representing the probabilities of selecting each solution.
         It returns 2 1D arrays:
             1) probs_start has the start of each range.
-            2) probs_start has the end of each range.
+            2) probs_end has the end of each range.
         It also returns an empty array for the parents.
         """
 
@@ -235,7 +235,7 @@ class ParentSelection:
             # Single-objective optimization problem.
             pass
 
-        # Reaching this step extends that fitness is a 1D array.
+        # Reaching this step confirms that fitness is a 1D array.
         fitness_sum = numpy.sum(fitness)
         if fitness_sum == 0:
             self.logger.error("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
@@ -276,7 +276,7 @@ class ParentSelection:
         Select the parents using the tournament selection technique for NSGA-II. 
         The traditional tournament selection uses the fitness values. But the tournament selection for NSGA-II uses non-dominated sorting and crowding distance.
         Using non-dominated sorting, the solutions are distributed across pareto fronts. The fronts are given the indices 0, 1, 2, ..., N where N is the number of pareto fronts. The lower the index of the pareto front, the better its solutions.
-        To select the parents solutions, 2 solutions are selected randomly. If the 2 solutions are in different pareto fronts, then the solution comming from a pareto front with lower index is selected.
+        To select the parents solutions, 2 solutions are selected randomly. If the 2 solutions are in different pareto fronts, then the solution coming from a pareto front with lower index is selected.
         If 2 solutions are in the same pareto front, then crowding distance is calculated. The solution with the higher crowding distance is selected.
         If the 2 solutions are in the same pareto front and have the same crowding distance, then a solution is randomly selected.
         Later, the selected parents will mate to produce the offspring.

@@ -130,7 +130,7 @@ class KerasGA:
     def create_population(self):
 
         """
-        Creates the initial population of the genetic algorithm as a list of networks' weights (i.e. solutions). Each element in the list holds a different weights of the Keras model.
+        Creates the initial population of the genetic algorithm as a list of networks' weights (i.e. solutions). Each element in the list holds a different set of weights for the Keras model.
 
         The method returns a list holding the weights of all solutions.
         """

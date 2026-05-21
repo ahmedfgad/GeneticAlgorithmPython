@@ -78,7 +78,7 @@ class Plot:
                 current_color = color[objective_idx]
                 current_linewidth = linewidth[objective_idx]
                 current_label = label[objective_idx]
-                # Return the fitness values for the current objective function across all best solutions acorss all generations.
+                # Return the fitness values for the current objective function across all generations.
                 fitness = numpy.array(self.best_solutions_fitness)[:, objective_idx]
                 if plot_type == "plot":
                     matplt.plot(fitness, 

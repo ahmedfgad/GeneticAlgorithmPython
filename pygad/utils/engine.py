@@ -425,7 +425,7 @@ class GAEngine:
                 generation_first_idx = self.generations_completed
                 generation_last_idx = self.num_generations + self.generations_completed
             else:
-                # If the 'self.generations_completed' parameter is '0', then stat from scratch.
+                # If the 'self.generations_completed' parameter is '0', then start from scratch.
                 generation_first_idx = 0
                 generation_last_idx = self.num_generations
 
@@ -488,8 +488,8 @@ class GAEngine:
                 if self.save_best_solutions:
                     self.best_solutions.append(list(best_solution))
 
-                # Note: Any code that has loop-dependant statements (e.g. continue, break, etc.) must be kept inside the loop of the 'run()' method. It can be moved to another method to clean the run() method.
-                # If the on_generation attribute is not None, then cal the callback function after the generation.
+                # Note: Any code that has loop-dependent statements (e.g. continue, break, etc.) must be kept inside the loop of the 'run()' method. It cannot be moved to another method to clean up the run() method.
+                # If the on_generation attribute is not None, then call the callback function after the generation.
                 if not (self.on_generation is None):
                     r = self.on_generation(self)
                     if type(r) is str and r.lower() == "stop":
@@ -874,7 +874,7 @@ class GAEngine:
         """
         Returns information about the best solution found by the genetic algorithm.
         Accepts the following parameters:
-            pop_fitness: An optional parameter holding the fitness values of the solutions in the latest population. If passed, then it save time calculating the fitness. If None, then the 'cal_pop_fitness()' method is called to calculate the fitness of the latest population.
+            pop_fitness: An optional parameter holding the fitness values of the solutions in the latest population. If passed, then it saves time calculating the fitness. If None, then the 'cal_pop_fitness()' method is called to calculate the fitness of the latest population.
         The following are returned:
             -best_solution: Best solution in the current population.
             -best_solution_fitness: Fitness value of the best solution.
@@ -883,7 +883,7 @@ class GAEngine:
 
         try:
             if pop_fitness is None:
-                # If the 'pop_fitness' parameter is not passed, then we have to call the 'cal_pop_fitness()' method to calculate the fitness of all solutions in the lastest population.
+                # If the 'pop_fitness' parameter is not passed, then we have to call the 'cal_pop_fitness()' method to calculate the fitness of all solutions in the latest population.
                 pop_fitness = self.cal_pop_fitness()
             # Verify the type of the 'pop_fitness' parameter.
             elif type(pop_fitness) in [tuple, list, numpy.ndarray]:

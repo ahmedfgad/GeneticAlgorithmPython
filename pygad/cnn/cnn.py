@@ -12,7 +12,7 @@ A tutorial that helps to get started (Building Convolutional Neural Network usin
 It is also translated into Chinese: http://m.aliyun.com/yunqi/articles/585741
 """
 
-# Supported activation functions by the cnn.py module.
+# The activation functions supported by the cnn.py module.
 supported_activation_functions = ("sigmoid", "relu", "softmax")
 
 def layers_weights(model, 
@@ -52,7 +52,7 @@ def layers_weights(model,
         raise TypeError(msg)
 
     # Currently, the weights of the layers are in the reverse order. In other words, the weights of the first layer are at the last index of the 'network_weights' list while the weights of the last layer are at the first index.
-    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appears at index 0 of the list).
+    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appear at index 0 of the list).
     network_weights.reverse()
     return network_weights
 
@@ -94,7 +94,7 @@ def layers_weights_as_matrix(model, vector_weights):
         raise TypeError(msg)
 
     # Currently, the weights of the layers are in the reverse order. In other words, the weights of the first layer are at the last index of the 'network_weights' list while the weights of the last layer are at the first index.
-    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appears at index 0 of the list).
+    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appear at index 0 of the list).
     network_weights.reverse()
     return numpy.array(network_weights, dtype=object)  # NEP 34: https://numpy.org/neps/nep-0034-infer-dtype-is-object.html
 
@@ -138,7 +138,7 @@ def layers_weights_as_vector(model, initial=True):
         raise TypeError(msg)
 
     # Currently, the weights of the layers are in the reverse order. In other words, the weights of the first layer are at the last index of the 'network_weights' list while the weights of the last layer are at the first index.
-    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appears at index 0 of the list).
+    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appear at index 0 of the list).
     network_weights.reverse()
     return numpy.array(network_weights)
 
@@ -301,7 +301,7 @@ class Conv2D(CustomLogger):
             msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
             self.logger.error(msg)
             raise TypeError(msg)
-        # A reference to the layer that preceeds the current layer in the network architecture.
+        # A reference to the layer that precedes the current layer in the network architecture.
         self.previous_layer = previous_layer
         
         # A reference to the bank of filters.
@@ -323,7 +323,7 @@ class Conv2D(CustomLogger):
         self.layer_input_size = self.previous_layer.layer_output_size
 
         # Size of the output from the layer.
-        # Later, it must conider strides and paddings
+        # Later, it must consider strides and padding.
         self.layer_output_size = (self.previous_layer.layer_output_size[0] - self.kernel_size + 1, 
                                   self.previous_layer.layer_output_size[1] - self.kernel_size + 1, 
                                   num_filters)
@@ -398,7 +398,7 @@ class Conv2D(CustomLogger):
             msg = 'A filter must be a square matrix. I.e. number of rows and columns must match.'
             self.logger.error(msg)
             raise ValueError(msg)
-        if self.initial_weights.shape[1]%2==0: # Check if filter diemnsions are odd.
+        if self.initial_weights.shape[1]%2==0: # Check if filter dimensions are odd.
             msg = 'A filter must have an odd size. I.e. number of rows and columns must be odd.'
             self.logger.error(msg)
             raise ValueError(msg)
@@ -452,7 +452,7 @@ class AveragePooling2D(CustomLogger):
             msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
             self.logger.error(msg)
             raise TypeError(msg)
-        # A reference to the layer that preceeds the current layer in the network architecture.
+        # A reference to the layer that precedes the current layer in the network architecture.
         self.previous_layer = previous_layer
 
         # Size of the input to the layer.
@@ -538,7 +538,7 @@ class MaxPooling2D(CustomLogger):
             msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
             self.logger.error(msg)
             raise TypeError(msg)
-        # A reference to the layer that preceeds the current layer in the network architecture.
+        # A reference to the layer that precedes the current layer in the network architecture.
         self.previous_layer = previous_layer
 
         # Size of the input to the layer.
@@ -604,7 +604,7 @@ class ReLU(CustomLogger):
             self.logger.error(msg)
             raise TypeError(msg)
 
-        # A reference to the layer that preceeds the current layer in the network architecture.
+        # A reference to the layer that precedes the current layer in the network architecture.
         self.previous_layer = previous_layer
 
         # Size of the input to the layer.
@@ -655,7 +655,7 @@ class Sigmoid(CustomLogger):
             msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
             self.logger.error(msg)
             raise TypeError(msg)
-        # A reference to the layer that preceeds the current layer in the network architecture.
+        # A reference to the layer that precedes the current layer in the network architecture.
         self.previous_layer = previous_layer
 
         # Size of the input to the layer.
@@ -706,7 +706,7 @@ class Flatten(CustomLogger):
             msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
             self.logger.error(msg)
             raise TypeError(msg)
-        # A reference to the layer that preceeds the current layer in the network architecture.
+        # A reference to the layer that precedes the current layer in the network architecture.
         self.previous_layer = previous_layer
 
         # Size of the input to the layer.
@@ -734,7 +734,7 @@ class Flatten(CustomLogger):
 class Dense(CustomLogger):
 
     """
-    Implementing the input dense (fully connected) layer of a CNN.
+    Implementing the dense (fully connected) layer of a CNN.
     """
 
     def __init__(self, 
@@ -784,7 +784,7 @@ class Dense(CustomLogger):
             msg = "The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter."
             self.logger.error(msg)
             raise TypeError(msg)
-        # A reference to the layer that preceeds the current layer in the network architecture.
+        # A reference to the layer that precedes the current layer in the network architecture.
         self.previous_layer = previous_layer
 
         if type(self.previous_layer.layer_output_size) in [list, tuple, numpy.ndarray] and len(self.previous_layer.layer_output_size) > 1:
@@ -865,13 +865,13 @@ class Model(CustomLogger):
     def get_layers(self):
 
         """
-        Prepares a  list of all layers in the CNN model.
+        Prepares a list of all layers in the CNN model.
         Returns the list.
         """
 
         network_layers = []
 
-        # The last layer in the network archietcture.
+        # The last layer in the network architecture.
         layer = self.last_layer
 
         while "previous_layer" in layer.__init__.__code__.co_varnames:

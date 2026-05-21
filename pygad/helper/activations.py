@@ -40,7 +40,7 @@ def softmax(layer_outputs):
     """
     Applies the softmax function.
 
-    sop: The input to which the softmax function is applied.
+    layer_outputs: The input to which the softmax function is applied.
 
     Returns the result of the softmax function.
     """

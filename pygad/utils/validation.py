@@ -13,7 +13,7 @@ class Validation:
                          mutation_by_replacement,
                          sample_size,
                          allow_duplicate_genes):
-        # If no logger is passed, then create a logger that logs only the messages to the console.
+        # If no logger is passed, then create a logger that logs the messages only to the console.
         if logger is None:
             # Create a logger named with the module name.
             logger = logging.getLogger(__name__)
@@ -771,7 +771,7 @@ class Validation:
                 self.valid_parameters = False
                 raise ValueError(f"When 'parent_selection_type' is assigned to a method, then it must accept 3 parameters:\n1) The fitness values of the current population.\n2) The number of parents needed.\n3) The instance from the pygad.GA class.\n\nThe passed parent selection method named '{parent_selection_type.__code__.co_name}' accepts {len(inspect.signature(parent_selection_type).parameters)} parameter(s).")
         elif inspect.isfunction(parent_selection_type):
-            # Check if the parent_selection_type is a function that accepts 2 parameters.
+            # Check if the parent_selection_type is a function that accepts 3 parameters.
             if len(inspect.signature(parent_selection_type).parameters) == 3:
                 # The parent selection function assigned to the parent_selection_type parameter is validated.
                 self.select_parents = parent_selection_type

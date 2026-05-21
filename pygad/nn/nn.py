@@ -38,7 +38,7 @@ def layers_weights(last_layer, initial=True):
         raise TypeError("The first layer in the network architecture must be an input layer.")
 
     # Currently, the weights of the layers are in the reverse order. In other words, the weights of the first layer are at the last index of the 'network_weights' list while the weights of the last layer are at the first index.
-    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appears at index 0 of the list).
+    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appear at index 0 of the list).
     network_weights.reverse()
     return network_weights
 
@@ -75,7 +75,7 @@ def layers_weights_as_vector(last_layer, initial=True):
         raise TypeError("The first layer in the network architecture must be an input layer.")
 
     # Currently, the weights of the layers are in the reverse order. In other words, the weights of the first layer are at the last index of the 'network_weights' list while the weights of the last layer are at the first index.
-    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appears at index 0 of the list).
+    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appear at index 0 of the list).
     network_weights.reverse()
     return numpy.array(network_weights)
 
@@ -112,7 +112,7 @@ def layers_weights_as_matrix(last_layer, vector_weights):
         raise TypeError("The first layer in the network architecture must be an input layer.")
 
     # Currently, the weights of the layers are in the reverse order. In other words, the weights of the first layer are at the last index of the 'network_weights' list while the weights of the last layer are at the first index.
-    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appears at index 0 of the list).
+    # Reversing the 'network_weights' list to order the layers' weights according to their location in the network architecture (i.e. the weights of the first layer appear at index 0 of the list).
     network_weights.reverse()
     return network_weights
 
@@ -136,8 +136,8 @@ def layers_activations(last_layer):
     if not (type(layer) is InputLayer):
         raise TypeError("The first layer in the network architecture must be an input layer.")
 
-    # Currently, the activations of layers are in the reverse order. In other words, the activation function of the first layer are at the last index of the 'activations' list while the activation function of the last layer are at the first index.
-    # Reversing the 'activations' list to order the layers' weights according to their location in the network architecture (i.e. the activation function of the first layer appears at index 0 of the list).
+    # Currently, the activations of layers are in the reverse order. In other words, the activation function of the first layer is at the last index of the 'activations' list while the activation function of the last layer is at the first index.
+    # Reversing the 'activations' list to order the activation functions according to their location in the network architecture (i.e. the activation function of the first layer appears at index 0 of the list).
     activations.reverse()
     return activations
 
@@ -196,13 +196,13 @@ def train(num_epochs,           last_layer,
                                  network_error=network_error,
                                  learning_rate=learning_rate)
 
-    # Initially, the 'trained_weights' attribute of the layers are set to None. After the is trained, the 'trained_weights' attribute is updated by the trained weights using the update_layers_trained_weights() function.
+    # Initially, the 'trained_weights' attribute of the layers is set to None. After the network is trained, the 'trained_weights' attribute is updated by the trained weights using the update_layers_trained_weights() function.
     update_layers_trained_weights(last_layer, weights)
 
 def update_weights(weights, network_error, learning_rate):
     """
     Updates the network weights using the learning rate only. 
-    The purpose of this project is to only apply the forward pass of training a neural network. Thus, there is no optimization algorithm is used like the gradient descent.
+    The purpose of this project is to apply only the forward pass of training a neural network. Thus, no optimization algorithm such as gradient descent is used.
     For optimizing the neural network, check this project (https://github.com/ahmedfgad/NeuralGenetic) in which the genetic algorithm is used for training the network.
     
     weights: The current weights of the network.
@@ -279,7 +279,7 @@ def predict(last_layer, data_inputs, problem_type="classification"):
 
 def to_vector(array):
     """
-    Converts a passed NumPy array (of any dimensionality) to its `array`  parameter into a 1D vector and returns the vector.
+    Converts the NumPy array passed to the `array` parameter (of any number of dimensions) into a 1D vector and returns the vector.
     
     array: The NumPy array to be converted into a 1D vector.
 
@@ -293,7 +293,7 @@ def to_vector(array):
 
 def to_array(vector, shape):
     """
-    Converts a passed vector to its `vector`  parameter into a NumPy array and returns the array.
+    Converts the 1D vector passed to the `vector` parameter into a NumPy array and returns the array.
 
     vector: The 1D vector to be converted into an array.
     shape: The target shape of the array.
@@ -322,7 +322,7 @@ class InputLayer:
 
 class DenseLayer:
     """
-    Implementing the input dense (fully connected) layer of a neural network.
+    Implementing the dense (fully connected) layer of a neural network.
     """
     def __init__(self, num_neurons, previous_layer, activation_function="sigmoid"):
         if num_neurons <= 0:
@@ -337,7 +337,7 @@ class DenseLayer:
 
         if previous_layer is None:
             raise TypeError("The previous layer cannot be of Type 'None'. Please pass a valid layer to the 'previous_layer' parameter.")
-        # A reference to the layer that preceeds the current layer in the network architecture.
+        # A reference to the layer that precedes the current layer in the network architecture.
         self.previous_layer = previous_layer
 
         # Initializing the weights of the layer.
