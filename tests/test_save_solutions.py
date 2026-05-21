@@ -1050,6 +1050,56 @@ def test_save_solutions_both_keep_adaptive_mutation_save_solutions_multi_objecti
 
 
 
+#### List length consistency
+
+def run_for_list_lengths(multi_objective=False,
+                         save_solutions=False,
+                         save_best_solutions=False,
+                         stop_at=None):
+
+    def fitness_func_single(ga, solution, idx):
+        return random.random()
+
+    def fitness_func_multi(ga, solution, idx):
+        return [random.random(), random.random()]
+
+    fitness_func = fitness_func_multi if multi_objective else fitness_func_single
+
+    on_generation = None
+    if stop_at is not None:
+        def on_generation(ga):
+            if ga.generations_completed >= stop_at:
+                return "stop"
+
+    ga_optimizer = pygad.GA(num_generations=num_generations,
+                            sol_per_pop=sol_per_pop,
+                            num_genes=6,
+                            num_parents_mating=num_parents_mating,
+                            fitness_func=fitness_func,
+                            on_generation=on_generation,
+                            save_best_solutions=save_best_solutions,
+                            save_solutions=save_solutions,
+                            random_seed=42,
+                            suppress_warnings=True)
+    ga_optimizer.run()
+    return ga_optimizer
+
+def test_list_lengths_best_solutions_on_generation_stop():
+    ga = run_for_list_lengths(save_best_solutions=True, stop_at=10)
+    assert len(ga.best_solutions) == len(ga.best_solutions_fitness)
+
+def test_list_lengths_best_solutions_on_generation_stop_multi_objective():
+    ga = run_for_list_lengths(multi_objective=True, save_best_solutions=True, stop_at=10)
+    assert len(ga.best_solutions) == len(ga.best_solutions_fitness)
+
+def test_list_lengths_best_solutions_normal_completion():
+    ga = run_for_list_lengths(save_best_solutions=True)
+    assert len(ga.best_solutions) == len(ga.best_solutions_fitness)
+
+def test_list_lengths_solutions_on_generation_stop():
+    ga = run_for_list_lengths(save_solutions=True, stop_at=10)
+    assert len(ga.solutions) == len(ga.solutions_fitness)
+
 if __name__ == "__main__":
     #### Single Objective
     print()

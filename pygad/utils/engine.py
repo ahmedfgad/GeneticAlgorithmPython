@@ -493,9 +493,6 @@ class GAEngine:
                 if not (self.on_generation is None):
                     r = self.on_generation(self)
                     if type(r) is str and r.lower() == "stop":
-                        # Before aborting the loop, save the fitness value of the best solution.
-                        # _, best_solution_fitness, _ = self.best_solution()
-                        self.best_solutions_fitness.append(best_solution_fitness)
                         break
 
                 if not self.stop_criteria is None:
