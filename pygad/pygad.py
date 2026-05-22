@@ -188,6 +188,38 @@ class GA(utils.parent_selection.ParentSelection,
             file.write(cloudpickle_serialized_object)
             cloudpickle.dump(self, file)
 
+    def push_to_vilvik(self, *, api_key=None, **overrides):
+        """Import this run into Vilvik (https://vilvik.com) as an editable,
+        continuable cloud record.
+
+        This is a thin convenience wrapper over the Vilvik SDK, which must be
+        installed separately::
+
+            pip install vilvik
+
+        After ``ga.run()``, call ``ga.push_to_vilvik()`` (sign in first with the
+        ``vilvik login`` command or set the ``VILVIK_API_KEY`` environment
+        variable). All keyword arguments are forwarded to ``vilvik.push`` (for
+        example ``name=``, ``fitness_source=``, ``callbacks=``, ``preamble=``,
+        ``dry_run=True``). Returns the created record, or a capture report when
+        ``dry_run=True``.
+        """
+        try:
+            import vilvik
+        except ImportError as exc:
+            raise ImportError(
+                "push_to_vilvik requires the Vilvik SDK. Install it with: "
+                "pip install vilvik"
+            ) from exc
+
+        import pygad
+        return vilvik.push(
+            self,
+            api_key=api_key,
+            origin_overrides={"client": "pygad_wrapper", "pygad_version": pygad.__version__},
+            **overrides,
+        )
+
 def load(filename):
     """
     Reads a saved instance of the genetic algorithm:
