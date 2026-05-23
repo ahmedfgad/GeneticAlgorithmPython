@@ -5,7 +5,6 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(  
     name="pygad",  
-    version="3.6.0",
     author="Ahmed Fawzy Gad",
     install_requires=["numpy", "matplotlib", "cloudpickle",],
     extras_require={

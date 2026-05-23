@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pygad"
-version = "3.6.0"
+dynamic = ["version"]
 description = "PyGAD: A Python Library for Building the Genetic Algorithm and Training Machine Learning Algoithms (Keras & PyTorch)."
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3"
@@ -62,3 +62,6 @@ deep_learning = ["keras", "tensorflow", "torch"]
 # PyTest Configuration. Later, PyTest will support the [tool.pytest] table.
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools.dynamic]
+version = { attr = "pygad._version.__version__" }
