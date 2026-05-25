@@ -42,7 +42,6 @@ classifiers = [
 keywords = ["genetic algorithm", "GA", "optimization", "evolutionary algorithm", "natural evolution", "pygad", "machine learning", "deep learning", "neural networks", "tensorflow", "keras", "pytorch"]
 dependencies = [
   "numpy",
-  "matplotlib",
   "cloudpickle",
 ]
 
@@ -58,6 +57,7 @@ dependencies = [
 
 [project.optional-dependencies]
 deep_learning = ["keras", "tensorflow", "torch"]
+visualize = ["matplotlib"]
 
 # PyTest Configuration. Later, PyTest will support the [tool.pytest] table.
 [tool.pytest.ini_options]
