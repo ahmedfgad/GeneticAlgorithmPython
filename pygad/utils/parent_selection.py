@@ -10,18 +10,25 @@ class ParentSelection:
         pass
 
     def steady_state_selection(self, fitness, num_parents):
-
         """
-        Selects the parents using the steady-state selection technique.
-        This works by sorting the solutions based on the fitness and selecting the best ones as parents.
-        Later, these parents will mate to produce the offspring.
+        Select the parents using the steady-state selection technique. The
+        solutions are sorted by fitness and the top ``num_parents`` are
+        chosen. Works for both single-objective and multi-objective
+        problems because the sort is delegated to ``sort_solutions_nsga2``.
 
-        It accepts 2 parameters:
-            -fitness: The fitness values of the solutions in the current population.
-            -num_parents: The number of parents to be selected.
-        It returns:
-            -An array of the selected parents.
-            -The indices of the selected solutions.
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            Fitness values of the solutions in the current population.
+        num_parents : int
+            Number of parents to select.
+
+        Returns
+        -------
+        parents : numpy.ndarray
+            Selected parent solutions copied from ``self.population``.
+        parents_indices : numpy.ndarray
+            Indices of the selected parents inside ``self.population``.
         """
 
         # Return the indices of the sorted solutions (all solutions in the population).
@@ -36,16 +43,25 @@ class ParentSelection:
         return parents, parents_indices
 
     def rank_selection(self, fitness, num_parents):
-
         """
-        Selects the parents using the rank selection technique. Later, these parents will mate to produce the offspring.
-        Rank selection gives a rank from 1 to N (number of solutions) to each solution based on its fitness.
-        It accepts 2 parameters:
-            -fitness: The fitness values of the solutions in the current population.
-            -num_parents: The number of parents to be selected.
-        It returns:
-            -An array of the selected parents.
-            -The indices of the selected solutions.
+        Select the parents using the rank selection technique. Solutions
+        are first sorted by fitness; rank 1 is given to the worst and
+        rank N to the best. The chance of being picked is proportional to
+        the rank.
+
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            Fitness values of the solutions in the current population.
+        num_parents : int
+            Number of parents to select.
+
+        Returns
+        -------
+        parents : numpy.ndarray
+            Selected parent solutions copied from ``self.population``.
+        parents_indices : numpy.ndarray
+            Indices of the selected parents inside ``self.population``.
         """
 
         # Return the indices of the sorted solutions (all solutions in the population).
@@ -57,7 +73,7 @@ class ParentSelection:
 
         probs = rank / numpy.sum(rank)
 
-        probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(), 
+        probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(),
                                                                       num_parents=num_parents)
 
         parents_indices = []
@@ -76,15 +92,23 @@ class ParentSelection:
         return parents, numpy.array(parents_indices)
 
     def random_selection(self, fitness, num_parents):
-    
         """
-        Selects the parents randomly. Later, these parents will mate to produce the offspring.
-        It accepts 2 parameters:
-            -fitness: The fitness values of the solutions in the current population.
-            -num_parents: The number of parents to be selected.
-        It returns:
-            -An array of the selected parents.
-            -The indices of the selected solutions.
+        Select the parents at random from the current population.
+
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            Fitness values of the solutions in the current population.
+            Not used by this method but kept for a uniform interface.
+        num_parents : int
+            Number of parents to select.
+
+        Returns
+        -------
+        parents : numpy.ndarray
+            Selected parent solutions copied from ``self.population``.
+        parents_indices : numpy.ndarray
+            Indices of the selected parents inside ``self.population``.
         """
 
         parents = self.initialize_parents_array((num_parents, self.population.shape[1]))
@@ -94,15 +118,24 @@ class ParentSelection:
         return parents, rand_indices
 
     def tournament_selection(self, fitness, num_parents):
-
         """
-        Selects the parents using the tournament selection technique. Later, these parents will mate to produce the offspring.
-        It accepts:
-            -fitness: The fitness values of the solutions in the current population.
-            -num_parents: The number of parents to be selected.
-        It returns:
-            -An array of the selected parents.
-            -The indices of the selected solutions.
+        Select the parents using the tournament selection technique. For
+        each parent slot, ``self.K_tournament`` candidates are picked at
+        random; the one with the best fitness rank wins.
+
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            Fitness values of the solutions in the current population.
+        num_parents : int
+            Number of parents to select.
+
+        Returns
+        -------
+        parents : numpy.ndarray
+            Selected parent solutions copied from ``self.population``.
+        parents_indices : numpy.ndarray
+            Indices of the selected parents inside ``self.population``.
         """
 
         # Return the indices of the sorted solutions (all solutions in the population).
@@ -132,21 +165,38 @@ class ParentSelection:
         return parents, parents_indices
 
     def roulette_wheel_selection(self, fitness, num_parents):
-    
         """
-        Selects the parents using the roulette wheel selection technique. Later, these parents will mate to produce the offspring.
-        It accepts 2 parameters:
-            -fitness: The fitness values of the solutions in the current population.
-            -num_parents: The number of parents to be selected.
-        It returns:
-            -An array of the selected parents.
-            -The indices of the selected solutions.
+        Select the parents using the roulette wheel selection technique.
+        Each solution gets a slice of the wheel proportional to its
+        fitness. A random pointer is drawn for every parent slot.
+
+        For multi-objective problems, the fitness rows are summed across
+        objectives so the wheel works on a single scalar per solution.
+
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            Fitness values of the solutions in the current population.
+        num_parents : int
+            Number of parents to select.
+
+        Returns
+        -------
+        parents : numpy.ndarray
+            Selected parent solutions copied from ``self.population``.
+        parents_indices : numpy.ndarray
+            Indices of the selected parents inside ``self.population``.
+
+        Raises
+        ------
+        ZeroDivisionError
+            If the sum of fitness values is zero.
         """
 
         ## Make edits to work with multi-objective optimization.
         ## The objective is to convert the fitness from M-D array to just 1D array.
         ## There are 2 ways:
-            # 1) By summing the fitness values of each solution. 
+            # 1) By summing the fitness values of each solution.
             # 2) By using only 1 objective to create the roulette wheel and excluding the others.
 
         # Take the sum of the fitness values of each solution.
@@ -166,7 +216,7 @@ class ParentSelection:
 
         probs = fitness / fitness_sum
 
-        probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(), 
+        probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(),
                                                                       num_parents=num_parents)
 
         parents_indices = []
@@ -185,14 +235,28 @@ class ParentSelection:
 
     def wheel_cumulative_probs(self, probs, num_parents):
         """
-        A helper function to calculate the wheel probabilities for these 2 methods:
-            1) roulette_wheel_selection
-            2) rank_selection
-        It accepts a single 1D array representing the probabilities of selecting each solution.
-        It returns 2 1D arrays:
-            1) probs_start has the start of each range.
-            2) probs_end has the end of each range.
-        It also returns an empty array for the parents.
+        Build the cumulative probability ranges used by the roulette
+        wheel and rank selection methods. Each solution gets a
+        ``[start, end)`` interval whose width is its selection
+        probability.
+
+        Parameters
+        ----------
+        probs : numpy.ndarray
+            A 1D array of selection probabilities, one per solution.
+        num_parents : int
+            Number of parents to pick later. Only used to allocate the
+            empty parents array returned to the caller.
+
+        Returns
+        -------
+        probs_start : numpy.ndarray
+            Start of each cumulative range, indexed by solution.
+        probs_end : numpy.ndarray
+            End of each cumulative range, indexed by solution.
+        parents : numpy.ndarray
+            An empty parents array with the right shape and dtype,
+            ready to be filled by the caller.
         """
 
         probs_start = numpy.zeros(probs.shape, dtype=float) # An array holding the start values of the ranges of probabilities.
@@ -209,21 +273,39 @@ class ParentSelection:
         return probs_start, probs_end, parents
 
     def stochastic_universal_selection(self, fitness, num_parents):
-
         """
-        Selects the parents using the stochastic universal selection technique. Later, these parents will mate to produce the offspring.
-        It accepts 2 parameters:
-            -fitness: The fitness values of the solutions in the current population.
-            -num_parents: The number of parents to be selected.
-        It returns:
-            -An array of the selected parents.
-            -The indices of the selected solutions.
+        Select the parents using the stochastic universal selection
+        technique. Like roulette wheel but uses a set of evenly spaced
+        pointers drawn from a single random offset, giving a more
+        balanced sampling than independent random pointers.
+
+        For multi-objective problems, the fitness rows are summed across
+        objectives so the wheel works on a single scalar per solution.
+
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            Fitness values of the solutions in the current population.
+        num_parents : int
+            Number of parents to select.
+
+        Returns
+        -------
+        parents : numpy.ndarray
+            Selected parent solutions copied from ``self.population``.
+        parents_indices : numpy.ndarray
+            Indices of the selected parents inside ``self.population``.
+
+        Raises
+        ------
+        ZeroDivisionError
+            If the sum of fitness values is zero.
         """
 
         ## Make edits to work with multi-objective optimization.
         ## The objective is to convert the fitness from M-D array to just 1D array.
         ## There are 2 ways:
-            # 1) By summing the fitness values of each solution. 
+            # 1) By summing the fitness values of each solution.
             # 2) By using only 1 objective to create the roulette wheel and excluding the others.
 
         # Take the sum of the fitness values of each solution.
@@ -243,12 +325,12 @@ class ParentSelection:
 
         probs = fitness / fitness_sum
 
-        probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(), 
+        probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(),
                                                                       num_parents=num_parents)
 
         pointers_distance = 1.0 / self.num_parents_mating # Distance between different pointers.
-        first_pointer = numpy.random.uniform(low=0.0, 
-                                             high=pointers_distance, 
+        first_pointer = numpy.random.uniform(low=0.0,
+                                             high=pointers_distance,
                                              size=1)[0] # Location of the first pointer.
 
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
@@ -271,27 +353,42 @@ class ParentSelection:
     def tournament_selection_nsga2(self,
                                    fitness,
                                    num_parents):
-    
         """
-        Select the parents using the tournament selection technique for NSGA-II. 
-        The traditional tournament selection uses the fitness values. But the tournament selection for NSGA-II uses non-dominated sorting and crowding distance.
-        Using non-dominated sorting, the solutions are distributed across pareto fronts. The fronts are given the indices 0, 1, 2, ..., N where N is the number of pareto fronts. The lower the index of the pareto front, the better its solutions.
-        To select the parents solutions, 2 solutions are selected randomly. If the 2 solutions are in different pareto fronts, then the solution coming from a pareto front with lower index is selected.
-        If 2 solutions are in the same pareto front, then crowding distance is calculated. The solution with the higher crowding distance is selected.
-        If the 2 solutions are in the same pareto front and have the same crowding distance, then a solution is randomly selected.
-        Later, the selected parents will mate to produce the offspring.
+        Select the parents using the tournament selection variant for
+        NSGA-II. For each parent slot, ``self.K_tournament`` candidates
+        are picked at random. The winner is decided as follows:
 
-        It accepts 2 parameters:
-            -fitness: The fitness values for the current population.
-            -num_parents: The number of parents to be selected.
-            -pareto_fronts: A nested array of all the pareto fronts. Each front has its solutions.
-            -solutions_fronts_indices: A list of the pareto front index of each solution in the current population.
-    
-        It returns:
-            -An array of the selected parents.
-            -The indices of the selected solutions.
+        1. If the candidates lie in different Pareto fronts, the one in
+           the front with the lowest index wins.
+        2. If two or more share the same best front, the one with the
+           higher crowding distance wins.
+        3. If they also share the same crowding distance, the winner is
+           picked at random.
+
+        Only works for multi-objective problems.
+
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            Fitness values of the solutions in the current population.
+            Each row must be an iterable of objective values.
+        num_parents : int
+            Number of parents to select.
+
+        Returns
+        -------
+        parents : numpy.ndarray
+            Selected parent solutions copied from ``self.population``.
+        parents_indices : numpy.ndarray
+            Indices of the selected parents inside ``self.population``.
+
+        Raises
+        ------
+        ValueError
+            If the fitness function returned scalar values (the problem
+            is single-objective).
         """
-    
+
         if self.gene_type_single == True:
             parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
         else:
@@ -313,7 +410,7 @@ class ParentSelection:
 
         # Randomly generate pairs of indices to apply for NSGA-II tournament selection for selecting the parents solutions.
         rand_indices = numpy.random.randint(low=0,
-                                            high=len(solutions_fronts_indices), 
+                                            high=len(solutions_fronts_indices),
                                             size=(num_parents, self.K_tournament))
 
         for parent_num in range(num_parents):
@@ -405,31 +502,41 @@ class ParentSelection:
 
         # Make sure the parents indices is returned as a NumPy array.
         return parents, numpy.array(parents_indices)
-    
+
     def nsga2_selection(self,
                         fitness,
                         num_parents
                         ):
-
         """
-        Select the parents using the Non-Dominated Sorting Genetic Algorithm II (NSGA-II). 
-        The selection is done using non-dominated sorting and crowding distance.
-        Using non-dominated sorting, the solutions are distributed across pareto fronts. The fronts are given the indices 0, 1, 2, ..., N where N is the number of pareto fronts. The lower the index of the pareto front, the better its solutions.
-        The parents are selected from the lower pareto fronts and moving up until selecting the number of desired parents. 
-        A solution from a pareto front X cannot be taken as a parent until all solutions in pareto front Y is selected given that Y < X.
-        For a pareto front X, if only a subset of its solutions is needed, then the corwding distance is used to determine which solutions to be selected from the front. The solution with the higher crowding distance is selected.
-        If the 2 solutions are in the same pareto front and have the same crowding distance, then a solution is randomly selected.
-        Later, the selected parents will mate to produce the offspring.
-    
-        It accepts 2 parameters:
-            -fitness: The fitness values for the current population.
-            -num_parents: The number of parents to be selected.
-            -pareto_fronts: A nested array of all the pareto fronts. Each front has its solutions.
-            -solutions_fronts_indices: A list of the pareto front index of each solution in the current population.
+        Select the parents using the Non-Dominated Sorting Genetic
+        Algorithm II (NSGA-II). The population is sorted into Pareto
+        fronts; whole fronts are taken in order until the next one would
+        overflow the requested parent count. The remaining slots are
+        filled from that critical front by crowding distance (higher
+        crowding distance wins; random pick on ties).
 
-        It returns:
-            -An array of the selected parents.
-            -The indices of the selected solutions.
+        Only works for multi-objective problems.
+
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            Fitness values of the solutions in the current population.
+            Each row must be an iterable of objective values.
+        num_parents : int
+            Number of parents to select.
+
+        Returns
+        -------
+        parents : numpy.ndarray
+            Selected parent solutions copied from ``self.population``.
+        parents_indices : numpy.ndarray
+            Indices of the selected parents inside ``self.population``.
+
+        Raises
+        ------
+        ValueError
+            If the fitness function returned scalar values (the problem
+            is single-objective).
         """
 
         if self.gene_type_single == True:
@@ -477,7 +584,7 @@ class ParentSelection:
                 num_remaining_parents -= len(current_pareto_front)
             else:
                 # If only a subset of the front is needed, then use the crowding distance to sort the solutions and select only the number needed.
-    
+
                 # Calculate the crowding distance of the solutions of the pareto front.
                 obj_crowding_distance_list, crowding_distance_sum, crowding_dist_front_sorted_indices, crowding_dist_pop_sorted_indices = self.crowding_distance(pareto_front=current_pareto_front.copy(),
                                                                                                                                                                  fitness=fitness)
@@ -489,12 +596,12 @@ class ParentSelection:
                     parents_indices.append(selected_solution_idx)
                     # Increase the parent index.
                     current_parent_idx += 1
-    
+
                 # Decrement the number of remaining parents by the number of selected parents.
                 num_remaining_parents -= num_remaining_parents
-    
+
             # Increase the pareto front index to take parents from the next front.
             pareto_front_idx += 1
-    
+
         # Make sure the parents indices is returned as a NumPy array.
         return parents, numpy.array(parents_indices)

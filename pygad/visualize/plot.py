@@ -7,11 +7,17 @@ import numpy
 import pygad
 
 def get_matplotlib():
-    # Importing matplotlib.pyplot at the module scope causes performance issues.
-    # This causes matplotlib.pyplot to be imported once pygad is imported.
-    # An efficient approach is to import matplotlib.pyplot only when needed.
-    # Inside each function, call get_matplotlib() to return the library object.
-    # If a function called get_matplotlib() once, then the library object is reused.
+    """
+    Lazy-import ``matplotlib.pyplot``. Importing it at module scope
+    would force every PyGAD user to pay the matplotlib import cost
+    even when no plot is ever drawn. The plot methods call this
+    helper instead so the import happens on first use.
+
+    Returns
+    -------
+    matplt : module
+        The imported ``matplotlib.pyplot`` module.
+    """
     import matplotlib.pyplot as matplt
     return matplt
 
@@ -32,20 +38,47 @@ class Plot:
                      save_dir=None):
 
         """
-        Creates, shows, and returns a figure that summarizes how the fitness value evolved by generation. Can only be called after completing at least 1 generation. If no generation is completed, an exception is raised.
+        Draw, show, and return a figure that traces the best fitness
+        across generations. For multi-objective problems, one curve
+        per objective is drawn on the same axes.
 
-        Accepts the following:
-            title: Figure title.
-            xlabel: Label on the X-axis.
-            ylabel: Label on the Y-axis.
-            linewidth: Line width of the plot. Defaults to 3.
-            font_size: Font size for the labels and title. Defaults to 14. Can be a list/tuple/numpy.ndarray if the problem is multi-objective optimization.
-            plot_type: Type of the plot which can be either "plot" (default), "scatter", or "bar".
-            color: Color of the plot which defaults to "#64f20c". Can be a list/tuple/numpy.ndarray if the problem is multi-objective optimization.
-            label: The label used for the legend in the figures of multi-objective problems. It is not used for single-objective problems.
-            save_dir: Directory to save the figure.
+        Must be called after at least one generation has completed;
+        otherwise it raises ``RuntimeError``.
 
-        Returns the figure.
+        Parameters
+        ----------
+        title : str
+            Figure title.
+        xlabel : str
+            X-axis label.
+        ylabel : str
+            Y-axis label.
+        linewidth : numeric or iterable
+            Line width. Pass an iterable in multi-objective mode to
+            give each objective its own width.
+        font_size : numeric
+            Font size used for the title and axis labels.
+        plot_type : str
+            One of ``"plot"``, ``"scatter"``, or ``"bar"``.
+        color : str or iterable
+            Curve colour. Pass an iterable in multi-objective mode to
+            colour each objective independently.
+        label : iterable or None
+            Per-objective legend label for multi-objective problems.
+            Ignored for single-objective problems.
+        save_dir : str or None
+            If set, the figure is saved to this path before being
+            shown.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib figure that was created.
+
+        Raises
+        ------
+        RuntimeError
+            If no generation has completed yet.
         """
 
         if self.generations_completed < 1:
@@ -140,19 +173,44 @@ class Plot:
                                save_dir=None):
 
         """
-        Creates, shows, and returns a figure that summarizes the rate of exploring new solutions. This method works only when save_solutions=True in the constructor of the pygad.GA class.
+        Draw, show, and return a figure that plots how many new
+        (previously unseen) solutions appear in each generation. A
+        flat curve means the population is repeating itself; a high
+        curve means it is still exploring.
 
-        Accepts the following:
-            title: Figure title.
-            xlabel: Label on the X-axis.
-            ylabel: Label on the Y-axis.
-            linewidth: Line width of the plot. Defaults to 3.
-            font_size: Font size for the labels and title. Defaults to 14.
-            plot_type: Type of the plot which can be either "plot" (default), "scatter", or "bar".
-            color: Color of the plot which defaults to "#64f20c".
-            save_dir: Directory to save the figure.
+        Requires ``save_solutions=True`` in the GA constructor and at
+        least one completed generation.
 
-        Returns the figure.
+        Parameters
+        ----------
+        title : str
+            Figure title.
+        xlabel : str
+            X-axis label.
+        ylabel : str
+            Y-axis label.
+        linewidth : numeric
+            Line width of the curve.
+        font_size : numeric
+            Font size for title and axis labels.
+        plot_type : str
+            One of ``"plot"``, ``"scatter"``, or ``"bar"``.
+        color : str
+            Curve colour.
+        save_dir : str or None
+            If set, the figure is saved to this path before being
+            shown.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib figure that was created.
+
+        Raises
+        ------
+        RuntimeError
+            If no generation has completed yet, or if
+            ``save_solutions`` is False.
         """
 
         if self.generations_completed < 1:
@@ -214,24 +272,56 @@ class Plot:
                    save_dir=None):
 
         """
-        Creates, shows, and returns a figure with number of subplots equal to the number of genes. Each subplot shows the gene value for each generation. 
-        This method works only when save_solutions=True in the constructor of the pygad.GA class. 
-        It also works only after completing at least 1 generation. If no generation is completed, an exception is raised.
+        Draw, show, and return a figure with one subplot per gene,
+        showing how that gene's value drifts across generations. The
+        plot can be drawn as a line ("plot"), as a boxplot per gene,
+        or as a histogram of values per gene.
 
-        Accepts the following:
-            title: Figure title.
-            xlabel: Label on the X-axis.
-            ylabel: Label on the Y-axis.
-            linewidth: Line width of the plot. Defaults to 3.
-            font_size: Font size for the labels and title. Defaults to 14.
-            plot_type: Type of the plot which can be either "plot" (default), "scatter", or "bar".
-            graph_type: Type of the graph which can be either "plot" (default), "boxplot", or "histogram".
-            fill_color: Fill color of the graph which defaults to "#64f20c". This has no effect if graph_type="plot".
-            color: Color of the plot which defaults to "black".
-            solutions: Defaults to "all" which means use all solutions. If "best" then only the best solutions are used.
-            save_dir: Directory to save the figure.
+        Requires ``save_solutions=True`` (when ``solutions="all"``)
+        or ``save_best_solutions=True`` (when ``solutions="best"``)
+        in the GA constructor and at least one completed generation.
 
-        Returns the figure.
+        Parameters
+        ----------
+        title : str
+            Figure title.
+        xlabel : str
+            X-axis label (used by the boxplot view).
+        ylabel : str
+            Y-axis label (used by the boxplot view).
+        linewidth : numeric
+            Line width.
+        font_size : numeric
+            Font size for the title and labels.
+        plot_type : str
+            One of ``"plot"``, ``"scatter"``, or ``"bar"``. Used when
+            ``graph_type="plot"``.
+        graph_type : str
+            One of ``"plot"``, ``"boxplot"``, or ``"histogram"``.
+        fill_color : str
+            Fill colour for the graph (curves, bars or boxes).
+        color : str
+            Outline / accent colour, mainly used by the boxplot view
+            for the whiskers, caps and medians.
+        solutions : str
+            ``"all"`` to plot every saved solution; ``"best"`` to plot
+            only the best solution of each generation.
+        save_dir : str or None
+            If set, the figure is saved to this path before being
+            shown.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib figure that was created.
+
+        Raises
+        ------
+        RuntimeError
+            If no generation has completed yet, if the required
+            ``save_solutions`` / ``save_best_solutions`` flag is
+            False, or if ``solutions`` is anything other than
+            ``"all"`` / ``"best"``.
         """
 
         if self.generations_completed < 1:
@@ -427,25 +517,53 @@ class Plot:
                                 marker="o",
                                 save_dir=None):
         """
-        Creates, shows, and returns the pareto front curve. Can only be used with multi-objective problems.
-        It only works with 2 objectives. 
-        It also works only after completing at least 1 generation. If no generation is completed, an exception is raised.
+        Draw, show, and return a 2D Pareto front curve for a
+        two-objective problem. The fitness of every solution in the
+        current population is plotted as a point, and the points on
+        Pareto front 0 are connected to form the curve.
 
-        Accepts the following:
-            title: Figure title.
-            xlabel: Label on the X-axis.
-            ylabel: Label on the Y-axis.
-            linewidth: Line width of the plot. Defaults to 3.
-            font_size: Font size for the labels and title. Defaults to 14.
-            label: The label used for the legend.
-            color: Color of the plot.
-            color_fitness: Color of the fitness points.
-            grid: Either True or False to control the visibility of the grid.
-            alpha: The transparency of the pareto front curve.
-            marker: The marker of the fitness points.
-            save_dir: Directory to save the figure.
+        Only works for multi-objective problems with exactly two
+        objectives and at least one completed generation.
 
-        Returns the figure.
+        Parameters
+        ----------
+        title : str
+            Figure title.
+        xlabel : str
+            X-axis label (the first objective).
+        ylabel : str
+            Y-axis label (the second objective).
+        linewidth : numeric
+            Line width of the Pareto curve.
+        font_size : numeric
+            Font size for the title and labels.
+        label : str
+            Legend label for the Pareto curve.
+        color : str
+            Colour of the Pareto curve.
+        color_fitness : str
+            Colour of the per-solution fitness scatter points.
+        grid : bool
+            Whether to draw the grid lines.
+        alpha : float
+            Transparency of the Pareto curve.
+        marker : str
+            Matplotlib marker style for the fitness points.
+        save_dir : str or None
+            If set, the figure is saved to this path before being
+            shown.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib figure that was created.
+
+        Raises
+        ------
+        RuntimeError
+            If no generation has completed yet, the problem is
+            single-objective, or the number of objectives is not
+            exactly two.
         """
 
         if self.generations_completed < 1:

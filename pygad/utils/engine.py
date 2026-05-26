@@ -6,6 +6,22 @@ import concurrent.futures
 class GAEngine:
 
     def round_genes(self, solutions):
+        """
+        Round the genes in ``solutions`` according to the precision
+        encoded in ``self.gene_type``. When ``gene_type_single`` is
+        True, the same dtype and precision are applied to every gene;
+        otherwise the per-gene dtype / precision pair is used.
+
+        Parameters
+        ----------
+        solutions : numpy.ndarray
+            A 2D array of solutions to round.
+
+        Returns
+        -------
+        solutions : numpy.ndarray
+            The same array with the rounding applied.
+        """
         if self.gene_type_single:
             if not self.gene_type[1] is None:
                 solutions = numpy.round(numpy.asarray(solutions, dtype=self.gene_type[0]),
@@ -23,17 +39,33 @@ class GAEngine:
                               gene_type,
                               gene_constraint):
         """
-        Creates an initial population randomly as a NumPy array. The array is saved in the instance attribute named 'population'.
+        Build the initial population at random and store it on the GA
+        instance. The procedure has four steps: generate the gene
+        values (from the gene space or the init range), apply the
+        gene dtype and rounding, enforce gene constraints, and resolve
+        duplicate genes when not allowed.
 
-        It accepts:
-            -allow_duplicate_genes: Whether duplicate genes are allowed or not.
-            -gene_type: The data type of the genes.
-            -gene_constraint: The constraints of the genes.
+        Sets the following instance attributes:
 
-        This method assigns the values of the following 3 instance attributes:
-            1. pop_size: Size of the population.
-            2. population: Initially, holds the initial population and later updated after each generation.
-            3. init_population: Keeping the initial population.
+        - ``pop_size``: a ``(sol_per_pop, num_genes)`` tuple.
+        - ``population``: the working population. Updated every
+          generation after this initial call.
+        - ``initial_population``: a frozen copy of the initial
+          population for later reference.
+
+        Parameters
+        ----------
+        allow_duplicate_genes : bool
+            If False, duplicate genes inside a single solution are
+            resolved by sampling new values.
+        gene_type : list or type
+            The dtype (and optional precision) for the genes. Used by
+            ``solve_duplicate_genes_randomly`` when resolving
+            duplicates outside the gene space.
+        gene_constraint : list or None
+            One callable per gene that returns the subset of a
+            candidate values list which satisfy the constraint. ``None``
+            disables the per-gene constraint check.
         """
 
         # Population size = (number of chromosomes, number of genes per chromosome)
@@ -157,9 +189,36 @@ class GAEngine:
 
     def cal_pop_fitness(self):
         """
-        Calculating the fitness values of batches of solutions in the current population. 
-        It returns:
-            -fitness: An array of the calculated fitness values.
+        Compute the fitness value of every solution in the current
+        population.
+
+        Avoids recomputing the fitness of solutions that were already
+        evaluated as parents in a previous generation: when
+        ``self.last_generation_parents`` is available, the matching
+        rows are reused from ``self.previous_generation_fitness``. The
+        rest are dispatched either sequentially or in parallel
+        depending on ``self.parallel_processing``. When
+        ``self.fitness_batch_size`` is set, solutions are submitted to
+        the fitness function in batches instead of one at a time.
+
+        Returns
+        -------
+        pop_fitness : numpy.ndarray
+            A 1D array of fitness values for single-objective problems
+            or a 2D array of shape ``(sol_per_pop, num_objectives)`` for
+            multi-objective problems.
+
+        Raises
+        ------
+        Exception
+            If ``self.valid_parameters`` is False, meaning the GA
+            instance was created with invalid parameters.
+        ValueError
+            If the fitness function returns a value of an unexpected
+            type or if a batch returns a wrong number of fitness values.
+        TypeError
+            If a batched fitness function does not return a list,
+            tuple, or numpy.ndarray.
         """
         try:
             if self.valid_parameters == False:
@@ -392,7 +451,29 @@ class GAEngine:
 
     def run(self):
         """
-        Runs the genetic algorithm. This is the main method in which the genetic algorithm is evolved through a number of generations.
+        Run the genetic algorithm for ``self.num_generations``
+        generations. This is the main entry point for users: it sets
+        up the bookkeeping lists, evaluates the initial population,
+        runs the generational loop (select, crossover, mutate, update
+        population, re-evaluate, callbacks, check stop criteria), and
+        finalises the best-solution data after the last generation.
+
+        Calls the optional user callbacks ``on_start``,
+        ``on_fitness``, ``on_parents``, ``on_crossover``,
+        ``on_mutation``, ``on_generation`` and ``on_stop`` at the
+        appropriate points.
+
+        Raises
+        ------
+        Exception
+            If ``self.valid_parameters`` is False, meaning the GA was
+            built with invalid parameters.
+        TypeError
+            If an NSGA-II / NSGA-III parent selection type is used on
+            a single-objective problem.
+        ValueError
+            If the ``stop_criteria`` parameter is malformed for the
+            current number of objectives.
         """
         try:
             if self.valid_parameters == False:
@@ -604,6 +685,28 @@ class GAEngine:
             raise ex
 
     def run_loop_head(self, best_solution_fitness):
+        """
+        Run the bookkeeping that takes place at the top of every
+        generation: call ``self.on_fitness`` if set (with optional
+        validation of the returned values), append the running best
+        fitness to ``self.best_solutions_fitness``, and append the
+        current population and fitness to ``self.solutions`` /
+        ``self.solutions_fitness`` when ``self.save_solutions`` is
+        True.
+
+        Internal helper. Not meant to be called by users.
+
+        Parameters
+        ----------
+        best_solution_fitness : numeric or numpy.ndarray
+            Fitness of the best solution in the previous generation.
+
+        Raises
+        ------
+        ValueError
+            If ``on_fitness`` returns an iterable whose shape does not
+            match the population fitness, or an unsupported type.
+        """
         if not (self.on_fitness is None):
             on_fitness_output = self.on_fitness(self, 
                                                 self.last_generation_fitness)
@@ -634,22 +737,40 @@ class GAEngine:
 
     def run_select_parents(self, call_on_parents=True):
         """
-        This method must be only called from inside the run() method. It is not meant for use by the user.
-        Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
+        Run the parent-selection step of one generation. Calls
+        ``self.select_parents`` (the operator chosen by
+        ``parent_selection_type``), validates the shapes of the
+        returned parents and indices, and updates these instance
+        attributes:
 
-        The objective of the 'run_select_parents()' method is to select the parents and call the callable on_parents() if defined.
-        It does not return any variables. However, it changes these 2 attributes of the pygad.GA class instances:
-            1) last_generation_parents: A NumPy array of the selected parents.
-            2) last_generation_parents_indices: A 1D NumPy array of the indices of the selected parents.
+        - ``self.last_generation_parents``: the selected parent
+          solutions.
+        - ``self.last_generation_parents_indices``: their indices
+          inside ``self.population``.
+
+        Optionally calls the user-supplied ``on_parents`` callback,
+        which may replace the parents and / or their indices in place.
+
+        Internal helper. Not meant to be called by users (any
+        ``run_*`` method is part of the generational loop driven by
+        ``run()``).
 
         Parameters
         ----------
-        call_on_parents : bool, optional
-            If True, then the callable 'on_parents()' is called. The default is True.
-    
-        Returns
-        -------
-        None.
+        call_on_parents : bool
+            When True, the ``on_parents`` callback is invoked after
+            selection. Set to False on the post-run cleanup pass so
+            the callback is not fired again.
+
+        Raises
+        ------
+        TypeError
+            If a user-supplied parent selection function returns
+            objects that are not ``numpy.ndarray``.
+        ValueError
+            If the selected parents have the wrong shape or the
+            ``on_parents`` callback returns an output that does not
+            match the expected layout.
         """
 
         # Selecting the best parents in the population for mating.
@@ -722,17 +843,32 @@ class GAEngine:
 
     def run_crossover(self):
         """
-        This method must be only called from inside the run() method. It is not meant for use by the user.
-        Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
+        Run the crossover step of one generation. Produces
+        ``self.num_offspring`` offspring from the selected parents and
+        updates these instance attributes:
 
-        The objective of the 'run_crossover()' method is to apply crossover and call the callable on_crossover() if defined.
-        It does not return any variables. However, it changes these 2 attributes of the pygad.GA class instances:
-            1) last_generation_offspring_crossover: A NumPy array of the selected offspring.
-            2) last_generation_elitism: A NumPy array of the current generation elitism. Applicable only if the 'keep_elitism' parameter > 0.
+        - ``self.last_generation_offspring_crossover``: the offspring
+          generated by crossover (or copied from parents when
+          ``crossover_type`` is None).
+        - ``self.last_generation_elitism``: the top
+          ``self.keep_elitism`` solutions in the population, used
+          later by ``run_update_population`` to seat the elite in the
+          next generation.
 
-        Returns
-        -------
-        None.
+        Optionally calls the user-supplied ``on_crossover`` callback,
+        which may replace the offspring in place.
+
+        Internal helper. Not meant to be called by users.
+
+        Raises
+        ------
+        TypeError
+            If a user-supplied crossover function returns an object
+            that is not a ``numpy.ndarray``.
+        ValueError
+            If the crossover output has the wrong shape or the
+            ``on_crossover`` callback returns an output that does not
+            match the expected layout.
         """
 
         # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
@@ -789,16 +925,27 @@ class GAEngine:
 
     def run_mutation(self):
         """
-        This method must be only called from inside the run() method. It is not meant for use by the user.
-        Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
+        Run the mutation step of one generation. Mutates the
+        post-crossover offspring and updates this instance attribute:
 
-        The objective of the 'run_mutation()' method is to apply mutation and call the callable on_mutation() if defined.
-        It does not return any variables. However, it changes this attribute of the pygad.GA class instances:
-            1) last_generation_offspring_mutation: A NumPy array of the mutated offspring.
+        - ``self.last_generation_offspring_mutation``: the mutated
+          offspring (or the unchanged crossover offspring when
+          ``mutation_type`` is None).
 
-        Returns
-        -------
-        None.
+        Optionally calls the user-supplied ``on_mutation`` callback,
+        which may replace the mutated offspring in place.
+
+        Internal helper. Not meant to be called by users.
+
+        Raises
+        ------
+        TypeError
+            If a user-supplied mutation function returns an object
+            that is not a ``numpy.ndarray``.
+        ValueError
+            If the mutation output has the wrong shape or the
+            ``on_mutation`` callback returns an output that does not
+            match the expected layout.
         """
 
         # If self.mutation_type=None, then no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
@@ -839,16 +986,24 @@ class GAEngine:
 
     def run_update_population(self):
         """
-        This method must be only called from inside the run() method. It is not meant for use by the user.
-        Generally, any method with a name starting with 'run_' is meant to be only called by PyGAD from inside the 'run()' method.
+        Build the next generation in ``self.population`` from the
+        offspring produced by mutation plus, optionally, the retained
+        parents (``keep_parents``) or elite (``keep_elitism``).
 
-        The objective of the 'run_update_population()' method is to update the 'population' attribute after completing the processes of crossover and mutation.
-        It does not return any variables. However, it changes this attribute of the pygad.GA class instances:
-            1) population: A NumPy array of the population of solutions/chromosomes.
+        Layout rules:
 
-        Returns
-        -------
-        None.
+        - ``keep_elitism > 0``: top ``keep_elitism`` solutions sit at
+          the front of the new population; the rest is the mutated
+          offspring.
+        - ``keep_elitism == 0`` and ``keep_parents == -1``: all
+          selected parents sit at the front; the rest is offspring.
+        - ``keep_elitism == 0`` and ``keep_parents == 0``: the new
+          population is offspring only.
+        - ``keep_elitism == 0`` and ``keep_parents > 0``: top
+          ``keep_parents`` selected parents sit at the front; the
+          rest is offspring.
+
+        Internal helper. Not meant to be called by users.
         """
 
         # Update the population attribute according to the offspring generated.
@@ -873,13 +1028,34 @@ class GAEngine:
 
     def best_solution(self, pop_fitness=None):
         """
-        Returns information about the best solution found by the genetic algorithm.
-        Accepts the following parameters:
-            pop_fitness: An optional parameter holding the fitness values of the solutions in the latest population. If passed, then it saves time calculating the fitness. If None, then the 'cal_pop_fitness()' method is called to calculate the fitness of the latest population.
-        The following are returned:
-            -best_solution: Best solution in the current population.
-            -best_solution_fitness: Fitness value of the best solution.
-            -best_match_idx: Index of the best solution in the current population.
+        Return the best solution found in the latest population. For
+        single-objective problems "best" is the solution with the
+        maximum fitness. For multi-objective problems, the best
+        solution is the top entry of the NSGA-II sort (front 0,
+        highest crowding distance).
+
+        Parameters
+        ----------
+        pop_fitness : list, tuple, numpy.ndarray, or None
+            Pre-computed fitness for the current population. When
+            None, ``cal_pop_fitness`` is called to compute it. Useful
+            to avoid re-evaluating the fitness function.
+
+        Returns
+        -------
+        best_solution : numpy.ndarray
+            The genes of the best solution.
+        best_solution_fitness : numeric or numpy.ndarray
+            Its fitness value.
+        best_match_idx : int
+            Its index inside ``self.population``.
+
+        Raises
+        ------
+        ValueError
+            If ``pop_fitness`` is provided but its length does not
+            match the population, or its type is not list / tuple /
+            numpy.ndarray.
         """
 
         try:

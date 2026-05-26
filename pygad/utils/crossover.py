@@ -11,17 +11,25 @@ class Crossover:
         pass
 
     def single_point_crossover(self, parents, offspring_size):
-
         """
-        Applies single-point crossover between pairs of parents.
-        This function selects a random point at which crossover occurs between the parents, generating offspring.
+        Apply single-point crossover between pairs of parents. One
+        random split point is picked per offspring; the genes before
+        the point come from the first parent and the genes from the
+        point onward come from the second parent.
 
-        Parameters:
-            parents (array-like): The parents to mate for producing the offspring.
-            offspring_size (int): The number of offspring to produce.
+        Parameters
+        ----------
+        parents : numpy.ndarray
+            A 2D array of parent solutions, one row per parent.
+        offspring_size : tuple
+            ``(num_offspring, num_genes)``. Shape of the offspring
+            array to return.
 
-        Returns:
-            array-like: An array containing the produced offspring.
+        Returns
+        -------
+        offspring : numpy.ndarray
+            A 2D array of the produced offspring with shape
+            ``offspring_size``.
         """
 
         if self.gene_type_single == True:
@@ -81,13 +89,24 @@ class Crossover:
         return offspring
 
     def two_points_crossover(self, parents, offspring_size):
-
         """
-        Applies the 2 points crossover. It selects the 2 points randomly at which crossover takes place between the pairs of parents.
-        It accepts 2 parameters:
-            -parents: The parents to mate for producing the offspring.
-            -offspring_size: The size of the offspring to produce.
-        It returns an array of the produced offspring.
+        Apply two-points crossover. Two split points are picked per
+        offspring; the genes outside ``[point1, point2)`` come from the
+        first parent and the genes inside come from the second parent.
+
+        Parameters
+        ----------
+        parents : numpy.ndarray
+            A 2D array of parent solutions, one row per parent.
+        offspring_size : tuple
+            ``(num_offspring, num_genes)``. Shape of the offspring
+            array to return.
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            A 2D array of the produced offspring with shape
+            ``offspring_size``.
         """
 
         if self.gene_type_single == True:
@@ -154,13 +173,23 @@ class Crossover:
         return offspring
 
     def uniform_crossover(self, parents, offspring_size):
-
         """
-        Applies the uniform crossover. For each gene, a parent out of the 2 mating parents is selected randomly and the gene is copied from it.
-        It accepts 2 parameters:
-            -parents: The parents to mate for producing the offspring.
-            -offspring_size: The size of the offspring to produce.
-        It returns an array of the produced offspring.
+        Apply uniform crossover. For each gene independently, the value
+        is copied from one of the two mating parents picked at random.
+
+        Parameters
+        ----------
+        parents : numpy.ndarray
+            A 2D array of parent solutions, one row per parent.
+        offspring_size : tuple
+            ``(num_offspring, num_genes)``. Shape of the offspring
+            array to return.
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            A 2D array of the produced offspring with shape
+            ``offspring_size``.
         """
 
         if self.gene_type_single == True:
@@ -222,13 +251,25 @@ class Crossover:
         return offspring
 
     def scattered_crossover(self, parents, offspring_size):
-
         """
-        Applies the scattered crossover. It randomly selects the gene from one of the 2 parents. 
-        It accepts 2 parameters:
-            -parents: The parents to mate for producing the offspring.
-            -offspring_size: The size of the offspring to produce.
-        It returns an array of the produced offspring.
+        Apply scattered crossover. For each gene independently, the
+        value is copied from one of the two mating parents picked at
+        random. (Same mechanic as ``uniform_crossover`` but kept as a
+        separate operator for backwards compatibility.)
+
+        Parameters
+        ----------
+        parents : numpy.ndarray
+            A 2D array of parent solutions, one row per parent.
+        offspring_size : tuple
+            ``(num_offspring, num_genes)``. Shape of the offspring
+            array to return.
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            A 2D array of the produced offspring with shape
+            ``offspring_size``.
         """
 
         if self.gene_type_single == True:

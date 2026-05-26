@@ -2,11 +2,19 @@ import numpy
 
 def sigmoid(sop):
     """
-    Applies the sigmoid function.
+    Apply the sigmoid activation function element-wise:
+    ``sigmoid(x) = 1 / (1 + exp(-x))``.
 
-    sop: The input to which the sigmoid function is applied.
+    Parameters
+    ----------
+    sop : numeric, list, tuple, or numpy.ndarray
+        The input value(s). Lists and tuples are converted to a
+        numpy array before computing.
 
-    Returns the result of the sigmoid function.
+    Returns
+    -------
+    activated : numeric or numpy.ndarray
+        The element-wise sigmoid of the input.
     """
 
     if type(sop) in [list, tuple]:
@@ -16,11 +24,19 @@ def sigmoid(sop):
 
 def relu(sop):
     """
-    Applies the ReLU function.
+    Apply the ReLU activation function element-wise:
+    ``relu(x) = max(0, x)``.
 
-    sop: The input to which the relu function is applied.
+    Parameters
+    ----------
+    sop : numeric, list, tuple, or numpy.ndarray
+        The input value(s). Scalars are handled as a special case.
+        Lists and tuples are converted to a numpy array.
 
-    Returns the result of the ReLU function.
+    Returns
+    -------
+    activated : numeric or numpy.ndarray
+        The element-wise ReLU of the input.
     """
 
     if not (type(sop) in [list, tuple, numpy.ndarray]):
@@ -38,10 +54,20 @@ def relu(sop):
 
 def softmax(layer_outputs):
     """
-    Applies the softmax function.
+    Apply a sum-normalised softmax: divide each value by the sum of
+    all values plus a tiny constant to avoid division by zero.
 
-    layer_outputs: The input to which the softmax function is applied.
+    Note that this is not the canonical softmax (which uses
+    exponentials); it just normalises the inputs so they sum to one.
 
-    Returns the result of the softmax function.
+    Parameters
+    ----------
+    layer_outputs : numpy.ndarray
+        The values to normalise.
+
+    Returns
+    -------
+    activated : numpy.ndarray
+        The normalised values.
     """
     return layer_outputs / (numpy.sum(layer_outputs) + 0.000001)

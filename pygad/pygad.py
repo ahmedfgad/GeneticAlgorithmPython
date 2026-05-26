@@ -183,8 +183,13 @@ class GA(utils.parent_selection.ParentSelection,
 
     def save(self, filename):
         """
-        Saves the genetic algorithm instance:
-            -filename: Name of the file to save the instance. No extension is needed.
+        Serialise the GA instance to disk with ``cloudpickle``. The
+        file extension ``.pkl`` is added automatically.
+
+        Parameters
+        ----------
+        filename : str
+            Path (without extension) where the pickle file is written.
         """
 
         cloudpickle_serialized_object = cloudpickle.dumps(self)
@@ -193,20 +198,36 @@ class GA(utils.parent_selection.ParentSelection,
             cloudpickle.dump(self, file)
 
     def push_to_vilvik(self, *, api_key=None, **overrides):
-        """Import this run into Vilvik (https://vilvik.com) as an editable,
-        continuable cloud record.
-
-        This is a thin convenience wrapper over the Vilvik SDK, which must be
-        installed separately::
+        """
+        Push this GA run to Vilvik (https://vilvik.com) as an
+        editable, continuable cloud record. Thin convenience wrapper
+        over the Vilvik SDK, which must be installed separately::
 
             pip install vilvik
 
-        After ``ga.run()``, call ``ga.push_to_vilvik()`` (sign in first with the
-        ``vilvik login`` command or set the ``VILVIK_API_KEY`` environment
-        variable). All keyword arguments are forwarded to ``vilvik.push`` (for
-        example ``name=``, ``fitness_source=``, ``callbacks=``, ``preamble=``,
-        ``dry_run=True``). Returns the created record, or a capture report when
-        ``dry_run=True``.
+        Call after ``ga.run()``. Sign in first with ``vilvik login``
+        or set the ``VILVIK_API_KEY`` environment variable.
+
+        Parameters
+        ----------
+        api_key : str, optional
+            Explicit API key. When None, the SDK falls back to the
+            CLI login or the ``VILVIK_API_KEY`` environment variable.
+        **overrides
+            Forwarded to ``vilvik.push``. Common keys include
+            ``name``, ``fitness_source``, ``callbacks``,
+            ``preamble``, and ``dry_run``.
+
+        Returns
+        -------
+        record : object
+            The created Vilvik record, or a capture report when
+            ``dry_run=True``.
+
+        Raises
+        ------
+        ImportError
+            If the ``vilvik`` package is not installed.
         """
         try:
             import vilvik
@@ -226,9 +247,27 @@ class GA(utils.parent_selection.ParentSelection,
 
 def load(filename):
     """
-    Reads a saved instance of the genetic algorithm:
-        -filename: Name of the file to read the instance. No extension is needed.
-    Returns the genetic algorithm instance.
+    Load a GA instance from a ``cloudpickle`` file written by
+    ``pygad.GA.save``. The file extension ``.pkl`` is added
+    automatically.
+
+    Parameters
+    ----------
+    filename : str
+        Path (without extension) where the pickle file is read from.
+
+    Returns
+    -------
+    ga_in : pygad.GA
+        The restored GA instance.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the file does not exist.
+    BaseException
+        If the file exists but cannot be unpickled (for example when
+        the original fitness function is not importable).
     """
 
     try:

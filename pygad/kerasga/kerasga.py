@@ -4,18 +4,19 @@ import tensorflow.keras
 
 def model_weights_as_vector(model):
     """
-    Reshapes the Keras model weight as a vector.
+    Flatten every weight tensor of a Keras model into a single 1D
+    NumPy array. Only the weights of trainable layers are included.
 
     Parameters
     ----------
-    model : TYPE
-        The Keras model.
+    model : tensorflow.keras.Model
+        The Keras model whose weights should be flattened.
 
     Returns
     -------
-    TYPE
-        The weights as a 1D vector.
-
+    weights_vector : numpy.ndarray
+        A 1D array with every trainable parameter of the model laid
+        out in layer order.
     """
     weights_vector = []
 
@@ -30,20 +31,23 @@ def model_weights_as_vector(model):
 
 def model_weights_as_matrix(model, weights_vector):
     """
-    Reshapes the PyGAD 1D solution as a Keras weight matrix.
+    Reshape a flat 1D weights vector back into the per-layer matrices
+    expected by ``model.set_weights``. Non-trainable layers keep their
+    current weights.
 
     Parameters
     ----------
-    model : TYPE
-        The Keras model.
-    weights_vector : TYPE
-        The PyGAD solution as a 1D vector.
+    model : tensorflow.keras.Model
+        The reference Keras model. Used to read the per-layer shapes.
+    weights_vector : array-like
+        A 1D vector in the same layout produced by
+        ``model_weights_as_vector``.
 
     Returns
     -------
-    weights_matrix : TYPE
-        The Keras weights as a matrix.
-
+    weights_matrix : list of numpy.ndarray
+        One matrix per layer, ready to be passed to
+        ``model.set_weights``.
     """
     weights_matrix = []
 
@@ -55,11 +59,11 @@ def model_weights_as_matrix(model, weights_vector):
             for l_weights in layer_weights:
                 layer_weights_shape = l_weights.shape
                 layer_weights_size = l_weights.size
-        
+
                 layer_weights_vector = weights_vector[start:start + layer_weights_size]
                 layer_weights_matrix = numpy.reshape(layer_weights_vector, (layer_weights_shape))
                 weights_matrix.append(layer_weights_matrix)
-        
+
                 start = start + layer_weights_size
         else:
             for l_weights in layer_weights:
@@ -67,35 +71,36 @@ def model_weights_as_matrix(model, weights_vector):
 
     return weights_matrix
 
-def predict(model, 
-            solution, 
-            data, 
+def predict(model,
+            solution,
+            data,
             batch_size=None,
             verbose=0,
             steps=None):
     """
-    Use the PyGAD's solution to make predictions using the Keras model.
+    Load the given solution as the model's weights and run a forward
+    pass on ``data``. The model is cloned first so the caller's
+    instance is left untouched.
 
     Parameters
     ----------
-    model : TYPE
-        The Keras model.
-    solution : TYPE
-        A single PyGAD solution as 1D vector.
-    data : TYPE
-        The data or a generator.
-    batch_size : TYPE, optional
-        The batch size (i.e. number of samples per step or batch). The default is None. Check documentation of the Keras Model.predict() method for more information.
-    verbose : TYPE, optional
-        Verbosity mode. The default is 0. Check documentation of the Keras Model.predict() method for more information.
-    steps : TYPE, optional
-        The total number of steps (batches of samples). The default is None. Check documentation of the Keras Model.predict() method for more information.
+    model : tensorflow.keras.Model
+        The reference Keras model.
+    solution : array-like
+        A 1D weights vector returned by the GA.
+    data : numpy.ndarray or tf.data.Dataset
+        Input data passed to ``Model.predict``.
+    batch_size : int or None
+        Number of samples per step. Forwarded to ``Model.predict``.
+    verbose : int
+        Verbosity level. Forwarded to ``Model.predict``.
+    steps : int or None
+        Number of steps (batches). Forwarded to ``Model.predict``.
 
     Returns
     -------
-    predictions : TYPE
-        The Keras model predictions.
-
+    predictions : numpy.ndarray
+        The Keras model output for ``data``.
     """
     # Fetch the parameters of the best solution.
     solution_weights = model_weights_as_matrix(model=model,
@@ -112,14 +117,21 @@ def predict(model,
 class KerasGA:
 
     def __init__(self, model, num_solutions):
-
         """
-        Creates an instance of the KerasGA class to build a population of model parameters.
+        Build a population of weight vectors for a Keras model so the
+        GA can evolve them.
 
-        model: A Keras model class.
-        num_solutions: Number of solutions in the population. Each solution has different model parameters.
+        Parameters
+        ----------
+        model : tensorflow.keras.Model
+            The Keras model to optimise. Its current weights are used
+            as the seed for the first solution.
+        num_solutions : int
+            Number of solutions in the population. Each solution is a
+            flat copy of the model weights with random perturbations
+            added to it.
         """
-        
+
         self.model = model
 
         self.num_solutions = num_solutions
@@ -128,11 +140,15 @@ class KerasGA:
         self.population_weights = self.create_population()
 
     def create_population(self):
-
         """
-        Creates the initial population of the genetic algorithm as a list of networks' weights (i.e. solutions). Each element in the list holds a different set of weights for the Keras model.
+        Build the initial population. The first solution is the model's
+        current flattened weights; every other solution is the same
+        vector with a uniform ``[-1, 1]`` perturbation added on top.
 
-        The method returns a list holding the weights of all solutions.
+        Returns
+        -------
+        net_population_weights : list of numpy.ndarray
+            One flat weight vector per solution.
         """
 
         model_weights_vector = model_weights_as_vector(model=self.model)

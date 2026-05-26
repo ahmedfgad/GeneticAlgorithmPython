@@ -8,20 +8,25 @@ class NSGA2:
 
     def get_non_dominated_set(self, curr_solutions):
         """
-        Get the set of non-dominated solutions from the current set of solutions.
-    
+        Split the input solutions into a non-dominated set and a
+        dominated set. The non-dominated set is the next Pareto front.
+
         Parameters
         ----------
-        curr_solutions : TYPE
-            The set of solutions to find its non-dominated set.
-    
+        curr_solutions : list
+            A list of (index, fitness_vector) pairs to be partitioned.
+            ``index`` is the position of the solution in the original
+            population and ``fitness_vector`` is its objective values.
+
         Returns
         -------
-        dominated_set : TYPE
-            A set of the dominated solutions.
-        non_dominated_set : TYPE
-            A set of the non-dominated solutions.
-    
+        dominated_set : list
+            The (index, fitness_vector) pairs that are dominated by at
+            least one other solution in ``curr_solutions``.
+        non_dominated_set : list
+            The (index, fitness_vector) pairs that no other solution in
+            ``curr_solutions`` dominates. These form the current Pareto
+            front.
         """
         # List of the members of the current dominated pareto front/set.
         dominated_set = []
@@ -69,18 +74,34 @@ class NSGA2:
 
     def non_dominated_sorting(self, fitness):
         """
-        Apply non-dominated sorting over the fitness to create the pareto fronts based on the non-dominated sorting of the solutions.
-    
+        Sort the population into Pareto fronts using non-dominated
+        sorting. Front 0 contains the solutions no other solution
+        dominates; front 1 contains those that are only dominated by
+        front 0; and so on.
+
+        Only works for multi-objective problems.
+
         Parameters
         ----------
-        fitness : TYPE
-            An array of the population's fitness values across all objective functions.
-    
+        fitness : numpy.ndarray
+            A 2D array of fitness values, one row per solution and one
+            column per objective.
+
         Returns
         -------
-        pareto_fronts : TYPE
-            An array of the pareto fronts.
+        pareto_fronts : list
+            A list of Pareto fronts. Each front is a numpy array whose
+            rows are (population_index, fitness_vector) pairs.
+        solutions_fronts_indices : numpy.ndarray
+            A 1D integer array of length ``len(fitness)``. Entry ``i``
+            is the index of the Pareto front the i-th solution belongs
+            to.
 
+        Raises
+        ------
+        TypeError
+            If the fitness rows are scalar (single-objective problem)
+            or of an unsupported type.
         """
 
         # Verify that the problem is multi-objective optimization as non-dominated sorting is only applied to multi-objective problems.
@@ -127,25 +148,36 @@ class NSGA2:
 
     def crowding_distance(self, pareto_front, fitness):
         """
-        Calculate the crowding distance for all solutions in the current pareto front.
-    
+        Calculate the crowding distance for every solution in the given
+        Pareto front. The crowding distance measures how isolated each
+        solution is from its neighbours along every objective. Boundary
+        solutions get a crowding distance of infinity.
+
         Parameters
         ----------
-        pareto_front : TYPE
-            The set of solutions in the current pareto front.
-        fitness : TYPE
-            The fitness of the current population.
-    
+        pareto_front : numpy.ndarray
+            The Pareto front returned by ``non_dominated_sorting``. Each
+            row is a (population_index, fitness_vector) pair.
+        fitness : numpy.ndarray
+            Fitness of the entire population. Used to compute the per-
+            objective range that normalises the crowding distance.
+
         Returns
         -------
-        obj_crowding_dist_list : TYPE
-            A nested list of the values for all objectives alongside their crowding distance.
-        crowding_dist_sum : TYPE
-            A list of the sum of crowding distances across all objectives for each solution.
-        crowding_dist_front_sorted_indices : TYPE
-            The indices of the solutions (relative to the current front) sorted by the crowding distance.
-        crowding_dist_pop_sorted_indices : TYPE
-            The indices of the solutions (relative to the population) sorted by the crowding distance.
+        obj_crowding_dist_list : numpy.ndarray
+            A nested array with the per-objective sorted lists used
+            internally. Each entry is ``[front_index, objective_value,
+            crowding_distance]``.
+        crowding_dist_sum : list
+            A list of ``[front_index, sum_of_crowding_distances]`` pairs
+            sorted by the sum in descending order (highest first).
+        crowding_dist_front_sorted_indices : numpy.ndarray
+            Indices of the solutions inside ``pareto_front`` sorted by
+            crowding distance (best first).
+        crowding_dist_pop_sorted_indices : numpy.ndarray
+            The same ordering but mapped back to the population indices,
+            so the caller can use them directly against
+            ``self.population``.
         """
     
         # Each solution in the pareto front has 2 elements:
@@ -232,23 +264,36 @@ class NSGA2:
                              fitness,
                              find_best_solution=False):
         """
-        Sort the solutions based on the fitness.
-        The sorting procedure differs based on whether the problem is single-objective or multi-objective optimization.
-        If it is multi-objective, then non-dominated sorting and crowding distance are applied.
-        At first, non-dominated sorting is applied to classify the solutions into pareto fronts.
-        Then the solutions inside each front are sorted using crowded distance.
-        The solutions inside pareto front X always come before those in front X+1.
-    
+        Sort the solutions by fitness and return their population
+        indices in best-to-worst order.
+
+        For single-objective problems the sort is a plain descending
+        sort on the fitness value. For multi-objective problems the
+        sort uses non-dominated sorting and then crowding distance
+        inside each Pareto front; solutions in front X always come
+        before solutions in front X+1.
+
         Parameters
         ----------
-        fitness: The fitness of the entire population.
-        find_best_solution: Whether the method is called only to find the best solution or as part of the PyGAD lifecycle. This is to decide whether the pareto_fronts instance attribute is edited or not.
+        fitness : numpy.ndarray
+            Fitness of the entire population.
+        find_best_solution : bool
+            If True, the method is being called only to identify the
+            best solution and ``self.pareto_fronts`` is left untouched.
+            If False (the default), the method is being called as part
+            of the GA lifecycle and ``self.pareto_fronts`` is updated to
+            reflect the latest fronts.
 
         Returns
         -------
-        solutions_sorted : TYPE
-            The indices of the sorted solutions.
-    
+        solutions_sorted : list
+            Population indices sorted from best to worst.
+
+        Raises
+        ------
+        TypeError
+            If a fitness row is neither a scalar nor a list / tuple /
+            numpy array.
         """
         if type(fitness[0]) in [list, tuple, numpy.ndarray]:
             # Multi-objective optimization problem.

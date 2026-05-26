@@ -16,15 +16,22 @@ class Mutation:
         pass
 
     def random_mutation(self, offspring):
-
         """
-        Applies the random mutation which changes the values of a number of genes randomly.
-        The random value is selected either using the 'gene_space' parameter or the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
+        Dispatch to one of the four random-mutation backends depending
+        on whether the user passed ``mutation_probability`` and whether
+        ``gene_space`` is set. The replacement value for each mutated
+        gene comes either from the gene space or from the
+        ``random_mutation_min_val`` / ``random_mutation_max_val`` range.
 
-        It accepts:
-            -offspring: The offspring to mutate.
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
 
-        It returns an array of the mutated offspring.
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         # If the mutation values are selected from the mutation space, the attribute 'gene_space' is not None. Otherwise, it is None.
@@ -48,12 +55,20 @@ class Mutation:
         return offspring
 
     def mutation_by_space(self, offspring):
-
         """
-        Applies the mutation using the gene_space parameter.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring using the mutation space.
+        Mutate ``self.mutation_num_genes`` genes per offspring by
+        sampling a replacement value from the ``gene_space`` of each
+        chosen gene.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         # For each offspring, a value from the gene space is selected randomly and assigned to the selected mutated gene.
@@ -77,12 +92,21 @@ class Mutation:
         return offspring
 
     def mutation_probs_by_space(self, offspring):
-
         """
-        Applies the random mutation using the mutation values' space and the mutation probability. For each gene, if its probability is <= the mutation probability, then it will be mutated based on the mutation space.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring using the mutation space.
+        Per-gene mutation that uses the ``gene_space`` for replacement
+        values and ``self.mutation_probability`` to decide which genes
+        to mutate. A gene is mutated when a uniform random draw is
+        less than or equal to the probability threshold.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         # For each offspring, a value from the gene space is selected randomly and assigned to the selected mutated gene.
@@ -112,16 +136,38 @@ class Mutation:
                                     range_min=None,
                                     range_max=None,
                                     sample_size=100):
-
         """
-        Generate/select values for the gene that satisfy the constraint. The values could be generated randomly or from the gene space.
-        It accepts:
-            -range_min: The minimum value in the range from which a value is selected.
-            -range_max: The maximum value in the range from which a value is selected.
-            -solution: The solution where the target gene exists.
-            -gene_idx: The index of the gene in the solution.
-            -sample_size: The number of random values to generate from which a value is selected. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values.
-        It returns a single numeric value that satisfies the gene constraint, if one exists in the gene_constraint parameter.
+        Pick a replacement value for a single gene. If the user passed a
+        ``gene_constraint`` for that gene, the method draws up to
+        ``sample_size`` candidate values, filters them through the
+        constraint, and picks one of the survivors at random; if no
+        candidate passes, the current value is kept.
+
+        When no constraint exists, a single value is sampled directly
+        from the gene space or the random-mutation range.
+
+        Parameters
+        ----------
+        solution : numpy.ndarray
+            The solution that owns the gene.
+        gene_idx : int
+            Index of the gene inside ``solution``.
+        range_min : float, optional
+            Lower bound of the random range. Used only when the gene
+            has no ``gene_space``.
+        range_max : float, optional
+            Upper bound of the random range. Used only when the gene
+            has no ``gene_space``.
+        sample_size : int
+            Maximum number of candidate values to draw when a gene
+            constraint is in effect. The actual number can be smaller
+            if the generator runs out of distinct values.
+
+        Returns
+        -------
+        value_selected : numeric
+            The new value for the gene. May be the old value if no
+            candidate satisfied the constraint.
         """
 
         # Check if the gene has a constraint.
@@ -156,12 +202,20 @@ class Mutation:
         return value_selected
 
     def mutation_randomly(self, offspring):
-
         """
-        Applies the random mutation.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        Mutate ``self.mutation_num_genes`` genes per offspring by
+        drawing a new value from the random-mutation range for each
+        chosen gene.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         # Random mutation changes one or more genes in each offspring randomly.
@@ -193,12 +247,21 @@ class Mutation:
         return offspring
 
     def mutation_probs_randomly(self, offspring):
-
         """
-        Applies the random mutation using the mutation probability. For each gene, if its probability is <= the mutation probability, then it will be mutated randomly.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        Per-gene mutation that uses the random-mutation range and
+        ``self.mutation_probability`` to decide which genes to mutate.
+        A gene is mutated when a uniform random draw is less than or
+        equal to the probability threshold.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         # Random mutation changes one or more genes in each offspring randomly.
@@ -231,12 +294,20 @@ class Mutation:
         return offspring
 
     def swap_mutation(self, offspring):
-
         """
-        Applies the swap mutation which interchanges the values of 2 randomly selected genes.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        Swap the values of two genes inside each offspring. One gene is
+        picked at random from the first half of the chromosome; the
+        other is its mirror in the second half.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         for idx in range(offspring.shape[0]):
@@ -249,12 +320,19 @@ class Mutation:
         return offspring
 
     def inversion_mutation(self, offspring):
-
         """
-        Applies the inversion mutation which selects a subset of genes and inverts them (in order).
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        Pick a slice of genes inside each offspring and reverse the
+        order of the values in that slice.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         for idx in range(offspring.shape[0]):
@@ -266,12 +344,19 @@ class Mutation:
         return offspring
 
     def scramble_mutation(self, offspring):
-
         """
-        Applies the scramble mutation which selects a subset of genes and shuffles their order randomly.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        Pick a slice of genes inside each offspring and shuffle the
+        values in that slice into a new random order.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         for idx in range(offspring.shape[0]):
@@ -285,13 +370,25 @@ class Mutation:
         return offspring
 
     def adaptive_mutation_population_fitness(self, offspring):
-
         """
-        A helper method to calculate the average fitness of the solutions before applying the adaptive mutation.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns the average fitness to be used in adaptive mutation.
-        """        
+        Compute the average fitness of the population built from the
+        kept parents (or elites) plus the current offspring. The
+        average is then used by the adaptive mutation operators to
+        decide which solutions are "low quality" and need a stronger
+        mutation rate.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions that will be mutated next.
+
+        Returns
+        -------
+        average_fitness : float or numpy.ndarray
+            Average fitness over the temporary population. For multi-
+            objective problems this is a 1D array with one entry per
+            objective.
+        """
 
         fitness = self.last_generation_fitness.copy()
         temp_population = numpy.zeros_like(self.population)
@@ -436,13 +533,22 @@ class Mutation:
         return average_fitness, fitness[len(parents_to_keep):]
 
     def adaptive_mutation(self, offspring):
-
         """
-        Applies the adaptive mutation which changes the values of a number of genes randomly. In adaptive mutation, the number of genes to mutate differs based on the fitness value of the solution.
-        The random value is selected either using the 'gene_space' parameter or the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        Dispatch to one of the four adaptive-mutation backends based on
+        whether ``mutation_probability`` is set and whether
+        ``gene_space`` is provided. With adaptive mutation, the
+        per-solution mutation rate is high for below-average solutions
+        and low for above-average solutions.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         # If the attribute 'gene_space' exists (i.e. not None), then the mutation values are selected from the 'gene_space' parameter according to the space of values of each gene. Otherwise, it is selected randomly based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
@@ -468,14 +574,22 @@ class Mutation:
         return offspring
 
     def adaptive_mutation_by_space(self, offspring):
-
         """
-        Applies the adaptive mutation based on the 2 parameters 'mutation_num_genes' and 'gene_space'. 
-        A number of genes are selected randomly for mutation. This number depends on the fitness of the solution.
-        The random values are selected from the 'gene_space' parameter.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        Adaptive mutation that uses ``mutation_num_genes`` and
+        ``gene_space``. The number of mutated genes per offspring is
+        the first element of ``mutation_num_genes`` for below-average
+        solutions and the second element for above-average ones. New
+        values come from the ``gene_space``.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
         
         # For each offspring, a value from the gene space is selected randomly and assigned to the selected gene for mutation.
@@ -529,14 +643,23 @@ class Mutation:
         return offspring
 
     def adaptive_mutation_randomly(self, offspring):
-
         """
-        Applies the adaptive mutation based on the 'mutation_num_genes' parameter. 
-        A number of genes are selected randomly for mutation. This number depends on the fitness of the solution.
-        The random values are selected based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        Adaptive mutation that uses ``mutation_num_genes`` and the
+        random-mutation range. The number of mutated genes per
+        offspring is the first element of ``mutation_num_genes`` for
+        below-average solutions and the second element for
+        above-average ones. New values are sampled uniformly from the
+        random-mutation range.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         average_fitness, offspring_fitness = self.adaptive_mutation_population_fitness(offspring)
@@ -593,14 +716,23 @@ class Mutation:
         return offspring
 
     def adaptive_mutation_probs_by_space(self, offspring):
-
         """
-        Applies the adaptive mutation based on the 2 parameters 'mutation_probability' and 'gene_space'.
-        Based on whether the solution fitness is above or below a threshold, the mutation is applied differently by mutating a high or low number of genes.
-        The random values are selected based on space of values for each gene.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        Adaptive mutation that uses ``mutation_probability`` and
+        ``gene_space``. The probability threshold per offspring is the
+        first element of ``mutation_probability`` for below-average
+        solutions and the second element for above-average ones. Each
+        gene is replaced with a value from its ``gene_space`` when its
+        random draw falls below the chosen threshold.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         # For each offspring, a value from the gene space is selected randomly and assigned to the selected gene for mutation.
@@ -656,14 +788,24 @@ class Mutation:
         return offspring
 
     def adaptive_mutation_probs_randomly(self, offspring):
-
         """
-        Applies the adaptive mutation based on the 'mutation_probability' parameter. 
-        Based on whether the solution fitness is above or below a threshold, the mutation is applied differently by mutating a high or low number of genes.
-        The random values are selected based on the 2 parameters 'random_mutation_min_val' and 'random_mutation_max_val'.
-        It accepts:
-            -offspring: The offspring to mutate.
-        It returns an array of the mutated offspring.
+        Adaptive mutation that uses ``mutation_probability`` and the
+        random-mutation range. The probability threshold per offspring
+        is the first element of ``mutation_probability`` for
+        below-average solutions and the second element for
+        above-average ones. Each gene is replaced with a value sampled
+        uniformly from the random-mutation range when its random draw
+        falls below the chosen threshold.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (modified in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
         """
 
         average_fitness, offspring_fitness = self.adaptive_mutation_population_fitness(offspring)

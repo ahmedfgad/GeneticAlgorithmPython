@@ -3,6 +3,22 @@ import numpy
 import torch
 
 def model_weights_as_vector(model):
+    """
+    Flatten every weight tensor of a PyTorch model into a single 1D
+    NumPy array. Tensors are moved off the GPU and detached from the
+    computational graph before being converted.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        The model whose weights should be flattened.
+
+    Returns
+    -------
+    weights_vector : numpy.ndarray
+        A 1D float array with every parameter of the model laid out
+        in ``state_dict`` order.
+    """
     weights_vector = []
 
     for curr_weights in model.state_dict().values():
@@ -16,6 +32,25 @@ def model_weights_as_vector(model):
     return numpy.array(weights_vector)
 
 def model_weights_as_dict(model, weights_vector):
+    """
+    Reshape a flat 1D weights vector back into the per-layer tensors
+    expected by ``model.load_state_dict``. The shapes are taken from
+    the model's current ``state_dict``.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        The reference model. Used only to read the per-layer shapes.
+    weights_vector : array-like
+        A 1D vector in the same layout produced by
+        ``model_weights_as_vector``.
+
+    Returns
+    -------
+    weights_dict : dict
+        A dict mapping every parameter name to a freshly built
+        ``torch.Tensor`` with the right shape.
+    """
     weights_dict = model.state_dict()
 
     start = 0
@@ -36,6 +71,26 @@ def model_weights_as_dict(model, weights_vector):
     return weights_dict
 
 def predict(model, solution, data):
+    """
+    Load the given solution as the model's weights and run a forward
+    pass on the input ``data``. The model is deep-copied first so the
+    caller's instance is left untouched.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        The reference model whose architecture should be used for the
+        forward pass.
+    solution : array-like
+        A 1D weights vector returned by the GA.
+    data : torch.Tensor
+        Input tensor of the right shape for the model.
+
+    Returns
+    -------
+    predictions : torch.Tensor
+        The model's output for ``data``.
+    """
     # Fetch the parameters of the best solution.
     model_weights_dict = model_weights_as_dict(model=model,
                                                weights_vector=solution)
@@ -52,12 +107,19 @@ def predict(model, solution, data):
 class TorchGA:
 
     def __init__(self, model, num_solutions):
-
         """
-        Creates an instance of the TorchGA class to build a population of model parameters.
+        Build a population of weight vectors for a PyTorch model so
+        the GA can evolve them.
 
-        model: A PyTorch model class.
-        num_solutions: Number of solutions in the population. Each solution has different model parameters.
+        Parameters
+        ----------
+        model : torch.nn.Module
+            The PyTorch model to optimise. Its current weights are
+            used as the seed for the first solution.
+        num_solutions : int
+            Number of solutions in the population. Each solution is
+            a flat copy of the model weights with random perturbations
+            added to it.
         """
         
         self.model = model
@@ -68,11 +130,15 @@ class TorchGA:
         self.population_weights = self.create_population()
 
     def create_population(self):
-
         """
-        Creates the initial population of the genetic algorithm as a list of networks' weights (i.e. solutions). Each element in the list holds a different set of weights for the PyTorch model.
+        Build the initial population. The first solution is the model's
+        current flattened weights; every other solution is the same
+        vector with a uniform ``[-1, 1]`` perturbation added on top.
 
-        The method returns a list holding the weights of all solutions.
+        Returns
+        -------
+        net_population_weights : list of numpy.ndarray
+            One flat weight vector per solution.
         """
 
         model_weights_vector = model_weights_as_vector(model=self.model)
