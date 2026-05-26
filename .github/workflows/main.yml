@@ -80,9 +80,13 @@ jobs:
           python3 -m build
 
       # Install the newly built .whl file to verify the package is installable.
+      # Install with the 'visualize' extra so matplotlib is available for the
+      # plotting tests (tests/test_visualize.py). This also validates that the
+      # optional 'visualize' extra resolves correctly.
       - name: Install PyGAD from Wheel
         run: |
-          pip install dist/*.whl
+          WHEEL=$(ls dist/*.whl)
+          pip install "${WHEEL}[visualize]"
 
       - name: Install PyTest
         run: pip install pytest

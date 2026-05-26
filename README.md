@@ -33,6 +33,16 @@ Install PyGAD with the following command:
 pip install pygad
 ```
 
+PyGAD's core install is intentionally lightweight (only `numpy` and `cloudpickle`). Some features need extra libraries, which are available as optional extras:
+
+```
+# Plotting features (e.g. plot_fitness(), plot_genes()) need matplotlib:
+pip install pygad[visualize]
+
+# Training Keras/PyTorch models (pygad.kerasga, pygad.torchga):
+pip install pygad[deep_learning]
+```
+
 To get started with PyGAD, read the documentation at [Read the Docs](https://pygad.readthedocs.io).
 
 # PyGAD Source Code
