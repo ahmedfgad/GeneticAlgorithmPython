@@ -2,12 +2,12 @@
 
 [PyGAD](https://pypi.org/project/pygad) is an open-source easy-to-use Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. It supports Keras and PyTorch. PyGAD supports optimizing both single-objective and multi-objective problems.
 
-> Try the [Optimization Gadget](https://optimgadget.com), a free cloud-based tool powered by PyGAD. It makes optimization easier by reducing or removing the need for coding, and it shows helpful visualizations.
+> Try [Vilvik](https://vilvik.com), a free cloud-based tool powered by PyGAD. It makes optimization easier by reducing or removing the need for coding, and it shows helpful visualizations.
 
 Read the [PyGAD documentation](https://pygad.readthedocs.io/en/latest).
 
 [![PyPI Downloads](https://pepy.tech/badge/pygad)](https://pepy.tech/project/pygad) [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/pygad.svg?label=Conda%20Downloads)](
-https://anaconda.org/conda-forge/PyGAD) [![PyPI version](https://badge.fury.io/py/pygad.svg)](https://badge.fury.io/py/pygad)![Docs](https://readthedocs.org/projects/pygad/badge)[![PyGAD PyTest / Python 3.13](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py313.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py313.yml) [![PyGAD PyTest / Python 3.12](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py312.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py312.yml) [![PyGAD PyTest / Python 3.11](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py311.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py311.yml) [![PyGAD PyTest / Python 3.10](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py310.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py310.yml) [![PyGAD PyTest / Python 3.9](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py39.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py39.yml) [![PyGAD PyTest / Python 3.8](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py38.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main_py38.yml) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Translation](https://hosted.weblate.org/widgets/weblate/-/svg-badge.svg)](https://hosted.weblate.org/engage/weblate/) [![REUSE](https://api.reuse.software/badge/github.com/WeblateOrg/weblate)](https://api.reuse.software/info/github.com/WeblateOrg/weblate) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-Ask%20questions-blue.svg)](
+https://anaconda.org/conda-forge/PyGAD) [![PyPI version](https://badge.fury.io/py/pygad.svg)](https://badge.fury.io/py/pygad)![Docs](https://readthedocs.org/projects/pygad/badge)[![PyGAD PyTest / Python 3.13](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main.yml) [![PyGAD PyTest / Python 3.12](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/release.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/release.yml) [![PyGAD PyTest / Python 3.11](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/scorecard.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/scorecard.yml) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Translation](https://hosted.weblate.org/widgets/weblate/-/svg-badge.svg)](https://hosted.weblate.org/engage/weblate/) [![REUSE](https://api.reuse.software/badge/github.com/WeblateOrg/weblate)](https://api.reuse.software/info/github.com/WeblateOrg/weblate) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-Ask%20questions-blue.svg)](
 https://stackoverflow.com/questions/tagged/pygad) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ahmedfgad/GeneticAlgorithmPython/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ahmedfgad/GeneticAlgorithmPython) [![DOI](https://zenodo.org/badge/DOI/10.1007/s11042-023-17167-y.svg)](https://doi.org/10.1007/s11042-023-17167-y)
 
 ![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
@@ -18,7 +18,6 @@ The library is under active development and more features are added regularly. I
 
 # Donation
 
-* [Credit/Debit Card](https://donate.stripe.com/eVa5kO866elKgM0144): https://donate.stripe.com/eVa5kO866elKgM0144
 * [Open Collective](https://opencollective.com/pygad): [opencollective.com/pygad](https://opencollective.com/pygad)
 * PayPal: Use either this link: [paypal.me/ahmedfgad](https://paypal.me/ahmedfgad) or the e-mail address ahmed.f.gad@gmail.com
 * Interac e-Transfer: Use e-mail address ahmed.f.gad@gmail.com
@@ -44,18 +43,6 @@ pip install pygad[deep_learning]
 ```
 
 To get started with PyGAD, read the documentation at [Read the Docs](https://pygad.readthedocs.io).
-
-# PyGAD Source Code
-
-The source code of the PyGAD modules is in the following GitHub projects:
-
-- [pygad](https://github.com/ahmedfgad/GeneticAlgorithmPython): (https://github.com/ahmedfgad/GeneticAlgorithmPython)
-- [pygad.nn](https://github.com/ahmedfgad/NumPyANN): https://github.com/ahmedfgad/NumPyANN
-- [pygad.gann](https://github.com/ahmedfgad/NeuralGenetic): https://github.com/ahmedfgad/NeuralGenetic
-- [pygad.cnn](https://github.com/ahmedfgad/NumPyCNN): https://github.com/ahmedfgad/NumPyCNN
-- [pygad.gacnn](https://github.com/ahmedfgad/CNNGenetic): https://github.com/ahmedfgad/CNNGenetic
-- [pygad.kerasga](https://github.com/ahmedfgad/KerasGA): https://github.com/ahmedfgad/KerasGA
-- [pygad.torchga](https://github.com/ahmedfgad/TorchGA): https://github.com/ahmedfgad/TorchGA
 
 # PyGAD Documentation
 
@@ -304,7 +291,4 @@ If you used PyGAD, please consider adding a citation to the following paper abou
 
 * E-mail: ahmed.f.gad@gmail.com
 * [LinkedIn](https://www.linkedin.com/in/ahmedfgad)
-* [Paperspace](https://blog.paperspace.com/author/ahmed)
-* [KDnuggets](https://kdnuggets.com/author/ahmed-gad)
-* [TowardsDataScience](https://towardsdatascience.com/@ahmedfgad)
 * [GitHub](https://github.com/ahmedfgad)

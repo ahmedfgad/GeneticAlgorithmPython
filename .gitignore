@@ -15,3 +15,9 @@ __pycache__/
 # =============================================================================
 docs/build/
 .venv-docs/
+
+# =============================================================================
+# IDE settings: JetBrains (PyCharm, IntelliJ, etc.) workspace files.
+# These are personal to each developer and should not be committed.
+# =============================================================================
+.idea/

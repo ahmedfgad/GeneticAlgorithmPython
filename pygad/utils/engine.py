@@ -435,12 +435,13 @@ class GAEngine:
             # Know whether the problem is SOO or MOO.
             if type(self.last_generation_fitness[0]) in self.supported_int_float_types:
                 # Single-objective problem.
-                # If the problem is SOO, the parent selection type cannot be nsga2 or tournament_nsga2.
-                if self.parent_selection_type in ['nsga2', 'tournament_nsga2']:
+                # If the problem is SOO, the parent selection type cannot be nsga2/nsga3 or their tournament variants.
+                if self.parent_selection_type in ['nsga2', 'tournament_nsga2', 'nsga3', 'tournament_nsga3']:
                     raise TypeError(f"Incorrect parent selection type. The fitness function returned a single numeric fitness value which means the problem is single-objective. But the parent selection type {self.parent_selection_type} is used which only works for multi-objective optimization problems.")
             elif type(self.last_generation_fitness[0]) in [list, tuple, numpy.ndarray]:
                 # Multi-objective problem.
-                pass                
+                if self.parent_selection_type in ('nsga3', 'tournament_nsga3'):
+                    self._bootstrap_nsga3_reference_points()
 
             best_solution, best_solution_fitness, best_match_idx = self.best_solution(pop_fitness=self.last_generation_fitness)
 

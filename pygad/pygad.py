@@ -9,6 +9,7 @@ class GA(utils.parent_selection.ParentSelection,
          utils.crossover.Crossover,
          utils.mutation.Mutation,
          utils.nsga2.NSGA2,
+         utils.nsga3.NSGA3,
          utils.validation.Validation,
          utils.engine.GAEngine,
          helper.unique.Unique,
@@ -37,6 +38,7 @@ class GA(utils.parent_selection.ParentSelection,
                  keep_parents=-1,
                  keep_elitism=1,
                  K_tournament=3,
+                 nsga3_num_divisions=None,
                  crossover_type="single_point",
                  crossover_probability=None,
                  mutation_type="random",
@@ -86,6 +88,7 @@ class GA(utils.parent_selection.ParentSelection,
         parent_selection_type: Type of parent selection.
         keep_parents: If 0, this means no parent in the current population will be used in the next population. If -1, this means all parents in the current population will be used in the next population. If set to a value > 0, then the specified value refers to the number of parents in the current population to be used in the next population. Some parent selection operators such as rank selection, favor population diversity and therefore keeping the parents in the next generation can be beneficial. However, some other parent selection operators, such as roulette wheel selection (RWS), have higher selection pressure and keeping more than one parent in the next generation can seriously harm population diversity. This parameter has an effect only when the keep_elitism parameter is 0. Thanks to Prof. Fernando Jiménez (http://webs.um.es/fernan) for editing this sentence.
         K_tournament: When the value of 'parent_selection_type' is 'tournament', the 'K_tournament' parameter specifies the number of solutions from which a parent is selected randomly.
+        nsga3_num_divisions: Only used when 'parent_selection_type' is 'nsga3' or 'tournament_nsga3'. It is the number of divisions per objective axis used to build the structured reference points (the 'p' parameter from Deb & Jain 2014). The total number of reference points is C(M + p - 1, p) where M is the number of objectives. Must be a positive integer. Defaults to None.
 
         keep_elitism: Added in PyGAD 2.18.0. It can take the value 0 or a positive integer that satisfies (0 <= keep_elitism <= sol_per_pop). It defaults to 1 which means only the best solution in the current generation is kept in the next generation. If assigned 0, this means it has no effect. If assigned a positive integer K, then the best K solutions are kept in the next generation. It cannot be assigned a value greater than the value assigned to the sol_per_pop parameter. If this parameter has a value different from 0, then the keep_parents parameter will have no effect.
 
@@ -145,6 +148,7 @@ class GA(utils.parent_selection.ParentSelection,
                                      keep_parents=keep_parents,
                                      keep_elitism=keep_elitism,
                                      K_tournament=K_tournament,
+                                     nsga3_num_divisions=nsga3_num_divisions,
                                      crossover_type=crossover_type,
                                      crossover_probability=crossover_probability,
                                      mutation_type=mutation_type,

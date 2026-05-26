@@ -755,11 +755,34 @@ class Validation:
                 warnings.warn("The 2 parameters mutation_type and crossover_type are None. This disables any type of evolution the genetic algorithm can make. As a result, the genetic algorithm cannot find a better solution than the best solution in the initial population.")
         return mutation_num_genes, mutation_percent_genes
 
+    def _validate_nsga3_num_divisions(self, parent_selection_type, nsga3_num_divisions):
+        if parent_selection_type not in ("nsga3", "tournament_nsga3"):
+            self.nsga3_num_divisions = nsga3_num_divisions
+            return
+        if nsga3_num_divisions is None:
+            self.valid_parameters = False
+            raise ValueError(
+                f"parent_selection_type='{parent_selection_type}' requires "
+                f"nsga3_num_divisions to be a positive integer. Pass "
+                f"nsga3_num_divisions=<int> to GA(...)."
+            )
+        if (type(nsga3_num_divisions) not in self.supported_int_types
+                or nsga3_num_divisions <= 0):
+            self.valid_parameters = False
+            raise ValueError(
+                f"nsga3_num_divisions must be a positive integer when "
+                f"parent_selection_type='{parent_selection_type}', but got "
+                f"{nsga3_num_divisions!r} of type "
+                f"{type(nsga3_num_divisions).__name__}."
+            )
+        self.nsga3_num_divisions = int(nsga3_num_divisions)
+
     def _validate_parent_selection(self,
                                    parent_selection_type,
                                    K_tournament,
                                    keep_parents,
-                                   keep_elitism):
+                                   keep_elitism,
+                                   nsga3_num_divisions=None):
         # select_parents: Refers to a method that selects the parents based on the parent selection type specified in the parent_selection_type attribute.
         # Validating the selected type of parent selection: parent_selection_type
         if inspect.ismethod(parent_selection_type):
@@ -811,11 +834,15 @@ class Validation:
                 self.select_parents = self.tournament_selection_nsga2
             elif parent_selection_type == "nsga2": # Supported in PyGAD >= 3.2
                 self.select_parents = self.nsga2_selection
+            elif parent_selection_type == "tournament_nsga3":
+                self.select_parents = self.tournament_selection_nsga3
+            elif parent_selection_type == "nsga3":
+                self.select_parents = self.nsga3_selection
             elif parent_selection_type == "rank":
                 self.select_parents = self.rank_selection
             else:
                 self.valid_parameters = False
-                raise TypeError(f"Undefined parent selection type: {parent_selection_type}. \nThe assigned value to the 'parent_selection_type' parameter does not refer to one of the supported parent selection techniques which are: \n-sss (steady state selection)\n-rws (roulette wheel selection)\n-sus (stochastic universal selection)\n-rank (rank selection)\n-random (random selection)\n-tournament (tournament selection)\n-tournament_nsga2: (Tournament selection for NSGA-II)\n-nsga2: (NSGA-II parent selection).\n")
+                raise TypeError(f"Undefined parent selection type: {parent_selection_type}. \nThe assigned value to the 'parent_selection_type' parameter does not refer to one of the supported parent selection techniques which are: \n-sss (steady state selection)\n-rws (roulette wheel selection)\n-sus (stochastic universal selection)\n-rank (rank selection)\n-random (random selection)\n-tournament (tournament selection)\n-tournament_nsga2: (Tournament selection for NSGA-II)\n-nsga2: (NSGA-II parent selection)\n-tournament_nsga3: (Tournament selection for NSGA-III)\n-nsga3: (NSGA-III parent selection).\n")
 
         # For tournament selection, validate the K value.
         if parent_selection_type == "tournament":
@@ -832,6 +859,8 @@ class Validation:
                 raise ValueError(f"The type of K of the tournament selection must be integer but the value ({K_tournament}) of type ({type(K_tournament)}) found.")
 
         self.K_tournament = K_tournament
+
+        self._validate_nsga3_num_divisions(parent_selection_type, nsga3_num_divisions)
 
         # Validating the number of parents to keep in the next population: keep_parents
         if not (type(keep_parents) in self.supported_int_types):
@@ -857,21 +886,27 @@ class Validation:
 
         self.keep_elitism = keep_elitism
 
-        # Validate keep_parents.
+        self._refresh_num_offspring()
+
+        return parent_selection_type
+
+    def _refresh_num_offspring(self):
+        """
+        Set self.num_offspring from the current values of sol_per_pop,
+        keep_elitism, keep_parents, and num_parents_mating. Called from
+        the initial validation step and again whenever the population
+        size changes after construction (for example, when NSGA-III grows
+        sol_per_pop to match the number of reference points).
+        """
         if self.keep_elitism == 0:
-            # Keep all parents in the next population.
             if self.keep_parents == -1:
                 self.num_offspring = self.sol_per_pop - self.num_parents_mating
-            # Keep no parents in the next population.
             elif self.keep_parents == 0:
                 self.num_offspring = self.sol_per_pop
-            # Keep the specified number of parents in the next population.
             elif self.keep_parents > 0:
                 self.num_offspring = self.sol_per_pop - self.keep_parents
         else:
             self.num_offspring = self.sol_per_pop - self.keep_elitism
-
-        return parent_selection_type
 
     def _validate_fitness_func(self,
                                fitness_func,
@@ -1399,6 +1434,7 @@ class Validation:
                             keep_parents,
                             keep_elitism,
                             K_tournament,
+                            nsga3_num_divisions,
                             crossover_type,
                             crossover_probability,
                             mutation_type,
@@ -1490,7 +1526,8 @@ class Validation:
         parent_selection_type = self._validate_parent_selection(parent_selection_type,
                                                                 K_tournament,
                                                                 keep_parents,
-                                                                keep_elitism)
+                                                                keep_elitism,
+                                                                nsga3_num_divisions)
 
         self._validate_fitness_func(fitness_func,
                                     fitness_batch_size)
