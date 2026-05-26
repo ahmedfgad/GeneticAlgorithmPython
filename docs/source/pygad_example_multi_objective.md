@@ -86,3 +86,19 @@ Predicted output 2 based on the best solution : 29.99714270722312
 This is the figure created by the `plot_fitness()` method. The fitness of the first objective is shown in green, and the fitness of the second objective is shown in blue.
 
 ![multi-objective-pygad](https://github.com/ahmedfgad/GeneticAlgorithmPython/assets/16560492/7896f8d8-01c5-4ff9-8d15-52191c309b63)
+
+## Using NSGA-III
+
+To solve the same problem with NSGA-III, change `parent_selection_type` to `'nsga3'` and add the `nsga3_num_divisions` parameter. The rest of the code is identical.
+
+```python
+ga_instance = pygad.GA(num_generations=num_generations,
+                       num_parents_mating=num_parents_mating,
+                       sol_per_pop=sol_per_pop,
+                       num_genes=num_genes,
+                       fitness_func=fitness_func,
+                       parent_selection_type='nsga3',
+                       nsga3_num_divisions=12)
+```
+
+`nsga3_num_divisions` is the number of divisions per objective axis used to build the structured reference points (the `p` parameter from Deb & Jain 2014). The total number of reference points is `C(M + p - 1, p)` where `M` is the number of objectives. With `M = 2` and `nsga3_num_divisions = 12`, the algorithm builds 13 reference points.

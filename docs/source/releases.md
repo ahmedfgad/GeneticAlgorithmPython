@@ -653,6 +653,10 @@ Release Date April 8, 2026
           3. Parallel processing.
           4. The `GANN` module.
           5. The plots created by the `visualize`.
+21. Support of multi-objective optimization using the Non-Dominated Sorting Genetic Algorithm III (NSGA-III). NSGA-III replaces the crowding distance of NSGA-II with niching against a structured grid of reference points, so it scales better to problems with 4 or more objectives. The new `NSGA3` class lives in the new `pygad/utils/nsga3.py` script and is mixed into the `pygad.GA` class the same way `NSGA2` is.
+22. Two new parent selection methods are added to support NSGA-III: 1) `nsga3_selection()` for plain NSGA-III selection, and 2) `tournament_selection_nsga3()` for the tournament variant. Use them by setting `parent_selection_type` to `'nsga3'` or `'tournament_nsga3'`.
+23. A new parameter `nsga3_num_divisions` is added to the `pygad.GA` constructor. It is required when `parent_selection_type` is `'nsga3'` or `'tournament_nsga3'` and sets the number of divisions per objective axis used to build the structured reference points (the `p` parameter from Deb & Jain 2014). The total number of reference points is `C(M + p - 1, p)` where `M` is the number of objectives.
+24. When `sol_per_pop` is smaller than the number of NSGA-III reference points, PyGAD raises a warning and grows the population to match before the generational loop starts.
 
 21. Instead of using repeated code for converting the data type and rounding the genes during crossover and mutation, the `change_gene_dtype_and_round()` method is called from the `pygad.helper.misc.Helper` class.
 22. Fix some documentation issues. https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/336

@@ -11,6 +11,7 @@ The submodules in the `pygad.utils` module are:
 3. `mutation`: Has the `Mutation` class that implements the mutation operators.
 4. `parent_selection`: Has the `ParentSelection` class that implements the parent selection operators.
 5. `nsga2`: Has the `NSGA2` class that implements the Non-Dominated Sorting Genetic Algorithm II (NSGA-II).
+6. `nsga3`: Has the `NSGA3` class that implements the Non-Dominated Sorting Genetic Algorithm III (NSGA-III).
 
 Note that the `pygad.GA` class extends all of these classes. So, the user can access any of the methods in such classes directly by the instance/object of the `pygad.GA` class.
 
@@ -255,6 +256,8 @@ The `pygad.utils.parent_selection` module has a class named `ParentSelection` wi
 6. Tournament: Implemented using the `tournament_selection()` method.
 7. NSGA-II: Implemented using the `nsga2_selection()` method.
 8. NSGA-II Tournament: Implemented using the `tournament_selection_nsga2()` method.
+9. NSGA-III: Implemented using the `nsga3_selection()` method.
+10. NSGA-III Tournament: Implemented using the `tournament_selection_nsga3()` method.
 
 All parent selection methods accept these parameters:
 
@@ -308,6 +311,14 @@ Selects the parents for the NSGA-II algorithm to solve multi-objective optimizat
 
 Selects the parents for the NSGA-II algorithm to solve multi-objective optimization problems. It selects the parents using the tournament selection technique applied based on non-dominated sorting and crowding distance.
 
+#### `nsga3_selection()`
+
+Selects the parents for the NSGA-III algorithm to solve multi-objective optimization problems. It accepts whole Pareto fronts in order until adding the next front would overflow the requested parent count, then picks the remaining survivors from that critical front using niching against the structured reference points stored on the GA instance. Requires the `nsga3_num_divisions` parameter to be set when constructing the `pygad.GA` instance.
+
+#### `tournament_selection_nsga3()`
+
+Selects the parents for the NSGA-III algorithm to solve multi-objective optimization problems. It selects the parents using the tournament selection technique where the within-front comparison is based on the niche count (instead of the crowding distance used by `tournament_selection_nsga2()`). Requires the `nsga3_num_divisions` parameter to be set.
+
 ## `pygad.utils.nsga2` Submodule
 
 The `pygad.utils.nsga2` module has a class named `NSGA2` that implements NSGA-II. The methods inside this class are:
@@ -316,6 +327,20 @@ The `pygad.utils.nsga2` module has a class named `NSGA2` that implements NSGA-II
 2. `get_non_dominated_set()`: Returns the 2 sets of non-dominated solutions and dominated solutions from the passed solutions. Note that the Pareto front consists of the solutions in the non-dominated set.
 3. `crowding_distance()`: Calculates the crowding distance for all solutions in the current pareto front.
 4. `sort_solutions_nsga2()`: Sort the solutions. If the problem is single-objective, then the solutions are sorted by sorting the fitness values of the population. If it is multi-objective, then non-dominated sorting and crowding distance are applied to sort the solutions.
+
+## `pygad.utils.nsga3` Submodule
+
+The `pygad.utils.nsga3` module has a class named `NSGA3` that implements NSGA-III. The methods inside this class are:
+
+1. `generate_reference_points()`: Build the structured grid of reference points on the unit simplex using the Das-Dennis (stars-and-bars) method.
+2. `compute_ideal_point()`: Return the ideal point (column maximum under PyGAD's maximisation convention).
+3. `find_extreme_points()`: For each objective axis, return the solution that best represents the corner of that axis based on the Achievement Scalarising Function (ASF).
+4. `compute_intercepts()`: Fit a hyperplane through the M extreme points and return the per-axis intercept point used as the normalisation denominator. Falls back to the nadir (worst per objective) when the hyperplane cannot be fitted or when the intercept is degenerate.
+5. `normalise_fitness()`: Scale each fitness row to the [0, 1] range using the ideal point and the intercepts.
+6. `associate_to_reference_points()`: For every normalised solution, return the nearest reference index and the perpendicular distance to that reference line.
+7. `niching_select()`: Pick K survivors from the critical front using niche counts and per-niche tie-breaking rules.
+8. `nsga3_selection()`: Top-level NSGA-III parent selection routine.
+9. `tournament_selection_nsga3()`: Tournament-style NSGA-III parent selection routine.
 
 ## More about the Operators
 

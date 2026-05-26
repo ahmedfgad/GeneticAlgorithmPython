@@ -9,7 +9,7 @@ This section covers the more advanced features of the `pygad` module. Pick a top
 :link: multi_objective
 :link-type: doc
 
-Optimize several objectives at once using NSGA-II.
+Optimize several objectives at once using NSGA-II or NSGA-III.
 :::
 
 :::{grid-item-card} Controlling Gene Values

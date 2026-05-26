@@ -1,6 +1,6 @@
 # Multi-Objective Optimization
 
-In [PyGAD 3.2.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-2-0), the library added support for multi-objective optimization using the non-dominated sorting genetic algorithm II (NSGA-II). The code is almost the same as the code for single-objective optimization, except for one difference: the return value of the fitness function.
+In [PyGAD 3.2.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-2-0), the library added support for multi-objective optimization using the non-dominated sorting genetic algorithm II (NSGA-II). The non-dominated sorting genetic algorithm III (NSGA-III) was added in a later release. The code is almost the same as the code for single-objective optimization, except for one difference: the return value of the fitness function.
 
 In single-objective optimization, the fitness function returns a single numeric value. In this example, the variable `fitness` is expected to be a numeric value.
 
@@ -26,10 +26,14 @@ Whenever the fitness function returns an iterable of these data types, then the 
 
 Other than the fitness function, everything else could be the same in both single and multi-objective problems.
 
-But it is recommended to use one of these 2 parent selection operators to solve multi-objective problems:
+But it is recommended to use one of these 4 parent selection operators to solve multi-objective problems:
 
 1. `nsga2`: This selects the parents based on non-dominated sorting and crowding distance.
 2. `tournament_nsga2`: This selects the parents using tournament selection which uses non-dominated sorting and crowding distance to rank the solutions.
+3. `nsga3`: This selects the parents based on non-dominated sorting and niching against a structured grid of reference points. Useful when the number of objectives is 4 or more because crowding distance loses its discrimination in high-dimensional objective spaces. Requires the `nsga3_num_divisions` parameter to be set.
+4. `tournament_nsga3`: This selects the parents using tournament selection which uses non-dominated sorting and niche count (instead of crowding distance) to rank the solutions. Requires the `nsga3_num_divisions` parameter to be set.
+
+When using `nsga3` or `tournament_nsga3`, the `nsga3_num_divisions` parameter must be a positive integer. It is the number of divisions per objective axis used to build the structured reference points (the `p` parameter from Deb & Jain 2014). The total number of reference points is `C(M + p - 1, p)` where `M` is the number of objectives. If `sol_per_pop` is smaller than the number of reference points, PyGAD warns and grows the population to match.
 
 This is a multi-objective optimization example that optimizes these 2 linear functions:
 
@@ -115,3 +119,53 @@ Predicted output 2 based on the best solution : 29.99714270722312
 This is the figure created by the `plot_fitness()` method. The fitness of the first objective has the green color. The blue color is used for the second objective fitness.
 
 ![multi-objective-pygad](https://github.com/ahmedfgad/GeneticAlgorithmPython/assets/16560492/7896f8d8-01c5-4ff9-8d15-52191c309b63)
+
+## NSGA-III Example
+
+This is the same problem solved with `nsga3` instead of `nsga2`. The only differences are the `parent_selection_type` value and the new `nsga3_num_divisions` parameter.
+
+```python
+import pygad
+import numpy
+
+function_inputs1 = [4,-2,3.5,5,-11,-4.7]
+function_inputs2 = [-2,0.7,-9,1.4,3,5]
+desired_output1 = 50
+desired_output2 = 30
+
+def fitness_func(ga_instance, solution, solution_idx):
+    output1 = numpy.sum(solution*function_inputs1)
+    output2 = numpy.sum(solution*function_inputs2)
+    fitness1 = 1.0 / (numpy.abs(output1 - desired_output1) + 0.000001)
+    fitness2 = 1.0 / (numpy.abs(output2 - desired_output2) + 0.000001)
+    return [fitness1, fitness2]
+
+num_generations = 100
+num_parents_mating = 10
+
+sol_per_pop = 20
+num_genes = len(function_inputs1)
+
+ga_instance = pygad.GA(num_generations=num_generations,
+                       num_parents_mating=num_parents_mating,
+                       sol_per_pop=sol_per_pop,
+                       num_genes=num_genes,
+                       fitness_func=fitness_func,
+                       parent_selection_type='nsga3',
+                       nsga3_num_divisions=12)
+
+ga_instance.run()
+
+ga_instance.plot_fitness(label=['Obj 1', 'Obj 2'])
+
+solution, solution_fitness, solution_idx = ga_instance.best_solution(ga_instance.last_generation_fitness)
+print(f"Parameters of the best solution : {solution}")
+print(f"Fitness value of the best solution = {solution_fitness}")
+
+prediction = numpy.sum(numpy.array(function_inputs1)*solution)
+print(f"Predicted output 1 based on the best solution : {prediction}")
+prediction = numpy.sum(numpy.array(function_inputs2)*solution)
+print(f"Predicted output 2 based on the best solution : {prediction}")
+```
+
+For M = 2 objectives and `nsga3_num_divisions = 12`, the number of reference points is `C(13, 12) = 13`, which is within `sol_per_pop = 20`. For higher-dimensional problems pick `nsga3_num_divisions` such that `C(M + p - 1, p)` stays close to the population size you want.

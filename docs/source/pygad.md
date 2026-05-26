@@ -185,6 +185,10 @@ The built-in types are:
 - `rank`: rank selection.
 - `random`: random selection.
 - `tournament`: tournament selection.
+- `nsga2`: NSGA-II selection (multi-objective).
+- `tournament_nsga2`: Tournament selection that ranks competitors with NSGA-II non-dominated sorting and crowding distance.
+- `nsga3`: NSGA-III selection (multi-objective). Requires the `nsga3_num_divisions` parameter.
+- `tournament_nsga3`: Tournament selection that ranks competitors with NSGA-III niche count instead of crowding distance. Requires the `nsga3_num_divisions` parameter.
 
 You can also pass your own parent selection function (since [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0)). See [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/user_defined_operators.html#user-defined-crossover-mutation-and-parent-selection-operators).
 :::
@@ -193,6 +197,14 @@ You can also pass your own parent selection function (since [PyGAD 2.16.0](https
 :animate: fade-in-slide-down
 
 In case that the parent selection type is `tournament`, the `K_tournament` specifies the number of parents participating in the tournament selection. It defaults to `3`.
+:::
+
+:::{dropdown} `nsga3_num_divisions=None`: Number of divisions per objective axis for NSGA-III.
+:animate: fade-in-slide-down
+
+Only used when `parent_selection_type` is `'nsga3'` or `'tournament_nsga3'`. It is the number of divisions per objective axis used to build the structured reference points (the `p` parameter from Deb & Jain 2014). The total number of reference points is `C(M + p - 1, p)` where `M` is the number of objectives. Must be a positive integer. Defaults to `None`.
+
+If `sol_per_pop` is smaller than the resulting number of reference points, PyGAD raises a warning and grows the population to match before the generational loop starts.
 :::
 
 #### Keeping Solutions
@@ -478,12 +490,14 @@ Here is the list of scripts and the classes that the `pygad.GA` class extends:
    1. `utils.mutation.Mutation`
 6. `utils/nsga2.py`
    1. `utils.nsga2.NSGA2`
-7. `helper/unique.py`
+7. `utils/nsga3.py`
+   1. `utils.nsga3.NSGA3`
+8. `helper/unique.py`
    1. `helper.unique.Unique` 
-8. `helper/misc.py`
+9. `helper/misc.py`
    1. `helper.misc.Helper`
-9. `visualize/plot.py`
-   1. `visualize.plot.Plot` 
+10. `visualize/plot.py`
+    1. `visualize.plot.Plot` 
 
 Since the `pygad.GA` class extends such classes, the attributes and methods inside them can be retrieved by instances of the `pygad.GA` class.
 
