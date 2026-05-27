@@ -1,12 +1,13 @@
 """
-Standard benchmark problems for PyGAD.
+Benchmark problems for PyGAD.
 
-Every problem class can be called with the standard PyGAD fitness
-function signature (ga, solution, sol_idx) and returns a fitness in
-PyGAD's maximization format. The original minimization values are
-negated so the user can plug the problem directly into PyGAD without
-extra wrapping. Each class also has the attributes num_genes,
-num_objectives, and bounds.
+Each problem class can be called with the fitness signature
+(ga, solution, sol_idx) and returns a fitness in PyGAD's
+maximisation format. For problems that are normally written as
+minimisation, the values are negated.
+
+Each class also exposes num_genes, num_objectives, and bounds so
+you can plug it into pygad.GA directly.
 """
 
 from pygad.benchmarks import classic

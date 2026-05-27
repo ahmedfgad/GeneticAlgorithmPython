@@ -1,10 +1,7 @@
-"""
-Run PyGAD on the TSP benchmark from `pygad.benchmarks.tsp`.
+"""Run PyGAD on the TSP benchmark.
 
-A solution is a permutation of the city indices. The fitness is the
-negative tour length so the GA maximizes toward the shortest tour.
-For this 4-city square instance the optimal tour walks the
-perimeter with length 4.
+Four cities at the corners of a unit square. The shortest tour
+walks the perimeter (length 4).
 """
 
 import pygad

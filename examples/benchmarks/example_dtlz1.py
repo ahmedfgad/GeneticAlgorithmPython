@@ -1,10 +1,4 @@
-"""
-Run PyGAD with NSGA-III on the DTLZ1 benchmark from
-`pygad.benchmarks.dtlz`.
-
-DTLZ1 has a linear hyperplane Pareto front where sum(f_i) = 0.5
-for M objectives. Use NSGA-III because the front lives in 3D.
-"""
+"""Run NSGA-III on DTLZ1. Front is the linear hyperplane sum(f_i) = 0.5."""
 
 import pygad
 from pygad.benchmarks.dtlz import DTLZ1

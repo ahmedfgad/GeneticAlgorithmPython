@@ -1,10 +1,4 @@
-"""
-Run PyGAD on the Schwefel benchmark from `pygad.benchmarks.classic`.
-
-The global minimum sits at x = (420.9687, ..., 420.9687) far from
-the next-best local minimum, so the function is hard for many
-algorithms.
-"""
+"""Run PyGAD on the Schwefel benchmark. Global minimum at (420.9687, ...)."""
 
 import pygad
 from pygad.benchmarks.classic import Schwefel

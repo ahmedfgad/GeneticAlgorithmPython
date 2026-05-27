@@ -1,9 +1,4 @@
-"""
-Run PyGAD on the Sphere benchmark from `pygad.benchmarks.classic`.
-
-The Sphere function has its global minimum at the origin where
-f(x) = 0. Under PyGAD's max convention the best fitness is 0.
-"""
+"""Run PyGAD on the Sphere benchmark. Best fitness is 0 (at the origin)."""
 
 import pygad
 from pygad.benchmarks.classic import Sphere

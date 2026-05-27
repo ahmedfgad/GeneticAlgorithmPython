@@ -1,10 +1,4 @@
-"""
-Run PyGAD with NSGA-II on the ZDT3 benchmark from
-`pygad.benchmarks.zdt`.
-
-ZDT3 has a Pareto front that is made of five disconnected convex
-pieces, which makes it a good test for diversity preservation.
-"""
+"""Run NSGA-II on ZDT3. Front is five disconnected convex pieces."""
 
 import pygad
 from pygad.benchmarks.zdt import ZDT3

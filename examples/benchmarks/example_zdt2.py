@@ -1,11 +1,4 @@
-"""
-Run PyGAD with NSGA-II on the ZDT2 benchmark from
-`pygad.benchmarks.zdt`.
-
-ZDT2 has the same decision variable layout as ZDT1 but a non-convex
-Pareto front:
-    f2 = 1 - f1**2 for f1 in [0, 1].
-"""
+"""Run NSGA-II on ZDT2. Non-convex front: f2 = 1 - f1**2."""
 
 import pygad
 from pygad.benchmarks.zdt import ZDT2

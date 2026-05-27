@@ -4,9 +4,8 @@ import pytest
 from pygad.utils import quality_indicators
 
 
-# Two-objective example used for hand-derived expected values. Under
-# the PyGAD-max convention the reference point must be strictly worse
-# than every solution on every objective.
+# 2-objective fixture used for hand-derived expected values. Under
+# PyGAD-max the reference must be strictly worse than every solution.
 TWO_OBJECTIVE_FRONT = numpy.array([
     [-1.0, -8.0],
     [-3.0, -5.0],
@@ -14,7 +13,7 @@ TWO_OBJECTIVE_FRONT = numpy.array([
 ])
 TWO_OBJECTIVE_REFERENCE = numpy.array([-10.0, -10.0])
 
-# A second front used to verify IGD / GD assertions.
+# Second front used by the IGD / GD tests.
 APPROXIMATION_FRONT = numpy.array([
     [-1.0, -8.0],
     [-4.0, -4.0],
@@ -23,27 +22,22 @@ APPROXIMATION_FRONT = numpy.array([
 
 
 def test_hypervolume_two_d_matches_hand_computation():
-    # Negate the points to switch to minimisation:
-    #   ref = (10, 10), points = (1, 8), (3, 5), (6, 2)
-    # The dominated area (computed by slicing the front from left to
-    # right) is 4 + 15 + 32 = 51.
+    # In min space: ref (10, 10), points (1, 8), (3, 5), (6, 2).
+    # Sliced area from left to right: 4 + 15 + 32 = 51.
     expected_hv = 4.0 + 15.0 + 32.0
     hv = quality_indicators.hypervolume(TWO_OBJECTIVE_FRONT, TWO_OBJECTIVE_REFERENCE)
     assert hv == pytest.approx(expected_hv, abs=1e-9)
 
 
 def test_hypervolume_single_solution_equals_box_volume():
-    # Single non-dominated point at (-2, -3) with reference (-10, -10).
-    # Negated: point (2, 3), ref (10, 10). Box volume = (10-2) * (10-3)
-    # = 8 * 7 = 56.
+    # Point (-2, -3), ref (-10, -10). In min: box = 8 * 7 = 56.
     fitness = numpy.array([[-2.0, -3.0]])
     reference = numpy.array([-10.0, -10.0])
     assert quality_indicators.hypervolume(fitness, reference) == pytest.approx(56.0)
 
 
 def test_hypervolume_drops_dominated_solutions():
-    # The third row is dominated by both other rows. Adding it must
-    # not change the hypervolume.
+    # The added row is dominated, so HV should not change.
     extra = numpy.vstack([TWO_OBJECTIVE_FRONT, [[-4.0, -6.0]]])
     hv_clean = quality_indicators.hypervolume(TWO_OBJECTIVE_FRONT, TWO_OBJECTIVE_REFERENCE)
     hv_with_dominated = quality_indicators.hypervolume(extra, TWO_OBJECTIVE_REFERENCE)
@@ -59,13 +53,8 @@ def test_hypervolume_rejects_reference_point_inside_front():
 
 
 def test_hypervolume_three_d_axis_aligned_extremes():
-    # Three axis-extreme solutions under PyGAD max:
-    #   (-1, 0, 0), (0, -1, 0), (0, 0, -1).
-    # Negated to minimisation:
-    #   (1, 0, 0), (0, 1, 0), (0, 0, 1)  with reference (2, 2, 2).
-    # Each solution dominates a 1 x 2 x 2 box of volume 4, but they
-    # overlap. By inclusion-exclusion the union has volume
-    # 4 + 4 + 4 - 2 - 2 - 2 + 1 = 7.
+    # Three axis-extreme points, ref (-2,-2,-2). In min: each point
+    # dominates a 1x2x2 box, by inclusion-exclusion union = 7.
     fitness = numpy.array([
         [-1.0,  0.0,  0.0],
         [ 0.0, -1.0,  0.0],
@@ -83,12 +72,10 @@ def test_inverted_generational_distance_zero_when_approximation_matches_referenc
 
 
 def test_inverted_generational_distance_matches_hand_value():
-    # For every row of TWO_OBJECTIVE_FRONT find the nearest row in
-    # APPROXIMATION_FRONT under Euclidean distance, then average.
-    # Hand check:
-    #   ref (-1, -8) closest to approx (-1, -8) = distance 0
-    #   ref (-3, -5) closest to approx (-4, -4) = sqrt(1 + 1) = sqrt(2)
-    #   ref (-6, -2) closest to approx (-7, -1) = sqrt(1 + 1) = sqrt(2)
+    # Nearest approx per ref:
+    #   (-1,-8) -> (-1,-8) = 0
+    #   (-3,-5) -> (-4,-4) = sqrt(2)
+    #   (-6,-2) -> (-7,-1) = sqrt(2)
     expected = (0.0 + numpy.sqrt(2.0) + numpy.sqrt(2.0)) / 3.0
     igd = quality_indicators.inverted_generational_distance(
         APPROXIMATION_FRONT, TWO_OBJECTIVE_FRONT)
@@ -96,8 +83,7 @@ def test_inverted_generational_distance_matches_hand_value():
 
 
 def test_generational_distance_matches_hand_value():
-    # For every row of APPROXIMATION_FRONT find the nearest row in
-    # TWO_OBJECTIVE_FRONT, then average.
+    # Symmetric of the IGD test: same pairings, same average.
     expected = (0.0 + numpy.sqrt(2.0) + numpy.sqrt(2.0)) / 3.0
     gd = quality_indicators.generational_distance(
         APPROXIMATION_FRONT, TWO_OBJECTIVE_FRONT)
@@ -105,9 +91,8 @@ def test_generational_distance_matches_hand_value():
 
 
 def test_spacing_zero_for_equally_spaced_points():
-    # Three colinear points equally spaced give nearest-neighbour
-    # distances [1, 1, 1] (each endpoint sees its closest neighbour at
-    # distance 1). The standard deviation is therefore 0.
+    # Three colinear, equally spaced points -> nearest-neighbour
+    # distances are all 1 -> std = 0.
     fitness = numpy.array([
         [0.0, 0.0],
         [1.0, 0.0],
@@ -117,17 +102,14 @@ def test_spacing_zero_for_equally_spaced_points():
 
 
 def test_spacing_for_single_solution_returns_zero():
-    # The metric is undefined for a single point; the implementation
-    # short-circuits to 0.0 so the user does not have to special-case
-    # it in their reporting code.
+    # Undefined for one point; we return 0.0 to keep callers simple.
     fitness = numpy.array([[1.0, 2.0]])
     assert quality_indicators.spacing(fitness) == 0.0
 
 
 def test_hypervolume_random_four_dim_matches_pinned_value():
-    # Pinned regression for a 4-objective case. The expected value
-    # was computed once on this exact input array and stored here so
-    # the test is fully self-contained (no external library calls).
+    # 4-objective regression. Expected value was computed once on
+    # this exact array and pinned so the test is self-contained.
     rng = numpy.random.default_rng(42)
     fitness_min = rng.uniform(0.0, 1.0, size=(20, 4))
     fitness_max = -fitness_min

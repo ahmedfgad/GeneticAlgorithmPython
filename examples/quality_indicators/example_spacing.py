@@ -1,10 +1,7 @@
-"""
-Compute the spacing metric of the final NSGA-II population on the
-ZDT1 benchmark.
+"""Compute the spacing metric of the final NSGA-II population on ZDT1.
 
-Spacing is the standard deviation of the distance from each
-solution to its nearest neighbour. A smaller value means the
-solutions are spread more evenly along the front.
+Spacing is the standard deviation of each solution's nearest
+neighbour distance. Smaller means a more even spread.
 """
 
 import pygad

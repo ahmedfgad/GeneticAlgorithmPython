@@ -1,13 +1,12 @@
 """
-0/1 Knapsack benchmark problem.
+0/1 Knapsack benchmark.
 
-Each item has a weight and a value. The goal is to pick a subset of
-items so the total value is the maximum possible while keeping the
-total weight at or below the capacity.
+Each item has a weight and a value. Pick a subset of items so the
+total value is the largest possible while the total weight stays
+within the capacity.
 
-A solution is a binary vector of length num_items. A 1 means the
-item is picked and a 0 means it is not. To plug into PyGAD use the
-class attributes `gene_space` and `gene_type` directly:
+A solution is a binary vector (one bit per item). Plug into PyGAD
+with the class attributes:
 
     problem = Knapsack(weights=[...], values=[...], capacity=...)
     ga = pygad.GA(
@@ -24,12 +23,10 @@ import numpy
 
 class Knapsack:
     """
-    0/1 knapsack problem.
+    0/1 knapsack.
 
-    If a candidate exceeds the capacity, the fitness is negative and
-    scaled by how much the solution is over the limit. So infeasible
-    solutions still carry useful gradient information toward the
-    feasible region.
+    If a solution is over capacity, fitness is negative and scaled by
+    the overweight amount. This keeps a gradient toward feasibility.
     """
     num_objectives = 1
     gene_space = [0, 1]
@@ -49,14 +46,11 @@ class Knapsack:
                 f"weights and values must have the same length, but got "
                 f"{weights.shape[0]} weights and {values.shape[0]} values.")
         if not numpy.all(weights >= 0):
-            raise ValueError(
-                "weights must be non-negative.")
+            raise ValueError("weights must be non-negative.")
         if not numpy.all(values >= 0):
-            raise ValueError(
-                "values must be non-negative.")
+            raise ValueError("values must be non-negative.")
         if capacity <= 0:
-            raise ValueError(
-                f"capacity must be positive, but got {capacity}.")
+            raise ValueError(f"capacity must be positive, but got {capacity}.")
         self.weights = weights
         self.values = values
         self.capacity = float(capacity)

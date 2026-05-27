@@ -1,10 +1,9 @@
 """
 Classic single-objective benchmark problems.
 
-Every problem class can be called with the PyGAD fitness function
-signature (ga, solution, sol_idx) and returns a single fitness value.
-The original minimization values are negated so PyGAD can maximize
-toward the original minimum.
+Each class is callable with the (ga, solution, sol_idx) signature
+and returns a single fitness value. Minimisation values are negated
+so PyGAD can maximise them.
 """
 
 import math
@@ -21,10 +20,7 @@ class _SingleObjectiveProblem:
 
 
 class Sphere(_SingleObjectiveProblem):
-    """
-    Sphere function. The global minimum is at the origin where
-    f(x) = 0.
-    """
+    """Sphere. Global minimum at the origin, f(x) = 0."""
     bounds = (-5.12, 5.12)
 
     def __init__(self, num_genes=10):
@@ -36,10 +32,7 @@ class Sphere(_SingleObjectiveProblem):
 
 
 class Rastrigin(_SingleObjectiveProblem):
-    """
-    Rastrigin function. It has many local minima placed at regular
-    spaces. The global minimum is at the origin where f(x) = 0.
-    """
+    """Rastrigin. Many regularly-spaced local minima. Global minimum at the origin, f(x) = 0."""
     bounds = (-5.12, 5.12)
 
     def __init__(self, num_genes=10):
@@ -53,9 +46,8 @@ class Rastrigin(_SingleObjectiveProblem):
 
 class Rosenbrock(_SingleObjectiveProblem):
     """
-    Rosenbrock function. The global minimum is at x = (1, 1, ..., 1)
-    where f(x) = 0. The minimum sits at the bottom of a long, narrow,
-    banana-shaped valley.
+    Rosenbrock. Global minimum at x = (1, ..., 1), f(x) = 0.
+    The minimum sits in a long narrow banana-shaped valley.
     """
     bounds = (-5.0, 10.0)
 
@@ -69,10 +61,7 @@ class Rosenbrock(_SingleObjectiveProblem):
 
 
 class Griewank(_SingleObjectiveProblem):
-    """
-    Griewank function. It has many local minima spread over a wide
-    area. The global minimum is at the origin where f(x) = 0.
-    """
+    """Griewank. Many local minima over a wide area. Global minimum at the origin, f(x) = 0."""
     bounds = (-600.0, 600.0)
 
     def __init__(self, num_genes=10):
@@ -89,10 +78,9 @@ class Griewank(_SingleObjectiveProblem):
 
 class Schwefel(_SingleObjectiveProblem):
     """
-    Schwefel function. The global minimum is at
-    x = (420.9687, 420.9687, ..., 420.9687) and f(x) is close to 0.
-    The global minimum sits far from the next-best local minimum so
-    the function is hard for many algorithms.
+    Schwefel. Global minimum at x = (420.9687, ..., 420.9687), f(x) ~ 0.
+    It sits far from the next-best local minimum, which trips up
+    many algorithms.
     """
     bounds = (-500.0, 500.0)
 
@@ -106,10 +94,7 @@ class Schwefel(_SingleObjectiveProblem):
 
 
 class Ackley(_SingleObjectiveProblem):
-    """
-    Ackley function. It has a near-flat outer region with a deep,
-    narrow basin at the origin where f(x) = 0.
-    """
+    """Ackley. Near-flat outer region with a deep narrow basin at the origin, f(x) = 0."""
     bounds = (-32.768, 32.768)
 
     def __init__(self, num_genes=10):
@@ -128,8 +113,7 @@ class Ackley(_SingleObjectiveProblem):
 
 class Himmelblau(_SingleObjectiveProblem):
     """
-    Himmelblau function. A 2D problem with four equal global minima
-    at f(x, y) = 0:
+    Himmelblau. 2D problem with four equal global minima at f = 0:
         (3.0, 2.0),
         (-2.805, 3.131),
         (-3.779, -3.283),

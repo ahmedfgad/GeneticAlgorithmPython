@@ -1,10 +1,4 @@
-"""
-Run PyGAD with NSGA-III on the DTLZ3 benchmark from
-`pygad.benchmarks.dtlz`.
-
-DTLZ3 has the same unit-sphere front as DTLZ2 but its g-function is
-hard and multimodal, which makes convergence much harder.
-"""
+"""Run NSGA-III on DTLZ3. Same unit-sphere front as DTLZ2, with a hard multimodal g."""
 
 import pygad
 from pygad.benchmarks.dtlz import DTLZ3

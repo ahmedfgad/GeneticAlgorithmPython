@@ -1,9 +1,4 @@
-"""
-Run PyGAD on the Griewank benchmark from `pygad.benchmarks.classic`.
-
-Griewank has many local minima spread over a wide area. The global
-minimum is at the origin where f(x) = 0.
-"""
+"""Run PyGAD on the Griewank benchmark. Many local minima, global at the origin."""
 
 import pygad
 from pygad.benchmarks.classic import Griewank

@@ -1,11 +1,4 @@
-"""
-Run PyGAD with NSGA-III on the DTLZ4 benchmark from
-`pygad.benchmarks.dtlz`.
-
-DTLZ4 has a unit-sphere front like DTLZ2 but the alpha bias squashes
-position variables toward one corner, so a good algorithm has to
-fight the bias to cover the whole front.
-"""
+"""Run NSGA-III on DTLZ4. Same shape as DTLZ2; alpha bias pushes solutions to one corner."""
 
 import pygad
 from pygad.benchmarks.dtlz import DTLZ4

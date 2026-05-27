@@ -1,16 +1,16 @@
 # Benchmark Problems
 
-PyGAD ships a small collection of standard benchmark problems under `pygad.benchmarks`. Each problem is a class that can be called with the PyGAD fitness signature `(ga, solution, sol_idx)` and returns a fitness value in PyGAD's maximization format (the original minimization values are negated for you).
+PyGAD bundles common benchmark problems under `pygad.benchmarks`. Each problem is a class callable with `(ga, solution, sol_idx)` and returns a fitness in PyGAD's maximisation format. Minimisation values are negated.
 
-Each class also exposes the attributes you usually need to set up the GA:
+Class attributes for setting up the GA:
 
 - `num_genes`: number of decision variables.
-- `num_objectives`: number of objectives. `1` for single-objective problems.
+- `num_objectives`: number of objectives (`1` for single-objective).
 - `bounds`: `(low, high)` tuple of variable bounds.
 
-For ZDT problems and ZDT4 / ZDT6, the class also has a `pareto_front(num_points)` method that returns reference points on the true Pareto front. Pass these to the IGD or GD indicators as the `reference_front` argument.
+ZDT classes also have a `pareto_front(num_points)` method that returns true-front reference points. Pass these to the IGD or GD indicators as `reference_front`.
 
-One runnable example per benchmark is available under `examples/benchmarks/`.
+A runnable example per benchmark lives under `examples/benchmarks/`.
 
 ## Single-Objective Problems
 
@@ -28,7 +28,7 @@ Available in `pygad.benchmarks.classic`:
 
 ## Multi-Objective Problems (ZDT family)
 
-Available in `pygad.benchmarks.zdt`. All ZDT problems have two objectives and variables in `[0, 1]` (except ZDT4 which uses `[-5, 5]` for the rest of the variables).
+In `pygad.benchmarks.zdt`. Two objectives, variables in `[0, 1]` (ZDT4 uses `[-5, 5]` for the rest).
 
 | Class | Pareto front shape |
 |---|---|
@@ -40,7 +40,7 @@ Available in `pygad.benchmarks.zdt`. All ZDT problems have two objectives and va
 
 ## Many-Objective Problems (DTLZ family)
 
-Available in `pygad.benchmarks.dtlz`. All DTLZ problems support an arbitrary number of objectives `M`. The number of decision variables is `M + k - 1` where `k` is a "distance" variable count.
+In `pygad.benchmarks.dtlz`. Any number of objectives `M`. Decision variables: `M + k - 1`, where `k` is the distance-variable count.
 
 | Class | Default M | Pareto front shape |
 |---|---|---|
@@ -51,13 +51,13 @@ Available in `pygad.benchmarks.dtlz`. All DTLZ problems support an arbitrary num
 
 ## Combinatorial Problems
 
-Two combinatorial benchmarks are available: the 0/1 `Knapsack` and the `TSP`.
+Two combinatorial benchmarks: 0/1 `Knapsack` and `TSP`.
 
 ### Knapsack
 
-Available in `pygad.benchmarks.knapsack`. The 0/1 `Knapsack` class takes three arguments: a 1D array of item `weights`, a 1D array of item `values`, and a numeric `capacity`. A solution is a binary vector where a 1 means the item is picked. The fitness is the total value when the candidate is within the capacity, and a negative penalty scaled by how much the candidate is over the limit otherwise.
+In `pygad.benchmarks.knapsack`. `Knapsack` takes three arguments: 1D arrays of `weights` and `values`, and a numeric `capacity`. A solution is a binary vector (1 = pick the item). Fitness is the total value within capacity, or a negative penalty scaled by the overweight amount.
 
-The class exposes `gene_space=[0, 1]` and `gene_type=int` so you can plug it directly into PyGAD:
+Class attributes `gene_space=[0, 1]` and `gene_type=int` plug into PyGAD as is:
 
 ```python
 import pygad
@@ -81,9 +81,9 @@ ga.run()
 
 ### Travelling Salesman Problem
 
-Available in `pygad.benchmarks.tsp`. The `TSP` class can be built from either a 2D array of city `coordinates` or a square `distance_matrix`. A solution is a permutation of the city indices and the fitness is the negative tour length (the tour closes back to the first city). Any non-permutation candidate gets a large negative penalty so the GA keeps a gradient toward feasibility.
+In `pygad.benchmarks.tsp`. Build `TSP` from either a 2D `coordinates` array or a square `distance_matrix`. A solution is a permutation of city indices and the fitness is the negative tour length (the tour closes back to the start). Non-permutation candidates get a large negative penalty.
 
-The class exposes `gene_space=list(range(num_cities))`, `gene_type=int`, and `allow_duplicate_genes=False` so the permutation constraint is respected:
+Class attributes `gene_space=list(range(num_cities))`, `gene_type=int`, and `allow_duplicate_genes=False` keep the permutation constraint:
 
 ```python
 import pygad
@@ -156,7 +156,7 @@ ga = pygad.GA(
 )
 ga.run()
 
-# Measure how close the final population is to the true Pareto front
+# IGD against the true front.
 true_front = problem.pareto_front(num_points=100)
 igd = inverted_generational_distance(ga.last_generation_fitness, true_front)
 print(f'IGD = {igd}')

@@ -1,9 +1,4 @@
-"""
-Run PyGAD on the Rastrigin benchmark from `pygad.benchmarks.classic`.
-
-Rastrigin has many local minima placed at regular spaces. The global
-minimum is at the origin where f(x) = 0.
-"""
+"""Run PyGAD on the Rastrigin benchmark. Many local minima, global at the origin."""
 
 import pygad
 from pygad.benchmarks.classic import Rastrigin

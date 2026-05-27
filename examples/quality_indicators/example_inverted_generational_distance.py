@@ -1,10 +1,7 @@
-"""
-Compute the Inverted Generational Distance (IGD) of the final
-NSGA-II population on the ZDT1 benchmark.
+"""Compute IGD of the final NSGA-II population on ZDT1.
 
-IGD is the mean Euclidean distance from each true-front reference
-point to its nearest approximation point. A smaller value is
-better; it reports both convergence and diversity.
+IGD averages the distance from each true-front reference point to
+its nearest approximation point. Smaller is better.
 """
 
 import pygad

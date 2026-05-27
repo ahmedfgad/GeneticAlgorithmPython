@@ -1,10 +1,4 @@
-"""
-Run PyGAD with NSGA-II on the ZDT1 benchmark from
-`pygad.benchmarks.zdt`.
-
-ZDT1 has two objectives and a convex Pareto front:
-    f2 = 1 - sqrt(f1) for f1 in [0, 1].
-"""
+"""Run NSGA-II on ZDT1. Convex front: f2 = 1 - sqrt(f1)."""
 
 import pygad
 from pygad.benchmarks.zdt import ZDT1

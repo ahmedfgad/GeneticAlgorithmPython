@@ -150,6 +150,20 @@ def test_normalise_fitness_clips_above_one_and_below_zero(nsga3):
     assert normalised.max() <= 1.0
 
 
+def test_normalise_fitness_handles_near_zero_negative_denominator(nsga3):
+    # Intercept sits within 1e-12 of the ideal so the denominator
+    # collapses to a tiny negative. The safeguard must keep the sign
+    # negative so (fitness - ideal) / denom comes out positive (and
+    # then clips to 1.0). A buggy safeguard that lets the denom flip
+    # to zero or positive would produce inf / nan or 0.0 instead.
+    ideal = numpy.array([0.0])
+    intercepts = numpy.array([-1e-15])
+    fitness = numpy.array([[-1.0]])
+    normalised = nsga3.normalise_fitness(fitness, ideal, intercepts)
+    assert numpy.all(numpy.isfinite(normalised))
+    assert normalised[0, 0] == pytest.approx(1.0)
+
+
 # Reference points for M=2, p=3 in the order generate_reference_points
 # emits them (stars-and-bars enumeration).
 REFERENCE_POINTS_M2_P3 = numpy.array([

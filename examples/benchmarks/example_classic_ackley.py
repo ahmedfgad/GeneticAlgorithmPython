@@ -1,9 +1,4 @@
-"""
-Run PyGAD on the Ackley benchmark from `pygad.benchmarks.classic`.
-
-Ackley has a near-flat outer region with a deep, narrow basin at
-the origin where f(x) = 0.
-"""
+"""Run PyGAD on the Ackley benchmark. Flat outside, deep basin at the origin."""
 
 import pygad
 from pygad.benchmarks.classic import Ackley

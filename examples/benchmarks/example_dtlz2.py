@@ -1,9 +1,4 @@
-"""
-Run PyGAD with NSGA-III on the DTLZ2 benchmark from
-`pygad.benchmarks.dtlz`.
-
-DTLZ2 has a Pareto front on the first orthant of the unit sphere.
-"""
+"""Run NSGA-III on DTLZ2. Front is the first orthant of the unit sphere."""
 
 import pygad
 from pygad.benchmarks.dtlz import DTLZ2

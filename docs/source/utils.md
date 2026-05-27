@@ -369,7 +369,7 @@ true_front = problem.pareto_front(num_points=100)
 igd = inverted_generational_distance(fitness, true_front)
 ```
 
-One runnable example per indicator is available under `examples/quality_indicators/`.
+A runnable example per indicator lives under `examples/quality_indicators/`.
 
 ## More about the Operators
 

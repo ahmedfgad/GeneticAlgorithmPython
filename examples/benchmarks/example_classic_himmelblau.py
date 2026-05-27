@@ -1,13 +1,4 @@
-"""
-Run PyGAD on the 2D Himmelblau benchmark from
-`pygad.benchmarks.classic`.
-
-Himmelblau has four equal global minima at f(x, y) = 0:
-    (3.0, 2.0),
-    (-2.805, 3.131),
-    (-3.779, -3.283),
-    (3.584, -1.848).
-"""
+"""Run PyGAD on the 2D Himmelblau benchmark. Four global minima at f = 0."""
 
 import pygad
 from pygad.benchmarks.classic import Himmelblau

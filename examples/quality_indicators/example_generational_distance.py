@@ -1,10 +1,7 @@
-"""
-Compute the Generational Distance (GD) of the final NSGA-II
-population on the ZDT2 benchmark.
+"""Compute GD of the final NSGA-II population on ZDT2.
 
-GD is the mean Euclidean distance from each approximation point to
-its nearest true-front reference point. A smaller value is better;
-GD only measures convergence and not diversity.
+GD averages the distance from each approximation point to its
+nearest true-front reference point. Smaller is better.
 """
 
 import pygad

@@ -203,10 +203,11 @@ class NSGA3:
         ideal_point = numpy.asarray(ideal_point, dtype=float)
         intercepts = numpy.asarray(intercepts, dtype=float)
         denominator = intercepts - ideal_point
-        # If the denominator is essentially zero on some axis, replace it
-        # with a tiny non-zero value so we do not divide by zero.
-        safe_denominator = numpy.where(numpy.abs(denominator) < INTERCEPT_NEAR_ZERO,
-                                       numpy.sign(denominator) * INTERCEPT_NEAR_ZERO + INTERCEPT_NEAR_ZERO,
+        # Under PyGAD-max, intercepts sit below ideal so denominator is
+        # negative. Replace near-zero entries with a tiny negative value
+        # to keep the sign correct and avoid divide-by-zero.
+        safe_denominator = numpy.where(denominator > -INTERCEPT_NEAR_ZERO,
+                                       -INTERCEPT_NEAR_ZERO,
                                        denominator)
         raw = (fitness - ideal_point) / safe_denominator
         return numpy.clip(raw, 0.0, 1.0)

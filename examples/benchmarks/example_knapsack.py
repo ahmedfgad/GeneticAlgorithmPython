@@ -1,11 +1,7 @@
-"""
-Run PyGAD on the 0/1 Knapsack benchmark from
-`pygad.benchmarks.knapsack`.
+"""Run PyGAD on the 0/1 Knapsack benchmark.
 
-A solution is a binary vector. The fitness is the total value when
-the candidate is within the capacity, and a negative penalty scaled
-by the overweight amount otherwise. The known optimal subset for
-this small instance is items 0 and 1 (total value = 7).
+Items (weight, value): (2,3), (3,4), (4,5), (5,6) with capacity 5.
+Optimal subset is items 0 and 1 (total value 7).
 """
 
 import pygad

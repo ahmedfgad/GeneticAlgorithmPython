@@ -1,12 +1,7 @@
-"""
-Compute the hypervolume of the final NSGA-II population on the
-ZDT1 benchmark.
+"""Compute the hypervolume of the final NSGA-II population on ZDT1.
 
-Hypervolume measures how much of the objective space is dominated
-by the approximation front. A bigger value means better coverage.
-The reference point must be worse than every solution on every
-objective; under PyGAD's max convention this means it must be
-strictly smaller than every fitness value.
+The reference point must be worse than every solution on every axis,
+which under PyGAD-max means strictly smaller than every fitness.
 """
 
 import numpy
@@ -32,7 +27,6 @@ ga = pygad.GA(num_generations=200,
 ga.run()
 
 final_fitness = numpy.asarray(ga.last_generation_fitness)
-# Reference: a little worse on every axis than the worst fitness seen.
 reference_point = final_fitness.min(axis=0) - 0.1
 
 hv = hypervolume(final_fitness, reference_point)

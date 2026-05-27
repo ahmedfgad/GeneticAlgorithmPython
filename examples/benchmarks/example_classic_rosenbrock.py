@@ -1,9 +1,4 @@
-"""
-Run PyGAD on the Rosenbrock benchmark from `pygad.benchmarks.classic`.
-
-The global minimum is at x = (1, 1, ..., 1) where f(x) = 0. The
-minimum lives at the bottom of a long, narrow, banana-shaped valley.
-"""
+"""Run PyGAD on the Rosenbrock benchmark. Minimum sits in a narrow banana-shaped valley."""
 
 import pygad
 from pygad.benchmarks.classic import Rosenbrock

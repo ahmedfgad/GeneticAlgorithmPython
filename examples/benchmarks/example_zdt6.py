@@ -1,11 +1,4 @@
-"""
-Run PyGAD with NSGA-II on the ZDT6 benchmark from
-`pygad.benchmarks.zdt`.
-
-ZDT6 has a non-uniform Pareto front. Solutions cluster toward one
-end so a good algorithm has to preserve diversity over the whole
-front.
-"""
+"""Run NSGA-II on ZDT6. Non-uniform front; solutions cluster at one end."""
 
 import pygad
 from pygad.benchmarks.zdt import ZDT6

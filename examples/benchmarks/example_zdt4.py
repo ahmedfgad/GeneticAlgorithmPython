@@ -1,11 +1,4 @@
-"""
-Run PyGAD with NSGA-II on the ZDT4 benchmark from
-`pygad.benchmarks.zdt`.
-
-ZDT4 has the same convex front as ZDT1 but its search space has
-many local minima. The first variable lives in [0, 1] and the rest
-in [-5, 5].
-"""
+"""Run NSGA-II on ZDT4. Same convex front as ZDT1; search space has many local minima."""
 
 import pygad
 from pygad.benchmarks.zdt import ZDT4

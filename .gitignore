@@ -17,6 +17,11 @@ docs/build/
 .venv-docs/
 
 # =============================================================================
+# Local virtual environment (setup_venv.sh).
+# =============================================================================
+.venv/
+
+# =============================================================================
 # IDE settings: JetBrains (PyCharm, IntelliJ, etc.) workspace files.
 # These are personal to each developer and should not be committed.
 # =============================================================================
