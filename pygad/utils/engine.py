@@ -533,6 +533,13 @@ class GAEngine:
             elif type(self.last_generation_fitness[0]) in [list, tuple, numpy.ndarray]:
                 # Multi-objective problem.
                 if self.parent_selection_type in ('nsga3', 'tournament_nsga3'):
+                    # The reference points are created before starting the evolution and after the initial fitness is calculated.
+                    # The number of reference points is determined based on:
+                    #     1) The number of divisions (passed by the user).
+                    #     2) The number of objectives (only known after the fitness is calculated).
+                    # In PyGAD, the number of objectives are known only from the length of the returned result of the fitness function.
+                    # This is how NSGA-III knows the number of objectives from the calculated fitness.
+                    # It is time to build the reference points.
                     self._bootstrap_nsga3_reference_points()
 
             best_solution, best_solution_fitness, best_match_idx = self.best_solution(pop_fitness=self.last_generation_fitness)
