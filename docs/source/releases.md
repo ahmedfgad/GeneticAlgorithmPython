@@ -648,11 +648,46 @@ Release Date April 8, 2026
 18. Fix a bug in the `visualize/plot.py` script that causes a warning to be given when the plot leged is used with single-objective problems.
 19. A new method called `initialize_parents_array()` is added to the `Helper` class in the `pygad/helper/misc.py` script. It is usually called from the methods in the `ParentSelection` class in the `pygad/utils/parent_selection.py` script to initialize the parents array.
 20. Add more tests about: 
-          1. Operators (crossover, mutation, and parent selection).
-                2. The `best_solution()` method.
-                3. Parallel processing.
-                      4. The `GANN` module.
-                      5. The plots created by the `visualize`.
+             1. Operators (crossover, mutation, and parent selection).
+                   2. The `best_solution()` method.
+                   3. Parallel processing.
+                         4. The `GANN` module.
+                         5. The plots created by the `visualize`.
 21. Instead of using repeated code for converting the data type and rounding the genes during crossover and mutation, the `change_gene_dtype_and_round()` method is called from the `pygad.helper.misc.Helper` class.
 22. Fix some documentation issues. https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/336
 23. Update the documentation to reflect the recent additions and changes to the library structure.
+
+## PyGAD 3.7.0
+
+Release Date ..., 2026
+
+1. Validation logic is applied to validate the `num_generations` parameter.
+2. The `num_generations` parameter must be assigned a positive integer. Previously, any number (positive/negative, int/float) was accepted.
+3. A new script called `activation.py` is added into the `pygad.helper` module to include the activation function used by the `cnn` and `nn` modules.
+4. In the `pygad.parent_selection.ParentSelection` class,  the `stochastic_universal_selection()` method now calls the `wheel_cumulative_probs()` method instead of repeating the code of calculating the probabilities used for parent selection.
+5. The `wheel_cumulative_probs()` method in the `pygad.parent_selection.ParentSelection` class is refactored to reduce its computational time.
+6. Use `numpy.where()` to decide which the source parent of each gene within the `uniform_crossover()` method in the `utils/crossover.py` script. The same was already applied to the `scattered_crossover()` method.
+7. Add tests for the following modules:
+  `nn`
+  `cnn`
+  `gacnn`
+  `kerasga`
+  `torchga`
+8. Fix a bug in the `visualize/plot.py` script where the `labels` parameter of `boxplot()` has been renamed `tick_labels` in Matplotlib.
+9. Fix a bug where the `best_solutions_fitness` list (instance attribute to `pygad.GA`) has the fitness of the last generation duplicated when an early stop happens inside the `on_generation()` callback. This made its size incompatible with the `best_solutions` list.
+10. The documentation is refactored to solve many language issues and the Furo theme is applied. For easy navigation, the index is reformatted to only show the main sections. At each page, its index is shown at the right side. A new theme toggle button to change theme between light and dark.
+11. Support of multi-objective optimization using the Non-Dominated Sorting Genetic Algorithm III (NSGA-III). NSGA-III replaces the crowding distance of NSGA-II with niching against a structured grid of reference points, so it scales better to problems with 4 or more objectives. The new `NSGA3` class lives in the new `pygad/utils/nsga3.py` script and is mixed into the `pygad.GA` class the same way `NSGA2` is.
+12. Two new parent selection methods are added to support NSGA-III: 1) `nsga3_selection()` for plain NSGA-III selection, and 2) `tournament_selection_nsga3()` for the tournament variant. Use them by setting `parent_selection_type` to `'nsga3'` or `'tournament_nsga3'`.
+13. A new parameter `nsga3_num_divisions` is added to the `pygad.GA` constructor. It is required when `parent_selection_type` is `'nsga3'` or `'tournament_nsga3'` and sets the number of divisions per objective axis used to build the structured reference points (the `p` parameter from Deb & Jain 2014). The total number of reference points is `C(M + p - 1, p)` where `M` is the number of objectives.
+14. When `sol_per_pop` is smaller than the number of NSGA-III reference points, PyGAD raises a warning and grows the population to match before the generational loop starts.
+15. A new crossover operator: Simulated Binary Crossover (SBX). Use it by setting `crossover_type='sbx'`. The shape of the spread is controlled by the new `sbx_crossover_eta` parameter (default 30).
+16. A new mutation operator: polynomial mutation. Use it by setting `mutation_type='polynomial'`. The size of the change is controlled by the new `polynomial_mutation_eta` parameter (default 20).
+17. Two new stop criteria: `time_<seconds>` stops the run when the time inside `run()` is at least the given number of seconds; `evaluations_<N>` stops the run when the number of fitness function calls reaches the given count. New instance attribute `num_fitness_evaluations` counts the calls.
+18. A new submodule `pygad.utils.quality_indicators` with four functions to measure the quality of a Pareto front: `hypervolume`, `inverted_generational_distance`, `generational_distance`, and `spacing`.
+19. A new submodule `pygad.benchmarks` with built-in benchmark problems. `pygad.benchmarks.classic` has Sphere, Rastrigin, Rosenbrock, Griewank, Schwefel, Ackley, and Himmelblau. `pygad.benchmarks.zdt` has the ZDT family (ZDT1, ZDT2, ZDT3, ZDT4, ZDT6). `pygad.benchmarks.dtlz` has DTLZ1, DTLZ2, DTLZ3, and DTLZ4. `pygad.benchmarks.knapsack` has the 0/1 Knapsack problem. Each class is callable with the PyGAD fitness signature and returns negated values (for the minimization-style problems) so PyGAD can maximize toward the original minimum.
+20. Update the documentation to reflect the recent additions and changes to the library structure.
+21. A new benchmark `pygad.benchmarks.tsp` with a `TSP` class for the Travelling Salesman Problem. The class accepts either 2D `coordinates` or a precomputed `distance_matrix`, exposes `gene_space`, `gene_type`, and `allow_duplicate_genes` for the permutation encoding, and returns the negative tour length as the fitness.
+22. Two new example folders under `/examples`: `examples/benchmarks/` has one runnable example per benchmark (classic, ZDT, DTLZ, knapsack, and TSP), and `examples/quality_indicators/` has one runnable example per quality indicator (hypervolume, IGD, GD, and spacing).
+23. `plot_pareto_front_curve()` now also supports 3 objectives (3D scatter). M >= 4 still raises and points to the new high-dimensional plots.
+24. Seven new plot methods on `pygad.GA`. The first three work on the final population (no extra flag needed): `plot_pareto_front_pcp()` (parallel coordinates, any M >= 2), `plot_pareto_front_scatter_matrix()` (M-by-M pairwise scatter, best for M >= 4), and `plot_pareto_front_heatmap()` (solutions-by-objectives heatmap). The other four require `save_solutions=True`: `plot_fitness_band()` (per-generation min / mean / max with a shaded band), `plot_non_dominated_hypervolume()` (hypervolume of the non-dominated set per generation), `plot_population_diversity()` (mean pairwise distance per generation), and `plot_pareto_front_evolution()` (non-dominated set overlaid every k generations).
+25. Fix a latent divide-by-zero in `NSGA3.normalise_fitness()`. The safeguard for near-zero denominators used to collapse to `0` for tiny negative values (the realistic case under PyGAD-max), which silently produced wrong normalised values. The safeguard now keeps the negative sign.

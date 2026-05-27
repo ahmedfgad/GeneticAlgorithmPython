@@ -1,317 +1,163 @@
 # `pygad.visualize` Module
 
-This section of the documentation discusses the **pygad.visualize** module. It offers methods to visualize the results in PyGAD.
+The `pygad.visualize.plot.Plot` class is mixed into `pygad.GA`. Each method below is callable on a GA instance after `run()`.
 
-This section explains the different ways to visualize the results in PyGAD through these methods:
+Every method returns the `matplotlib.figure.Figure` it created and optionally writes it to disk via `save_dir`. A runnable script for each plot lives under [`examples/plots/`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/plots).
 
-1. `plot_fitness()`: Creates plots that show how the fitness evolves over the generations.
-2. `plot_genes()`: Creates plots that show how the gene values change over the generations.
-3. `plot_new_solution_rate()`: Creates plots that show how many new solutions are explored in each generation.
-4. `plot_pareto_front_curve()`: Creates the Pareto front plot for multi-objective problems.
+## Plot inventory
 
-In the following code, the `save_solutions` flag is set to `True` which means all solutions are saved in the `solutions` attribute. The code runs for only 10 generations.
+| Method | Works for | Needs `save_solutions=True` |
+|---|---|---|
+| `plot_fitness()` | SOO + MOO | no |
+| `plot_new_solution_rate()` | SOO + MOO | yes |
+| `plot_genes()` | SOO + MOO | yes (`solutions="all"`) or `save_best_solutions=True` (`solutions="best"`) |
+| `plot_pareto_front_curve()` | MOO (M=2 or M=3) | no |
+| `plot_pareto_front_pcp()` | MOO (any M >= 2) | no |
+| `plot_pareto_front_scatter_matrix()` | MOO (any M >= 2; best for M >= 4) | no |
+| `plot_pareto_front_heatmap()` | MOO (any M >= 2) | no |
+| `plot_fitness_band()` | SOO + MOO | yes |
+| `plot_non_dominated_hypervolume()` | MOO | yes |
+| `plot_population_diversity()` | SOO + MOO | yes |
+| `plot_pareto_front_evolution()` | MOO (M=2 or M=3) | yes |
 
-```python
-import pygad
-import numpy
+Every method requires at least one completed generation. Each one raises `RuntimeError` with a clear message if it is called too early, on a single-objective problem when MOO is required, or without the `save_solutions` flag when one is required.
 
-equation_inputs = [4, -2, 3.5, 8, -2, 3.5, 8]
-desired_output = 2671.1234
+## `plot_fitness()`
 
-def fitness_func(ga_instance, solution, solution_idx):
-    output = numpy.sum(solution * equation_inputs)
-    fitness = 1.0 / (numpy.abs(output - desired_output) + 0.000001)
-    return fitness
+Best fitness per generation. For MOO, one curve per objective on the same axes.
 
-ga_instance = pygad.GA(num_generations=10,
-                       sol_per_pop=10,
-                       num_parents_mating=5,
-                       num_genes=len(equation_inputs),
-                       fitness_func=fitness_func,
-                       gene_space=[range(1, 10), range(10, 20), range(15, 30), range(20, 40), range(25, 50), range(10, 30), range(20, 50)],
-                       gene_type=int,
-                       save_solutions=True)
-
-ga_instance.run()
-```
-
-The next sections explain how to visualize the results with these methods.
-
-## Fitness
-
-### `plot_fitness()`
-
-The `plot_fitness()` method shows the fitness value for each generation. It creates, shows, and returns a figure that summarizes how the fitness value(s) evolve(s) by generation. It was previously named `plot_result()`.
-
-It works only after at least 1 generation is completed. If no generation is completed, an exception is raised.
-
-This method accepts the following parameters:
-
-1. `title`: Title of the figure.
-2. `xlabel`: X-axis label.
-3. `ylabel`: Y-axis label.
-4. `linewidth`: Line width of the plot. Defaults to `3`.
-5. `font_size`: Font size for the labels and title. Defaults to `14`.
-6. `plot_type`: Type of the plot which can be either `"plot"` (default), `"scatter"`, or `"bar"`.
-7. `color`: Color of the plot which defaults to the greenish color `"#64f20c"`.
-8. `label`: The label used for the legend in the figures of multi-objective problems. It is not used for single-objective problems. It defaults to `None` which means no labels used.
-9. `save_dir`: Directory to save the figure.
-
-#### `plot_type="plot"`
-
-The simplest way to call this method is as follows leaving the `plot_type` with its default value `"plot"` to create a continuous line connecting the fitness values across all generations:
+Parameters: `title`, `xlabel`, `ylabel`, `linewidth`, `font_size`, `plot_type` (`"plot"` / `"scatter"` / `"bar"`), `color`, `label`, `save_dir`.
 
 ```python
 ga_instance.plot_fitness()
-# ga_instance.plot_fitness(plot_type="plot")
 ```
 
-![plot_fitness_plot](https://user-images.githubusercontent.com/16560492/122472609-d02f5280-cf8e-11eb-88a7-f9366ff6e7c6.png)
+![plot_fitness](figures/plot_fitness.png)
 
-#### `plot_type="scatter"`
+## `plot_new_solution_rate()`
 
-The `plot_type` can also be set to `"scatter"` to create a scatter graph with each individual fitness represented as a dot. The size of these dots can be changed using the `linewidth` parameter.
+Number of previously-unseen solutions per generation. A flat curve means the GA is repeating itself; a high curve means it is still exploring. Requires `save_solutions=True`.
 
-```python
-ga_instance.plot_fitness(plot_type="scatter")
-```
-
-![plot_fitness_scatter](https://user-images.githubusercontent.com/16560492/122473159-75e2c180-cf8f-11eb-942d-31279b286dbd.png)
-
-#### `plot_type="bar"`
-
-The third value for the `plot_type` parameter is `"bar"` to create a bar graph with each individual fitness represented as a bar. 
-
-```python
-ga_instance.plot_fitness(plot_type="bar")
-```
-
-![plot_fitness_bar](https://user-images.githubusercontent.com/16560492/122473340-b7736c80-cf8f-11eb-89c5-4f7db3b653cc.png)
-
-## New Solution Rate
-
-### `plot_new_solution_rate()`
-
-The `plot_new_solution_rate()` method shows the number of new solutions explored in each generation. This helps you see whether the genetic algorithm is still finding new solutions. If no new solutions are explored, then no further evolution is possible.
-
-It works only after at least 1 generation is completed. If no generation is completed, an exception is raised.
-
-The `plot_new_solution_rate()` method accepts the same parameters as the `plot_fitness()` method (it also has 3 possible values for the `plot_type` parameter). Here are all the parameters it accepts:
-
-1. `title`: Title of the figure.
-2. `xlabel`: X-axis label.
-3. `ylabel`: Y-axis label.
-4. `linewidth`: Line width of the plot. Defaults to `3`.
-5. `font_size`: Font size for the labels and title. Defaults to `14`.
-6. `plot_type`: Type of the plot which can be either `"plot"` (default), `"scatter"`, or `"bar"`.
-7. `color`: Color of the plot which defaults to `"#3870FF"`.
-8. `save_dir`: Directory to save the figure.
-
-#### `plot_type="plot"`
-
-The default value for the `plot_type` parameter is `"plot"`.
+Parameters: `title`, `xlabel`, `ylabel`, `linewidth`, `font_size`, `plot_type`, `color`, `save_dir`.
 
 ```python
 ga_instance.plot_new_solution_rate()
-# ga_instance.plot_new_solution_rate(plot_type="plot")
 ```
 
-The next figure shows that, for example, generation 6 has the least number of new solutions, which is 4. The number of new solutions in the first generation is always equal to the number of solutions in the population (the value of the `sol_per_pop` parameter in the constructor of the `pygad.GA` class), which is 10 in this example.
+![plot_new_solution_rate](figures/plot_new_solution_rate.png)
 
-![plot_new_solution_rate_plot](https://user-images.githubusercontent.com/16560492/122475815-3322e880-cf93-11eb-9648-bf66f823234b.png)
+## `plot_genes()`
 
-#### `plot_type="scatter"`
+One subplot per gene showing how that gene drifts across generations. Three views: line per gene (`graph_type="plot"`), per-gene boxplot, per-gene histogram.
 
-The previous graph can be represented as scattered points by setting `plot_type="scatter"`.
+Use `solutions="all"` to plot every saved solution (needs `save_solutions=True`) or `solutions="best"` to plot only the best solution of each generation (needs `save_best_solutions=True`).
 
-```python
-ga_instance.plot_new_solution_rate(plot_type="scatter")
-```
-
-![plot_new_solution_rate_scatter](https://user-images.githubusercontent.com/16560492/122476108-adec0380-cf93-11eb-80ac-7588bf90492f.png)
-
-#### `plot_type="bar"`
-
-By setting `plot_type="bar"`, each value is represented as a vertical bar.
-
-```python
-ga_instance.plot_new_solution_rate(plot_type="bar")
-```
-
-![plot_new_solution_rate_bar](https://user-images.githubusercontent.com/16560492/122476173-c2c89700-cf93-11eb-9e77-d39737cd3a96.png)
-
-## Genes
-
-### `plot_genes()`
-
-The `plot_genes()` method is the third option to visualize the PyGAD results. The `plot_genes()` method creates, shows, and returns a figure that describes each gene. It has different options to create the figures which helps to:
-
-1. Explore the gene value for each generation by creating a normal plot. 
-2. Create a histogram for each gene.
-3. Create a boxplot.
-
-It works only after at least 1 generation is completed. If no generation is completed, an exception is raised.
-
-This method accepts the following parameters:
-
-1. `title`: Title of the figure.
-2. `xlabel`: X-axis label.
-3. `ylabel`: Y-axis label.
-4. `linewidth`: Line width of the plot. Defaults to `3`.
-5. `font_size`: Font size for the labels and title. Defaults to `14`.
-6. `plot_type`: Type of the plot which can be either `"plot"` (default), `"scatter"`, or `"bar"`.
-7. `graph_type`: Type of the graph which can be either `"plot"` (default), `"boxplot"`, or `"histogram"`.
-8. `fill_color`: Fill color of the graph which defaults to `"#3870FF"`. This has no effect if `graph_type="plot"`.
-9. `color`: Color of the plot which defaults to `"#3870FF"`.
-10. `solutions`: Defaults to `"all"` which means use all solutions. If `"best"` then only the best solutions are used.
-11. `save_dir`: Directory to save the figure.
-
-This method has 3 control variables:
-
-1. `graph_type="plot"`: Can be `"plot"` (default), `"boxplot"`, or `"histogram"`.
-2. `plot_type="plot"`: Identical to the `plot_type` parameter explored in the `plot_fitness()` and `plot_new_solution_rate()` methods.
-3. `solutions="all"`: Can be `"all"` (default) or `"best"`.
-
-These 3 parameters control the style of the output figure.
-
-The `graph_type` parameter selects the type of the graph which helps to explore the gene values as:
-
-1. A normal plot. 
-2. A histogram.
-3. A box and whisker plot.
-
-The `plot_type` parameter works only when the type of the graph is set to `"plot"`.
-
-The `solutions` parameter selects whether the genes come from all solutions in the population or from just the best solutions.
-
-An exception is raised if:
-
-* `solutions="all"` while `save_solutions=False` in the constructor of the `pygad.GA` class.
-* `solutions="best"` while `save_best_solutions=False` in the constructor of the `pygad.GA` class.
-
-#### `graph_type="plot"`
-
-When `graph_type="plot"`, then the figure creates a normal graph where the relationship between the gene values and the generation numbers is represented as a continuous plot, scattered points, or bars.
-
-##### `plot_type="plot"`
-
-Because the default value for both `graph_type` and `plot_type` is `"plot"`, then all of the lines below creates the same figure. This figure is helpful to know whether a gene value lasts for more generations as an indication of the best value for this gene. For example, the value 16 for the gene with index 5 (at column 2 and row 2 of the next graph) lasted for 83 generations.
-
-```python
-ga_instance.plot_genes()
-
-ga_instance.plot_genes(graph_type="plot")
-
-ga_instance.plot_genes(plot_type="plot")
-
-ga_instance.plot_genes(graph_type="plot", 
-                       plot_type="plot")
-```
-
-![plot_genes_plot](https://user-images.githubusercontent.com/16560492/122477158-4a62d580-cf95-11eb-8c93-9b6e74cb814c.png)
-
-As the default value for the `solutions` parameter is `"all"`, then the following method calls generate the same plot.
-
-```python
-ga_instance.plot_genes(solutions="all")
-
-ga_instance.plot_genes(graph_type="plot",
-                       solutions="all")
-
-ga_instance.plot_genes(plot_type="plot",
-                       solutions="all")
-
-ga_instance.plot_genes(graph_type="plot", 
-                       plot_type="plot",
-                       solutions="all")
-```
-
-##### `plot_type="scatter"`
-
-The following calls of the `plot_genes()` method create the same scatter plot.
-
-```python
-ga_instance.plot_genes(plot_type="scatter")
-
-ga_instance.plot_genes(graph_type="plot", 
-                       plot_type="scatter", 
-                       solutions='all')
-```
-
-![plot_genes_scatter](https://user-images.githubusercontent.com/16560492/122477273-73836600-cf95-11eb-828f-f357c7b0f815.png)
-
-##### `plot_type="bar"`
-
-```python
-ga_instance.plot_genes(plot_type="bar")
-
-ga_instance.plot_genes(graph_type="plot", 
-                       plot_type="bar", 
-                       solutions='all')
-```
-
-![plot_genes_bar](https://user-images.githubusercontent.com/16560492/122477370-99106f80-cf95-11eb-8643-865b55e6b844.png)
-
-#### `graph_type="boxplot"`
-
-By setting `graph_type` to `"boxplot"`, then a box and whisker graph is created. Now, the `plot_type` parameter has no effect.
-
-The following 2 calls of the `plot_genes()` method create the same figure as the default value for the `solutions` parameter is `"all"`.
+Parameters: `title`, `xlabel`, `ylabel`, `linewidth`, `font_size`, `plot_type`, `graph_type`, `fill_color`, `color`, `solutions`, `save_dir`.
 
 ```python
 ga_instance.plot_genes(graph_type="boxplot")
-
-ga_instance.plot_genes(graph_type="boxplot", 
-                       solutions='all')
 ```
 
-![plot_genes_boxplot](https://user-images.githubusercontent.com/16560492/122479260-beeb4380-cf98-11eb-8f08-23707929b12c.png)
+![plot_genes](figures/plot_genes.png)
 
-#### `graph_type="histogram"`
+## `plot_pareto_front_curve()`
 
-For `graph_type="histogram"`, a histogram is created for each gene. As with `graph_type="boxplot"`, the `plot_type` parameter has no effect.
+Pareto front of the final population. With 2 objectives it draws the population as a scatter and connects the non-dominated points with a curve. With 3 objectives it switches to a 3D scatter and highlights the non-dominated points. With 4 or more objectives it raises and points to the high-dimensional plots below.
 
-The following 2 calls of the `plot_genes()` method create the same figure as the default value for the `solutions` parameter is `"all"`.
-
-```python
-ga_instance.plot_genes(graph_type="histogram")
-
-ga_instance.plot_genes(graph_type="histogram", 
-                       solutions='all')
-```
-
-![plot_genes_histogram](https://user-images.githubusercontent.com/16560492/122477314-8007be80-cf95-11eb-9c95-da3f49204151.png)
-
-All the previous figures can be created for only the best solutions by setting `solutions="best"`.
-
-## Pareto Front
-
-### `plot_pareto_front_curve()`
-
-The `plot_pareto_front_curve()` method creates the Pareto front curve for multi-objective optimization problems. It creates, shows, and returns a figure that shows the Pareto front curve and points representing the fitness. It only works when 2 objectives are used.
-
-It works only after at least 1 generation is completed. If no generation is completed, an exception is raised.
-
-This method accepts the following parameters:
-
-1. `title`: Title of the figure.
-2. `xlabel`: X-axis label.
-3. `ylabel`: Y-axis label.
-4. `linewidth`: Line width of the plot. Defaults to `3`.
-5. `font_size`: Font size for the labels and title. Defaults to `14`.
-6. `label`: The label used for the legend.
-7. `color`: Color of the plot which defaults to the tomato color `#FF6347`.
-8. `color_fitness`: Color of the fitness points which defaults to the royal blue color `#4169E1`.
-9.  `grid`: Either `True` or `False` to control the visibility of the grid.
-10. `alpha`: The transparency of the pareto front curve.
-11. `marker`: The marker of the fitness points.
-12. `save_dir`: Directory to save the figure.
-
-This is an example of calling the `plot_pareto_front_curve()` method.
+Parameters: `title`, `xlabel`, `ylabel`, `zlabel` (only used for M=3), `linewidth`, `font_size`, `label`, `color`, `color_fitness`, `grid`, `alpha`, `marker`, `save_dir`.
 
 ```python
 ga_instance.plot_pareto_front_curve()
 ```
 
-![plot_pareto_front_curve](https://github.com/user-attachments/assets/606d853c-7370-41a0-8ddb-857a4c6c7fb9)
+For M=2 (NSGA-II on ZDT1):
 
+![plot_pareto_front_curve_2d](figures/plot_pareto_front_curve_2d.png)
+
+For M=3 (NSGA-III on DTLZ2):
+
+![plot_pareto_front_curve_3d](figures/plot_pareto_front_curve_3d.png)
+
+## `plot_pareto_front_pcp()`
+
+Parallel-coordinates view of the final non-dominated set. Each objective is a vertical axis. Each non-dominated solution becomes a polyline that crosses every axis. Values are normalised per objective so very different scales remain comparable. Useful for any M >= 2 and especially for M >= 4.
+
+Parameters: `title`, `xlabel`, `ylabel`, `linewidth`, `font_size`, `color`, `alpha`, `grid`, `save_dir`.
+
+```python
+ga_instance.plot_pareto_front_pcp()
+```
+
+![plot_pareto_front_pcp](figures/plot_pareto_front_pcp.png)
+
+## `plot_pareto_front_scatter_matrix()`
+
+M-by-M grid of pairwise scatter plots for the final non-dominated set. The diagonal shows a histogram of each objective. The best fit when M >= 4 and a single 3D scatter no longer reads well.
+
+Parameters: `title`, `font_size`, `color`, `marker`, `alpha`, `grid`, `save_dir`.
+
+```python
+ga_instance.plot_pareto_front_scatter_matrix()
+```
+
+![plot_pareto_front_scatter_matrix](figures/plot_pareto_front_scatter_matrix.png)
+
+## `plot_pareto_front_heatmap()`
+
+Heatmap of the final non-dominated set. Rows are solutions, columns are objectives, colour is the raw objective value. Rows are sorted by objective `sort_by` (default `0`); pass `sort_by=None` to keep the original order.
+
+Parameters: `title`, `xlabel`, `ylabel`, `font_size`, `cmap`, `sort_by`, `save_dir`.
+
+```python
+ga_instance.plot_pareto_front_heatmap(sort_by=0)
+```
+
+![plot_pareto_front_heatmap](figures/plot_pareto_front_heatmap.png)
+
+## `plot_fitness_band()`
+
+Per-generation min, mean, and max with a shaded min-max band. Reveals selection pressure and diversity collapse at a glance. For MOO, pick one objective via `objective_index` (default `0`). Requires `save_solutions=True`.
+
+Parameters: `title`, `xlabel`, `ylabel`, `font_size`, `color`, `band_alpha`, `linewidth`, `objective_index`, `grid`, `save_dir`.
+
+```python
+ga_instance.plot_fitness_band()
+```
+
+![plot_fitness_band](figures/plot_fitness_band.png)
+
+## `plot_non_dominated_hypervolume()`
+
+Hypervolume of the non-dominated set per generation. Uses `pygad.utils.quality_indicators.hypervolume`. Pass `reference_point` explicitly, or let the method pick the column-wise min across all saved generations minus `0.1`. Requires `save_solutions=True`.
+
+Parameters: `reference_point`, `title`, `xlabel`, `ylabel`, `font_size`, `color`, `linewidth`, `grid`, `save_dir`.
+
+```python
+ga_instance.plot_non_dominated_hypervolume()
+```
+
+![plot_non_dominated_hypervolume](figures/plot_non_dominated_hypervolume.png)
+
+## `plot_population_diversity()`
+
+Mean pairwise Euclidean distance between solutions per generation. A drop signals the population is converging or collapsing into duplicates. Requires `save_solutions=True`.
+
+Parameters: `title`, `xlabel`, `ylabel`, `font_size`, `color`, `linewidth`, `grid`, `save_dir`.
+
+```python
+ga_instance.plot_population_diversity()
+```
+
+![plot_population_diversity](figures/plot_population_diversity.png)
+
+## `plot_pareto_front_evolution()`
+
+Overlays the non-dominated set every `every_k` generations on a single figure. The colormap goes from early to late so you can see the front converge. Works for 2 or 3 objectives. Requires `save_solutions=True`.
+
+Parameters: `every_k`, `title`, `xlabel`, `ylabel`, `zlabel`, `font_size`, `cmap`, `marker`, `alpha`, `grid`, `save_dir`.
+
+```python
+ga_instance.plot_pareto_front_evolution(every_k=20)
+```
+
+![plot_pareto_front_evolution](figures/plot_pareto_front_evolution.png)
