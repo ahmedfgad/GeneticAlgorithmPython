@@ -10,6 +10,8 @@ Each class also exposes the attributes you usually need to set up the GA:
 
 For ZDT problems and ZDT4 / ZDT6, the class also has a `pareto_front(num_points)` method that returns reference points on the true Pareto front. Pass these to the IGD or GD indicators as the `reference_front` argument.
 
+One runnable example per benchmark is available under `examples/benchmarks/`.
+
 ## Single-Objective Problems
 
 Available in `pygad.benchmarks.classic`:
@@ -49,6 +51,10 @@ Available in `pygad.benchmarks.dtlz`. All DTLZ problems support an arbitrary num
 
 ## Combinatorial Problems
 
+Two combinatorial benchmarks are available: the 0/1 `Knapsack` and the `TSP`.
+
+### Knapsack
+
 Available in `pygad.benchmarks.knapsack`. The 0/1 `Knapsack` class takes three arguments: a 1D array of item `weights`, a 1D array of item `values`, and a numeric `capacity`. A solution is a binary vector where a 1 means the item is picked. The fitness is the total value when the candidate is within the capacity, and a negative penalty scaled by how much the candidate is over the limit otherwise.
 
 The class exposes `gene_space=[0, 1]` and `gene_type=int` so you can plug it directly into PyGAD:
@@ -69,6 +75,34 @@ ga = pygad.GA(
     num_genes=problem.num_genes,
     gene_space=problem.gene_space,
     gene_type=problem.gene_type,
+)
+ga.run()
+```
+
+### Travelling Salesman Problem
+
+Available in `pygad.benchmarks.tsp`. The `TSP` class can be built from either a 2D array of city `coordinates` or a square `distance_matrix`. A solution is a permutation of the city indices and the fitness is the negative tour length (the tour closes back to the first city). Any non-permutation candidate gets a large negative penalty so the GA keeps a gradient toward feasibility.
+
+The class exposes `gene_space=list(range(num_cities))`, `gene_type=int`, and `allow_duplicate_genes=False` so the permutation constraint is respected:
+
+```python
+import pygad
+from pygad.benchmarks.tsp import TSP
+
+problem = TSP(coordinates=[[0.0, 0.0],
+                           [1.0, 0.0],
+                           [1.0, 1.0],
+                           [0.0, 1.0]])
+
+ga = pygad.GA(
+    num_generations=200,
+    num_parents_mating=10,
+    fitness_func=problem,
+    sol_per_pop=30,
+    num_genes=problem.num_genes,
+    gene_space=problem.gene_space,
+    gene_type=problem.gene_type,
+    allow_duplicate_genes=problem.allow_duplicate_genes,
 )
 ga.run()
 ```

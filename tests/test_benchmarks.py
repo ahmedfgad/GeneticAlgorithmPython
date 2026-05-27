@@ -4,7 +4,7 @@ import numpy
 import pytest
 
 import pygad
-from pygad.benchmarks import classic, zdt, dtlz, knapsack
+from pygad.benchmarks import classic, zdt, dtlz, knapsack, tsp
 
 
 # ── Classic single-objective problems ────────────────────────────────────────
@@ -194,6 +194,8 @@ def test_benchmarks_module_is_importable_from_top_level():
     assert pygad.benchmarks.dtlz.DTLZ2().num_objectives == 3
     assert pygad.benchmarks.knapsack.Knapsack(
         weights=[1.0], values=[1.0], capacity=1.0).num_genes == 1
+    assert pygad.benchmarks.tsp.TSP(
+        coordinates=[[0.0, 0.0], [1.0, 0.0]]).num_genes == 2
 
 
 # ── Knapsack ─────────────────────────────────────────────────────────────────
@@ -266,3 +268,90 @@ def test_knapsack_finds_optimal_solution_on_small_instance_end_to_end():
     best_solution, best_fitness, _ = ga.best_solution(ga.last_generation_fitness)
     assert best_fitness == pytest.approx(7.0)
     numpy.testing.assert_array_equal(best_solution, [1, 1, 0, 0])
+
+
+# ── TSP ──────────────────────────────────────────────────────────────────────
+
+
+def test_tsp_tour_length_on_unit_square():
+    # Unit square with cities in order (0,0), (1,0), (1,1), (0,1).
+    # The closed tour visiting them in that order has length 4.
+    problem = tsp.TSP(coordinates=[[0.0, 0.0],
+                                   [1.0, 0.0],
+                                   [1.0, 1.0],
+                                   [0.0, 1.0]])
+    assert problem.tour_length([0, 1, 2, 3]) == pytest.approx(4.0)
+
+
+def test_tsp_fitness_is_negative_of_tour_length():
+    problem = tsp.TSP(coordinates=[[0.0, 0.0],
+                                   [3.0, 0.0],
+                                   [3.0, 4.0]])
+    # 3-4-5 triangle: tour length = 3 + 4 + 5 = 12.
+    fitness = problem(None, numpy.array([0, 1, 2]), 0)
+    assert fitness == pytest.approx(-12.0)
+
+
+def test_tsp_accepts_precomputed_distance_matrix():
+    distances = numpy.array([[0.0, 2.0, 9.0],
+                             [2.0, 0.0, 6.0],
+                             [9.0, 6.0, 0.0]])
+    problem = tsp.TSP(distance_matrix=distances)
+    # Tour 0-1-2: 2 + 6 + 9 = 17.
+    assert problem.tour_length([0, 1, 2]) == pytest.approx(17.0)
+
+
+def test_tsp_invalid_permutation_returns_penalty():
+    problem = tsp.TSP(coordinates=[[0.0, 0.0],
+                                   [1.0, 0.0],
+                                   [1.0, 1.0],
+                                   [0.0, 1.0]])
+    # Duplicate city 0 and missing city 3.
+    fitness = problem(None, numpy.array([0, 1, 2, 0]), 0)
+    assert fitness < -problem.distance_matrix.sum()
+
+
+def test_tsp_rejects_passing_both_inputs():
+    with pytest.raises(ValueError, match="exactly one"):
+        tsp.TSP(coordinates=[[0.0, 0.0], [1.0, 0.0]],
+                distance_matrix=[[0.0, 1.0], [1.0, 0.0]])
+
+
+def test_tsp_rejects_passing_no_inputs():
+    with pytest.raises(ValueError, match="exactly one"):
+        tsp.TSP()
+
+
+def test_tsp_rejects_non_square_distance_matrix():
+    with pytest.raises(ValueError, match="square"):
+        tsp.TSP(distance_matrix=[[0.0, 1.0, 2.0],
+                                 [1.0, 0.0, 1.0]])
+
+
+def test_tsp_rejects_negative_distance():
+    with pytest.raises(ValueError, match="non-negative"):
+        tsp.TSP(distance_matrix=[[0.0, -1.0], [-1.0, 0.0]])
+
+
+def test_tsp_finds_optimal_tour_on_small_square_end_to_end():
+    # Square with side 1: optimal tour is the perimeter, length 4.
+    # Any tour that crosses the square (e.g. 0-2-1-3) is longer
+    # (2 + sqrt(2) + 2 + sqrt(2) > 4) so the GA must learn to walk
+    # the perimeter.
+    problem = tsp.TSP(coordinates=[[0.0, 0.0],
+                                   [1.0, 0.0],
+                                   [1.0, 1.0],
+                                   [0.0, 1.0]])
+    ga = pygad.GA(num_generations=100,
+                  num_parents_mating=10,
+                  fitness_func=problem,
+                  sol_per_pop=30,
+                  num_genes=problem.num_genes,
+                  gene_space=problem.gene_space,
+                  gene_type=problem.gene_type,
+                  allow_duplicate_genes=problem.allow_duplicate_genes,
+                  random_seed=2,
+                  suppress_warnings=True)
+    ga.run()
+    _, best_fitness, _ = ga.best_solution(ga.last_generation_fitness)
+    assert best_fitness == pytest.approx(-4.0, abs=1e-6)

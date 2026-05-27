@@ -13,5 +13,6 @@ from pygad.benchmarks import classic
 from pygad.benchmarks import zdt
 from pygad.benchmarks import dtlz
 from pygad.benchmarks import knapsack
+from pygad.benchmarks import tsp
 
-__all__ = ["classic", "zdt", "dtlz", "knapsack"]
+__all__ = ["classic", "zdt", "dtlz", "knapsack", "tsp"]
