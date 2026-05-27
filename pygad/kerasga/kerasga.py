@@ -124,7 +124,7 @@ class KerasGA:
         Parameters
         ----------
         model : tensorflow.keras.Model
-            The Keras model to optimise. Its current weights are used
+            The Keras model to optimize. Its current weights are used
             as the seed for the first solution.
         num_solutions : int
             Number of solutions in the population. Each solution is a

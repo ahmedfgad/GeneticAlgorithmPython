@@ -61,8 +61,8 @@ class Plot:
         plot_type : str
             One of ``"plot"``, ``"scatter"``, or ``"bar"``.
         color : str or iterable
-            Curve colour. Pass an iterable in multi-objective mode to
-            colour each objective independently.
+            Curve color. Pass an iterable in multi-objective mode to
+            color each objective independently.
         label : iterable or None
             Per-objective legend label for multi-objective problems.
             Ignored for single-objective problems.
@@ -196,7 +196,7 @@ class Plot:
         plot_type : str
             One of ``"plot"``, ``"scatter"``, or ``"bar"``.
         color : str
-            Curve colour.
+            Curve color.
         save_dir : str or None
             If set, the figure is saved to this path before being
             shown.
@@ -299,9 +299,9 @@ class Plot:
         graph_type : str
             One of ``"plot"``, ``"boxplot"``, or ``"histogram"``.
         fill_color : str
-            Fill colour for the graph (curves, bars or boxes).
+            Fill color for the graph (curves, bars or boxes).
         color : str
-            Outline / accent colour, mainly used by the boxplot view
+            Outline / accent color, mainly used by the boxplot view
             for the whiskers, caps and medians.
         solutions : str
             ``"all"`` to plot every saved solution; ``"best"`` to plot
@@ -645,8 +645,8 @@ class Plot:
         first_best = self.best_solutions_fitness[0]
         if type(first_best) in [list, tuple, numpy.ndarray] and len(first_best) > 1:
             return len(first_best)
-        self.logger.error(f"The {method_name} method only works with multi-objective optimisation problems.")
-        raise RuntimeError(f"The {method_name} method only works with multi-objective optimisation problems.")
+        self.logger.error(f"The {method_name} method only works with multi-objective optimization problems.")
+        raise RuntimeError(f"The {method_name} method only works with multi-objective optimization problems.")
 
     def _last_generation_pareto_front(self):
         """
@@ -712,7 +712,7 @@ class Plot:
 
         Every objective gets a vertical axis. Each non-dominated
         solution becomes a polyline that crosses all axes. Values are
-        normalised per objective so axes with very different ranges
+        normalized per objective so axes with very different ranges
         stay comparable.
 
         Works for any M >= 2.
@@ -723,7 +723,7 @@ class Plot:
         linewidth : numeric
         font_size : numeric
         color : str
-            Polyline colour.
+            Polyline color.
         alpha : float
         grid : bool
         save_dir : str or None
@@ -747,12 +747,12 @@ class Plot:
         min_per_obj = front.min(axis=0)
         max_per_obj = front.max(axis=0)
         spread = numpy.where(max_per_obj > min_per_obj, max_per_obj - min_per_obj, 1.0)
-        normalised = (front - min_per_obj) / spread
+        normalized = (front - min_per_obj) / spread
 
         matplt = get_matplotlib()
         fig, ax = matplt.subplots()
         x_axis = numpy.arange(num_objectives)
-        for row in normalised:
+        for row in normalized:
             ax.plot(x_axis, row, color=color, alpha=alpha, linewidth=linewidth)
         ax.set_xticks(x_axis)
         ax.set_xticklabels([f"f{i + 1}" for i in range(num_objectives)], fontsize=font_size)
@@ -842,7 +842,7 @@ class Plot:
                                   save_dir=None):
         """
         Heatmap of the final non-dominated set. Rows are solutions,
-        columns are objectives, colour is the (raw) objective value.
+        columns are objectives, color is the (raw) objective value.
 
         Parameters
         ----------

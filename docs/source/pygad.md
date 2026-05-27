@@ -497,25 +497,29 @@ To keep the library modular and structured, the code is split into several scrip
 Here is the list of scripts and the classes that the `pygad.GA` class extends:
 
 1. `utils/engine.py`:
-   1. `utils.engine.GAEngine`: 
+   1. `utils.engine.GAEngine`: Runs the GA loop and owns the run-time lifecycle helpers.
 2. `utils/validation.py`
-   1. `utils.validation.Validation`
+   1. `utils.validation.Validation`: Validates every constructor parameter and dispatches `parent_selection_type` / `crossover_type` / `mutation_type` to the right method.
 3. `utils/parent_selection.py`
-   1. `utils.parent_selection.ParentSelection`
+   1. `utils.parent_selection.ParentSelection`: All built-in parent selection operators, including `nsga2_selection`, `tournament_selection_nsga2`, `nsga3_selection`, and `tournament_selection_nsga3`.
 4. `utils/crossover.py`
-   1. `utils.crossover.Crossover`
+   1. `utils.crossover.Crossover`: Built-in crossover operators.
 5. `utils/mutation.py`
-   1. `utils.mutation.Mutation`
-6. `utils/nsga2.py`
-   1. `utils.nsga2.NSGA2`
-7. `utils/nsga3.py`
-   1. `utils.nsga3.NSGA3`
-8. `helper/unique.py`
-   1. `helper.unique.Unique` 
-9. `helper/misc.py`
-   1. `helper.misc.Helper`
-10. `visualize/plot.py`
-    1. `visualize.plot.Plot` 
+   1. `utils.mutation.Mutation`: Built-in mutation operators.
+6. `utils/nsga.py`
+   1. `utils.nsga.NSGA`: Building blocks shared by NSGA-II and NSGA-III (`non_dominated_sorting`, `get_non_dominated_set`).
+7. `utils/nsga2.py`
+   1. `utils.nsga2.NSGA2`: NSGA-II specific primitives (`crowding_distance`, `sort_solutions_nsga2`).
+8. `utils/nsga3.py`
+   1. `utils.nsga3.NSGA3`: NSGA-III algorithm primitives (reference points, ideal point, extreme points, intercepts, normalization, association, niching).
+9. `utils/report.py`
+   1. `utils.report.Report`: Builds a PDF report of the run (`generate_report`).
+10. `helper/unique.py`
+    1. `helper.unique.Unique`: Routines that resolve duplicate genes inside a solution.
+11. `helper/misc.py`
+    1. `helper.misc.Helper`: Generic helpers used across the library (population dtype handling, per-gene value generation, constraint sampling, lifecycle summary).
+12. `visualize/plot.py`
+    1. `visualize.plot.Plot`: All plot methods. See [`pygad.visualize`](https://pygad.readthedocs.io/en/latest/visualize.html).
 
 Since the `pygad.GA` class extends such classes, the attributes and methods inside them can be retrieved by instances of the `pygad.GA` class.
 
@@ -527,53 +531,222 @@ Since the `pygad.GA` class extends such classes, the attributes and methods insi
 
 ### Other Instance Attributes & Methods
 
-All the parameters and functions passed to the `pygad.GA` class constructor are used as class attributes and methods in the instances of the `pygad.GA` class. In addition to such attributes, there are other attributes and methods added to the instances of the `pygad.GA` class:
-
-The next 2 subsections list such attributes and methods.
+All the parameters and functions passed to the `pygad.GA` class constructor are used as class attributes and methods in the instances of the `pygad.GA` class. In addition to such attributes, there are other attributes and methods added to the instances of the `pygad.GA` class.
 
 > The `GA` class gains the attributes of its parent classes via inheritance, making them accessible through the `GA` object even if they are defined externally to its specific class body.
 
-#### Other Attributes
+> Names that begin with an underscore (for example `_bootstrap_nsga3_reference_points`) are internal helpers. They are listed below for completeness but are not part of the stable API; do not rely on their signature staying the same across releases.
 
-- `generations_completed`:  Holds the number of the last completed generation.
-- `population`: A NumPy array that initially holds the initial population and is later updated after each generation.
-- `valid_parameters`: Set to `True` when all the parameters passed in the `GA` class constructor are valid.
+#### Lifecycle
+
+##### Attributes
+
+- `generations_completed`: Number of the last completed generation.
 - `run_completed`: Set to `True` only after the `run()` method completes gracefully.
-- `pop_size`: The population size.
-- `best_solutions_fitness`: A list holding the fitness values of the best solutions for all generations.
-- `best_solution_generation`: The generation number at which the best fitness value is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
-- `best_solutions`: A NumPy array holding the best solution per each generation. It only exists when the `save_best_solutions` parameter in the `pygad.GA` class constructor is set to `True`.
-- `last_generation_fitness`: The fitness values of the solutions in the last generation. [Added in PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
-- `previous_generation_fitness`: At the end of each generation, the fitness of the most recent population is saved in the `last_generation_fitness` attribute. The fitness of the population exactly preceding this most recent population is saved in the `previous_generation_fitness` attribute. This `previous_generation_fitness` attribute is used to fetch the pre-calculated fitness instead of calling the fitness function for already explored solutions. [Added in PyGAD 2.16.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-2).
-- `last_generation_parents`: The parents selected from the last generation. [Added in PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
-- `last_generation_offspring_crossover`: The offspring generated after applying the crossover in the last generation. [Added in PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
-- `last_generation_offspring_mutation`: The offspring generated after applying the mutation in the last generation. [Added in PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
-- `gene_type_single`: A flag that is set to `True` if the `gene_type` parameter is assigned to a single data type that is applied to all genes. If `gene_type` is assigned a `list`, `tuple`, or `numpy.ndarray`, then the value of `gene_type_single` will be `False`. [Added in PyGAD 2.14.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-14-0).
-- `last_generation_parents_indices`: This attribute holds the indices of the selected parents in the last generation. Supported in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0). 
-- `last_generation_elitism`: This attribute holds the elitism of the last generation. It is effective only if the `keep_elitism` parameter has a non-zero value. Supported in [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0). 
-- `last_generation_elitism_indices`: This attribute holds the indices of the elitism of the last generation. It is effective only if the `keep_elitism` parameter has a non-zero value. Supported in [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0). 
-- `logger`: This attribute holds the logger from the `logging` module. Supported in [PyGAD 3.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-0-0). 
-- `gene_space_unpacked`: This is the unpacked version of the `gene_space` parameter. For example, `range(1, 5)` is unpacked to `[1, 2, 3, 4]`. For an infinite range like `{'low': 2, 'high': 4}`, then it is unpacked to a limited number of values (e.g. 100). Supported in [PyGAD 3.1.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-1-0). 
-- `pareto_fronts`: A new instance attribute named `pareto_fronts` added to the `pygad.GA` instances that holds the pareto fronts when solving a multi-objective problem. Supported in [PyGAD 3.2.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-2-0). 
+- `valid_parameters`: Set to `True` when all the parameters passed in the `GA` class constructor are valid.
+- `run_start_time`: Monotonic clock value captured right before the generation loop starts. Internal.
+- `logger`: Logger object from the `logging` module. Supported in [PyGAD 3.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-0-0).
+
+##### Methods
+
+- `run()`: Runs the generation loop. The main entry point.
+- `run_loop_head(best_solution_fitness)`: Per-generation pre-loop bookkeeping. Internal; called from inside `run()`. Added in [PyGAD 3.3.1](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1).
+- `run_select_parents(call_on_parents=True)`: Select parents and call `on_parents` when defined. Internal; called from inside `run()`. Pass `call_on_parents=False` when refreshing the parent set at the end of `run()`. Added in [PyGAD 3.3.1](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1).
+- `run_crossover()`: Apply crossover and call `on_crossover` when defined. Internal. Added in [PyGAD 3.3.1](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1).
+- `run_mutation()`: Apply mutation and call `on_mutation` when defined. Internal. Added in [PyGAD 3.3.1](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1).
+- `run_update_population()`: Replace `self.population` with the crossed-over and mutated offspring. Internal. Added in [PyGAD 3.3.1](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1).
+- `summary(...)`: Prints a Keras-like summary of the PyGAD lifecycle. Added in [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0). See [Print Lifecycle Summary](https://pygad.readthedocs.io/en/latest/logging.html#print-lifecycle-summary).
+
+#### Population and Initialization
+
+##### Attributes
+
+- `population`: A NumPy array that initially holds the initial population and is later updated after each generation.
+- `initial_population`: Frozen copy of the initial population, set after `initialize_population` runs.
+- `pop_size`: A `(sol_per_pop, num_genes)` tuple describing the population shape.
+- `gene_type_single`: `True` when every gene shares the same dtype; `False` when `gene_type` is a list/tuple/numpy.ndarray. Added in [PyGAD 2.14.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-14-0).
+- `gene_space_unpacked`: Unpacked version of `gene_space`. For example, `range(1, 5)` becomes `[1, 2, 3, 4]`; `{'low': 2, 'high': 4}` becomes a finite sample. Added in [PyGAD 3.1.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-1-0).
+
+##### Methods
+
+- `initialize_population(allow_duplicate_genes, gene_type, gene_constraint)`: Build the initial population, apply gene types and constraints, resolve duplicates when not allowed.
+- `initialize_parents_array(shape)`: Allocate an empty parents (or offspring) array with the right dtype.
+- `change_population_dtype_and_round(population)`: Cast a 2D population to the dtype encoded in `self.gene_type` and round non-integer genes.
+- `change_gene_dtype_and_round(gene_index, gene_value)`: Same as above, but for a single gene value.
+- `round_genes(solutions)`: Round genes in a 2D array according to `self.gene_type` precision.
+- `get_initial_population_range(gene_index)`: Return the `[init_range_low, init_range_high]` window for a specific gene.
+- `get_random_mutation_range(gene_index)`: Return the `[random_mutation_min_val, random_mutation_max_val]` window for a specific gene.
+- `get_gene_dtype(gene_index)`: Return the `(type, precision)` pair for a specific gene.
+- `generate_gene_value(...)`: Sample a single gene value from the gene space or from the configured range.
+- `generate_gene_value_from_space(...)`: Sample a single gene value from `gene_space`.
+- `generate_gene_value_randomly(...)`: Sample a single gene value from the configured numeric range.
+
+#### Fitness
+
+##### Attributes
+
+- `last_generation_fitness`: Fitness values of the solutions in the last generation. Added in [PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
+- `previous_generation_fitness`: Fitness of the population one step before `last_generation_fitness`. Used to skip re-evaluating solutions PyGAD has already seen. Added in [PyGAD 2.16.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-2).
+- `best_solutions_fitness`: List of best-solution fitness per generation.
+- `best_solutions`: A NumPy array of the best solution per generation. Only populated when `save_best_solutions=True`.
+- `best_solutions_fitness`: Fitness for every entry in `best_solutions`.
+- `solutions`: All visited solutions when `save_solutions=True`.
+- `solutions_fitness`: Fitness for every entry in `solutions`.
+- `best_solution_generation`: Generation at which the best fitness was reached. `-1` until `run()` completes.
+
+##### Methods
+
+- `cal_pop_fitness()`: Compute the fitness of every solution in the current population, reusing previously calculated values where possible.
+- `best_solution(pop_fitness=None)`: Return the best solution, its fitness, and its population index.
+- `adaptive_mutation_population_fitness(offspring)`: Average fitness used by adaptive mutation to split solutions into low / high quality.
+
+#### Parent Selection (general)
+
+##### Attributes
+
+- `last_generation_parents`: Parents selected in the last generation. Added in [PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
+- `last_generation_parents_indices`: Indices of the selected parents in `self.population`. Added in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0).
+
+##### Methods
+
+- `select_parents(fitness, num_parents)`: Active parent-selection method. Bound during validation according to `parent_selection_type`.
+- `steady_state_selection(fitness, num_parents)`: Steady-state selection.
+- `rank_selection(fitness, num_parents)`: Rank-based selection.
+- `random_selection(fitness, num_parents)`: Random selection.
+- `tournament_selection(fitness, num_parents)`: K-tournament selection.
+- `roulette_wheel_selection(fitness, num_parents)`: Roulette-wheel selection.
+- `stochastic_universal_selection(fitness, num_parents)`: SUS selection.
+- `wheel_cumulative_probs(probs, num_parents)`: Build the `[start, end)` ranges used by RWS and SUS.
+
+#### Multi-Objective Optimization (NSGA-II)
+
+##### Attributes
+
+- `pareto_fronts`: List of the Pareto fronts of the last generation when running a multi-objective problem. Each front is a NumPy array of `(population_index, fitness_vector)` pairs. Added in [PyGAD 3.2.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-2-0).
+
+##### Methods
+
+- `non_dominated_sorting(fitness)`: Sort the population into Pareto fronts. Defined in `utils.nsga.NSGA` and shared with NSGA-III.
+- `get_non_dominated_set(curr_solutions)`: Split the current set of solutions into a dominated and non-dominated subset. Defined in `utils.nsga.NSGA`.
+- `crowding_distance(pareto_front, fitness)`: Per-solution crowding distance inside a Pareto front. Defined in `utils.nsga2.NSGA2`.
+- `sort_solutions_nsga2(fitness, find_best_solution=False)`: Sort population indices best-to-worst using Pareto fronts and crowding distance for MOO; descending fitness for SOO. Defined in `utils.nsga2.NSGA2`.
+- `nsga2_selection(fitness, num_parents)`: NSGA-II parent selection. Defined in `utils.parent_selection.ParentSelection`.
+- `tournament_selection_nsga2(fitness, num_parents)`: K-tournament with non-dominated rank + crowding distance as tiebreakers. Defined in `utils.parent_selection.ParentSelection`.
+
+#### Multi-Objective Optimization (NSGA-III)
+
+##### Attributes
+
+- `nsga3_num_divisions`: Stored value of the `nsga3_num_divisions` constructor parameter. Used when building the reference grid.
+- `nsga3_reference_points`: Structured grid of reference points on the unit simplex. A 2D NumPy array of shape `(n_points, num_objectives)` where each row sums to 1. Built once before the generation loop starts (`_bootstrap_nsga3_reference_points`). Re-used for every generation.
+
+##### Methods (algorithm primitives in `utils.nsga3.NSGA3`)
+
+- `nsga3_generate_reference_points(num_objectives, num_divisions)`: Build the Das-Dennis grid.
+- `nsga3_compute_ideal_point(fitness)`: Best fitness per objective across the input rows (column max under maximization).
+- `nsga3_find_extreme_points(fitness, ideal_point, epsilon=NSGA3_ASF_EPSILON)`: For each objective, find the row that best represents the corner of that axis using the ASF.
+- `nsga3_compute_intercepts(extreme_points, ideal_point, fallback_fitness)`: Fit a hyperplane through the extreme points and return per-axis intercepts. Falls back to the nadir on singular systems.
+- `nsga3_normalize_fitness(fitness, ideal_point, intercepts)`: Scale each fitness row to the unit hypercube and clip outliers to `[0, 1]`.
+- `nsga3_associate_to_reference_points(normalized, reference_points)`: For every normalized row, find the closest reference line and the perpendicular distance to it.
+- `nsga3_niching_select(critical_front_indices, critical_front_associations, critical_front_distances, accepted_associations, num_reference_points, num_to_select)`: Niching loop that picks survivors from the critical front to preserve diversity across reference points.
+
+##### Methods (selection in `utils.parent_selection.ParentSelection`)
+
+- `nsga3_selection(fitness, num_parents)`: NSGA-III parent selection.
+- `tournament_selection_nsga3(fitness, num_parents)`: K-tournament with niche count + perpendicular distance as tiebreakers.
+- `_nsga3_pick_critical_front_survivors(...)`: Run normalization and niching on `P_next ∪ critical_front` and return the picked survivors. Internal.
+- `_nsga3_pick_tournament_winner(...)`: Decide the winner of one K-tournament round under NSGA-III rules. Internal.
+- `_nsga3_build_parents(final_indices, num_parents)`: Copy the chosen rows out of the population into a new parents array. Internal.
+
+##### Methods (bootstrap and population growth in `utils.engine.GAEngine`)
+
+- `_bootstrap_nsga3_reference_points()`: Build the reference-point grid once, right after the first fitness evaluation. Calls `_nsga3_grow_population` when `sol_per_pop` is smaller than the reference count.
+- `_nsga3_grow_population(required_size, num_objectives)`: Append random solutions to `self.population`, update `sol_per_pop` / `pop_size` / `num_offspring`, re-evaluate fitness.
+- `_nsga3_generate_extra_random_solutions(count)`: Build `count` random solutions respecting the gene space, init range, gene type, gene constraints, and `allow_duplicate_genes` rules.
+- `_nsga3_generate_single_random_gene(gene_idx, partial_solution)`: Sample a single gene value using initial-population settings (not mutation settings).
+- `_nsga3_apply_gene_constraints(population)`: Enforce `gene_constraint` on the new rows.
+- `_nsga3_resolve_duplicate_genes(population)`: Resolve duplicate genes in the new rows when `allow_duplicate_genes=False`.
+
+##### Module-level helpers (in `pygad.utils.nsga3`)
+
+- `NSGA3_ASF_EPSILON`: Off-axis weight used by the ASF inside `nsga3_find_extreme_points`.
+- `NSGA3_INTERCEPT_NEAR_ZERO`: Threshold under which an intercept gap is treated as zero.
+- `_nsga3_pick_target_reference_point(niche_counts, critical_front_associations, remaining_positions)`: Choose the next reference point for the niching loop. Internal.
+- `_nsga3_pick_candidate_at_reference(candidates_at_target, critical_front_distances, niche_count_at_target)`: Choose a candidate at a given reference point. Internal.
+- `_nsga3_enumerate_compositions(num_objectives, num_divisions)`: Yield every non-negative integer tuple summing to `num_divisions`. Internal.
+
+##### Module-level helpers (in `pygad.utils.parent_selection`)
+
+- `_nsga3_validate_multi_objective_fitness(fitness, supported_int_float_types, method_name)`: Raise when the GA was set to NSGA-III but the fitness function returned scalars.
+- `_nsga3_accumulate_fronts(pareto_fronts, num_parents)`: Walk the Pareto fronts and split them into the accepted set + the critical front.
+
+#### Crossover
+
+##### Attributes
+
+- `last_generation_offspring_crossover`: Offspring after crossover. Added in [PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
+
+##### Methods
+
+- `crossover()`: Active crossover operator. Bound during validation according to `crossover_type`.
+- `single_point_crossover(parents, offspring_size)`: Single-point crossover.
+- `two_points_crossover(parents, offspring_size)`: Two-point crossover.
+- `uniform_crossover(parents, offspring_size)`: Uniform crossover.
+- `scattered_crossover(parents, offspring_size)`: Scattered crossover.
+- `sbx_crossover(parents, offspring_size)`: Simulated binary crossover. Uses `self.sbx_crossover_eta`.
+
+#### Mutation
+
+##### Attributes
+
+- `last_generation_offspring_mutation`: Offspring after mutation. Added in [PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
+- `last_generation_offspring_mutation_indices`: Indices of mutated offspring inside `self.population`.
+
+##### Methods
+
+- `mutation()`: Active mutation operator. Bound during validation according to `mutation_type`.
+- `random_mutation(offspring)`: Random mutation (replaces or adds a uniform random value).
+- `swap_mutation(offspring)`: Swap mutation.
+- `inversion_mutation(offspring)`: Inversion mutation.
+- `scramble_mutation(offspring)`: Scramble mutation.
+- `adaptive_mutation(offspring)`: Adaptive mutation. Uses `adaptive_mutation_population_fitness`.
+- `polynomial_mutation(offspring)`: Polynomial mutation. Uses `self.polynomial_mutation_eta`.
+- `mutation_change_gene_dtype_and_round(...)`: Round and re-cast a mutated gene to the configured dtype/precision.
+
+#### Elitism
+
+##### Attributes
+
+- `last_generation_elitism`: Elitism solutions from the last generation. Added in [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0).
+- `last_generation_elitism_indices`: Population indices of `last_generation_elitism`. Added in [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0).
+
+#### Gene Constraints and Duplicate Resolution
+
+##### Methods
+
+- `validate_gene_constraint_callable_output(selected_values, values)`: Sanity-check the return value of a user-defined `gene_constraint`.
+- `filter_gene_values_by_constraint(values, solution, gene_idx)`: Run `gene_constraint[gene_idx]` and return the filtered list.
+- `get_valid_gene_constraint_values(...)`: Sample candidate values until one satisfies the gene constraint.
+- `solve_duplicate_genes_randomly(...)`: Resolve duplicate genes by sampling new values from the random range.
+- `solve_duplicate_genes_by_space(...)`: Resolve duplicate genes by sampling new values from `gene_space`.
+- `solve_duplicates_deeply(...)`: Slow, exhaustive fallback for duplicate resolution.
+- `unique_int_gene_from_range(...)`: Pick an integer gene that does not already appear in the solution.
+- `unique_float_gene_from_range(...)`: Pick a float gene that does not already appear in the solution.
+- `unique_gene_by_space(...)`: Pick a unique value from `gene_space`.
+- `unique_genes_by_space(...)`: Pick unique values for several genes from `gene_space`.
+- `select_unique_value(...)`: Sample one value uniformly at random from a list of candidates.
+- `find_two_duplicates(solution)`: Locate the first pair of duplicated indices in a solution.
+- `unpack_gene_space(...)`: Materialize the unpacked `gene_space` (used to build `gene_space_unpacked`).
+
+#### Saving, Loading, and Reporting
+
+##### Methods
+
+- `save(filename)`: Pickle the GA instance to disk (uses `cloudpickle`).
+- `generate_report(filename, ...)`: Build a PDF report of the run. See [`generate_report()`](#generate-report) below.
+- `push_to_vilvik(...)`: Optional convenience wrapper around the Vilvik SDK.
 
 Note that the attributes with names starting with `last_generation_` are updated after each generation.
-
-#### Other Methods
-
-- `cal_pop_fitness()`: A method that calculates the fitness values for all solutions within the population by calling the function passed to the `fitness_func` parameter for each solution.
-- `crossover()`: Refers to the method that applies the crossover operator based on the selected type of crossover in the `crossover_type` property.
-- `mutation()`: Refers to the method that applies the mutation operator based on the selected type of mutation in the `mutation_type` property.
-- `select_parents()`: Refers to a method that selects the parents based on the parent selection type specified in the `parent_selection_type` attribute.
-- `adaptive_mutation_population_fitness()`: Returns the average fitness value used in the adaptive mutation to filter the solutions.
-- `summary()`: Prints a Keras-like summary of the PyGAD lifecycle. This helps to have an overview of the architecture. Supported in [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0). Check the [Print Lifecycle Summary](https://pygad.readthedocs.io/en/latest/logging.html#print-lifecycle-summary) section for more details and examples.
-- 5 methods with names starting with `run_`. Their purpose is to keep the main loop inside the `run()` method clean. The details inside the loop are moved to 4 individual methods. Generally, any method with a name starting with `run_` is meant to be called by PyGAD from inside the `run()` method. Supported in [PyGAD 3.3.1](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1).
-  1. `run_loop_head()`: The code before the loop starts.
-  2. `run_select_parents(call_on_parents=True)`: Select the parents and call the callable `on_parents()` if defined. If `call_on_parents` is `True`, then the callable `on_parents()` is called. It must be `False` when the `run_select_parents()` method is called to update the parents at the end of the `run()` method.
-  3. `run_crossover()`: Apply crossover and call the callable `on_crossover()` if defined.
-  4. `run_mutation()`: Apply mutation and call the callable `on_mutation()` if defined.
-  5. `run_update_population()`: Update the `population` attribute after completing the processes of crossover and mutation.
-
-There are many methods that are not designed for user usage. Some of them are listed above but this is not a comprehensive list. The [release history](https://pygad.readthedocs.io/en/latest/releases.html) section usually covers them. Moreover, you can check the [PyGAD GitHub repository](https://github.com/ahmedfgad/GeneticAlgorithmPython) to find more.
 
 The next sections discuss the methods available in the `pygad.GA` class.
 
@@ -584,6 +757,33 @@ The `save()` method in the `pygad.GA` class saves the genetic algorithm instance
 Accepts the following parameter:
 
 * `filename`: Name of the file to save the instance. No extension is needed.
+
+### `generate_report()`
+
+Builds a PDF report of the current GA run. It bundles the configuration table, a run-summary table, the best solution, and every applicable plot. Requires the optional `report` extra:
+
+```
+pip install pygad[report]
+```
+
+Call it after `run()` finishes. A minimal example:
+
+```python
+ga_instance.run()
+ga_instance.generate_report("my_run")  # writes my_run.pdf next to the script
+```
+
+Parameters:
+
+- `filename` (`str`, required): Output path. `.pdf` is appended automatically if missing.
+- `title` (`str` or `None`, default `None`): Title shown on the first page. Defaults to `"PyGAD run report"`.
+- `sections` (iterable of `str` or `None`, default `None`): Sections to include and their order. Valid entries are `"title"`, `"configuration"`, `"run_summary"`, `"best_solution"`, `"plots"`, and `"notes"`. When `None`, every section is included in their default order.
+- `include_plots` (iterable of `str`, `"all"`, or `None`, default `None`): Plots to embed under the `"plots"` section. `None` or `"all"` auto-selects every plot whose preconditions are met by this run. Pass a list of plot method names to include only those.
+- `figure_size_inches` (`(float, float)`, default `(7.0, 4.5)`): Width and height (in inches) used when each plot is drawn for the report.
+- `notes` (`str` or `None`, default `None`): Free-form text rendered in the optional `"notes"` section.
+- `page_size` (`str`, default `"letter"`): Either `"letter"` or `"A4"`.
+
+The report skips any plot whose preconditions are not met. For example, `plot_pareto_front_curve` is included only for multi-objective runs with 2 or 3 objectives; `plot_non_dominated_hypervolume` is included only when `save_solutions=True` is set on the GA. A full example lives at [`examples/example_generate_report.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/example_generate_report.py).
 
 ## Functions in `pygad`
 

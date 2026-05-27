@@ -54,20 +54,20 @@ def relu(sop):
 
 def softmax(layer_outputs):
     """
-    Apply a sum-normalised softmax: divide each value by the sum of
+    Apply a sum-normalized softmax: divide each value by the sum of
     all values plus a tiny constant to avoid division by zero.
 
     Note that this is not the canonical softmax (which uses
-    exponentials); it just normalises the inputs so they sum to one.
+    exponentials); it just normalizes the inputs so they sum to one.
 
     Parameters
     ----------
     layer_outputs : numpy.ndarray
-        The values to normalise.
+        The values to normalize.
 
     Returns
     -------
     activated : numpy.ndarray
-        The normalised values.
+        The normalized values.
     """
     return layer_outputs / (numpy.sum(layer_outputs) + 0.000001)

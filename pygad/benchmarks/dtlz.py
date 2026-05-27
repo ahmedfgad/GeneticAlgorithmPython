@@ -5,7 +5,7 @@ Each problem takes M (objectives) and k (distance variables). The
 number of decision variables is M + k - 1. Defaults: k = 5 for
 DTLZ1, k = 10 for DTLZ2, DTLZ3, and DTLZ4.
 
-Fitness values are negated so PyGAD can maximise them.
+Fitness values are negated so PyGAD can maximize them.
 """
 
 import math

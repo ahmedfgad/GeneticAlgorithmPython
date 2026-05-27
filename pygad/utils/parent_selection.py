@@ -404,7 +404,7 @@ class ParentSelection:
         parents_indices = []
 
         # If there is only a single objective, each pareto front is expected to have only 1 solution.
-        # TODO Make a test to check for that behaviour and add it to the GitHub actions tests.
+        # TODO Make a test to check for that behavior and add it to the GitHub actions tests.
         pareto_fronts, solutions_fronts_indices = self.non_dominated_sorting(fitness)
         self.pareto_fronts = pareto_fronts.copy()
 
@@ -554,7 +554,7 @@ class ParentSelection:
         parents_indices = []
 
         # If there is only a single objective, each pareto front is expected to have only 1 solution.
-        # TODO Make a test to check for that behaviour.
+        # TODO Make a test to check for that behavior.
         pareto_fronts, solutions_fronts_indices = self.non_dominated_sorting(fitness)
         self.pareto_fronts = pareto_fronts.copy()
 
@@ -605,3 +605,243 @@ class ParentSelection:
 
         # Make sure the parents indices is returned as a NumPy array.
         return parents, numpy.array(parents_indices)
+
+    def nsga3_selection(self, fitness, num_parents):
+        """
+        Select ``num_parents`` parents from the current population using
+        NSGA-III. Solutions are first sorted into Pareto fronts. Whole
+        fronts are accepted in order until the next front would overflow
+        the requested parent count; that front becomes the critical
+        front. Survivors from the critical front are picked by niching
+        against the structured reference points stored on the GA
+        instance.
+
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            Fitness values for the entire population. Must be
+            multi-objective (each row is a vector of M values).
+        num_parents : int
+            Number of parents to select.
+
+        Returns
+        -------
+        parents : numpy.ndarray
+            Selected parent solutions copied from ``self.population``.
+        parents_indices : numpy.ndarray
+            Indices of the selected parents inside ``self.population``.
+        """
+        _nsga3_validate_multi_objective_fitness(
+            fitness, self.supported_int_float_types, 'nsga3_selection')
+        pareto_fronts, _ = self.non_dominated_sorting(fitness)
+        self.pareto_fronts = pareto_fronts.copy()
+
+        accepted_indices, critical_front_indices = _nsga3_accumulate_fronts(
+            pareto_fronts, num_parents)
+        if critical_front_indices:
+            picked = self._nsga3_pick_critical_front_survivors(
+                accepted_indices,
+                critical_front_indices,
+                fitness,
+                num_parents - len(accepted_indices))
+            final_indices = accepted_indices + picked
+        else:
+            # The accepted fronts already fit exactly; no niching needed.
+            final_indices = accepted_indices
+
+        return self._nsga3_build_parents(final_indices, num_parents)
+
+    def _nsga3_pick_critical_front_survivors(self,
+                                             accepted_indices,
+                                             critical_front_indices,
+                                             fitness,
+                                             num_to_select):
+        """
+        Run the NSGA-III normalization and niching steps on the
+        candidate pool described below, then ask
+        ``nsga3_niching_select`` for ``num_to_select`` survivors from
+        the critical front.
+
+        The candidate pool is the union of two sets:
+          1. The already-accepted solutions (``accepted_indices``).
+             These are the solutions taken from earlier, fully-fitting
+             Pareto fronts.
+          2. The critical-front candidates (``critical_front_indices``).
+             These are every solution in the first Pareto front that
+             would not fit entirely into the parent quota.
+
+        Working on the union (and not just the survivors) is what the
+        NSGA-III paper requires: the ideal point, extreme points,
+        intercepts and normalized values must be computed on this
+        combined pool so the geometry stays stable as the niching loop
+        accepts or rejects critical-front members.
+        """
+        selection_pool_indices = accepted_indices + critical_front_indices
+        selection_pool_fitness = numpy.array(
+            [fitness[i] for i in selection_pool_indices], dtype=float)
+        ideal_point = self.nsga3_compute_ideal_point(selection_pool_fitness)
+        extremes = self.nsga3_find_extreme_points(selection_pool_fitness,
+                                                  ideal_point)
+        intercepts = self.nsga3_compute_intercepts(extremes,
+                                                   ideal_point,
+                                                   selection_pool_fitness)
+        normalized = self.nsga3_normalize_fitness(selection_pool_fitness,
+                                                  ideal_point,
+                                                  intercepts)
+        associations, distances = self.nsga3_associate_to_reference_points(
+            normalized, self.nsga3_reference_points)
+        # The first len(accepted_indices) rows of the pool belong to the
+        # accepted set; the rest are the critical-front candidates.
+        split = len(accepted_indices)
+        return self.nsga3_niching_select(
+            critical_front_indices=critical_front_indices,
+            critical_front_associations=associations[split:],
+            critical_front_distances=distances[split:],
+            accepted_associations=associations[:split],
+            num_reference_points=len(self.nsga3_reference_points),
+            num_to_select=num_to_select,
+        )
+
+    def _nsga3_build_parents(self, final_indices, num_parents):
+        """
+        Copy the chosen solutions out of ``self.population`` into a new
+        parents array of the right dtype, and return it together with
+        the index array.
+        """
+        parents = self.initialize_parents_array(
+            (num_parents, self.population.shape[1]))
+        for slot, idx in enumerate(final_indices):
+            parents[slot, :] = self.population[idx, :].copy()
+        return parents, numpy.array(final_indices)
+
+    def tournament_selection_nsga3(self, fitness, num_parents):
+        """
+        Select ``num_parents`` parents using K-tournament where the
+        within-front comparison is based on NSGA-III niching.
+
+        The full population is sorted into Pareto fronts and normalized
+        once at the start. For each parent slot:
+          1. Pick ``self.K_tournament`` solutions at random.
+          2. Keep only the ones in the best (lowest) Pareto front.
+          3. If more than one is left, the winner is the solution whose
+             reference point has the smallest niche count. Ties on niche
+             count go to the smaller perpendicular distance.
+
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            Fitness values for the entire population. Must be
+            multi-objective.
+        num_parents : int
+            Number of parents to select.
+
+        Returns
+        -------
+        parents : numpy.ndarray
+            Selected parent solutions.
+        parents_indices : numpy.ndarray
+            Indices of the selected parents inside ``self.population``.
+        """
+        _nsga3_validate_multi_objective_fitness(
+            fitness, self.supported_int_float_types,
+            'tournament_selection_nsga3')
+        pareto_fronts, solutions_fronts_indices = self.non_dominated_sorting(fitness)
+        self.pareto_fronts = pareto_fronts.copy()
+
+        # Convert the fitness rows to a clean 2D float array.
+        fitness_matrix = numpy.array([list(row) for row in fitness], dtype=float)
+        ideal_point = self.nsga3_compute_ideal_point(fitness_matrix)
+        extremes = self.nsga3_find_extreme_points(fitness_matrix, ideal_point)
+        intercepts = self.nsga3_compute_intercepts(extremes,
+                                                   ideal_point,
+                                                   fitness_matrix)
+        normalized = self.nsga3_normalize_fitness(fitness_matrix,
+                                                  ideal_point,
+                                                  intercepts)
+        associations, distances = self.nsga3_associate_to_reference_points(
+            normalized, self.nsga3_reference_points)
+        # Niche count is the number of population solutions attached to
+        # each reference point.
+        niche_counts = numpy.bincount(associations,
+                                      minlength=len(self.nsga3_reference_points))
+
+        rand_indices = numpy.random.randint(low=0,
+                                            high=len(solutions_fronts_indices),
+                                            size=(num_parents, self.K_tournament))
+        parents_indices = [self._nsga3_pick_tournament_winner(rand_indices[slot],
+                                                              solutions_fronts_indices,
+                                                              associations,
+                                                              distances,
+                                                              niche_counts)
+                           for slot in range(num_parents)]
+        return self._nsga3_build_parents(parents_indices, num_parents)
+
+    def _nsga3_pick_tournament_winner(self,
+                                      competitor_indices,
+                                      fronts_indices,
+                                      associations,
+                                      distances,
+                                      niche_counts):
+        """
+        Pick the best solution among the K-tournament competitors. The
+        best front index wins first; ties are broken by lower niche
+        count, then by smaller perpendicular distance.
+        """
+        best_front = fronts_indices[competitor_indices].min()
+        finalists = competitor_indices[
+            fronts_indices[competitor_indices] == best_front]
+        if len(finalists) == 1:
+            return int(finalists[0])
+        finalist_niche_counts = niche_counts[associations[finalists]]
+        finalist_distances = distances[finalists]
+        # lexsort sorts by the last key first, so this orders by niche
+        # count first and breaks ties by distance.
+        ordering = numpy.lexsort((finalist_distances, finalist_niche_counts))
+        return int(finalists[ordering[0]])
+
+
+def _nsga3_validate_multi_objective_fitness(fitness,
+                                            supported_int_float_types,
+                                            method_name):
+    """
+    Raise an error if the first fitness value is a scalar (which means
+    the problem is single-objective and NSGA-III cannot be applied) or
+    if it is some other unsupported type.
+    """
+    if type(fitness[0]) in supported_int_float_types:
+        raise TypeError(
+            f"{method_name} requires a multi-objective fitness function "
+            f"(an iterable per solution), but the first fitness value "
+            f"({fitness[0]!r}) has scalar type {type(fitness[0]).__name__}."
+        )
+    if type(fitness[0]) not in (list, tuple, numpy.ndarray):
+        raise TypeError(
+            f"{method_name} expects each fitness value to be a list, tuple, "
+            f"or numpy.ndarray, but the first fitness value has type "
+            f"{type(fitness[0]).__name__}."
+        )
+
+
+def _nsga3_accumulate_fronts(pareto_fronts, num_parents):
+    """
+    Walk the Pareto fronts in order and add each whole front to the
+    accepted list while the running total stays at or below
+    ``num_parents``. The first front that would overflow becomes the
+    critical front.
+
+    Returns a pair (accepted_indices, critical_front_indices). When the
+    accepted set fits exactly into ``num_parents``,
+    ``critical_front_indices`` is empty.
+    """
+    accepted_indices = []
+    critical_front_indices = []
+    for front in pareto_fronts:
+        front_solution_indices = front[:, 0].astype(int).tolist()
+        if len(accepted_indices) + len(front_solution_indices) <= num_parents:
+            accepted_indices.extend(front_solution_indices)
+            if len(accepted_indices) == num_parents:
+                break
+        else:
+            critical_front_indices = front_solution_indices
+            break
+    return accepted_indices, critical_front_indices

@@ -1131,3 +1131,184 @@ class GAEngine:
             raise ex
 
         return best_solution, best_solution_fitness, best_match_idx
+
+    def _bootstrap_nsga3_reference_points(self):
+        """
+        Build the reference-point grid once, right after the first
+        fitness evaluation. The number of objectives M is read from the
+        length of the first fitness vector.
+
+        If ``sol_per_pop`` is smaller than the number of reference
+        points, grow the population to match and re-evaluate fitness so
+        the GA loop can carry on with a valid population.
+        """
+        num_objectives = len(self.last_generation_fitness[0])
+        self.nsga3_reference_points = self.nsga3_generate_reference_points(
+            num_objectives, self.nsga3_num_divisions)
+        required_size = len(self.nsga3_reference_points)
+        if self.sol_per_pop < required_size:
+            self._nsga3_grow_population(required_size, num_objectives)
+
+    def _nsga3_grow_population(self, required_size, num_objectives):
+        """
+        Append random solutions to ``self.population`` until the size
+        equals ``required_size``, then re-evaluate fitness. The new
+        rows follow the same gene space, init range, gene type, gene
+        constraints, and ``allow_duplicate_genes`` rules used to build
+        the initial population, so the grown population is
+        indistinguishable from one created with ``sol_per_pop`` set to
+        ``required_size`` from the start.
+        """
+        original_size = self.sol_per_pop
+        if not self.suppress_warnings:
+            warnings.warn(
+                f"sol_per_pop ({original_size}) is smaller than the number of "
+                f"NSGA-III reference points ({required_size}) for M={num_objectives} "
+                f"objectives and nsga3_num_divisions={self.nsga3_num_divisions}. "
+                f"Growing the population to {required_size} random solutions "
+                f"and re-evaluating fitness."
+            )
+        extra = self._nsga3_generate_extra_random_solutions(
+            required_size - original_size)
+        self.population = numpy.vstack([self.population, extra])
+        self.sol_per_pop = required_size
+        self.pop_size = (required_size, self.num_genes)
+        # Shared helper on the Validation mixin keeps the rule in one place.
+        self._refresh_num_offspring()
+        self.last_generation_fitness = self.cal_pop_fitness()
+
+    def _nsga3_generate_extra_random_solutions(self, count):
+        """
+        Build ``count`` random solutions that obey every initial-
+        population rule: ``gene_space``, ``init_range_low`` /
+        ``init_range_high``, ``gene_type`` (including nested per-gene
+        type / precision), ``gene_constraint``, and
+        ``allow_duplicate_genes``.
+
+        Steps mirror ``initialize_population``:
+          1. Sample each gene from its space (or init range).
+          2. Cast and round to the configured gene type.
+          3. Enforce gene constraints when present.
+          4. Resolve duplicate genes when not allowed.
+        """
+        extra = numpy.empty((count, self.num_genes), dtype=object)
+        for sol_idx in range(count):
+            for gene_idx in range(self.num_genes):
+                extra[sol_idx, gene_idx] = self._nsga3_generate_single_random_gene(
+                    gene_idx, extra[sol_idx])
+        extra = self.change_population_dtype_and_round(extra)
+
+        if self.gene_constraint is not None:
+            extra = self._nsga3_apply_gene_constraints(extra)
+
+        if not self.allow_duplicate_genes:
+            extra = self._nsga3_resolve_duplicate_genes(extra)
+            extra = self.change_population_dtype_and_round(extra)
+
+        return extra
+
+    def _nsga3_generate_single_random_gene(self, gene_idx, partial_solution):
+        """
+        Pick a single random gene value for ``gene_idx`` using the
+        initial-population settings. When ``gene_space`` is set, the
+        gene-space sampler is used; otherwise the per-gene init range
+        is used. ``mutation_by_replacement`` is forced to True so the
+        sampler returns a value drawn from the configured range rather
+        than an offset to add to an existing gene (which is the
+        mutation-time behavior).
+        """
+        if self.gene_space is None:
+            range_min, range_max = self.get_initial_population_range(
+                gene_index=gene_idx)
+            return self.generate_gene_value_randomly(range_min=range_min,
+                                                    range_max=range_max,
+                                                    gene_idx=gene_idx,
+                                                    mutation_by_replacement=True,
+                                                    gene_value=None,
+                                                    sample_size=1,
+                                                    step=1)
+        return self.generate_gene_value_from_space(gene_idx=gene_idx,
+                                                   mutation_by_replacement=True,
+                                                   gene_value=None,
+                                                   solution=partial_solution,
+                                                   sample_size=1)
+
+    def _nsga3_apply_gene_constraints(self, population):
+        """
+        Walk the new rows and replace any gene that does not satisfy
+        its gene constraint, using the same logic that
+        ``initialize_population`` runs during the initial build.
+        """
+        for sol_idx, solution in enumerate(population):
+            for gene_idx in range(self.num_genes):
+                if not self.gene_constraint[gene_idx]:
+                    continue
+                values = [solution[gene_idx]]
+                filtered_values = self.gene_constraint[gene_idx](solution, values)
+                result = self.validate_gene_constraint_callable_output(
+                    selected_values=filtered_values, values=values)
+                if not result:
+                    raise Exception(
+                        "The output from the gene_constraint callable/function "
+                        "must be a list or NumPy array that is a subset of the "
+                        "passed values (second argument).")
+                if len(filtered_values) == 1 and filtered_values[0] != solution[gene_idx]:
+                    raise Exception(
+                        f"It is expected to receive a list/numpy.ndarray from "
+                        f"the gene_constraint callable with a single value "
+                        f"equal to {values[0]}, but the value "
+                        f"{filtered_values[0]} found.")
+                if len(filtered_values) < 1:
+                    range_min, range_max = self.get_initial_population_range(
+                        gene_index=gene_idx)
+                    values_filtered = self.get_valid_gene_constraint_values(
+                        range_min=range_min,
+                        range_max=range_max,
+                        gene_value=None,
+                        gene_idx=gene_idx,
+                        mutation_by_replacement=True,
+                        solution=solution,
+                        sample_size=self.sample_size,
+                    )
+                    if values_filtered is None:
+                        if not self.suppress_warnings:
+                            warnings.warn(
+                                f"No value satisfied the constraint for the "
+                                f"gene at index {gene_idx} with value "
+                                f"{solution[gene_idx]} while growing the "
+                                f"population for NSGA-III.")
+                    else:
+                        population[sol_idx, gene_idx] = random.choice(values_filtered)
+                elif len(filtered_values) > 1:
+                    raise Exception(
+                        f"It is expected to receive a list/numpy.ndarray from "
+                        f"the gene_constraint callable that is either empty or "
+                        f"has a single value equal, but received a list/numpy."
+                        f"ndarray of length {len(filtered_values)}.")
+        return population
+
+    def _nsga3_resolve_duplicate_genes(self, population):
+        """
+        Apply the same duplicate-resolution path
+        ``initialize_population`` uses, so the grown rows never carry
+        duplicate genes when ``allow_duplicate_genes`` is False.
+        """
+        for solution_idx in range(population.shape[0]):
+            if self.gene_space is None:
+                population[solution_idx], _, _ = self.solve_duplicate_genes_randomly(
+                    solution=population[solution_idx],
+                    min_val=self.init_range_low,
+                    max_val=self.init_range_high,
+                    gene_type=self.gene_type,
+                    mutation_by_replacement=True,
+                    sample_size=self.sample_size,
+                )
+            else:
+                population[solution_idx], _, _ = self.solve_duplicate_genes_by_space(
+                    solution=population[solution_idx].copy(),
+                    gene_type=self.gene_type,
+                    mutation_by_replacement=True,
+                    sample_size=self.sample_size,
+                    build_initial_pop=True,
+                )
+        return population

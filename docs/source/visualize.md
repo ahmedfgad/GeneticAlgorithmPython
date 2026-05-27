@@ -80,7 +80,7 @@ For M=3 (NSGA-III on DTLZ2):
 
 ## `plot_pareto_front_pcp()`
 
-Parallel-coordinates view of the final non-dominated set. Each objective is a vertical axis. Each non-dominated solution becomes a polyline that crosses every axis. Values are normalised per objective so very different scales remain comparable. Useful for any M >= 2 and especially for M >= 4.
+Parallel-coordinates view of the final non-dominated set. Each objective is a vertical axis. Each non-dominated solution becomes a polyline that crosses every axis. Values are normalized per objective so very different scales remain comparable. Useful for any M >= 2 and especially for M >= 4.
 
 Parameters: `title`, `xlabel`, `ylabel`, `linewidth`, `font_size`, `color`, `alpha`, `grid`, `save_dir`.
 
@@ -104,7 +104,7 @@ ga_instance.plot_pareto_front_scatter_matrix()
 
 ## `plot_pareto_front_heatmap()`
 
-Heatmap of the final non-dominated set. Rows are solutions, columns are objectives, colour is the raw objective value. Rows are sorted by objective `sort_by` (default `0`); pass `sort_by=None` to keep the original order.
+Heatmap of the final non-dominated set. Rows are solutions, columns are objectives, color is the raw objective value. Rows are sorted by objective `sort_by` (default `0`); pass `sort_by=None` to keep the original order.
 
 Parameters: `title`, `xlabel`, `ylabel`, `font_size`, `cmap`, `sort_by`, `save_dir`.
 

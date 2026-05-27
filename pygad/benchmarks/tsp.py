@@ -2,7 +2,7 @@
 Travelling Salesman Problem (TSP) benchmark.
 
 A solution is a permutation of city indices. Fitness is the
-negative tour length so PyGAD can maximise it.
+negative tour length so PyGAD can maximize it.
 
 Build the problem from a 2D array of coordinates or from a
 precomputed distance matrix. The class exposes gene_space,

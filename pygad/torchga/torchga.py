@@ -114,7 +114,7 @@ class TorchGA:
         Parameters
         ----------
         model : torch.nn.Module
-            The PyTorch model to optimise. Its current weights are
+            The PyTorch model to optimize. Its current weights are
             used as the seed for the first solution.
         num_solutions : int
             Number of solutions in the population. Each solution is

@@ -320,28 +320,45 @@ Selects the parents for the NSGA-III algorithm to solve multi-objective optimiza
 
 Selects the parents for the NSGA-III algorithm to solve multi-objective optimization problems. It selects the parents using the tournament selection technique where the within-front comparison is based on the niche count (instead of the crowding distance used by `tournament_selection_nsga2()`). Requires the `nsga3_num_divisions` parameter to be set.
 
+## `pygad.utils.nsga` Submodule
+
+The `pygad.utils.nsga` module has a class named `NSGA` that holds the building blocks shared by NSGA-II and NSGA-III. The methods inside this class are:
+
+1. `non_dominated_sorting()`: Returns all the Pareto fronts by applying non-dominated sorting over the solutions.
+2. `get_non_dominated_set()`: Returns the two sets of non-dominated and dominated solutions from the passed solutions. The Pareto front is the non-dominated set.
+
 ## `pygad.utils.nsga2` Submodule
 
-The `pygad.utils.nsga2` module has a class named `NSGA2` that implements NSGA-II. The methods inside this class are:
+The `pygad.utils.nsga2` module has a class named `NSGA2` that implements the NSGA-II-specific primitives. The methods inside this class are:
 
-1. `non_dominated_sorting()`: Returns all the pareto fronts by applying non-dominated sorting over the solutions.
-2. `get_non_dominated_set()`: Returns the 2 sets of non-dominated solutions and dominated solutions from the passed solutions. Note that the Pareto front consists of the solutions in the non-dominated set.
-3. `crowding_distance()`: Calculates the crowding distance for all solutions in the current pareto front.
-4. `sort_solutions_nsga2()`: Sort the solutions. If the problem is single-objective, then the solutions are sorted by sorting the fitness values of the population. If it is multi-objective, then non-dominated sorting and crowding distance are applied to sort the solutions.
+1. `crowding_distance()`: Calculates the crowding distance for all solutions in the current Pareto front.
+2. `sort_solutions_nsga2()`: Sort the solutions. If the problem is single-objective, the solutions are sorted by their fitness values. If it is multi-objective, non-dominated sorting and crowding distance are applied to sort the solutions.
 
 ## `pygad.utils.nsga3` Submodule
 
-The `pygad.utils.nsga3` module has a class named `NSGA3` that implements NSGA-III. The methods inside this class are:
+The `pygad.utils.nsga3` module has a class named `NSGA3` that implements the NSGA-III algorithm primitives. NSGA-III novel names start with `nsga3_` to make the algorithm surface easy to spot.
 
-1. `generate_reference_points()`: Build the structured grid of reference points on the unit simplex using the Das-Dennis (stars-and-bars) method.
-2. `compute_ideal_point()`: Return the ideal point (column maximum under PyGAD's maximisation convention).
-3. `find_extreme_points()`: For each objective axis, return the solution that best represents the corner of that axis based on the Achievement Scalarising Function (ASF).
-4. `compute_intercepts()`: Fit a hyperplane through the M extreme points and return the per-axis intercept point used as the normalisation denominator. Falls back to the nadir (worst per objective) when the hyperplane cannot be fitted or when the intercept is degenerate.
-5. `normalise_fitness()`: Scale each fitness row to the [0, 1] range using the ideal point and the intercepts.
-6. `associate_to_reference_points()`: For every normalised solution, return the nearest reference index and the perpendicular distance to that reference line.
-7. `niching_select()`: Pick K survivors from the critical front using niche counts and per-niche tie-breaking rules.
-8. `nsga3_selection()`: Top-level NSGA-III parent selection routine.
-9. `tournament_selection_nsga3()`: Tournament-style NSGA-III parent selection routine.
+1. `nsga3_generate_reference_points()`: Build the structured grid of reference points on the unit simplex using the Das-Dennis (stars-and-bars) method.
+2. `nsga3_compute_ideal_point()`: Return the ideal point (column maximum under PyGAD's maximization convention).
+3. `nsga3_find_extreme_points()`: For each objective axis, return the solution that best represents the corner of that axis based on the Achievement Scalarizing Function (ASF).
+4. `nsga3_compute_intercepts()`: Fit a hyperplane through the M extreme points and return the per-axis intercept point used as the normalization denominator. Falls back to the nadir (worst per objective) when the hyperplane cannot be fitted or when the intercept is degenerate.
+5. `nsga3_normalize_fitness()`: Scale each fitness row to the `[0, 1]` range using the ideal point and the intercepts.
+6. `nsga3_associate_to_reference_points()`: For every normalized solution, return the nearest reference index and the perpendicular distance to that reference line.
+7. `nsga3_niching_select()`: Pick `num_to_select` survivors from the critical front using niche counts and per-niche tie-breaking rules.
+
+The selection methods `nsga3_selection()` and `tournament_selection_nsga3()` live in `pygad.utils.parent_selection`. The engine-time helpers (`_bootstrap_nsga3_reference_points()`, `_nsga3_grow_population()`, `_nsga3_generate_extra_random_solutions()`, `_nsga3_generate_single_random_gene()`) live in `pygad.utils.engine`.
+
+Two module-level constants in `pygad.utils.nsga3` control the numerical safeguards: `NSGA3_ASF_EPSILON` (default `1e-6`) and `NSGA3_INTERCEPT_NEAR_ZERO` (default `1e-12`).
+
+## `pygad.utils.report` Submodule
+
+The `pygad.utils.report` module has a class named `Report` that adds the `generate_report()` method to the `pygad.GA` class. It builds a PDF report of the GA run, bundling the configuration table, a run summary, the best solution, and every applicable plot. Requires the optional dependencies `reportlab` and `matplotlib`:
+
+```
+pip install pygad[report]
+```
+
+See [`generate_report()`](https://pygad.readthedocs.io/en/latest/pygad.html#generate-report) and the runnable example at [`examples/example_generate_report.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/example_generate_report.py).
 
 ## `pygad.utils.quality_indicators` Submodule
 

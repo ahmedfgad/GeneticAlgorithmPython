@@ -1,5 +1,5 @@
 """
-Quality indicators for multi-objective optimisation.
+Quality indicators for multi-objective optimization.
 
 Four indicators to measure the quality of a Pareto front built by
 PyGAD:

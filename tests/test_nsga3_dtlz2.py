@@ -3,8 +3,8 @@ End-to-end NSGA-III tests on the DTLZ2 benchmark.
 
 DTLZ2 is a multi-objective test problem whose Pareto-optimal solutions
 lie on the unit sphere in the first orthant of objective space. The
-problem is naturally a minimisation; this test file negates each
-objective so it fits PyGAD's maximisation convention.
+problem is naturally a minimization; this test file negates each
+objective so it fits PyGAD's maximization convention.
 
 The Deb & Jain 2014 paper checks convergence by asking whether every
 final solution is non-dominated and whether at least 12 of the 15
@@ -46,7 +46,7 @@ MIN_REFERENCE_POINTS_COVERED = 7
 def _dtlz2_max_fitness(ga, solution, sol_idx):
     """
     Standard DTLZ2 objective function, negated so larger values mean
-    better fitness under PyGAD's maximisation convention. Decision
+    better fitness under PyGAD's maximization convention. Decision
     variables are clipped to [0, 1] before being used so mutations that
     push genes out of range do not produce non-finite outputs.
     """
@@ -112,14 +112,14 @@ def _evaluate_final_fitness(ga):
                        dtype=float)
 
 
-def _normalised_distances_per_reference(ga, fitness):
+def _normalized_distances_per_reference(ga, fitness):
     nsga3 = NSGA3()
-    ideal_point = nsga3.compute_ideal_point(fitness)
-    extreme_points = nsga3.find_extreme_points(fitness, ideal_point)
-    intercepts = nsga3.compute_intercepts(extreme_points, ideal_point, fitness)
-    normalised = nsga3.normalise_fitness(fitness, ideal_point, intercepts)
-    assignments, distances = nsga3.associate_to_reference_points(
-        normalised, ga.nsga3_reference_points)
+    ideal_point = nsga3.nsga3_compute_ideal_point(fitness)
+    extreme_points = nsga3.nsga3_find_extreme_points(fitness, ideal_point)
+    intercepts = nsga3.nsga3_compute_intercepts(extreme_points, ideal_point, fitness)
+    normalized = nsga3.nsga3_normalize_fitness(fitness, ideal_point, intercepts)
+    assignments, distances = nsga3.nsga3_associate_to_reference_points(
+        normalized, ga.nsga3_reference_points)
     nearest_per_reference = numpy.full(len(ga.nsga3_reference_points), numpy.inf)
     for solution_index, reference_index in enumerate(assignments):
         if distances[solution_index] < nearest_per_reference[reference_index]:
@@ -168,7 +168,7 @@ def test_dtlz2_reference_directions_have_neighbours():
     ga = _make_dtlz2_ga()
     ga.run()
     final_fitness = _evaluate_final_fitness(ga)
-    nearest_per_reference = _normalised_distances_per_reference(ga, final_fitness)
+    nearest_per_reference = _normalized_distances_per_reference(ga, final_fitness)
     covered_count = int(numpy.sum(nearest_per_reference <= COVERAGE_THRESHOLD))
     assert covered_count >= MIN_REFERENCE_POINTS_COVERED, (
         f"Only {covered_count} of {len(ga.nsga3_reference_points)} reference "
