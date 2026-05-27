@@ -653,9 +653,6 @@ Release Date April 8, 2026
                 3. Parallel processing.
                       4. The `GANN` module.
                       5. The plots created by the `visualize`.
-
 21. Instead of using repeated code for converting the data type and rounding the genes during crossover and mutation, the `change_gene_dtype_and_round()` method is called from the `pygad.helper.misc.Helper` class.
 22. Fix some documentation issues. https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/336
 23. Update the documentation to reflect the recent additions and changes to the library structure.
-24. A new benchmark `pygad.benchmarks.tsp` with a `TSP` class for the Travelling Salesman Problem. The class accepts either 2D `coordinates` or a precomputed `distance_matrix`, exposes `gene_space`, `gene_type`, and `allow_duplicate_genes` for the permutation encoding, and returns the negative tour length as the fitness.
-25. Two new example folders under `/examples`: `examples/benchmarks/` has one runnable example per benchmark (classic, ZDT, DTLZ, knapsack, and TSP), and `examples/quality_indicators/` has one runnable example per quality indicator (hypervolume, IGD, GD, and spacing).
