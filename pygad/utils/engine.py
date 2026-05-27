@@ -284,6 +284,7 @@ class GAEngine:
                         # Check if batch processing is used. If not, then calculate this missing fitness value.
                         if self.fitness_batch_size in [1, None]:
                             fitness = self.fitness_func(self, sol, sol_idx)
+                            self.num_fitness_evaluations += 1
                             if type(fitness) in self.supported_int_float_types:
                                 # The fitness function returns a single numeric value.
                                 # This is a single-objective optimization problem.
@@ -318,6 +319,7 @@ class GAEngine:
 
                         batch_fitness = self.fitness_func(
                             self, batch_solutions, batch_indices)
+                        self.num_fitness_evaluations += len(batch_indices)
                         if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
                             raise TypeError(f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
                         elif len(numpy.array(batch_fitness)) != len(batch_indices):
@@ -394,6 +396,7 @@ class GAEngine:
 
                     # Check if batch processing is used. If not, then calculate the fitness value for individual solutions.
                     if self.fitness_batch_size in [1, None]:
+                        self.num_fitness_evaluations += len(solutions_to_submit_indices)
                         for index, fitness in zip(solutions_to_submit_indices, executor.map(self.fitness_func, [self]*len(solutions_to_submit_indices), solutions_to_submit, solutions_to_submit_indices)):
                             if type(fitness) in self.supported_int_float_types:
                                 # The fitness function returns a single numeric value.
@@ -424,6 +427,7 @@ class GAEngine:
                             batches_solutions.append(batch_solutions)
                             batches_indices.append(batch_indices)
 
+                        self.num_fitness_evaluations += sum(len(b) for b in batches_indices)
                         for batch_indices, batch_fitness in zip(batches_indices, executor.map(self.fitness_func, [self]*len(solutions_to_submit_indices), batches_solutions, batches_indices)):
                             if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
                                 raise TypeError(f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
@@ -497,6 +501,13 @@ class GAEngine:
 
             if not (self.on_start is None):
                 self.on_start(self)
+
+            # Reset the counters used by the "evaluations_<N>" and
+            # "time_<seconds>" stop criteria. Each run() call should
+            # only count the work it did itself.
+            self.num_fitness_evaluations = 0
+            import time as _time
+            self.run_start_time = _time.monotonic()
 
             stop_run = False
 
@@ -634,6 +645,19 @@ class GAEngine:
                                         else:
                                             stop_run = False
                                             break
+                        elif criterion[0] == "time":
+                            # Stop when the time spent inside run()
+                            # passes the user limit.
+                            import time as _time
+                            if _time.monotonic() - self.run_start_time >= float(criterion[1]):
+                                stop_run = True
+                                break
+                        elif criterion[0] == "evaluations":
+                            # Stop when the number of fitness calls
+                            # reaches the user limit.
+                            if self.num_fitness_evaluations >= int(criterion[1]):
+                                stop_run = True
+                                break
 
                 if stop_run:
                     break

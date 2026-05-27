@@ -293,6 +293,73 @@ class Mutation:
                                                                                              sample_size=self.sample_size)
         return offspring
 
+    def polynomial_mutation(self, offspring):
+        """
+        Apply polynomial mutation. Each gene is mutated with
+        probability ``self.mutation_probability`` (or with probability
+        ``1/num_genes`` when ``mutation_probability`` is not set).
+
+        The size of the change is set by
+        ``self.polynomial_mutation_eta`` (a higher value means a
+        smaller change). The per-gene bounds come from
+        ``get_initial_population_range``.
+
+        Parameters
+        ----------
+        offspring : numpy.ndarray
+            The offspring solutions to mutate (changed in place).
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            The mutated offspring.
+        """
+        eta = float(self.polynomial_mutation_eta)
+        per_gene_probability = (self.mutation_probability
+                                if self.mutation_probability is not None
+                                else 1.0 / self.num_genes)
+        eta_plus_one = eta + 1.0
+        near_zero = 1e-14
+
+        for sol_idx in range(offspring.shape[0]):
+            for gene_idx in range(offspring.shape[1]):
+                if numpy.random.random() > per_gene_probability:
+                    continue
+
+                range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
+                lower = float(range_min)
+                upper = float(range_max)
+                if upper - lower < near_zero:
+                    continue
+
+                gene_value = float(offspring[sol_idx, gene_idx])
+                delta_lower = (gene_value - lower) / (upper - lower)
+                delta_upper = (upper - gene_value) / (upper - lower)
+
+                rand_u = numpy.random.random()
+                if rand_u <= 0.5:
+                    xy = 1.0 - delta_lower
+                    val = 2.0 * rand_u + (1.0 - 2.0 * rand_u) * pow(xy, eta_plus_one)
+                    delta_q = pow(val, 1.0 / eta_plus_one) - 1.0
+                else:
+                    xy = 1.0 - delta_upper
+                    val = 2.0 * (1.0 - rand_u) + 2.0 * (rand_u - 0.5) * pow(xy, eta_plus_one)
+                    delta_q = 1.0 - pow(val, 1.0 / eta_plus_one)
+
+                new_value = gene_value + delta_q * (upper - lower)
+                new_value = numpy.clip(new_value, lower, upper)
+                offspring[sol_idx, gene_idx] = new_value
+
+                if self.allow_duplicate_genes == False:
+                    offspring[sol_idx], _, _ = self.solve_duplicate_genes_randomly(
+                        solution=offspring[sol_idx],
+                        min_val=lower,
+                        max_val=upper,
+                        mutation_by_replacement=True,
+                        gene_type=self.gene_type,
+                        sample_size=self.sample_size)
+        return offspring
+
     def swap_mutation(self, offspring):
         """
         Swap the values of two genes inside each offspring. One gene is

@@ -55,12 +55,16 @@ Introduced in [PyGAD 2.0.0](https://pygad.readthedocs.io/en/latest/releases.html
 
 One or more conditions that stop the evolution early. Each criterion is a string made of a stop word and a number, like `"reach_40"`.
 
-Two stop words are supported:
+Four stop words are supported:
 
 - `reach`: stop when the fitness is greater than or equal to a given value. Example: `"reach_40"` stops once the fitness is `>= 40`.
 - `saturate`: stop when the fitness does not change for a given number of generations. Example: `"saturate_7"` stops if the fitness stays the same for 7 generations in a row.
+- `time`: stop when the time spent inside `run()` is at least the given number of seconds. Example: `"time_30"` stops the run after 30 seconds.
+- `evaluations`: stop when the number of fitness function calls made inside `run()` reaches the given count. Example: `"evaluations_1000"` stops the run once 1000 calls have been made.
 
-Added in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0).
+You can also pass a list of criteria; the run stops as soon as any one of them is met.
+
+Added in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0). The `time` and `evaluations` keywords were added in PyGAD 3.6.0.
 :::
 
 #### Fitness Function
@@ -251,10 +255,17 @@ The built-in types are:
 - `two_points`: two-point crossover.
 - `uniform`: uniform crossover.
 - `scattered`: scattered crossover (since [PyGAD 2.9.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-9-0)).
+- `sbx`: simulated binary crossover. The standard real-coded operator. Requires the `sbx_crossover_eta` parameter.
 
 You can also pass your own crossover function (since [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0)). See [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/user_defined_operators.html#user-defined-crossover-mutation-and-parent-selection-operators).
 
 If `crossover_type=None`, the crossover step is skipped and no offspring are created, so the next generation reuses the current population (since [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2)).
+:::
+
+:::{dropdown} `sbx_crossover_eta=30`: Distribution index for SBX crossover.
+:animate: fade-in-slide-down
+
+Only used when `crossover_type` is `'sbx'`. Sets how close the children stay to the parents. A higher value means children stay closer. Must be a positive number. Defaults to `30`.
 :::
 
 :::{dropdown} `crossover_probability=None`: Chance a parent is used for crossover.
@@ -281,10 +292,17 @@ The built-in types are:
 - `inversion`: inversion mutation.
 - `scramble`: scramble mutation.
 - `adaptive`: adaptive mutation (since [PyGAD 2.10.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-10-0)). See [Adaptive Mutation](https://pygad.readthedocs.io/en/latest/adaptive_mutation.html#adaptive-mutation) and [Use Adaptive Mutation in PyGAD](https://pygad.readthedocs.io/en/latest/adaptive_mutation.html#use-adaptive-mutation-in-pygad).
+- `polynomial`: polynomial mutation. The standard real-coded operator used together with SBX. Requires the `polynomial_mutation_eta` parameter.
 
 You can also pass your own mutation function (since [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0)). See [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/user_defined_operators.html#user-defined-crossover-mutation-and-parent-selection-operators).
 
 If `mutation_type=None`, the mutation step is skipped and the offspring are used unchanged (since [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2)).
+:::
+
+:::{dropdown} `polynomial_mutation_eta=20`: Distribution index for polynomial mutation.
+:animate: fade-in-slide-down
+
+Only used when `mutation_type` is `'polynomial'`. Sets the size of the change. A higher value means a smaller change. Must be a positive number. Defaults to `20`.
 :::
 
 :::{dropdown} `mutation_probability=None`: Per-gene chance of mutation.

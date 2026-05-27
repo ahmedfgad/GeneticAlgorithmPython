@@ -12,6 +12,7 @@ The submodules in the `pygad.utils` module are:
 4. `parent_selection`: Has the `ParentSelection` class that implements the parent selection operators.
 5. `nsga2`: Has the `NSGA2` class that implements the Non-Dominated Sorting Genetic Algorithm II (NSGA-II).
 6. `nsga3`: Has the `NSGA3` class that implements the Non-Dominated Sorting Genetic Algorithm III (NSGA-III).
+7. `indicators`: Has functions to measure the quality of a Pareto front: `hypervolume`, `inverted_generational_distance`, `generational_distance`, and `spacing`.
 
 Note that the `pygad.GA` class extends all of these classes. So, the user can access any of the methods in such classes directly by the instance/object of the `pygad.GA` class.
 
@@ -341,6 +342,32 @@ The `pygad.utils.nsga3` module has a class named `NSGA3` that implements NSGA-II
 7. `niching_select()`: Pick K survivors from the critical front using niche counts and per-niche tie-breaking rules.
 8. `nsga3_selection()`: Top-level NSGA-III parent selection routine.
 9. `tournament_selection_nsga3()`: Tournament-style NSGA-III parent selection routine.
+
+## `pygad.utils.indicators` Submodule
+
+The `pygad.utils.indicators` module has functions to measure the quality of a Pareto front. All functions take fitness values in PyGAD's maximization format. The functions are:
+
+1. `hypervolume(fitness, reference_point)`: Volume of the objective space dominated by the front. The reference point must be worse than every solution on every objective. A larger value is better.
+2. `inverted_generational_distance(fitness, reference_front)`: Mean distance from each reference-front point to its nearest approximation point. Reports both convergence and diversity. A smaller value is better.
+3. `generational_distance(fitness, reference_front)`: Mean distance from each approximation point to its nearest reference point. Reports convergence only. A smaller value is better.
+4. `spacing(fitness)`: Standard deviation of the distance from each solution to its nearest neighbour. A smaller value means the solutions are spread more evenly.
+
+Example:
+
+```python
+from pygad.utils.indicators import hypervolume, inverted_generational_distance
+
+# After ga.run()
+fitness = ga.last_generation_fitness
+reference_point = [-10.0, -10.0]   # worse than every solution
+hv = hypervolume(fitness, reference_point)
+
+# If the true Pareto front is known
+from pygad.benchmarks.zdt import ZDT1
+problem = ZDT1()
+true_front = problem.pareto_front(num_points=100)
+igd = inverted_generational_distance(fitness, true_front)
+```
 
 ## More about the Operators
 

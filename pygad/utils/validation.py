@@ -669,7 +669,8 @@ class Validation:
     
     def _validate_crossover(self,
                             crossover_type,
-                            crossover_probability):
+                            crossover_probability,
+                            sbx_crossover_eta=30):
         """
         Validate the ``crossover_type`` and ``crossover_probability``
         parameters and store them on the GA instance. ``crossover_type``
@@ -751,11 +752,24 @@ class Validation:
                 self.crossover = self.uniform_crossover
             elif crossover_type == "scattered":
                 self.crossover = self.scattered_crossover
+            elif crossover_type == "sbx":
+                self.crossover = self.sbx_crossover
             else:
                 self.valid_parameters = False
-                raise TypeError(f"Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) parameter does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover)\n-scattered (for scattered crossover).\n")
+                raise TypeError(f"Undefined crossover type. \nThe assigned value to the crossover_type ({crossover_type}) parameter does not refer to one of the supported crossover types which are: \n-single_point (for single point crossover)\n-two_points (for two points crossover)\n-uniform (for uniform crossover)\n-scattered (for scattered crossover)\n-sbx (for simulated binary crossover).\n")
 
         self.crossover_type = crossover_type
+
+        # Validate sbx_crossover_eta. It is only used when
+        # crossover_type is 'sbx', but it is stored on the instance
+        # in all cases so user callables can read it too.
+        if type(sbx_crossover_eta) not in self.supported_int_float_types or sbx_crossover_eta <= 0:
+            self.valid_parameters = False
+            raise ValueError(
+                f"sbx_crossover_eta must be a positive number, but got {sbx_crossover_eta!r} "
+                f"of type {type(sbx_crossover_eta).__name__}."
+            )
+        self.sbx_crossover_eta = float(sbx_crossover_eta)
 
         # Calculate the value of crossover_probability
         if crossover_probability is None:
@@ -774,7 +788,8 @@ class Validation:
                            mutation_type,
                            mutation_probability,
                            mutation_num_genes,
-                           mutation_percent_genes):
+                           mutation_percent_genes,
+                           polynomial_mutation_eta=20):
         """
         Validate the mutation-related parameters and store them on the
         GA instance. ``mutation_type`` may be one of the built-in
@@ -870,11 +885,26 @@ class Validation:
                 self.mutation = self.inversion_mutation
             elif mutation_type == "adaptive":
                 self.mutation = self.adaptive_mutation
+            elif mutation_type == "polynomial":
+                self.mutation = self.polynomial_mutation
             else:
                 self.valid_parameters = False
-                raise TypeError(f"Undefined mutation type. \nThe assigned string value to the 'mutation_type' parameter ({mutation_type}) does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation)\n-adaptive (for adaptive mutation).\n")
+                raise TypeError(f"Undefined mutation type. \nThe assigned string value to the 'mutation_type' parameter ({mutation_type}) does not refer to one of the supported mutation types which are: \n-random (for random mutation)\n-swap (for swap mutation)\n-inversion (for inversion mutation)\n-scramble (for scramble mutation)\n-adaptive (for adaptive mutation)\n-polynomial (for polynomial mutation).\n")
 
         self.mutation_type = mutation_type
+
+        # Validate polynomial_mutation_eta. It is only used when
+        # mutation_type is 'polynomial', but it is stored on the
+        # instance in all cases so user callables can read it too.
+        if (type(polynomial_mutation_eta) not in self.supported_int_float_types
+                or polynomial_mutation_eta <= 0):
+            self.valid_parameters = False
+            raise ValueError(
+                f"polynomial_mutation_eta must be a positive number, but "
+                f"got {polynomial_mutation_eta!r} of type "
+                f"{type(polynomial_mutation_eta).__name__}."
+            )
+        self.polynomial_mutation_eta = float(polynomial_mutation_eta)
 
         # Calculate the value of mutation_probability
         if not (self.mutation_type is None):
@@ -1658,6 +1688,10 @@ class Validation:
           target value.
         - ``"saturate"``: stop when the best fitness does not change
           for the given number of generations.
+        - ``"time"``: stop when the time spent inside ``run()`` is
+          at least the given number of seconds.
+        - ``"evaluations"``: stop when the number of fitness function
+          calls made inside ``run()`` reaches the given count.
 
         Parameters
         ----------
@@ -1675,7 +1709,7 @@ class Validation:
             not a number.
         """
         self.stop_criteria = []
-        self.supported_stop_words = ["reach", "saturate"]
+        self.supported_stop_words = ["reach", "saturate", "time", "evaluations"]
         if stop_criteria is None:
             # None: Stop after passing through all generations.
             self.stop_criteria = None
@@ -1884,6 +1918,14 @@ class Validation:
         # The number of completed generations.
         self.generations_completed = 0
 
+        # Counts how many times the fitness function was called inside
+        # the current run(). Used by the "evaluations_<N>" stop
+        # criterion. Reset to 0 at the start of each run() call.
+        self.num_fitness_evaluations = 0
+        # Time at which the current run() call started. Used by the
+        # "time_<seconds>" stop criterion. None outside of run().
+        self.run_start_time = None
+
         # At this point, all necessary parameters validation is done successfully, and we are sure that the parameters are valid.
         # Set to True when all the parameters passed in the GA class constructor are valid.
         self.valid_parameters = True
@@ -1945,8 +1987,10 @@ class Validation:
                             nsga3_num_divisions,
                             crossover_type,
                             crossover_probability,
+                            sbx_crossover_eta,
                             mutation_type,
                             mutation_probability,
+                            polynomial_mutation_eta,
                             mutation_by_replacement,
                             mutation_percent_genes,
                             mutation_num_genes,
@@ -2046,12 +2090,14 @@ class Validation:
         self.num_parents_mating = num_parents_mating
 
         self._validate_crossover(crossover_type,
-                                 crossover_probability)
+                                 crossover_probability,
+                                 sbx_crossover_eta=sbx_crossover_eta)
 
         mutation_num_genes, mutation_percent_genes = self._validate_mutation(mutation_type,
                                                                              mutation_probability,
                                                                              mutation_num_genes,
-                                                                             mutation_percent_genes)
+                                                                             mutation_percent_genes,
+                                                                             polynomial_mutation_eta=polynomial_mutation_eta)
 
         parent_selection_type = self._validate_parent_selection(parent_selection_type,
                                                                 K_tournament,

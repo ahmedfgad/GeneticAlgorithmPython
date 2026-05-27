@@ -41,8 +41,10 @@ class GA(utils.parent_selection.ParentSelection,
                  nsga3_num_divisions=None,
                  crossover_type="single_point",
                  crossover_probability=None,
+                 sbx_crossover_eta=30,
                  mutation_type="random",
                  mutation_probability=None,
+                 polynomial_mutation_eta=20,
                  mutation_by_replacement=False,
                  mutation_percent_genes='default',
                  mutation_num_genes=None,
@@ -94,9 +96,11 @@ class GA(utils.parent_selection.ParentSelection,
 
         crossover_type: Type of the crossover operator. If  crossover_type=None, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
         crossover_probability: The probability of selecting a solution for the crossover operation. If the solution probability is <= crossover_probability, the solution is selected. The value must be between 0 and 1 inclusive.
+        sbx_crossover_eta: Only used when 'crossover_type' is 'sbx'. The distribution index that controls how close the children stay to the parents (higher value = closer). Defaults to 30.
 
         mutation_type: Type of the mutation operator. If mutation_type=None, then the mutation step is bypassed which means no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
         mutation_probability: The probability of selecting a gene for the mutation operation. If the gene probability is <= mutation_probability, the gene is selected. It accepts either a single value for fixed mutation or a list/tuple/numpy.ndarray of 2 values for adaptive mutation. The values must be between 0 and 1 inclusive. If specified, then no need for the 2 parameters mutation_percent_genes and mutation_num_genes.
+        polynomial_mutation_eta: Only used when 'mutation_type' is 'polynomial'. The distribution index that controls how small the mutation step is (higher value = smaller step). Defaults to 20.
 
         mutation_by_replacement: An optional bool parameter. It works only when the selected type of mutation is random (mutation_type="random"). In this case, setting mutation_by_replacement=True means replace the gene by the randomly generated value. If False, then it has no effect and random mutation works by adding the random value to the gene.
 
@@ -151,8 +155,10 @@ class GA(utils.parent_selection.ParentSelection,
                                      nsga3_num_divisions=nsga3_num_divisions,
                                      crossover_type=crossover_type,
                                      crossover_probability=crossover_probability,
+                                     sbx_crossover_eta=sbx_crossover_eta,
                                      mutation_type=mutation_type,
                                      mutation_probability=mutation_probability,
+                                     polynomial_mutation_eta=polynomial_mutation_eta,
                                      mutation_by_replacement=mutation_by_replacement,
                                      mutation_percent_genes=mutation_percent_genes,
                                      mutation_num_genes=mutation_num_genes,
