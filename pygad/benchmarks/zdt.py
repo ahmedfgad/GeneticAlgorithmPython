@@ -3,7 +3,7 @@ ZDT multi-objective benchmark problems.
 
 Two objectives. Variables live in [0, 1] (ZDT4 uses a wider range
 for some). Every class has a pareto_front() method that returns
-points on the true front in PyGAD's maximisation format (negated),
+points on the true front in PyGAD's maximization format (negated),
 which you can pass to the IGD and GD indicators as reference_front.
 """
 

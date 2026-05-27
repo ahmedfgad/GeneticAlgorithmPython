@@ -3,7 +3,7 @@ Benchmark problems for PyGAD.
 
 Each problem class can be called with the fitness signature
 (ga, solution, sol_idx) and returns a fitness in PyGAD's
-maximisation format. For problems that are normally written as
+maximization format. For problems that are normally written as
 minimisation, the values are negated.
 
 Each class also exposes num_genes, num_objectives, and bounds so

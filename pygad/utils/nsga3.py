@@ -66,7 +66,7 @@ class NSGA3:
         """
         For each objective axis, find the solution that best represents the
         corner of that axis. This is done by running the Achievement
-        Scalarising Function (ASF) once per axis with a weight vector that
+        Scalarizing Function (ASF) once per axis with a weight vector that
         puts weight 1.0 on the target axis and a tiny weight (epsilon) on
         every other axis. The solution with the smallest ASF score wins.
 
@@ -105,11 +105,11 @@ class NSGA3:
         """
         Fit a hyperplane through the M extreme points and return the
         intercept point on each axis. The result is the point we use to
-        scale every objective to the [0, 1] range during normalisation.
+        scale every objective to the [0, 1] range during normalization.
 
         The NSGA-III paper define the intercept as the point that
-        normalises to value 1 on its own axis (i.e. each extreme row lands
-        on a simplex corner after normalisation). The math is:
+        normalizes to value 1 on its own axis (i.e. each extreme row lands
+        on a simplex corner after normalization). The math is:
 
             (extreme_points - ideal_point) @ b = 1
             intercepts = ideal_point + 1 / b
@@ -117,14 +117,14 @@ class NSGA3:
         When the linear system cannot be solved, when any coefficient is
         too close to zero, or when the resulting intercept ends up on the
         wrong side of the ideal point, fall back to the worst observed
-        value per objective (the column minimum under maximisation).
+        value per objective (the column minimum under maximization).
 
         Two extra safety steps run after the linear solve:
           1. If an intercept value extrapolates past the worst observed
              value for that objective, clip it back to the worst value.
           2. If the gap between an intercept and the ideal point shrinks
              below INTERCEPT_NEAR_ZERO after clipping, replace that
-             intercept with the worst observed value so the normalisation
+             intercept with the worst observed value so the normalization
              denominator stays non-zero.
 
         Parameters
@@ -145,7 +145,7 @@ class NSGA3:
         ideal_point = numpy.asarray(ideal_point, dtype=float)
         extreme_points = numpy.asarray(extreme_points, dtype=float)
         fallback_fitness = numpy.asarray(fallback_fitness, dtype=float)
-        # Worst per objective under maximisation is the column minimum.
+        # Worst per objective under maximization is the column minimum.
         worst_per_objective = fallback_fitness.min(axis=0)
         translated = extreme_points - ideal_point
         try:
@@ -158,8 +158,8 @@ class NSGA3:
         if numpy.any(numpy.abs(coefficients) < INTERCEPT_NEAR_ZERO):
             return worst_per_objective
         intercepts = ideal_point + 1.0 / coefficients
-        # Under maximisation a valid intercept sits strictly below the
-        # ideal. If it does not, the normalisation denominator would flip
+        # Under maximization a valid intercept sits strictly below the
+        # ideal. If it does not, the normalization denominator would flip
         # sign and produce nonsense values.
         if numpy.any(intercepts >= ideal_point - INTERCEPT_NEAR_ZERO):
             return worst_per_objective
@@ -188,7 +188,7 @@ class NSGA3:
         Parameters
         ----------
         fitness : numpy.ndarray
-            The fitness array to normalise.
+            The fitness array to normalize.
         ideal_point : numpy.ndarray
             The ideal point.
         intercepts : numpy.ndarray
@@ -370,10 +370,10 @@ class NSGA3:
     def _pick_critical_front_survivors(self, accepted_indices, fl_indices,
                                        fitness, K):
         """
-        Run the NSGA-III normalisation and niching steps on the pool
+        Run the NSGA-III normalization and niching steps on the pool
         P_next U Fl, then ask niching_select for K survivors from Fl.
 
-        The ideal point, extreme points, intercepts and normalised values
+        The ideal point, extreme points, intercepts and normalized values
         are all computed on the combined pool (accepted plus critical
         front) because that is what the NSGA-III paper specifies.
         """
@@ -590,6 +590,7 @@ def _enumerate_compositions(num_objectives, num_divisions):
     if num_objectives == 1:
         yield [num_divisions]
         return
+    # 13
     for first in range(num_divisions + 1):
         for rest in _enumerate_compositions(num_objectives - 1, num_divisions - first):
             yield [first] + rest

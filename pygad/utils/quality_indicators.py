@@ -11,7 +11,7 @@ PyGAD:
    point to its nearest reference point.
 4. spacing: how evenly the approximation points are spread.
 
-All functions take fitness values in PyGAD's maximisation format
+All functions take fitness values in PyGAD's maximization format
 (higher is better). The reference point for hypervolume must be
 worse than every solution on every axis.
 """
@@ -142,7 +142,7 @@ def inverted_generational_distance(fitness, reference_front):
     ----------
     fitness : numpy.ndarray
         Approximation front, shape (num_solutions, num_objectives),
-        in PyGAD's maximisation format.
+        in PyGAD's maximization format.
     reference_front : numpy.ndarray
         Reference front, shape (num_reference_points, num_objectives),
         in the same format.
@@ -165,7 +165,7 @@ def generational_distance(fitness, reference_front):
     ----------
     fitness : numpy.ndarray
         Approximation front, shape (num_solutions, num_objectives),
-        in PyGAD's maximisation format.
+        in PyGAD's maximization format.
     reference_front : numpy.ndarray
         Reference front, shape (num_reference_points, num_objectives),
         in the same format.
@@ -190,7 +190,7 @@ def spacing(fitness):
     ----------
     fitness : numpy.ndarray
         Approximation front, shape (num_solutions, num_objectives),
-        in PyGAD's maximisation format.
+        in PyGAD's maximization format.
 
     Returns
     -------
