@@ -102,7 +102,7 @@ ga.run()
 ```python
 import pygad
 from pygad.benchmarks.zdt import ZDT1
-from pygad.utils.indicators import inverted_generational_distance
+from pygad.utils.quality_indicators import inverted_generational_distance
 
 problem = ZDT1(num_genes=10)
 

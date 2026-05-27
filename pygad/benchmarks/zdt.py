@@ -6,7 +6,7 @@ All ZDT problems have two objectives, real decision variables in
 and a known Pareto front. Every class has a pareto_front() method
 that returns reference points on the true front in PyGAD's
 maximization format (already negated). The user can pass these to
-the IGD and GD indicators as the reference_front argument.
+the IGD and GD quality indicators as the reference_front argument.
 """
 
 import numpy
