@@ -1250,6 +1250,12 @@ class Validation:
         self._validate_nsga3_num_divisions(parent_selection_type, nsga3_num_divisions)
 
         # Validating the number of parents to keep in the next population: keep_parents
+        # keep_parents defaults to None (sentinel) so we can tell whether the user
+        # explicitly set it. Resolve None to -1 to preserve the historical default
+        # behavior (keep all selected parents) byte-for-byte.
+        self.keep_parents_explicitly_set = keep_parents is not None
+        if keep_parents is None:
+            keep_parents = -1
         if not (type(keep_parents) in self.supported_int_types):
             self.valid_parameters = False
             raise TypeError(f"Incorrect type of the value assigned to the keep_parents parameter. The value ({keep_parents}) of type {type(keep_parents)} found but an integer is expected.")
@@ -1272,6 +1278,13 @@ class Validation:
             raise ValueError(f"Incorrect value to the keep_elitism parameter: {keep_elitism}. \nThe assigned value to the keep_elitism parameter must satisfy the following conditions: \n1) Less than or equal to sol_per_pop\n2) Greater than or equal to 0.")
 
         self.keep_elitism = keep_elitism
+
+        # keep_elitism takes precedence over keep_parents: when keep_elitism > 0,
+        # keep_parents is ignored. Warn if the user explicitly set keep_parents while
+        # keep_elitism is non-zero, instead of silently ignoring it.
+        if self.keep_parents_explicitly_set and self.keep_elitism != 0:
+            if not self.suppress_warnings:
+                warnings.warn(f"Both keep_parents (={self.keep_parents}) and keep_elitism (={self.keep_elitism}) are set. Because keep_elitism is greater than 0, it takes precedence and keep_parents is ignored. To make keep_parents take effect, set keep_elitism=0.")
 
         self._refresh_num_offspring()
 
