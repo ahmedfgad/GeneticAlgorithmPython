@@ -18,15 +18,41 @@ class Helper:
                 print_step_parameters=True,
                 print_parameters_summary=True):
         """
-        The summary() method prints a summary of the PyGAD lifecycle in a Keras style.
-        The parameters are:
-            line_length: An integer representing the length of the single line in characters.
-            fill_character: A character to fill the lines.
-            line_character: A character for creating a line separator.
-            line_character2: A secondary character to create a line separator.
-            columns_equal_len: The table rows are split into equal-sized columns or split subjective to the width needed.
-            print_step_parameters: Whether to print extra parameters about each step inside the step. If print_step_parameters=False and print_parameters_summary=True, then the parameters of each step are printed at the end of the table.
-            print_parameters_summary: Whether to print parameters summary at the end of the table. If print_step_parameters=False, then the parameters of each step are printed at the end of the table too.
+        Print a Keras-style summary of the PyGAD lifecycle. Each
+        configured step (fitness, parent selection, crossover,
+        mutation, etc.) is shown on its own row together with the
+        handler name and an output-shape hint. The string written to
+        the logger is also returned.
+
+        Parameters
+        ----------
+        line_length : int
+            Total width of a printed line in characters.
+        fill_character : str
+            Character used to pad cells to the column width.
+        line_character : str
+            Character used to draw the lighter horizontal separator
+            between rows.
+        line_character2 : str
+            Character used to draw the heavier separator between the
+            header and the body.
+        columns_equal_len : bool
+            If True, the three columns are split into equal widths.
+            Otherwise the widths follow the longest content in each
+            column.
+        print_step_parameters : bool
+            If True, the extra parameters of each step are printed
+            inside the step's row.
+        print_parameters_summary : bool
+            If True, a summary block of global parameters is printed
+            below the table. When ``print_step_parameters`` is False,
+            the per-step extras are folded into this summary block.
+
+        Returns
+        -------
+        summary_output : str
+            The full summary as a single string (the same text that
+            was written to the logger).
         """
 
         summary_output = ""
@@ -240,7 +266,20 @@ class Helper:
 
     def initialize_parents_array(self, shape):
         """
-        Standardize array initialization for parents and offspring.
+        Allocate an empty parents (or offspring) array with the right
+        dtype. Uses the dtype of the first gene type when every gene
+        shares the same type, otherwise falls back to ``object``.
+
+        Parameters
+        ----------
+        shape : tuple
+            The shape of the array, usually
+            ``(num_parents, num_genes)``.
+
+        Returns
+        -------
+        array : numpy.ndarray
+            An uninitialised array of the requested shape and dtype.
         """
         if self.gene_type_single:
             return numpy.empty(shape, dtype=self.gene_type[0])
@@ -250,13 +289,21 @@ class Helper:
     def change_population_dtype_and_round(self,
                                           population):
         """
-        Change the data type of the population. It works with iterables (e.g. lists or NumPy arrays) of shape 2D.
-        It does not handle single numeric values or 1D arrays.
+        Cast a 2D population to the dtype encoded in
+        ``self.gene_type`` and round non-integer genes to the
+        configured precision. When ``gene_type_single`` is True, the
+        same dtype and precision are applied to every gene; otherwise
+        each gene gets its own dtype and precision.
 
-        It accepts:
-            -population: The iterable to change its dtype.
+        Parameters
+        ----------
+        population : list or numpy.ndarray
+            A 2D iterable with shape ``(num_solutions, num_genes)``.
 
-        It returns the iterable with the data type changed for all genes.
+        Returns
+        -------
+        population_new : numpy.ndarray
+            The same data cast (and rounded) to the right type.
         """
 
         population_new = numpy.array(population.copy(), dtype=object)
@@ -299,13 +346,22 @@ class Helper:
                                     gene_index,
                                     gene_value):
         """
-        Change the data type and round a single gene value or a vector of values FOR THE SAME GENE. E.g., the input could be 6 or [6, 7, 8].
+        Cast and round one or more candidate values that all belong
+        to the same gene index. Useful when generating mutation
+        values for a specific gene.
 
-        It accepts 2 parameters:
-            -gene_index: The index of the target gene.
-            -gene_value: The gene value.
+        Parameters
+        ----------
+        gene_index : int
+            Index of the gene whose dtype / precision should be used.
+        gene_value : numeric or iterable
+            Either a single value or a vector of values for that
+            gene.
 
-        If gene_value has a single value, then it returns a single number with the type changed and value rounded. If gene_value is a vector, then a vector is returned after changing the data type and rounding.
+        Returns
+        -------
+        gene_value_new : numeric
+            The first (or only) value after casting and rounding.
         """
 
         if self.gene_type_single == True:
@@ -344,15 +400,28 @@ class Helper:
                                              gene_value,
                                              mutation_by_replacement):
         """
-        Change the data type and round the random value used to apply mutation.
+        Apply a random mutation value to a gene and cast / round the
+        result. If ``mutation_by_replacement`` is True, the random
+        value replaces the gene; otherwise it is added to the
+        existing value.
 
-        It accepts:
-            -random_value: The random value to change its data type.
-            -gene_index: The index of the target gene.
-            -gene_value: The gene value before mutation. Only used if mutation_by_replacement=False and gene_type_single=False.
-            -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
+        Parameters
+        ----------
+        random_value : numeric
+            The freshly drawn mutation value.
+        gene_index : int
+            Index of the gene being mutated.
+        gene_value : numeric
+            Gene value before mutation. Only used when
+            ``mutation_by_replacement`` is False.
+        mutation_by_replacement : bool
+            If True, replace the gene; otherwise add the random
+            value to it.
 
-        It returns the new value after changing the data type and being rounded.
+        Returns
+        -------
+        gene_value_new : numeric
+            The mutated value after casting and rounding.
         """
 
         if mutation_by_replacement:
@@ -369,6 +438,26 @@ class Helper:
     def validate_gene_constraint_callable_output(self,
                                                  selected_values,
                                                  values):
+        """
+        Check that a gene constraint callable returned a list or
+        numpy array whose elements are all members of the original
+        candidate ``values``.
+
+        Parameters
+        ----------
+        selected_values : list, numpy.ndarray, or other
+            The return value from the user-supplied constraint
+            callable.
+        values : iterable
+            The full set of candidate values that was passed to the
+            callable.
+
+        Returns
+        -------
+        valid : bool
+            True when ``selected_values`` is a list or numpy array
+            and is a subset of ``values``. False otherwise.
+        """
         if type(selected_values) in [list, numpy.ndarray]:
             selected_values_set = set(selected_values)
             if selected_values_set.issubset(values):
@@ -384,16 +473,32 @@ class Helper:
                                          values,
                                          solution,
                                          gene_idx):
-
         """
-        Filter the random values generated for mutation based on whether they meet the gene constraint in the gene_constraint parameter.
+        Pass a list of candidate values through the user-supplied
+        gene constraint callable and return the subset that satisfies
+        the constraint.
 
-        It accepts:
-            -values: The values to filter.
-            -solution: The solution containing the target gene.
-            -gene_idx: The index of the gene in the solution.
+        Parameters
+        ----------
+        values : list or numpy.ndarray
+            Candidate values to filter.
+        solution : numpy.ndarray
+            The solution that owns the gene. Passed to the constraint
+            callable so it can look at the other genes if needed.
+        gene_idx : int
+            Index of the gene inside ``solution``.
 
-        It returns None if no values satisfy the constraint. Otherwise, an array of values that satisfy the constraint is returned.
+        Returns
+        -------
+        filtered_values : list, numpy.ndarray, or None
+            The values that satisfy the constraint, or None when no
+            value satisfies it (a warning is issued in that case).
+
+        Raises
+        ------
+        Exception
+            If the gene has no constraint, or the constraint callable
+            returns a result that is not a subset of ``values``.
         """
 
         if self.gene_constraint and self.gene_constraint[gene_idx]:
@@ -423,14 +528,23 @@ class Helper:
         return filtered_values
 
     def get_gene_dtype(self, gene_index):
-
         """
-        Returns the data type of the gene by its index.
+        Return the dtype (and optional precision) for the gene at the
+        given index. When ``gene_type_single`` is True the same dtype
+        is returned for every gene; otherwise the per-gene entry is
+        returned.
 
-        It accepts a single parameter:
-            -gene_index: The index of the gene to get its data type. Only used if each gene has its own data type.
+        Parameters
+        ----------
+        gene_index : int
+            Index of the gene whose dtype is wanted. Ignored when
+            ``gene_type_single`` is True.
 
-        It returns the data type of the gene.
+        Returns
+        -------
+        dtype : type or list
+            Either a single Python / numpy type, or a
+            ``[type, precision]`` pair.
         """
 
         if self.gene_type_single == True:
@@ -440,14 +554,24 @@ class Helper:
         return dtype
 
     def get_random_mutation_range(self, gene_index):
-
         """
-        Returns the minimum and maximum values of the mutation range.
+        Return the random-mutation range ``(min, max)`` for the gene
+        at the given index. When ``random_mutation_min_val`` is a
+        scalar, the same range is used for every gene; otherwise the
+        per-gene entry is returned.
 
-        It accepts a single parameter:
-            -gene_index: The index of the gene to get its range. Only used if the gene has a specific mutation range.
+        Parameters
+        ----------
+        gene_index : int
+            Index of the gene. Ignored when the range parameters are
+            scalars.
 
-        It returns the minimum and maximum values of the gene mutation range.
+        Returns
+        -------
+        range_min : numeric
+            Lower bound of the random delta.
+        range_max : numeric
+            Upper bound of the random delta.
         """
 
         # We can use either random_mutation_min_val or random_mutation_max_val.
@@ -460,14 +584,24 @@ class Helper:
         return range_min, range_max
 
     def get_initial_population_range(self, gene_index):
-
         """
-        Returns the minimum and maximum values of the initial population range.
+        Return the initial-population range ``(min, max)`` for the
+        gene at the given index. When ``init_range_low`` is a scalar,
+        the same range is used for every gene; otherwise the
+        per-gene entry is returned.
 
-        It accepts a single parameter:
-            -gene_index: The index of the gene to get its range. Only used if the gene has a specific range
+        Parameters
+        ----------
+        gene_index : int
+            Index of the gene. Ignored when the range parameters are
+            scalars.
 
-        It returns the minimum and maximum values of the gene initial population range.
+        Returns
+        -------
+        range_min : numeric
+            Lower bound for the random initial gene value.
+        range_max : numeric
+            Upper bound for the random initial gene value.
         """
 
         # We can use either init_range_low or init_range_high.
@@ -486,18 +620,37 @@ class Helper:
                                        gene_value=None,
                                        sample_size=1):
         """
-        Generate/select one or more values for the gene from the gene space.
+        Generate one or more candidate values for the gene from its
+        ``gene_space`` entry. Handles flat spaces, nested spaces,
+        ``range`` objects, and ``{low, high, step}`` dictionaries.
 
-        It accepts:
-            -gene_idx: The index of the gene in the solution.
-            -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
-            -solution (iterable, optional): The solution where we need to generate a gene. Needed if you are selecting a single value (sample_size=1) to select a value that respects the allow_duplicate_genes parameter instead of selecting a value randomly. If None, then the gene value is selected randomly.
-            -gene_value (int, optional): The original gene value before applying mutation. Needed if you are calling this method to apply mutation. If None, then a sample is created from the gene space without being summed to the gene value.
-            -sample_size (int, optional): The number of random values to generate. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values. For int data types, it could be None to keep all the values. For float data types, a None value returns only a single value.
+        Parameters
+        ----------
+        gene_idx : int
+            Index of the gene inside the solution.
+        mutation_by_replacement : bool
+            If True (mutation by replacement) the generated value is
+            used as-is. If False the generated value is added to
+            ``gene_value``. Set to True when building the initial
+            population.
+        solution : iterable or None
+            The solution the gene belongs to. When provided and
+            ``sample_size`` is 1, the helper tries to pick a value
+            that does not duplicate any existing gene.
+        gene_value : numeric or None
+            The current gene value. Required when applying mutation
+            with ``mutation_by_replacement=False`` so the random
+            value can be added on top.
+        sample_size : int
+            Number of candidate values to generate. ``1`` returns a
+            single number; larger values return an array; ``None``
+            keeps the full integer range or a single float value.
 
-        It returns,
-            -A single numeric value if sample_size=1. Or
-            -An array with number of maximum number of values equal to sample_size if sample_size>1.
+        Returns
+        -------
+        value : numeric or numpy.ndarray
+            A single value when ``sample_size=1``; otherwise an
+            array of up to ``sample_size`` values.
         """
 
         if gene_value is None:
@@ -648,19 +801,39 @@ class Helper:
                                      sample_size=1,
                                      step=1):
         """
-        Randomly generate one or more values for the gene.
-        It accepts:
-            -range_min: The minimum value in the range from which a value is selected.
-            -range_max: The maximum value in the range from which a value is selected.
-            -gene_value: The original gene value before applying mutation.
-            -gene_idx: The index of the gene in the solution.
-            -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
-            -sample_size: The number of random values to generate. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values. For int data types, it could be None to keep all the values. For float data types, a None value returns only a single value.
-            -step (int, optional): The step size for generating candidate values. Defaults to 1. Only used with genes of an integer data type.
+        Generate one or more candidate values for the gene by drawing
+        from the random range ``[range_min, range_max)``. For integer
+        gene types the helper iterates over the discrete values; for
+        float types it samples uniformly.
 
-        It returns,
-            -A single numeric value if sample_size=1. Or
-            -An array with number of values equal to sample_size if sample_size>1.
+        Parameters
+        ----------
+        range_min : numeric
+            Lower bound of the random range.
+        range_max : numeric
+            Upper bound of the random range.
+        gene_value : numeric
+            The current gene value, used when
+            ``mutation_by_replacement`` is False so the random delta
+            can be added to it.
+        gene_idx : int
+            Index of the gene inside the solution.
+        mutation_by_replacement : bool
+            If True, the random value replaces the gene; otherwise it
+            is added.
+        sample_size : int or None
+            Number of candidate values to generate. ``1`` returns a
+            single number; larger values return an array of up to
+            that many values; ``None`` keeps every value in the
+            integer range or returns a single float.
+        step : int
+            Step size used when enumerating an integer range.
+
+        Returns
+        -------
+        random_value : numeric or numpy.ndarray
+            A single value when ``sample_size=1``; otherwise an
+            array of unique values.
         """
 
         gene_type = self.get_gene_dtype(gene_index=gene_idx)
@@ -716,20 +889,40 @@ class Helper:
                             sample_size=1,
                             step=1):
         """
-        Generate one or more values for the gene either randomly or from the gene space. It acts as a router.
-        It accepts:
-            -gene_value: The original gene value before applying mutation.
-            -gene_idx: The index of the gene in the solution.
-            -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
-            -solution (iterable, optional): The solution where we need to generate a gene. Needed if you are selecting a single value (sample_size=1) to select a value that respects the allow_duplicate_genes parameter instead of selecting a value randomly. If None, then the gene value is selected randomly.
-            -range_min (int, optional): The minimum value in the range from which a value is selected. It must be passed for generating the gene value randomly because we cannot decide whether it is the range for the initial population (init_range_low and init_range_high) or mutation (random_mutation_min_val and random_mutation_max_val).
-            -range_max (int, optional): The maximum value in the range from which a value is selected. It must be passed for generating the gene value randomly because we cannot decide whether it is the range for the initial population (init_range_low and init_range_high) or mutation (random_mutation_min_val and random_mutation_max_val).
-            -sample_size: The number of random values to generate/select and return. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values. For int data types, it could be None to keep all the values. For float data types, a None value returns only a single value.
-            -step (int, optional): The step size for generating candidate values. Defaults to 1. Only used with genes of an integer data type.
+        Dispatcher that picks between
+        ``generate_gene_value_from_space`` (when ``self.gene_space``
+        is set) and ``generate_gene_value_randomly`` (otherwise) to
+        generate one or more candidate values for the gene.
 
-        It returns,
-            -A single numeric value if sample_size=1. Or
-            -An array with number of values equal to sample_size if sample_size>1.
+        Parameters
+        ----------
+        gene_value : numeric
+            The current gene value, used when
+            ``mutation_by_replacement`` is False.
+        gene_idx : int
+            Index of the gene inside the solution.
+        mutation_by_replacement : bool
+            See ``generate_gene_value_randomly``.
+        solution : iterable or None
+            The solution that owns the gene. Used to avoid creating
+            duplicates when ``sample_size=1`` and
+            ``allow_duplicate_genes`` is False.
+        range_min : numeric or None
+            Lower bound for the random range. Required when
+            ``self.gene_space`` is None.
+        range_max : numeric or None
+            Upper bound for the random range. Required when
+            ``self.gene_space`` is None.
+        sample_size : int or None
+            Number of candidate values to generate.
+        step : int
+            Step size for the integer random range.
+
+        Returns
+        -------
+        output : numeric or numpy.ndarray
+            A single value when ``sample_size=1``; otherwise an
+            array of values.
         """
         if self.gene_space is None:
             output = self.generate_gene_value_randomly(range_min=range_min,
@@ -757,22 +950,36 @@ class Helper:
                                          sample_size=100,
                                          step=1):
         """
-        Generate/select values for the gene that satisfy the constraint. The values could be generated randomly or from the gene space.
-        The number of returned values is at its maximum equal to the sample_size parameter.
-        It accepts:
-            -range_min: The minimum value in the range from which a value is selected.
-            -range_max: The maximum value in the range from which a value is selected.
-            -gene_value: The original gene value before applying mutation.
-            -gene_idx: The index of the gene in the solution.
-            -mutation_by_replacement: A flag indicating whether mutation by replacement is enabled or not. The reason is to make this helper method usable while generating the initial population. In this case, mutation_by_replacement does not matter and should be considered False.
-            -solution: The solution in which the gene exists.
-            -sample_size: The number of values to generate or select. It tries to generate a number of values up to a maximum of sample_size. But it is not always guaranteed because the total number of values might not be enough or the random generator creates duplicate random values.
-            -step (int, optional): The step size for generating candidate values. Defaults to 1. Only used with genes of an integer data type.
+        Generate up to ``sample_size`` candidate values for the gene
+        (via ``generate_gene_value``) and then filter them through
+        the user-supplied ``gene_constraint`` callable.
 
-        It returns,
-            -A single numeric value if sample_size=1. Or
-            -An array with number of values equal to sample_size if sample_size>1. Or
-            -None if no value found that satisfies the constraint.
+        Parameters
+        ----------
+        range_min : numeric or None
+            Lower bound of the random range.
+        range_max : numeric or None
+            Upper bound of the random range.
+        gene_value : numeric
+            The current gene value, used when
+            ``mutation_by_replacement`` is False.
+        gene_idx : int
+            Index of the gene inside the solution.
+        mutation_by_replacement : bool
+            See ``generate_gene_value_randomly``.
+        solution : iterable
+            The solution that owns the gene. Passed to the
+            constraint callable so it can look at the other genes.
+        sample_size : int
+            Number of candidate values to draw before filtering.
+        step : int
+            Step size for the integer random range.
+
+        Returns
+        -------
+        values_filtered : numpy.ndarray or None
+            Values that satisfy the constraint, or None if no
+            candidate satisfies it.
         """
 
         # Either generate the values randomly or from the gene space.

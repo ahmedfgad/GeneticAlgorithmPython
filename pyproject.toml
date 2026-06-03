@@ -58,6 +58,7 @@ dependencies = [
 [project.optional-dependencies]
 deep_learning = ["keras", "tensorflow", "torch"]
 visualize = ["matplotlib"]
+report = ["matplotlib", "reportlab"]
 
 # PyTest Configuration. Later, PyTest will support the [tool.pytest] table.
 [tool.pytest.ini_options]

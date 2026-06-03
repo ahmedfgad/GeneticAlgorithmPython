@@ -11,6 +11,8 @@ The submodules in the `pygad.utils` module are:
 3. `mutation`: Has the `Mutation` class that implements the mutation operators.
 4. `parent_selection`: Has the `ParentSelection` class that implements the parent selection operators.
 5. `nsga2`: Has the `NSGA2` class that implements the Non-Dominated Sorting Genetic Algorithm II (NSGA-II).
+6. `nsga3`: Has the `NSGA3` class that implements the Non-Dominated Sorting Genetic Algorithm III (NSGA-III).
+7. `quality_indicators`: Has functions to measure the quality of a Pareto front: `hypervolume`, `inverted_generational_distance`, `generational_distance`, and `spacing`.
 
 Note that the `pygad.GA` class extends all of these classes. So, the user can access any of the methods in such classes directly by the instance/object of the `pygad.GA` class.
 
@@ -255,6 +257,8 @@ The `pygad.utils.parent_selection` module has a class named `ParentSelection` wi
 6. Tournament: Implemented using the `tournament_selection()` method.
 7. NSGA-II: Implemented using the `nsga2_selection()` method.
 8. NSGA-II Tournament: Implemented using the `tournament_selection_nsga2()` method.
+9. NSGA-III: Implemented using the `nsga3_selection()` method.
+10. NSGA-III Tournament: Implemented using the `tournament_selection_nsga3()` method.
 
 All parent selection methods accept these parameters:
 
@@ -308,14 +312,81 @@ Selects the parents for the NSGA-II algorithm to solve multi-objective optimizat
 
 Selects the parents for the NSGA-II algorithm to solve multi-objective optimization problems. It selects the parents using the tournament selection technique applied based on non-dominated sorting and crowding distance.
 
+#### `nsga3_selection()`
+
+Selects the parents for the NSGA-III algorithm to solve multi-objective optimization problems. It accepts whole Pareto fronts in order until adding the next front would overflow the requested parent count, then picks the remaining survivors from that critical front using niching against the structured reference points stored on the GA instance. Requires the `nsga3_num_divisions` parameter to be set when constructing the `pygad.GA` instance.
+
+#### `tournament_selection_nsga3()`
+
+Selects the parents for the NSGA-III algorithm to solve multi-objective optimization problems. It selects the parents using the tournament selection technique where the within-front comparison is based on the niche count (instead of the crowding distance used by `tournament_selection_nsga2()`). Requires the `nsga3_num_divisions` parameter to be set.
+
+## `pygad.utils.nsga` Submodule
+
+The `pygad.utils.nsga` module has a class named `NSGA` that holds the building blocks shared by NSGA-II and NSGA-III. The methods inside this class are:
+
+1. `non_dominated_sorting()`: Returns all the Pareto fronts by applying non-dominated sorting over the solutions.
+2. `get_non_dominated_set()`: Returns the two sets of non-dominated and dominated solutions from the passed solutions. The Pareto front is the non-dominated set.
+
 ## `pygad.utils.nsga2` Submodule
 
-The `pygad.utils.nsga2` module has a class named `NSGA2` that implements NSGA-II. The methods inside this class are:
+The `pygad.utils.nsga2` module has a class named `NSGA2` that implements the NSGA-II-specific primitives. The methods inside this class are:
 
-1. `non_dominated_sorting()`: Returns all the pareto fronts by applying non-dominated sorting over the solutions.
-2. `get_non_dominated_set()`: Returns the 2 sets of non-dominated solutions and dominated solutions from the passed solutions. Note that the Pareto front consists of the solutions in the non-dominated set.
-3. `crowding_distance()`: Calculates the crowding distance for all solutions in the current pareto front.
-4. `sort_solutions_nsga2()`: Sort the solutions. If the problem is single-objective, then the solutions are sorted by sorting the fitness values of the population. If it is multi-objective, then non-dominated sorting and crowding distance are applied to sort the solutions.
+1. `crowding_distance()`: Calculates the crowding distance for all solutions in the current Pareto front.
+2. `sort_solutions_nsga2()`: Sort the solutions. If the problem is single-objective, the solutions are sorted by their fitness values. If it is multi-objective, non-dominated sorting and crowding distance are applied to sort the solutions.
+
+## `pygad.utils.nsga3` Submodule
+
+The `pygad.utils.nsga3` module has a class named `NSGA3` that implements the NSGA-III algorithm primitives. NSGA-III novel names start with `nsga3_` to make the algorithm surface easy to spot.
+
+1. `nsga3_generate_reference_points()`: Build the structured grid of reference points on the unit simplex using the Das-Dennis (stars-and-bars) method.
+2. `nsga3_compute_ideal_point()`: Return the ideal point (column maximum under PyGAD's maximization convention).
+3. `nsga3_find_extreme_points()`: For each objective axis, return the solution that best represents the corner of that axis based on the Achievement Scalarizing Function (ASF).
+4. `nsga3_compute_intercepts()`: Fit a hyperplane through the M extreme points and return the per-axis intercept point used as the normalization denominator. Falls back to the nadir (worst per objective) when the hyperplane cannot be fitted or when the intercept is degenerate.
+5. `nsga3_normalize_fitness()`: Scale each fitness row to the `[0, 1]` range using the ideal point and the intercepts.
+6. `nsga3_associate_to_reference_points()`: For every normalized solution, return the nearest reference index and the perpendicular distance to that reference line.
+7. `nsga3_niching_select()`: Pick `num_to_select` survivors from the critical front using niche counts and per-niche tie-breaking rules.
+
+The selection methods `nsga3_selection()` and `tournament_selection_nsga3()` live in `pygad.utils.parent_selection`. The engine-time helpers (`_bootstrap_nsga3_reference_points()`, `_nsga3_grow_population()`, `_nsga3_generate_extra_random_solutions()`, `_nsga3_generate_single_random_gene()`) live in `pygad.utils.engine`.
+
+Two module-level constants in `pygad.utils.nsga3` control the numerical safeguards: `NSGA3_ASF_EPSILON` (default `1e-6`) and `NSGA3_INTERCEPT_NEAR_ZERO` (default `1e-12`).
+
+## `pygad.utils.report` Submodule
+
+The `pygad.utils.report` module has a class named `Report` that adds the `generate_report()` method to the `pygad.GA` class. It builds a PDF report of the GA run, bundling the configuration table, a run summary, the best solution, and every applicable plot. Requires the optional dependencies `reportlab` and `matplotlib`:
+
+```
+pip install pygad[report]
+```
+
+See [`generate_report()`](https://pygad.readthedocs.io/en/latest/pygad.html#generate-report) and the runnable example at [`examples/example_generate_report.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/example_generate_report.py).
+
+## `pygad.utils.quality_indicators` Submodule
+
+The `pygad.utils.quality_indicators` module has functions to measure the quality of a Pareto front. All functions take fitness values in PyGAD's maximization format. The functions are:
+
+1. `hypervolume(fitness, reference_point)`: Volume of the objective space dominated by the front. The reference point must be worse than every solution on every objective. A larger value is better.
+2. `inverted_generational_distance(fitness, reference_front)`: Mean distance from each reference-front point to its nearest approximation point. Reports both convergence and diversity. A smaller value is better.
+3. `generational_distance(fitness, reference_front)`: Mean distance from each approximation point to its nearest reference point. Reports convergence only. A smaller value is better.
+4. `spacing(fitness)`: Standard deviation of the distance from each solution to its nearest neighbour. A smaller value means the solutions are spread more evenly.
+
+Example:
+
+```python
+from pygad.utils.quality_indicators import hypervolume, inverted_generational_distance
+
+# After ga.run()
+fitness = ga.last_generation_fitness
+reference_point = [-10.0, -10.0]   # worse than every solution
+hv = hypervolume(fitness, reference_point)
+
+# If the true Pareto front is known
+from pygad.benchmarks.zdt import ZDT1
+problem = ZDT1()
+true_front = problem.pareto_front(num_points=100)
+igd = inverted_generational_distance(fitness, true_front)
+```
+
+A runnable example per indicator lives under `examples/quality_indicators/`.
 
 ## More about the Operators
 

@@ -9,7 +9,7 @@ This section covers the more advanced features of the `pygad` module. Pick a top
 :link: multi_objective
 :link-type: doc
 
-Optimize several objectives at once using NSGA-II.
+Optimize several objectives at once using NSGA-II or NSGA-III.
 :::
 
 :::{grid-item-card} Controlling Gene Values
@@ -47,6 +47,13 @@ Print a Keras-like summary and log the outputs.
 Pass your own functions, methods, or classes for the fitness and callbacks.
 :::
 
+:::{grid-item-card} Benchmark Problems
+:link: benchmarks
+:link-type: doc
+
+Built-in single, multi, and many-objective benchmark problems to plug into the GA.
+:::
+
 ::::
 
 :::{toctree}
@@ -58,4 +65,5 @@ generations
 fitness_calculation
 logging
 custom_functions
+benchmarks
 :::

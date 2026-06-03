@@ -187,6 +187,162 @@ def test_visualize_save_dir():
     
     print("test_visualize_save_dir passed.")
 
+def _build_three_objective_ga(num_generations=4, sol_per_pop=10, save_solutions=False):
+    def fitness_func_three(ga_instance, solution, solution_idx):
+        return [numpy.sum(solution ** 2),
+                numpy.sum(solution),
+                float(solution[0])]
+
+    ga = pygad.GA(num_generations=num_generations,
+                  num_parents_mating=4,
+                  fitness_func=fitness_func_three,
+                  sol_per_pop=sol_per_pop,
+                  num_genes=3,
+                  parent_selection_type="nsga2",
+                  save_solutions=save_solutions,
+                  random_seed=0,
+                  suppress_warnings=True)
+    ga.run()
+    return ga
+
+
+def test_plot_pareto_front_curve_three_objectives_returns_3d_figure():
+    ga = _build_three_objective_ga()
+    fig = ga.plot_pareto_front_curve()
+    assert isinstance(fig, matplotlib.figure.Figure)
+    plt.close(fig)
+
+
+def test_plot_pareto_front_curve_rejects_four_or_more_objectives():
+    def fitness_four(ga_instance, solution, solution_idx):
+        return [float(solution[0]), float(solution[1]),
+                float(solution[2]), float(solution[0]) + float(solution[1])]
+
+    ga = pygad.GA(num_generations=2,
+                  num_parents_mating=4,
+                  fitness_func=fitness_four,
+                  sol_per_pop=8,
+                  num_genes=3,
+                  parent_selection_type="nsga2",
+                  random_seed=0,
+                  suppress_warnings=True)
+    ga.run()
+    try:
+        ga.plot_pareto_front_curve()
+    except RuntimeError as exc:
+        assert "2 or 3 objectives" in str(exc)
+    else:
+        raise AssertionError("plot_pareto_front_curve() should reject M >= 4")
+
+
+def test_plot_pareto_front_pcp_returns_figure():
+    ga = _build_three_objective_ga()
+    fig = ga.plot_pareto_front_pcp()
+    assert isinstance(fig, matplotlib.figure.Figure)
+    plt.close(fig)
+
+
+def test_plot_pareto_front_scatter_matrix_returns_figure():
+    ga = _build_three_objective_ga()
+    fig = ga.plot_pareto_front_scatter_matrix()
+    assert isinstance(fig, matplotlib.figure.Figure)
+    plt.close(fig)
+
+
+def test_plot_pareto_front_heatmap_returns_figure_and_validates_sort_by():
+    ga = _build_three_objective_ga()
+    fig = ga.plot_pareto_front_heatmap()
+    assert isinstance(fig, matplotlib.figure.Figure)
+    plt.close(fig)
+    try:
+        ga.plot_pareto_front_heatmap(sort_by=99)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("plot_pareto_front_heatmap() should reject out-of-range sort_by")
+
+
+def test_plot_fitness_band_requires_save_solutions():
+    ga = pygad.GA(num_generations=3,
+                  num_parents_mating=2,
+                  fitness_func=fitness_func,
+                  sol_per_pop=6,
+                  num_genes=2,
+                  random_seed=0,
+                  suppress_warnings=True)
+    ga.run()
+    try:
+        ga.plot_fitness_band()
+    except RuntimeError as exc:
+        assert "save_solutions" in str(exc)
+    else:
+        raise AssertionError("plot_fitness_band() should require save_solutions=True")
+
+
+def test_plot_fitness_band_returns_figure_when_save_solutions_true():
+    ga = pygad.GA(num_generations=3,
+                  num_parents_mating=2,
+                  fitness_func=fitness_func,
+                  sol_per_pop=6,
+                  num_genes=2,
+                  save_solutions=True,
+                  random_seed=0,
+                  suppress_warnings=True)
+    ga.run()
+    fig = ga.plot_fitness_band()
+    assert isinstance(fig, matplotlib.figure.Figure)
+    plt.close(fig)
+
+
+def test_plot_non_dominated_hypervolume_returns_figure():
+    ga = _build_three_objective_ga(save_solutions=True)
+    fig = ga.plot_non_dominated_hypervolume()
+    assert isinstance(fig, matplotlib.figure.Figure)
+    plt.close(fig)
+
+
+def test_plot_non_dominated_hypervolume_requires_save_solutions():
+    ga = _build_three_objective_ga(save_solutions=False)
+    try:
+        ga.plot_non_dominated_hypervolume()
+    except RuntimeError as exc:
+        assert "save_solutions" in str(exc)
+    else:
+        raise AssertionError("plot_non_dominated_hypervolume() should require save_solutions=True")
+
+
+def test_plot_population_diversity_returns_figure():
+    ga = pygad.GA(num_generations=4,
+                  num_parents_mating=2,
+                  fitness_func=fitness_func,
+                  sol_per_pop=6,
+                  num_genes=3,
+                  save_solutions=True,
+                  random_seed=0,
+                  suppress_warnings=True)
+    ga.run()
+    fig = ga.plot_population_diversity()
+    assert isinstance(fig, matplotlib.figure.Figure)
+    plt.close(fig)
+
+
+def test_plot_pareto_front_evolution_returns_figure():
+    ga = _build_three_objective_ga(save_solutions=True)
+    fig = ga.plot_pareto_front_evolution(every_k=2)
+    assert isinstance(fig, matplotlib.figure.Figure)
+    plt.close(fig)
+
+
+def test_plot_pareto_front_evolution_rejects_non_positive_k():
+    ga = _build_three_objective_ga(save_solutions=True)
+    try:
+        ga.plot_pareto_front_evolution(every_k=0)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("plot_pareto_front_evolution() should reject every_k <= 0")
+
+
 if __name__ == "__main__":
     test_plot_fitness_parameters()
     test_plot_new_solution_rate_parameters()

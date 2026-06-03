@@ -11,17 +11,25 @@ class Crossover:
         pass
 
     def single_point_crossover(self, parents, offspring_size):
-
         """
-        Applies single-point crossover between pairs of parents.
-        This function selects a random point at which crossover occurs between the parents, generating offspring.
+        Apply single-point crossover between pairs of parents. One
+        random split point is picked per offspring; the genes before
+        the point come from the first parent and the genes from the
+        point onward come from the second parent.
 
-        Parameters:
-            parents (array-like): The parents to mate for producing the offspring.
-            offspring_size (int): The number of offspring to produce.
+        Parameters
+        ----------
+        parents : numpy.ndarray
+            A 2D array of parent solutions, one row per parent.
+        offspring_size : tuple
+            ``(num_offspring, num_genes)``. Shape of the offspring
+            array to return.
 
-        Returns:
-            array-like: An array containing the produced offspring.
+        Returns
+        -------
+        offspring : numpy.ndarray
+            A 2D array of the produced offspring with shape
+            ``offspring_size``.
         """
 
         if self.gene_type_single == True:
@@ -81,13 +89,24 @@ class Crossover:
         return offspring
 
     def two_points_crossover(self, parents, offspring_size):
-
         """
-        Applies the 2 points crossover. It selects the 2 points randomly at which crossover takes place between the pairs of parents.
-        It accepts 2 parameters:
-            -parents: The parents to mate for producing the offspring.
-            -offspring_size: The size of the offspring to produce.
-        It returns an array of the produced offspring.
+        Apply two-points crossover. Two split points are picked per
+        offspring; the genes outside ``[point1, point2)`` come from the
+        first parent and the genes inside come from the second parent.
+
+        Parameters
+        ----------
+        parents : numpy.ndarray
+            A 2D array of parent solutions, one row per parent.
+        offspring_size : tuple
+            ``(num_offspring, num_genes)``. Shape of the offspring
+            array to return.
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            A 2D array of the produced offspring with shape
+            ``offspring_size``.
         """
 
         if self.gene_type_single == True:
@@ -154,13 +173,23 @@ class Crossover:
         return offspring
 
     def uniform_crossover(self, parents, offspring_size):
-
         """
-        Applies the uniform crossover. For each gene, a parent out of the 2 mating parents is selected randomly and the gene is copied from it.
-        It accepts 2 parameters:
-            -parents: The parents to mate for producing the offspring.
-            -offspring_size: The size of the offspring to produce.
-        It returns an array of the produced offspring.
+        Apply uniform crossover. For each gene independently, the value
+        is copied from one of the two mating parents picked at random.
+
+        Parameters
+        ----------
+        parents : numpy.ndarray
+            A 2D array of parent solutions, one row per parent.
+        offspring_size : tuple
+            ``(num_offspring, num_genes)``. Shape of the offspring
+            array to return.
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            A 2D array of the produced offspring with shape
+            ``offspring_size``.
         """
 
         if self.gene_type_single == True:
@@ -221,14 +250,123 @@ class Crossover:
 
         return offspring
 
-    def scattered_crossover(self, parents, offspring_size):
-
+    def sbx_crossover(self, parents, offspring_size):
         """
-        Applies the scattered crossover. It randomly selects the gene from one of the 2 parents. 
-        It accepts 2 parameters:
-            -parents: The parents to mate for producing the offspring.
-            -offspring_size: The size of the offspring to produce.
-        It returns an array of the produced offspring.
+        Apply Simulated Binary Crossover (SBX). For each gene, the
+        offspring value is drawn from a distribution centered on the
+        parents. The spread of this distribution is set by
+        ``self.sbx_crossover_eta`` (a higher value means the child
+        stays closer to the parents).
+
+        The bounded form is used. The per-gene bounds come from
+        ``get_initial_population_range``.
+
+        Parameters
+        ----------
+        parents : numpy.ndarray
+            A 2D array of parent solutions, one row per parent.
+        offspring_size : tuple
+            (num_offspring, num_genes). Shape of the offspring array
+            to return.
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            A 2D array of offspring with shape offspring_size.
+        """
+        if self.gene_type_single == True:
+            offspring = numpy.empty(offspring_size, dtype=self.gene_type[0])
+        else:
+            offspring = numpy.empty(offspring_size, dtype=object)
+
+        eta = float(self.sbx_crossover_eta)
+        near_zero = 1e-14
+
+        for k in range(offspring_size[0]):
+            if not (self.crossover_probability is None):
+                probs = numpy.random.random(size=parents.shape[0])
+                indices = list(set(numpy.where(probs <= self.crossover_probability)[0]))
+
+                if len(indices) == 0:
+                    offspring[k, :] = parents[k % parents.shape[0], :]
+                    continue
+                elif len(indices) == 1:
+                    parent1_idx = indices[0]
+                    parent2_idx = parent1_idx
+                else:
+                    indices = random.sample(indices, 2)
+                    parent1_idx = indices[0]
+                    parent2_idx = indices[1]
+            else:
+                parent1_idx = k % parents.shape[0]
+                parent2_idx = (k + 1) % parents.shape[0]
+
+            for gene_idx in range(offspring_size[1]):
+                p1 = float(parents[parent1_idx, gene_idx])
+                p2 = float(parents[parent2_idx, gene_idx])
+                y1 = min(p1, p2)
+                y2 = max(p1, p2)
+
+                if y2 - y1 < near_zero:
+                    # The two parents have the same value on this gene.
+                    offspring[k, gene_idx] = p1
+                    continue
+
+                range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
+                lower = float(range_min)
+                upper = float(range_max)
+
+                # Beta is the spread factor that controls how far the
+                # child can move away from the parents.
+                beta = 1.0 + 2.0 * min(y1 - lower, upper - y2) / (y2 - y1)
+                alpha = 2.0 - pow(beta, -(eta + 1.0))
+                rand_u = numpy.random.random()
+                if rand_u <= 1.0 / alpha:
+                    beta_q = pow(rand_u * alpha, 1.0 / (eta + 1.0))
+                else:
+                    beta_q = pow(1.0 / (2.0 - rand_u * alpha), 1.0 / (eta + 1.0))
+
+                child = 0.5 * ((y1 + y2) - beta_q * (y2 - y1))
+                child = numpy.clip(child, lower, upper)
+                offspring[k, gene_idx] = child
+
+            if self.allow_duplicate_genes == False:
+                if self.gene_space is None:
+                    offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
+                                                                             min_val=self.random_mutation_min_val,
+                                                                             max_val=self.random_mutation_max_val,
+                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                             gene_type=self.gene_type,
+                                                                             sample_size=self.sample_size)
+                else:
+                    offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
+                                                                             gene_type=self.gene_type,
+                                                                             sample_size=self.sample_size,
+                                                                             mutation_by_replacement=self.mutation_by_replacement,
+                                                                             build_initial_pop=False)
+
+        return offspring
+
+    def scattered_crossover(self, parents, offspring_size):
+        """
+        Apply scattered crossover. For each gene independently, the
+        value is copied from one of the two mating parents picked at
+        random. (Same mechanic as ``uniform_crossover`` but kept as a
+        separate operator for backwards compatibility.)
+
+        Parameters
+        ----------
+        parents : numpy.ndarray
+            A 2D array of parent solutions, one row per parent.
+        offspring_size : tuple
+            ``(num_offspring, num_genes)``. Shape of the offspring
+            array to return.
+
+        Returns
+        -------
+        offspring : numpy.ndarray
+            A 2D array of the produced offspring with shape
+            ``offspring_size``.
         """
 
         if self.gene_type_single == True:

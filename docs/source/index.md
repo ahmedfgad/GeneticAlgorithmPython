@@ -144,7 +144,7 @@ There is much more you can do with PyGAD. Read the documentation to explore its 
 6. The `kerasga` module trains [Keras](https://keras.io) models using the genetic algorithm.
 7. The `torchga` module trains [PyTorch](https://pytorch.org) models using the genetic algorithm.
 8. The `visualize` module visualizes the results.
-9. The `utils` module holds the operators (crossover, mutation, and parent selection) and the NSGA-II code.
+9. The `utils` module holds the operators (crossover, mutation, and parent selection) and the NSGA-II and NSGA-III code.
 10. The `helper` module has some helper functions.
 
 The documentation explains these modules.
