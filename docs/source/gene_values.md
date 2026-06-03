@@ -174,6 +174,19 @@ lambda solution,values: [val for val in values if val<5]
 
 The first parameter is the solution where the target gene exists. It is passed just in case you would like to compare the gene value with other genes. The second parameter is the list of candidate values for the gene. The objective of the lambda function is to filter the values and return only the valid values that are less than 5.
 
+#### What does the `solution` parameter hold?
+
+The `solution` passed to the callable is **not** a fixed snapshot taken before the operation started. PyGAD processes the genes one at a time and writes each gene's chosen value back into the solution *in place* before moving on to the next gene. So the `solution` is updated incrementally, and the state it is in when a given gene's constraint runs depends on which genes were already processed in the current step:
+
+* The genes that were **already processed** in the current step hold their **updated** values (i.e. the value just selected for that gene).
+* The genes that were **not processed yet** still hold their **previous** values: the values inherited from crossover (when mutating offspring) or the values originally sampled (when creating the initial population).
+
+When the genes are processed in index order (this is the case while creating the initial population and when using probability-based mutation via `mutation_probability`), this means that for the gene at index `i`, the entries `solution[:i]` already hold their updated values while `solution[i:]` still hold their previous values.
+
+This is exactly why dependent genes must be ordered so that a gene appears **after** the genes it depends on: by the time a later gene's constraint runs, the earlier genes it reads have already been finalized. See the note at the end of this section.
+
+> **Note:** The callable receives a copy of the solution, so modifying it inside the callable has no effect on the actual solution. Only the values returned from the callable are used.
+
 A lambda function is used in this case but we can use a regular function:
 
 ```python
