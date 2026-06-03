@@ -668,11 +668,11 @@ Release Date ..., 2026
 5. The `wheel_cumulative_probs()` method in the `pygad.parent_selection.ParentSelection` class is refactored to reduce its computational time.
 6. Use `numpy.where()` to decide which the source parent of each gene within the `uniform_crossover()` method in the `utils/crossover.py` script. The same was already applied to the `scattered_crossover()` method.
 7. Add tests for the following modules:
-  `nn`
-  `cnn`
-  `gacnn`
-  `kerasga`
-  `torchga`
+     `nn`
+       `cnn`
+       `gacnn`
+       `kerasga`
+       `torchga`
 8. Fix a bug in the `visualize/plot.py` script where the `labels` parameter of `boxplot()` has been renamed `tick_labels` in Matplotlib.
 9. Fix a bug where the `best_solutions_fitness` list (instance attribute to `pygad.GA`) has the fitness of the last generation duplicated when an early stop happens inside the `on_generation()` callback. This made its size incompatible with the `best_solutions` list.
 10. The documentation is refactored to solve many language issues and the Furo theme is applied. For easy navigation, the index is reformatted to only show the main sections. At each page, its index is shown at the right side. A new theme toggle button to change theme between light and dark.
@@ -699,3 +699,4 @@ Release Date ..., 2026
 31. A new `Report` mixin in `pygad/utils/report.py` adds `ga_instance.generate_report(filename, ...)` to build a PDF report of the run. The report bundles a configuration table, a run-summary table, the best solution, and every applicable plot (auto-selected based on the run's properties: SOO vs MOO, number of objectives, `save_solutions`, `save_best_solutions`). The report uses `reportlab` and `matplotlib`, both available through the new optional dependency extra `pip install pygad[report]`.
 32. A new example `examples/example_generate_report.py` shows how to build a PDF report after running a multi-objective GA.
 33. The `pygad.md`, `releases.md`, `visualize.md`, and `utils.md` documentation pages were updated to reflect the new module layout, the renamed methods, the new `generate_report()` entry point, and the new NSGA-III instance attributes (`nsga3_num_divisions`, `nsga3_reference_points`). The "Other Instance Attributes & Methods" section in `pygad.md` is now grouped by area (Lifecycle, Population, Fitness, Parent Selection, NSGA-II, NSGA-III, Crossover, Mutation, Elitism, Gene Constraints, Saving) so each method or attribute appears under its topic.
+34. Fix issue https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/351 by updating the documentation to clarify what the `solution` has.
