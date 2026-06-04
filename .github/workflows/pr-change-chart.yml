@@ -1,0 +1,96 @@
+name: PR change chart
+
+# Posts (and keeps updated) a single comment on each pull request showing the
+# diff size per file: a Mermaid pie chart of each file's share of the churn
+# plus a collapsible +/- breakdown table. Uses only first-party actions and
+# the PR API, so there is no checkout, no build, and no third-party action.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  change-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and upsert the change-summary comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Hidden marker so we can find and update our own comment instead
+            // of posting a new one on every push.
+            const MARKER = '<!-- pr-change-chart -->';
+            const TOP = 15; // cap rows so the chart/table stay readable
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+
+            // Per-file additions/deletions come straight from the PR API.
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner, repo, pull_number: pr.number, per_page: 100,
+            });
+
+            let totalAdd = 0, totalDel = 0;
+            const rows = files.map(f => {
+              totalAdd += f.additions;
+              totalDel += f.deletions;
+              return { name: f.filename, add: f.additions, del: f.deletions, total: f.changes };
+            }).sort((a, b) => b.total - a.total);
+
+            const shown = rows.slice(0, TOP);
+            const rest = rows.slice(TOP);
+            const restTotal = rest.reduce((s, r) => s + r.total, 0);
+            const churn = totalAdd + totalDel;
+
+            // Mermaid pie of churn share per file (GitHub renders Mermaid
+            // natively). Guarded: a pie with no slices would error, so we skip
+            // it when the diff is all-binary / zero-line.
+            let pie = '';
+            if (churn > 0) {
+              pie = '```mermaid\npie showData\n';
+              pie += `    title Lines changed per file (${churn} total)\n`;
+              for (const r of shown) {
+                if (r.total <= 0) continue;
+                const label = r.name.replace(/"/g, "'");
+                pie += `    "${label}" : ${r.total}\n`;
+              }
+              if (restTotal > 0) pie += `    "… ${rest.length} more files" : ${restTotal}\n`;
+              pie += '```';
+            }
+
+            // Collapsible per-file table with the +/- split.
+            let table = '| File | + | − | total |\n|---|--:|--:|--:|\n';
+            for (const r of shown) {
+              table += `| \`${r.name}\` | ${r.add} | ${r.del} | ${r.total} |\n`;
+            }
+            if (rest.length) {
+              table += `| _… ${rest.length} more files_ |  |  | ${restTotal} |\n`;
+            }
+            table += `| **Total (${files.length} files)** | **${totalAdd}** | **${totalDel}** | **${churn}** |\n`;
+
+            const body = [
+              MARKER,
+              '### 📊 Change summary',
+              `**${files.length}** files changed · **+${totalAdd}** / **−${totalDel}** lines`,
+              '',
+              pie,
+              '',
+              '<details><summary>Per-file breakdown</summary>',
+              '',
+              table,
+              '</details>',
+            ].join('\n');
+
+            // Upsert: update our marked comment if it exists, else create it.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: pr.number, per_page: 100,
+            });
+            const mine = comments.find(c => c.body && c.body.includes(MARKER));
+            if (mine) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+            }
