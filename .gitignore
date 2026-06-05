@@ -26,3 +26,21 @@ docs/build/
 # These are personal to each developer and should not be committed.
 # =============================================================================
 .idea/
+
+# =============================================================================
+# Example datasets from third parties. These are not part of PyGAD and are
+# not shipped in the repository. Download them separately to run the
+# examples that use them.
+# =============================================================================
+examples/data/Fruit360/
+examples/data/Skin_Cancer_Dataset/
+examples/data/Fish.csv
+examples/data/*.npy
+
+# =============================================================================
+# Local-only working directories that are not part of PyGAD. These hold
+# personal tooling, caches, and their own virtual environments.
+# =============================================================================
+release_video/
+.pytest_cache/
+.claude/
