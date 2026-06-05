@@ -1,13 +1,13 @@
 # PyGAD: Genetic Algorithm in Python
 
-[PyGAD](https://pypi.org/project/pygad) is an open-source easy-to-use Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. It supports Keras and PyTorch. PyGAD supports optimizing both single-objective and multi-objective problems.
+[PyGAD](https://pypi.org/project/pygad) is an open-source, easy-to-use Python 3 library for building the genetic algorithm and optimizing machine learning algorithms. It supports Keras and PyTorch, and it can optimize both single-objective and multi-objective problems.
 
 > Try [Vilvik](https://vilvik.com), a free cloud-based tool powered by PyGAD. It makes optimization easier by reducing or removing the need for coding, and it shows helpful visualizations.
 
 Read the [PyGAD documentation](https://pygad.readthedocs.io/en/latest).
 
 [![PyPI Downloads](https://pepy.tech/badge/pygad)](https://pepy.tech/project/pygad) [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/pygad.svg?label=Conda%20Downloads)](
-https://anaconda.org/conda-forge/PyGAD) [![PyPI version](https://badge.fury.io/py/pygad.svg)](https://badge.fury.io/py/pygad)![Docs](https://readthedocs.org/projects/pygad/badge)[![PyGAD PyTest / Python 3.13](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main.yml) [![PyGAD PyTest / Python 3.12](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/release.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/release.yml) [![PyGAD PyTest / Python 3.11](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/scorecard.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/scorecard.yml) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Translation](https://hosted.weblate.org/widgets/weblate/-/svg-badge.svg)](https://hosted.weblate.org/engage/weblate/) [![REUSE](https://api.reuse.software/badge/github.com/WeblateOrg/weblate)](https://api.reuse.software/info/github.com/WeblateOrg/weblate) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-Ask%20questions-blue.svg)](
+https://anaconda.org/conda-forge/PyGAD) [![PyPI version](https://badge.fury.io/py/pygad.svg)](https://badge.fury.io/py/pygad)![Docs](https://readthedocs.org/projects/pygad/badge)[![PyGAD PyTest Matrix](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main.yml) [![Release](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/release.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/release.yml) [![Scorecard supply-chain security](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/scorecard.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/scorecard.yml) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Translation](https://hosted.weblate.org/widgets/weblate/-/svg-badge.svg)](https://hosted.weblate.org/engage/weblate/) [![REUSE](https://api.reuse.software/badge/github.com/WeblateOrg/weblate)](https://api.reuse.software/info/github.com/WeblateOrg/weblate) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-Ask%20questions-blue.svg)](
 https://stackoverflow.com/questions/tagged/pygad) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ahmedfgad/GeneticAlgorithmPython/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ahmedfgad/GeneticAlgorithmPython) [![DOI](https://zenodo.org/badge/DOI/10.1007/s11042-023-17167-y.svg)](https://doi.org/10.1007/s11042-023-17167-y)
 
 ![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
@@ -60,11 +60,11 @@ Please check the **Contact Us** section for more contact details.
 
 # Life Cycle of PyGAD
 
-The next figure shows the main stages in the life cycle of a `pygad.GA` instance. PyGAD stops when all generations are completed or when the function passed to the `on_generation` parameter returns the string `stop`.
+The following figure shows the main stages in the life cycle of a `pygad.GA` instance. PyGAD stops when all generations are completed or when the function passed to the `on_generation` parameter returns the string `stop`.
 
 ![PyGAD Lifecycle](https://user-images.githubusercontent.com/16560492/220486073-c5b6089d-81e4-44d9-a53c-385f479a7273.jpg)
 
-The next code implements all the callback functions to trace the execution of the genetic algorithm. Each callback function prints its name.
+The following code implements all the callback functions to trace the execution of the genetic algorithm. Each callback function prints its name.
 
 ```python
 import pygad
@@ -175,7 +175,7 @@ num_parents_mating = 7 # Number of solutions to be selected as parents in the ma
 
 # To prepare the initial population, there are 2 ways:
 # 1) Prepare it yourself and pass it to the initial_population parameter. This way is useful when the user wants to start the genetic algorithm with a custom initial population.
-# 2) Assign valid integer values to the sol_per_pop and num_genes parameters. If the initial_population parameter exists, then the sol_per_pop and num_genes parameters are useless.
+# 2) Assign valid integer values to the sol_per_pop and num_genes parameters. If the initial_population parameter is used, then the sol_per_pop and num_genes parameters are ignored.
 sol_per_pop = 50 # Number of solutions in the population.
 num_genes = len(function_inputs)
 
@@ -260,7 +260,7 @@ Read about training neural networks using the genetic algorithm through the tuto
 
 ## Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 
-You can also check my book cited as [**Ahmed Fawzy Gad 'Practical Computer Vision Applications Using Deep Learning with CNNs'. Dec. 2018, Apress, 978-1-4842-4167-7**](https://www.amazon.com/Practical-Computer-Vision-Applications-Learning/dp/1484241665) which discusses neural networks, convolutional neural networks, deep learning, genetic algorithm, and more.
+You can also check my book cited as [**Ahmed Fawzy Gad 'Practical Computer Vision Applications Using Deep Learning with CNNs'. Dec. 2018, Apress, 978-1-4842-4167-7**](https://www.amazon.com/Practical-Computer-Vision-Applications-Learning/dp/1484241665) which discusses neural networks, convolutional neural networks, deep learning, genetic algorithms, and more.
 
 Find the book at these links:
 
