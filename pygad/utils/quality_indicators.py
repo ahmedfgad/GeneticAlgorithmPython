@@ -20,12 +20,12 @@ import numpy
 
 
 def _to_min_fitness(fitness):
-    """Negate the fitness to switch to minimisation."""
+    """Negate the fitness to switch to minimization."""
     return -numpy.asarray(fitness, dtype=float)
 
 
 def _drop_dominated_under_min(points):
-    """Drop dominated rows under minimisation. Keeps input order."""
+    """Drop dominated rows under minimization. Keeps input order."""
     n = points.shape[0]
     keep = numpy.ones(n, dtype=bool)
     for i in range(n):
@@ -63,7 +63,7 @@ def _wfg_exclusive_hv(point, others, reference_point):
 
 
 def _hv_under_min(points, reference_point):
-    """WFG hypervolume under minimisation. Fast enough for typical PyGAD populations."""
+    """WFG hypervolume under minimization. Fast enough for typical PyGAD populations."""
     if len(points) == 0:
         return 0.0
     # Sort by the last objective to keep recursion shallow.
@@ -82,7 +82,7 @@ def hypervolume(fitness, reference_point):
 
     The reference is the worst case on every axis. Under PyGAD-max it
     must be smaller than every fitness value. The function flips the
-    sign internally so the WFG algorithm (written for minimisation)
+    sign internally so the WFG algorithm (written for minimization)
     can be reused. The returned value is positive; bigger is better.
 
     Parameters
@@ -180,7 +180,7 @@ def generational_distance(fitness, reference_front):
 
 def spacing(fitness):
     """
-    Spacing: standard deviation of each solution's nearest-neighbour
+    Spacing: standard deviation of each solution's nearest-neighbor
     distance. Smaller means the solutions are more evenly spread.
 
     Returns 0.0 when fewer than two solutions are given so the caller

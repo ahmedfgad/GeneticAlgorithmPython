@@ -352,7 +352,7 @@ Two module-level constants in `pygad.utils.nsga3` control the numerical safeguar
 
 ## `pygad.utils.report` Submodule
 
-The `pygad.utils.report` module has a class named `Report` that adds the `generate_report()` method to the `pygad.GA` class. It builds a PDF report of the GA run, bundling the configuration table, a run summary, the best solution, and every applicable plot. Requires the optional dependencies `reportlab` and `matplotlib`:
+The `pygad.utils.report` module has a class named `Report` that adds the `generate_report()` method to the `pygad.GA` class. It builds a PDF report of the GA run, bundling the configuration table, a run summary, the best solution, and every applicable plot. The title page shows the PyGAD logo, which ships with the package. Requires the optional dependencies `reportlab` and `matplotlib`:
 
 ```
 pip install pygad[report]

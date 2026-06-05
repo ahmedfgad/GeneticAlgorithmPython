@@ -164,7 +164,7 @@ def test_dtlz2_final_population_is_mostly_non_dominated():
         f"{[len(front) for front in fronts]}.")
 
 
-def test_dtlz2_reference_directions_have_neighbours():
+def test_dtlz2_reference_directions_have_neighbors():
     ga = _make_dtlz2_ga()
     ga.run()
     final_fitness = _evaluate_final_fitness(ga)

@@ -24,15 +24,15 @@ from pygad.utils.nsga3 import NSGA3
 #
 #   s0..s2  : axis extremes (best on one objective, ideal on the others).
 #   s3..s5  : midpoints of each edge of the simplex.
-#   s6      : centre of the unit simplex.
+#   s6      : center of the unit simplex.
 THREE_OBJECTIVE_FITNESS = numpy.array([
-    [-1.0,  0.0,  0.0],   # s0 — extreme for f0
-    [ 0.0, -1.0,  0.0],   # s1 — extreme for f1
-    [ 0.0,  0.0, -1.0],   # s2 — extreme for f2
+    [-1.0,  0.0,  0.0],   # s0 - extreme for f0
+    [ 0.0, -1.0,  0.0],   # s1 - extreme for f1
+    [ 0.0,  0.0, -1.0],   # s2 - extreme for f2
     [-0.5, -0.5,  0.0],   # s3
     [-0.5,  0.0, -0.5],   # s4
     [ 0.0, -0.5, -0.5],   # s5
-    [-1 / 3, -1 / 3, -1 / 3],   # s6 — simplex centre
+    [-1 / 3, -1 / 3, -1 / 3],   # s6 - simplex center
 ])
 
 
@@ -156,7 +156,7 @@ def test_associations_for_three_objective_set(nsga3):
     #   ref[4] = (0.5, 0.5, 0  )
     #   ref[5] = (1,   0,   0  )
     # Each on-simplex solution sits on one reference line and has zero
-    # distance. The centre solution is the same distance from ref[1], ref[3]
+    # distance. The center solution is the same distance from ref[1], ref[3]
     # and ref[4]; the lower-index tie break picks ref[1].
     nsga3_ref_points = nsga3.nsga3_generate_reference_points(3, 2)
     ideal = nsga3.nsga3_compute_ideal_point(THREE_OBJECTIVE_FITNESS)
@@ -245,9 +245,9 @@ def test_full_pipeline_recovers_simplex_corners(nsga3):
 # NSGA-III normalization is invariant to positive affine transforms of
 # the fitness.
 WIDE_RANGE_FITNESS = numpy.array([
-    [15.0, -10.0],   # s0 — best f0, worst f1
-    [-10.0,  15.0],  # s1 — worst f0, best f1
-    [  0.0,   0.0],  # s2 — middle
+    [15.0, -10.0],   # s0 - best f0, worst f1
+    [-10.0,  15.0],  # s1 - worst f0, best f1
+    [  0.0,   0.0],  # s2 - middle
 ])
 
 NARROW_RANGE_FITNESS = numpy.array([
