@@ -11,7 +11,7 @@ class NSGA2:
         """
         Calculate the crowding distance for every solution in the given
         Pareto front. The crowding distance measures how isolated each
-        solution is from its neighbours along every objective. Boundary
+        solution is from its neighbors along every objective. Boundary
         solutions get a crowding distance of infinity.
 
         Parameters

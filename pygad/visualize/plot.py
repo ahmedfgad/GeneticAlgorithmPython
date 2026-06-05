@@ -543,9 +543,9 @@ class Plot:
         label : str
             Legend label for the Pareto front.
         color : str
-            Colour of the Pareto curve (2D) or non-dominated markers (3D).
+            Color of the Pareto curve (2D) or non-dominated markers (3D).
         color_fitness : str
-            Colour of the population scatter points.
+            Color of the population scatter points.
         grid : bool
             Draw grid lines.
         alpha : float
@@ -700,7 +700,7 @@ class Plot:
     def plot_pareto_front_pcp(self,
                               title="Pareto Front - Parallel Coordinates",
                               xlabel="Objective",
-                              ylabel="Normalised value",
+                              ylabel="Normalized value",
                               linewidth=1.5,
                               font_size=14,
                               color="#4169E1",
@@ -1130,7 +1130,7 @@ class Plot:
                                     save_dir=None):
         """
         Overlay the non-dominated set every ``every_k`` generations.
-        Colour goes from early generations to late so you can see the
+        Color goes from early generations to late so you can see the
         front converging.
 
         Works for 2 or 3 objectives. Requires ``save_solutions=True``.

@@ -91,7 +91,7 @@ def test_generational_distance_matches_hand_value():
 
 
 def test_spacing_zero_for_equally_spaced_points():
-    # Three colinear, equally spaced points -> nearest-neighbour
+    # Three colinear, equally spaced points -> nearest-neighbor
     # distances are all 1 -> std = 0.
     fitness = numpy.array([
         [0.0, 0.0],

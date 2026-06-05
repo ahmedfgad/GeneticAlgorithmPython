@@ -99,7 +99,7 @@ def test_generate_report_requires_at_least_one_completed_generation(tmp_path):
 def test_select_plot_methods_filters_out_moo_only_plots_for_soo():
     ga = _build_soo_ga(save_solutions=True, save_best_solutions=True)
     ga.run()
-    method_names = report_module._select_plot_methods(ga, include_plots=None)
+    method_names = report_module._pdf_report_select_plot_methods(ga, include_plots=None)
     assert "plot_fitness" in method_names
     assert "plot_new_solution_rate" in method_names
     assert "plot_pareto_front_curve" not in method_names
@@ -110,7 +110,7 @@ def test_select_plot_methods_filters_out_moo_only_plots_for_soo():
 def test_select_plot_methods_includes_moo_plots_for_moo_with_save_solutions():
     ga = _build_moo_ga(save_solutions=True)
     ga.run()
-    method_names = report_module._select_plot_methods(ga, include_plots=None)
+    method_names = report_module._pdf_report_select_plot_methods(ga, include_plots=None)
     assert "plot_fitness" in method_names
     assert "plot_pareto_front_curve" in method_names
     assert "plot_pareto_front_pcp" in method_names
@@ -122,7 +122,7 @@ def test_select_plot_methods_includes_moo_plots_for_moo_with_save_solutions():
 def test_select_plot_methods_omits_save_solutions_plots_when_flag_is_false():
     ga = _build_moo_ga(save_solutions=False)
     ga.run()
-    method_names = report_module._select_plot_methods(ga, include_plots=None)
+    method_names = report_module._pdf_report_select_plot_methods(ga, include_plots=None)
     assert "plot_fitness" in method_names
     # plot_pareto_front_curve does not need save_solutions.
     assert "plot_pareto_front_curve" in method_names

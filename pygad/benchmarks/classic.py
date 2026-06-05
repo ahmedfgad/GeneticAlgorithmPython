@@ -2,7 +2,7 @@
 Classic single-objective benchmark problems.
 
 Each class is callable with the (ga, solution, sol_idx) signature
-and returns a single fitness value. Minimisation values are negated
+and returns a single fitness value. Minimization values are negated
 so PyGAD can maximize them.
 """
 

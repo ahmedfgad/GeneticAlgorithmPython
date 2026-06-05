@@ -1,0 +1,9 @@
+version = 1
+
+# Every file tracked in this repository is part of PyGAD and is licensed
+# under BSD-3-Clause. Third-party example datasets are not tracked here
+# (see .gitignore) and keep their own licenses where you download them.
+[[annotations]]
+path = "**"
+SPDX-FileCopyrightText = "GeneticAlgorithmPython Contributors"
+SPDX-License-Identifier = "BSD-3-Clause"

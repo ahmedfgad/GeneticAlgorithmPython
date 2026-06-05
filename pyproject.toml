@@ -66,3 +66,7 @@ testpaths = ["tests"]
 
 [tool.setuptools.dynamic]
 version = { attr = "pygad._version.__version__" }
+
+# Ship the logo image used by the PDF report alongside the package code.
+[tool.setuptools.package-data]
+"pygad.utils" = ["pygad_logo.png"]

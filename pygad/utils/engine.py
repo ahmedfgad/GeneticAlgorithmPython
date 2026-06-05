@@ -460,7 +460,7 @@ class GAEngine:
         up the bookkeeping lists, evaluates the initial population,
         runs the generational loop (select, crossover, mutate, update
         population, re-evaluate, callbacks, check stop criteria), and
-        finalises the best-solution data after the last generation.
+        finalizes the best-solution data after the last generation.
 
         Calls the optional user callbacks ``on_start``,
         ``on_fitness``, ``on_parents``, ``on_crossover``,

@@ -10,9 +10,19 @@ The report relies on two optional dependencies, ``matplotlib`` and
 ``reportlab``. Both are installed by ``pip install pygad[report]``.
 The imports happen on first use so users who never call
 ``generate_report`` keep the lean install.
+
+The title page shows the PyGAD logo. The image is bundled with the
+package, so no network access is needed. If the file is missing the
+report is still built without it.
 """
 
 import io
+import os
+
+
+# The PyGAD logo shown on the title page of the report. The file sits
+# next to this module and is shipped with the package.
+LOGO_FILENAME = "pygad_logo.png"
 
 
 # Default order in which sections appear in the report. Used by
@@ -182,11 +192,11 @@ class Report:
                 "generate_report() can only be called after at least one "
                 "generation has completed. Call run() first.")
 
-        reportlab_modules = _import_reportlab()
-        matplt = _import_matplotlib()
+        reportlab_modules = _pdf_report_import_reportlab()
+        matplt = _pdf_report_import_matplotlib()
 
-        section_list = _resolve_sections(sections)
-        page_size_obj = _resolve_page_size(page_size, reportlab_modules)
+        section_list = _pdf_report_resolve_sections(sections)
+        page_size_obj = _pdf_report_resolve_page_size(page_size, reportlab_modules)
 
         if not filename.endswith(".pdf"):
             filename = filename + ".pdf"
@@ -195,19 +205,19 @@ class Report:
         styles = reportlab_modules["styles"].getSampleStyleSheet()
         for section_name in section_list:
             if section_name == "title":
-                story.extend(_build_title_section(
+                story.extend(_pdf_report_build_title_section(
                     self, title, styles, reportlab_modules))
             elif section_name == "configuration":
-                story.extend(_build_configuration_section(
+                story.extend(_pdf_report_build_configuration_section(
                     self, styles, reportlab_modules))
             elif section_name == "run_summary":
-                story.extend(_build_run_summary_section(
+                story.extend(_pdf_report_build_run_summary_section(
                     self, styles, reportlab_modules))
             elif section_name == "best_solution":
-                story.extend(_build_best_solution_section(
+                story.extend(_pdf_report_build_best_solution_section(
                     self, styles, reportlab_modules))
             elif section_name == "plots":
-                story.extend(_build_plots_section(
+                story.extend(_pdf_report_build_plots_section(
                     self,
                     include_plots,
                     figure_size_inches,
@@ -215,7 +225,7 @@ class Report:
                     reportlab_modules,
                     matplt))
             elif section_name == "notes":
-                story.extend(_build_notes_section(
+                story.extend(_pdf_report_build_notes_section(
                     notes, styles, reportlab_modules))
 
         doc = reportlab_modules["SimpleDocTemplate"](
@@ -228,7 +238,7 @@ class Report:
         return filename
 
 
-def _import_reportlab():
+def _pdf_report_import_reportlab():
     """
     Import reportlab on first use. Returns a dict with the names the
     report builder needs, so the calling code does not have to repeat
@@ -237,6 +247,7 @@ def _import_reportlab():
     try:
         from reportlab.lib import colors, pagesizes, styles
         from reportlab.lib.units import inch
+        from reportlab.lib.utils import ImageReader
         from reportlab.platypus import (
             Image,
             PageBreak,
@@ -256,6 +267,7 @@ def _import_reportlab():
         "pagesizes": pagesizes,
         "styles": styles,
         "inch": inch,
+        "ImageReader": ImageReader,
         "Image": Image,
         "PageBreak": PageBreak,
         "Paragraph": Paragraph,
@@ -266,7 +278,7 @@ def _import_reportlab():
     }
 
 
-def _import_matplotlib():
+def _pdf_report_import_matplotlib():
     """
     Import matplotlib on first use. The Agg backend is forced so the
     report can be generated in headless environments.
@@ -283,7 +295,7 @@ def _import_matplotlib():
     return matplt
 
 
-def _resolve_sections(sections):
+def _pdf_report_resolve_sections(sections):
     if sections is None:
         return list(REPORT_DEFAULT_SECTIONS)
     requested = list(sections)
@@ -295,7 +307,7 @@ def _resolve_sections(sections):
     return requested
 
 
-def _resolve_page_size(page_size, reportlab_modules):
+def _pdf_report_resolve_page_size(page_size, reportlab_modules):
     name = page_size.lower()
     if name == "letter":
         return reportlab_modules["pagesizes"].LETTER
@@ -305,7 +317,7 @@ def _resolve_page_size(page_size, reportlab_modules):
         f"Unknown page_size {page_size!r}. Allowed values: 'letter', 'A4'.")
 
 
-def _is_multi_objective(ga):
+def _pdf_report_is_multi_objective(ga):
     """Return True when the last fitness row is iterable (MOO)."""
     if getattr(ga, "last_generation_fitness", None) is None:
         return False
@@ -313,29 +325,80 @@ def _is_multi_objective(ga):
     return hasattr(first, "__len__")
 
 
-def _num_objectives(ga):
+def _pdf_report_num_objectives(ga):
     """Return the number of objectives, or 1 for single-objective runs."""
-    if not _is_multi_objective(ga):
+    if not _pdf_report_is_multi_objective(ga):
         return 1
     return len(ga.last_generation_fitness[0])
 
 
-def _build_title_section(ga, title, styles, modules):
+def _pdf_report_build_title_section(ga, title, styles, modules):
     Paragraph = modules["Paragraph"]
     Spacer = modules["Spacer"]
     inch = modules["inch"]
+
+    elements = []
+
+    logo_image = _pdf_report_build_logo_image(modules)
+    if logo_image is not None:
+        elements.append(logo_image)
+        elements.append(Spacer(1, 0.2 * inch))
+
     title_text = title or "PyGAD run report"
     import pygad as _pygad_module
     subtitle = f"PyGAD version: {_pygad_module.__version__}"
-    return [
+    elements.extend([
         Paragraph(title_text, styles["Title"]),
         Spacer(1, 0.15 * inch),
         Paragraph(subtitle, styles["Normal"]),
         Spacer(1, 0.25 * inch),
-    ]
+    ])
+    return elements
 
 
-def _build_configuration_section(ga, styles, modules):
+def _pdf_report_read_logo_bytes():
+    """
+    Read the bundled PyGAD logo and return its bytes. Return None if the
+    file is missing or cannot be read, so the report is still built
+    without it.
+    """
+    logo_path = os.path.join(os.path.dirname(__file__), LOGO_FILENAME)
+    try:
+        with open(logo_path, "rb") as logo_file:
+            return logo_file.read() or None
+    except OSError:
+        return None
+
+
+def _pdf_report_build_logo_image(modules, target_width_inches=2.0):
+    """
+    Build a centered reportlab Image for the logo, scaled to
+    target_width_inches while keeping the aspect ratio. Return None when
+    the logo cannot be read, so a missing or broken image never breaks
+    the report.
+    """
+    logo_png = _pdf_report_read_logo_bytes()
+    if logo_png is None:
+        return None
+
+    Image = modules["Image"]
+    ImageReader = modules["ImageReader"]
+    inch = modules["inch"]
+    try:
+        natural_width, natural_height = ImageReader(
+            io.BytesIO(logo_png)).getSize()
+        if not natural_width or not natural_height:
+            return None
+        width = target_width_inches * inch
+        height = width * natural_height / natural_width
+        image = Image(io.BytesIO(logo_png), width=width, height=height)
+        image.hAlign = "CENTER"
+        return image
+    except Exception:
+        return None
+
+
+def _pdf_report_build_configuration_section(ga, styles, modules):
     Paragraph = modules["Paragraph"]
     Spacer = modules["Spacer"]
     Table = modules["Table"]
@@ -353,7 +416,7 @@ def _build_configuration_section(ga, styles, modules):
             value = getattr(ga, parameter_name)
             rows.append([
                 Paragraph(parameter_name, styles["BodyText"]),
-                Paragraph(_format_value(value), styles["BodyText"]),
+                Paragraph(_pdf_report_format_value(value), styles["BodyText"]),
             ])
         if len(rows) <= 1:
             continue
@@ -372,7 +435,7 @@ def _build_configuration_section(ga, styles, modules):
     return elements
 
 
-def _build_run_summary_section(ga, styles, modules):
+def _pdf_report_build_run_summary_section(ga, styles, modules):
     Paragraph = modules["Paragraph"]
     Spacer = modules["Spacer"]
     Table = modules["Table"]
@@ -383,10 +446,10 @@ def _build_run_summary_section(ga, styles, modules):
     rows = [[Paragraph("<b>Item</b>", styles["BodyText"]),
              Paragraph("<b>Value</b>", styles["BodyText"])]]
     rows.append([Paragraph("Problem type", styles["BodyText"]),
-                 Paragraph("Multi-objective" if _is_multi_objective(ga)
+                 Paragraph("Multi-objective" if _pdf_report_is_multi_objective(ga)
                            else "Single-objective", styles["BodyText"])])
     rows.append([Paragraph("Number of objectives", styles["BodyText"]),
-                 Paragraph(str(_num_objectives(ga)), styles["BodyText"])])
+                 Paragraph(str(_pdf_report_num_objectives(ga)), styles["BodyText"])])
     rows.append([Paragraph("Generations completed", styles["BodyText"]),
                  Paragraph(str(ga.generations_completed), styles["BodyText"])])
     rows.append([Paragraph("Final population size", styles["BodyText"]),
@@ -394,9 +457,9 @@ def _build_run_summary_section(ga, styles, modules):
     rows.append([Paragraph("Best solution generation", styles["BodyText"]),
                  Paragraph(str(ga.best_solution_generation),
                            styles["BodyText"])])
-    if not _is_multi_objective(ga):
+    if not _pdf_report_is_multi_objective(ga):
         rows.append([Paragraph("Best fitness", styles["BodyText"]),
-                     Paragraph(_format_value(ga.best_solutions_fitness[-1]
+                     Paragraph(_pdf_report_format_value(ga.best_solutions_fitness[-1]
                                              if ga.best_solutions_fitness else "n/a"),
                                styles["BodyText"])])
 
@@ -413,7 +476,7 @@ def _build_run_summary_section(ga, styles, modules):
     ]
 
 
-def _build_best_solution_section(ga, styles, modules):
+def _pdf_report_build_best_solution_section(ga, styles, modules):
     Paragraph = modules["Paragraph"]
     Spacer = modules["Spacer"]
     inch = modules["inch"]
@@ -429,15 +492,15 @@ def _build_best_solution_section(ga, styles, modules):
     elements = [Paragraph("Best solution", styles["Heading1"])]
     elements.append(Paragraph(f"Population index: {best_idx}",
                               styles["BodyText"]))
-    elements.append(Paragraph(f"Fitness: {_format_value(best_fitness)}",
+    elements.append(Paragraph(f"Fitness: {_pdf_report_format_value(best_fitness)}",
                               styles["BodyText"]))
-    elements.append(Paragraph(f"Solution: {_format_value(list(best_solution))}",
+    elements.append(Paragraph(f"Solution: {_pdf_report_format_value(list(best_solution))}",
                               styles["BodyText"]))
     elements.append(Spacer(1, 0.2 * inch))
     return elements
 
 
-def _build_plots_section(ga,
+def _pdf_report_build_plots_section(ga,
                          include_plots,
                          figure_size_inches,
                          styles,
@@ -449,7 +512,7 @@ def _build_plots_section(ga,
     PageBreak = modules["PageBreak"]
     inch = modules["inch"]
 
-    plot_method_names = _select_plot_methods(ga, include_plots)
+    plot_method_names = _pdf_report_select_plot_methods(ga, include_plots)
     elements = [Paragraph("Plots", styles["Heading1"])]
     if not plot_method_names:
         elements.append(Paragraph(
@@ -464,7 +527,7 @@ def _build_plots_section(ga,
         if method_name not in plot_method_names:
             continue
         elements.append(Paragraph(entry["name"], styles["Heading2"]))
-        figure_data = _render_plot_to_png(ga, entry, figure_size_inches, matplt)
+        figure_data = _pdf_report_render_plot_to_png(ga, entry, figure_size_inches, matplt)
         if figure_data is None:
             elements.append(Paragraph(
                 f"Plot {method_name} could not be drawn for this run.",
@@ -480,7 +543,7 @@ def _build_plots_section(ga,
     return elements
 
 
-def _build_notes_section(notes, styles, modules):
+def _pdf_report_build_notes_section(notes, styles, modules):
     if not notes:
         return []
     Paragraph = modules["Paragraph"]
@@ -493,7 +556,7 @@ def _build_notes_section(notes, styles, modules):
     ]
 
 
-def _select_plot_methods(ga, include_plots):
+def _pdf_report_select_plot_methods(ga, include_plots):
     """
     Return the set of plot method names that the report will include.
     When the caller passes ``None`` or ``"all"``, auto-pick every plot
@@ -510,8 +573,8 @@ def _select_plot_methods(ga, include_plots):
                 f"Unknown plot method(s) in include_plots: {sorted(unknown)}. "
                 f"Allowed values: {sorted(valid_method_names)}.")
 
-    is_moo = _is_multi_objective(ga)
-    num_objectives = _num_objectives(ga)
+    is_moo = _pdf_report_is_multi_objective(ga)
+    num_objectives = _pdf_report_num_objectives(ga)
     selected = []
     for entry in REPORT_PLOTS:
         if requested is not None and entry["method"] not in requested:
@@ -527,7 +590,7 @@ def _select_plot_methods(ga, include_plots):
     return selected
 
 
-def _render_plot_to_png(ga, plot_entry, figure_size_inches, matplt):
+def _pdf_report_render_plot_to_png(ga, plot_entry, figure_size_inches, matplt):
     """
     Call the requested plot method on the GA, capture the matplotlib
     figure, save it as PNG bytes, and close it so the figure stack does
@@ -554,12 +617,12 @@ def _render_plot_to_png(ga, plot_entry, figure_size_inches, matplt):
     return buffer.getvalue()
 
 
-def _format_value(value):
+def _pdf_report_format_value(value):
     """Compact, human-readable rendering for the configuration table."""
     if callable(value) and hasattr(value, "__name__"):
         return f"<callable {value.__name__}>"
     if isinstance(value, (list, tuple)) and len(value) > 8:
-        head = ", ".join(_format_value(v) for v in value[:6])
+        head = ", ".join(_pdf_report_format_value(v) for v in value[:6])
         return f"[{head}, ... (+{len(value) - 6} more)]"
     if isinstance(value, float):
         return f"{value:g}"

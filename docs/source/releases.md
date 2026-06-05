@@ -659,7 +659,7 @@ Release Date April 8, 2026
 
 ## PyGAD 3.7.0
 
-Release Date ..., 2026
+Release Date June 5, 2026
 
 1. Validation logic is applied to validate the `num_generations` parameter.
 2. The `num_generations` parameter must be assigned a positive integer. Previously, any number (positive/negative, int/float) was accepted.
@@ -668,11 +668,11 @@ Release Date ..., 2026
 5. The `wheel_cumulative_probs()` method in the `pygad.parent_selection.ParentSelection` class is refactored to reduce its computational time.
 6. Use `numpy.where()` to decide which the source parent of each gene within the `uniform_crossover()` method in the `utils/crossover.py` script. The same was already applied to the `scattered_crossover()` method.
 7. Add tests for the following modules:
-     `nn`
-       `cnn`
-       `gacnn`
-       `kerasga`
-       `torchga`
+     1. `nn`
+     2. `cnn`
+     3. `gacnn`
+     4. `kerasga`
+     5. `torchga`
 8. Fix a bug in the `visualize/plot.py` script where the `labels` parameter of `boxplot()` has been renamed `tick_labels` in Matplotlib.
 9. Fix a bug where the `best_solutions_fitness` list (instance attribute to `pygad.GA`) has the fitness of the last generation duplicated when an early stop happens inside the `on_generation()` callback. This made its size incompatible with the `best_solutions` list.
 10. The documentation is refactored to solve many language issues and the Furo theme is applied. For easy navigation, the index is reformatted to only show the main sections. At each page, its index is shown at the right side. A new theme toggle button to change theme between light and dark.
@@ -700,3 +700,17 @@ Release Date ..., 2026
 32. A new example `examples/example_generate_report.py` shows how to build a PDF report after running a multi-objective GA.
 33. The `pygad.md`, `releases.md`, `visualize.md`, and `utils.md` documentation pages were updated to reflect the new module layout, the renamed methods, the new `generate_report()` entry point, and the new NSGA-III instance attributes (`nsga3_num_divisions`, `nsga3_reference_points`). The "Other Instance Attributes & Methods" section in `pygad.md` is now grouped by area (Lifecycle, Population, Fitness, Parent Selection, NSGA-II, NSGA-III, Crossover, Mutation, Elitism, Gene Constraints, Saving) so each method or attribute appears under its topic.
 34. Fix issue https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/351 by updating the documentation to clarify what the `solution` has.
+35. Version changed in the following modules:
+      1. A new submodule `pygad.benchmarks` is added with the version `1.0.0`.
+      2. The version of the `pygad.utils` submodule is upgraded from `1.4.0` to `1.5.0`.
+      3. The version of the `pygad.helper` submodule is upgraded from `1.3.0` to `1.4.0`.
+      4. The version of the `pygad.visualize` submodule is upgraded from `1.1.1` to `1.2.0`.
+      5. The version of the `pygad.nn` submodule is upgraded from `1.2.2` to `1.2.3`.
+      6. The version of the `pygad.cnn` submodule is upgraded from `1.1.1` to `1.1.2`.
+      7. The version of the `pygad.kerasga` submodule is upgraded from `1.3.1` to `1.3.2`.
+      8. The version of the `pygad.torchga` submodule is upgraded from `1.4.1` to `1.4.2`.
+      9. The version of the `pygad.gann` submodule is upgraded from `1.0.0` to `1.0.1`.
+      10. The version of the `pygad.gacnn` submodule is upgraded from `1.0.0` to `1.0.1`.
+36. The PDF report built by `generate_report()` now shows the PyGAD logo on its title page. The logo image ships with the package, so no network access is needed. If the image file is missing, the report is built without it.
+37. Two private helper functions are added to the `pygad/utils/report.py` script for the logo. `_pdf_report_read_logo_bytes()` reads the bundled logo file and returns its bytes, or `None` if the file is missing. `_pdf_report_build_logo_image()` builds the image that is placed on the title page, or returns `None` so the report still builds without the logo.
+38. The private helper functions in the `pygad/utils/report.py` script are renamed to start with the `_pdf_report_` prefix so their purpose is clear from the name. For example, `_build_title_section()` becomes `_pdf_report_build_title_section()` and `_render_plot_to_png()` becomes `_pdf_report_render_plot_to_png()`.

@@ -785,6 +785,8 @@ Parameters:
 
 The report skips any plot whose preconditions are not met. For example, `plot_pareto_front_curve` is included only for multi-objective runs with 2 or 3 objectives; `plot_non_dominated_hypervolume` is included only when `save_solutions=True` is set on the GA. A full example lives at [`examples/example_generate_report.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/example_generate_report.py).
 
+The title page shows the PyGAD logo. The image ships with the package, so it works without network access. If the image file is missing, the report is built without it.
+
 ## Functions in `pygad`
 
 Besides the methods available in the `pygad.GA` class, this section discusses the functions available in `pygad`. Up to this time, there is only a single function named `load()`.
