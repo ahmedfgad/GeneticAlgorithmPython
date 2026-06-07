@@ -758,6 +758,7 @@ Accepts the following parameter:
 
 * `filename`: Name of the file to save the instance. No extension is needed.
 
+(generate-report)=
 ### `generate_report()`
 
 Builds a PDF report of the current GA run. It bundles the configuration table, a run-summary table, the best solution, and every applicable plot. Requires the optional `report` extra:
