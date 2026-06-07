@@ -661,6 +661,12 @@ Release Date April 8, 2026
 
 Release Date June 5, 2026
 
+Watch the release video on [YouTube](https://youtu.be/EXMy37crL7c).
+
+```{raw} html
+<iframe width="560" height="315" src="https://www.youtube.com/embed/EXMy37crL7c" title="PyGAD 3.7.0 Release" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+```
+
 1. Validation logic is applied to validate the `num_generations` parameter.
 2. The `num_generations` parameter must be assigned a positive integer. Previously, any number (positive/negative, int/float) was accepted.
 3. A new script called `activation.py` is added into the `pygad.helper` module to include the activation function used by the `cnn` and `nn` modules.
