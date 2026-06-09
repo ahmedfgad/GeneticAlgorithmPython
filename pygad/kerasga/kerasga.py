@@ -79,8 +79,8 @@ def predict(model,
             steps=None):
     """
     Load the given solution as the model's weights and run a forward
-    pass on ``data``. The model is cloned first so the caller's
-    instance is left untouched.
+    pass on ``data``. The model's original weights are restored
+    afterwards, so the model passed by the caller is not changed.
 
     Parameters
     ----------
@@ -105,12 +105,24 @@ def predict(model,
     # Fetch the parameters of the best solution.
     solution_weights = model_weights_as_matrix(model=model,
                                                weights_vector=solution)
-    _model = tensorflow.keras.models.clone_model(model)
-    _model.set_weights(solution_weights)
-    predictions = _model.predict(x=data,
-                                 batch_size=batch_size,
-                                 verbose=verbose,
-                                 steps=steps)
+
+    # Set the solution as the model weights, then put the original weights
+    # back at the end. The model is not cloned because cloning it on every
+    # call is slow when predict() is used inside a fitness function.
+    original_weights = model.get_weights()
+    model.set_weights(solution_weights)
+    try:
+        if batch_size is None and steps is None:
+            # When no batching is asked for, call the model directly. This
+            # is faster than model.predict() when called once per solution.
+            predictions = numpy.array(model(data, training=False))
+        else:
+            predictions = model.predict(x=data,
+                                        batch_size=batch_size,
+                                        verbose=verbose,
+                                        steps=steps)
+    finally:
+        model.set_weights(original_weights)
 
     return predictions
 
