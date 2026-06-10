@@ -203,7 +203,6 @@ class GA(utils.parent_selection.ParentSelection,
         cloudpickle_serialized_object = cloudpickle.dumps(self)
         with open(filename + ".pkl", 'wb') as file:
             file.write(cloudpickle_serialized_object)
-            cloudpickle.dump(self, file)
 
     def push_to_vilvik(self, *, api_key=None, **overrides):
         """
