@@ -4,6 +4,16 @@
 
 > Try the [Optimization Gadget](https://optimgadget.com), a free cloud-based tool powered by PyGAD. It makes optimization easier by reducing or removing the need for coding, and it shows helpful visualizations.
 
+> Run PyGAD in the cloud with [Vilvik](https://vilvik.com): push your PyGAD problem to Vilvik, let it run in the cloud, and get the results back.
+
+:::{figure} images/pygad_vilvik_cloud.*
+:alt: Run PyGAD in the cloud with Vilvik
+:width: 100%
+:align: center
+
+Push your PyGAD problem to [Vilvik](https://vilvik.com) and run it in the cloud.
+:::
+
 [PyGAD](https://github.com/ahmedfgad/GeneticAlgorithmPython) supports different types of crossover, mutation, and parent selection operators. It lets you optimize many types of problems with the genetic algorithm by writing your own fitness function. It works with both single-objective and multi-objective optimization problems.
 
 ![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
