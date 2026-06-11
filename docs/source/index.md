@@ -11,7 +11,7 @@
 :width: 100%
 :align: center
 
-Push your PyGAD problem to [Vilvik](https://vilvik.com) and run it in the cloud.
+Push your PyGAD problem to [Vilvik](https://vilvik.com) and run it in the cloud. To get started, follow this tutorial: [Push your PyGAD problem to Vilvik in 10 minutes](https://vilvik.com/blog/@vilvik/pygad-to-vilvik-in-10-minutes).
 :::
 
 [PyGAD](https://github.com/ahmedfgad/GeneticAlgorithmPython) supports different types of crossover, mutation, and parent selection operators. It lets you optimize many types of problems with the genetic algorithm by writing your own fitness function. It works with both single-objective and multi-objective optimization problems.
