@@ -183,6 +183,12 @@ The kept solutions are placed at the top of the next population, starting at ind
 The kept solutions are copied to the top of the population. The offspring fill the rest.
 :::
 
+Watch the tutorial on [YouTube](https://www.youtube.com/shorts/-uupRJhesjI).
+
+```{raw} html
+<iframe width="315" height="560" src="https://www.youtube.com/embed/-uupRJhesjI" title="keep_elitism vs keep_parents" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+```
+
 ## Random Seed
 
 In [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0), a new parameter called `random_seed` is supported. Its value is used as a seed for the random function generators.
