@@ -135,7 +135,7 @@ data_outputs = tensorflow.keras.utils.to_categorical(data_outputs)
 
 The next figure shows how the fitness value changes.
 
-![pygad_keras_image_classification_Conv](https://user-images.githubusercontent.com/16560492/93722654-cc55d780-fb98-11ea-8f95-7b65dc67f5c8.png)
+![pygad_keras_image_classification_Conv](images/93722654-cc55d780-fb98-11ea-8f95-7b65dc67f5c8.png)
 
 Here are some statistics about the trained model. The model accuracy is 75% after the 200 generations. Note that just running the code again may give different results.
 

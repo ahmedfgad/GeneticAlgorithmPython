@@ -145,4 +145,4 @@ print(f"Absolute error : {abs_error}.")
 
 The next figure shows how the fitness value changes for the 500 generations used.
 
-![example_regression_fish](https://user-images.githubusercontent.com/16560492/92948486-bbe78380-f459-11ea-9e31-0d4c7269d606.png)
+![example_regression_fish](images/92948486-bbe78380-f459-11ea-9e31-0d4c7269d606.png)

@@ -188,7 +188,7 @@ ga_instance.plot_fitness(title="PyGAD & PyTorch - Iteration vs. Fitness", linewi
 
 Here is the figure.
 
-![PyTorch PyGAD XOR Regression 250 Generations](https://user-images.githubusercontent.com/16560492/103469779-22f5b480-4d37-11eb-80dc-95503065ebb1.png)
+![PyTorch PyGAD XOR Regression 250 Generations](images/103469779-22f5b480-4d37-11eb-80dc-95503065ebb1.png)
 
 To get information about the best solution found by PyGAD, use the `best_solution()` method.
 

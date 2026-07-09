@@ -1,6 +1,6 @@
 # Release History
 
-![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
+![PYGAD-LOGO](images/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
 
 ## PyGAD 1.0.17
 

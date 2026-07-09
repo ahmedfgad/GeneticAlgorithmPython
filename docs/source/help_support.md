@@ -59,6 +59,6 @@ https://blog.csdn.net/sinat_38079265/article/details/108449614
 * [TowardsDataScience](https://towardsdatascience.com/@ahmedfgad)
 * [GitHub](https://github.com/ahmedfgad)
 
-![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
+![PYGAD-LOGO](images/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
 
 Thank you for using [PyGAD](https://github.com/ahmedfgad/GeneticAlgorithmPython) :)

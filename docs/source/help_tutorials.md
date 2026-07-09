@@ -52,7 +52,7 @@ The latest PyGAD version, 2.8.0 (released on 20 September 2020), supports a new 
 
 This tutorial discusses how to train Keras models using PyGAD. The discussion includes building Keras models using either the Sequential Model or the Functional API, building an initial population of Keras model parameters, creating an appropriate fitness function, and more.
 
-[![PyGAD+Keras](https://user-images.githubusercontent.com/16560492/111009628-2b372500-8362-11eb-90cf-01b47d831624.png)](https://blog.paperspace.com/train-keras-models-using-genetic-algorithm-with-pygad)
+[![PyGAD+Keras](images/111009628-2b372500-8362-11eb-90cf-01b47d831624.png)](https://blog.paperspace.com/train-keras-models-using-genetic-algorithm-with-pygad)
 
 ### [Train PyTorch Models Using Genetic Algorithm with PyGAD](https://neptune.ai/blog/train-pytorch-models-using-genetic-algorithm-with-pygad)
 
@@ -62,7 +62,7 @@ PyGAD has a module called [pygad.kerasga](https://github.com/ahmedfgad/KerasGA).
 
 So, in this tutorial, we’ll explore how to use PyGAD to train PyTorch models.
 
-[![PyGAD+PyTorch](https://user-images.githubusercontent.com/16560492/111009678-5457b580-8362-11eb-899a-39e2f96984df.png)](https://neptune.ai/blog/train-pytorch-models-using-genetic-algorithm-with-pygad)
+[![PyGAD+PyTorch](images/111009678-5457b580-8362-11eb-899a-39e2f96984df.png)](https://neptune.ai/blog/train-pytorch-models-using-genetic-algorithm-with-pygad)
 
 ### [A Guide to Genetic ‘Learning’ Algorithms for Optimization](https://towardsdatascience.com/a-guide-to-genetic-learning-algorithms-for-optimization-e1067cdc77e7)
 
@@ -80,7 +80,7 @@ To start with coding the genetic algorithm, you can check the tutorial titled [*
 
 [This tutorial](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad) is prepared based on a previous version of the project but it still a good resource to start with coding the genetic algorithm.
 
-[![Genetic Algorithm Implementation in Python](https://user-images.githubusercontent.com/16560492/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png)](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad)
+[![Genetic Algorithm Implementation in Python](images/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png)](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad)
 
 ### Tutorial: Introduction to Genetic Algorithm
 
@@ -90,7 +90,7 @@ Get started with the genetic algorithm by reading the tutorial titled [**Introdu
 * [Towards Data Science](https://www.kdnuggets.com/2018/03/introduction-optimization-with-genetic-algorithm.html)
 * [KDnuggets](https://towardsdatascience.com/introduction-to-optimization-with-genetic-algorithm-2f5001d9964b)
 
-[![Introduction to Genetic Algorithm](https://user-images.githubusercontent.com/16560492/82078259-26252d00-96e1-11ea-9a02-52a99e1054b9.jpg)](https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad)
+[![Introduction to Genetic Algorithm](images/82078259-26252d00-96e1-11ea-9a02-52a99e1054b9.jpg)](https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad)
 
 ### Tutorial: Build Neural Networks in Python
 
@@ -100,7 +100,7 @@ Read about building neural networks in Python through the tutorial titled [**Art
 * [Towards Data Science](https://towardsdatascience.com/artificial-neural-network-implementation-using-numpy-and-classification-of-the-fruits360-image-3c56affa4491)
 * [KDnuggets](https://www.kdnuggets.com/2019/02/artificial-neural-network-implementation-using-numpy-and-image-classification.html)
 
-[![Building Neural Networks Python](https://user-images.githubusercontent.com/16560492/82078281-30472b80-96e1-11ea-8017-6a1f4383d602.jpg)](https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad)
+[![Building Neural Networks Python](images/82078281-30472b80-96e1-11ea-8017-6a1f4383d602.jpg)](https://www.linkedin.com/pulse/artificial-neural-network-implementation-using-numpy-fruits360-gad)
 
 ### Tutorial: Optimize Neural Networks with Genetic Algorithm
 
@@ -110,7 +110,7 @@ Read about training neural networks using the genetic algorithm through the tuto
 - [Towards Data Science](https://towardsdatascience.com/artificial-neural-networks-optimization-using-genetic-algorithm-with-python-1fe8ed17733e)
 - [KDnuggets](https://www.kdnuggets.com/2019/03/artificial-neural-networks-optimization-genetic-algorithm-python.html)
 
-[![Training Neural Networks using Genetic Algorithm Python](https://user-images.githubusercontent.com/16560492/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg)](https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad)
+[![Training Neural Networks using Genetic Algorithm Python](images/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg)](https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad)
 
 ### Tutorial: Building CNN in Python
 
@@ -123,7 +123,7 @@ To start with coding the genetic algorithm, you can check the tutorial titled [*
 
 [This tutorial](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)) is prepared based on a previous version of the project but it still a good resource to start with coding CNNs.
 
-[![Building CNN in Python](https://user-images.githubusercontent.com/16560492/82431022-6c3a1200-9a8e-11ea-8f1b-b055196d76e3.png)](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)
+[![Building CNN in Python](images/82431022-6c3a1200-9a8e-11ea-8f1b-b055196d76e3.png)](https://www.linkedin.com/pulse/building-convolutional-neural-network-using-numpy-from-ahmed-gad)
 
 ### Tutorial: Derivation of CNN from FCNN
 
@@ -133,7 +133,7 @@ Get started with the genetic algorithm by reading the tutorial titled [**Derivat
 * [Towards Data Science](https://towardsdatascience.com/derivation-of-convolutional-neural-network-from-fully-connected-network-step-by-step-b42ebafa5275)
 * [KDnuggets](https://www.kdnuggets.com/2018/04/derivation-convolutional-neural-network-fully-connected-step-by-step.html)
 
-[![Derivation of CNN from FCNN](https://user-images.githubusercontent.com/16560492/82431369-db176b00-9a8e-11ea-99bd-e845192873fc.png)](https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad)
+[![Derivation of CNN from FCNN](images/82431369-db176b00-9a8e-11ea-99bd-e845192873fc.png)](https://www.linkedin.com/pulse/derivation-convolutional-neural-network-from-fully-connected-gad)
 
 ### Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 
@@ -147,7 +147,7 @@ Find the book at these links:
 - [O'Reilly](https://www.oreilly.com/library/view/practical-computer-vision/9781484241677)
 - [Google Books](https://books.google.com.eg/books?id=xLd9DwAAQBAJ)
 
-![Fig04](https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg)
+![Fig04](images/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg)
 
 ## More Links
 

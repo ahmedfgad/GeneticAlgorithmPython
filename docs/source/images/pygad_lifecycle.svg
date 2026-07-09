@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 1180" width="780" height="1180" font-family="Arial, 'Helvetica Neue', Helvetica, sans-serif">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#5b6470"/>
+    </marker>
+    <marker id="arg" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#0b6e4f"/>
+    </marker>
+  </defs>
+
+  <!-- card -->
+  <rect x="2" y="2" width="776" height="1176" rx="16" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+
+  <!-- title -->
+  <text x="390" y="42" text-anchor="middle" font-size="20" font-weight="700" fill="#1f2d3d">The PyGAD life cycle with callback functions</text>
+
+  <!-- ===================== edges (main vertical flow) ===================== -->
+  <g stroke="#5b6470" stroke-width="2" fill="none">
+    <line x1="250" y1="110" x2="250" y2="150" marker-end="url(#ar)"/>
+    <line x1="250" y1="200" x2="250" y2="250" marker-end="url(#ar)"/>
+    <line x1="250" y1="300" x2="250" y2="340" marker-end="url(#ar)"/>
+    <line x1="250" y1="390" x2="250" y2="440" marker-end="url(#ar)"/>
+    <line x1="250" y1="490" x2="250" y2="540" marker-end="url(#ar)"/>
+    <line x1="250" y1="590" x2="250" y2="640" marker-end="url(#ar)"/>
+    <line x1="250" y1="690" x2="250" y2="740" marker-end="url(#ar)"/>
+    <line x1="250" y1="790" x2="250" y2="812" marker-end="url(#ar)"/>
+    <line x1="250" y1="922" x2="250" y2="960" marker-end="url(#ar)"/>
+    <line x1="250" y1="1010" x2="250" y2="1052" marker-end="url(#ar)"/>
+    <!-- loop back: on_generation -> start a generation -->
+    <polyline points="150,765 70,765 70,275 150,275" marker-end="url(#ar)"/>
+  </g>
+
+  <!-- ===================== green action arrows (right -> flow) ===================== -->
+  <g stroke="#0b6e4f" stroke-width="2" fill="none">
+    <line x1="500" y1="130" x2="352" y2="130" marker-end="url(#arg)"/>
+    <line x1="500" y1="225" x2="352" y2="225" marker-end="url(#arg)"/>
+    <line x1="500" y1="415" x2="352" y2="415" marker-end="url(#arg)"/>
+    <line x1="500" y1="515" x2="352" y2="515" marker-end="url(#arg)"/>
+    <line x1="500" y1="615" x2="352" y2="615" marker-end="url(#arg)"/>
+    <!-- next-gen sub-flow into on_mutation -> on_generation gap -->
+    <line x1="615" y1="708" x2="615" y2="730" marker-end="url(#arg)"/>
+    <polyline points="500,758 430,758 430,715 352,715" marker-end="url(#arg)"/>
+  </g>
+
+  <!-- ===================== nodes ===================== -->
+  <!-- Start terminator -->
+  <rect x="175" y="64" width="150" height="46" rx="23" fill="#e9f7ef" stroke="#0b6e4f" stroke-width="2"/>
+  <text x="250" y="93" text-anchor="middle" font-size="18" font-weight="700" fill="#0b6e4f">Start</text>
+
+  <!-- callback nodes (blue) -->
+  <g>
+    <rect x="150" y="150" width="200" height="50" rx="8" fill="#eef4fb" stroke="#3b6ea5" stroke-width="2"/>
+    <text x="250" y="181" text-anchor="middle" font-size="17" font-family="'DejaVu Sans Mono','Courier New',monospace" fill="#1f2d3d">on_start()</text>
+
+    <rect x="150" y="250" width="200" height="50" rx="8" fill="#f5f7fa" stroke="#5b6470" stroke-width="2"/>
+    <text x="250" y="281" text-anchor="middle" font-size="16" fill="#334155">Start a Generation</text>
+
+    <rect x="150" y="340" width="200" height="50" rx="8" fill="#eef4fb" stroke="#3b6ea5" stroke-width="2"/>
+    <text x="250" y="371" text-anchor="middle" font-size="17" font-family="'DejaVu Sans Mono','Courier New',monospace" fill="#1f2d3d">on_fitness()</text>
+
+    <rect x="150" y="440" width="200" height="50" rx="8" fill="#eef4fb" stroke="#3b6ea5" stroke-width="2"/>
+    <text x="250" y="471" text-anchor="middle" font-size="17" font-family="'DejaVu Sans Mono','Courier New',monospace" fill="#1f2d3d">on_parents()</text>
+
+    <rect x="150" y="540" width="200" height="50" rx="8" fill="#eef4fb" stroke="#3b6ea5" stroke-width="2"/>
+    <text x="250" y="571" text-anchor="middle" font-size="17" font-family="'DejaVu Sans Mono','Courier New',monospace" fill="#1f2d3d">on_crossover()</text>
+
+    <rect x="150" y="640" width="200" height="50" rx="8" fill="#eef4fb" stroke="#3b6ea5" stroke-width="2"/>
+    <text x="250" y="671" text-anchor="middle" font-size="17" font-family="'DejaVu Sans Mono','Courier New',monospace" fill="#1f2d3d">on_mutation()</text>
+
+    <rect x="150" y="740" width="200" height="50" rx="8" fill="#eef4fb" stroke="#3b6ea5" stroke-width="2"/>
+    <text x="250" y="771" text-anchor="middle" font-size="17" font-family="'DejaVu Sans Mono','Courier New',monospace" fill="#1f2d3d">on_generation()</text>
+  </g>
+
+  <!-- decision diamond -->
+  <polygon points="250,812 350,867 250,922 150,867" fill="#fff7e6" stroke="#d9a441" stroke-width="2"/>
+  <text x="250" y="861" text-anchor="middle" font-size="14" font-weight="700" fill="#8a6100">Completed OR</text>
+  <text x="250" y="880" text-anchor="middle" font-size="14" font-weight="700" fill="#8a6100">return "stop"</text>
+
+  <!-- on_stop node (red accent) -->
+  <rect x="150" y="960" width="200" height="50" rx="8" fill="#fdecea" stroke="#c0392b" stroke-width="2"/>
+  <text x="250" y="991" text-anchor="middle" font-size="17" font-family="'DejaVu Sans Mono','Courier New',monospace" fill="#a52c1f">on_stop()</text>
+
+  <!-- Stop terminator -->
+  <rect x="175" y="1052" width="150" height="46" rx="23" fill="#fdecea" stroke="#c0392b" stroke-width="2"/>
+  <text x="250" y="1081" text-anchor="middle" font-size="18" font-weight="700" fill="#c0392b">Stop</text>
+
+  <!-- ===================== green annotation boxes (right) ===================== -->
+  <g>
+    <rect x="500" y="103" width="240" height="54" rx="8" fill="#e9f7ef" stroke="#0b6e4f" stroke-width="2"/>
+    <text x="620" y="126" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Validation &amp;</text>
+    <text x="620" y="145" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Initialization</text>
+
+    <rect x="500" y="198" width="240" height="54" rx="8" fill="#e9f7ef" stroke="#0b6e4f" stroke-width="2"/>
+    <text x="620" y="221" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Calculate Initial</text>
+    <text x="620" y="240" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Population Fitness</text>
+
+    <rect x="500" y="388" width="240" height="54" rx="8" fill="#e9f7ef" stroke="#0b6e4f" stroke-width="2"/>
+    <text x="620" y="411" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Select Parents</text>
+    <text x="620" y="430" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">(Mating Pool)</text>
+
+    <rect x="500" y="491" width="240" height="48" rx="8" fill="#e9f7ef" stroke="#0b6e4f" stroke-width="2"/>
+    <text x="620" y="521" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Do Crossover</text>
+
+    <rect x="500" y="591" width="240" height="48" rx="8" fill="#e9f7ef" stroke="#0b6e4f" stroke-width="2"/>
+    <text x="620" y="621" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Do Mutation</text>
+
+    <rect x="500" y="656" width="240" height="52" rx="8" fill="#e9f7ef" stroke="#0b6e4f" stroke-width="2"/>
+    <text x="620" y="678" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Next Generation's</text>
+    <text x="620" y="697" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Population</text>
+
+    <rect x="500" y="730" width="240" height="54" rx="8" fill="#e9f7ef" stroke="#0b6e4f" stroke-width="2"/>
+    <text x="620" y="753" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Calculate New</text>
+    <text x="620" y="772" text-anchor="middle" font-size="15" font-weight="700" fill="#0b6e4f">Population Fitness</text>
+  </g>
+</svg>

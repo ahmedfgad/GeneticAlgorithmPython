@@ -114,7 +114,7 @@ data_outputs = numpy.load("outputs.npy")
 
 The next figure shows how the fitness value changes.
 
-![PyTorch PyGAD Dense Image Classification 200 Generations](https://user-images.githubusercontent.com/16560492/103469855-5d138600-4d38-11eb-84b1-b5eff8faa7bc.png)
+![PyTorch PyGAD Dense Image Classification 200 Generations](images/103469855-5d138600-4d38-11eb-84b1-b5eff8faa7bc.png)
 
 Here are some statistics about the trained model.
 

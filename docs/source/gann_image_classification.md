@@ -143,4 +143,4 @@ Classification accuracy : 99.94903160040775.
 
 The next figure shows how fitness value evolves by generation.
 
-![Training Neural Networks using Genetic Algorithm](https://user-images.githubusercontent.com/16560492/82152993-21898180-9865-11ea-8387-b995f88b83f7.png)
+![Training Neural Networks using Genetic Algorithm](images/82152993-21898180-9865-11ea-8387-b995f88b83f7.png)

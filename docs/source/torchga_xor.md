@@ -131,7 +131,7 @@ loss_function = torch.nn.BCELoss()
 
 After the previous code completes, the next figure shows how the fitness value change by generation.
 
-![PyTorch PyGAD XOR Classification 250 Generations](https://user-images.githubusercontent.com/16560492/103469818-c646c980-4d37-11eb-98c3-d9d591acd5e2.png)
+![PyTorch PyGAD XOR Classification 250 Generations](images/103469818-c646c980-4d37-11eb-98c3-d9d591acd5e2.png)
 
 Here is some information about the trained model. Its fitness value is `100000000.0`, loss is `0.0` and accuracy is 100%.
 

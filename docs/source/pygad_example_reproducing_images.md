@@ -34,7 +34,7 @@ target_im = numpy.asarray(target_im/255, dtype=float)
 
 Here is the read image.
 
-![fruit](https://user-images.githubusercontent.com/16560492/36948808-f0ac882e-1fe8-11e8-8d07-1307e3477fd0.jpg)
+![fruit](images/36948808-f0ac882e-1fe8-11e8-8d07-1307e3477fd0.jpg)
 
 Based on the chromosome representation used in the example, the pixel values can be in the 0-255 range, the 0-1 range, or any other range.
 
@@ -119,7 +119,7 @@ ga_instance.plot_fitness()
 
 Here is the plot after 20,000 generations.
 
-![Fitness Values](https://user-images.githubusercontent.com/16560492/82232124-77762c00-992e-11ea-9fc6-14a1cd7a04ff.png)
+![Fitness Values](images/82232124-77762c00-992e-11ea-9fc6-14a1cd7a04ff.png)
 
 ## Calculate Some Statistics
 
@@ -144,11 +144,11 @@ matplotlib.pyplot.show()
 
 The solution reached after the 20,000 generations is shown below.
 
-![solution](https://user-images.githubusercontent.com/16560492/82232405-e0f63a80-992e-11ea-984f-b6ed76465bd1.png)
+![solution](images/82232405-e0f63a80-992e-11ea-984f-b6ed76465bd1.png)
 
 After more generations, the result can be improved, as shown below.
 
-![solution](https://user-images.githubusercontent.com/16560492/82232345-cf149780-992e-11ea-8390-bf1a57a19de7.png)
+![solution](images/82232345-cf149780-992e-11ea-8390-bf1a57a19de7.png)
 
 The results can also be enhanced by changing the parameters passed to the constructor of the `pygad.GA` class.
 
@@ -156,28 +156,28 @@ Here is how the image evolves from generation 0 to generation 20,000.
 
 Generation 0
 
-![solution_0](https://user-images.githubusercontent.com/16560492/36948589-b47276f0-1fe5-11e8-8efe-0cd1a225ea3a.png)
+![solution_0](images/36948589-b47276f0-1fe5-11e8-8efe-0cd1a225ea3a.png)
 
 Generation 1,000
 
-![solution_1000](https://user-images.githubusercontent.com/16560492/36948823-16f490ee-1fe9-11e8-97db-3e8905ad5440.png)
+![solution_1000](images/36948823-16f490ee-1fe9-11e8-97db-3e8905ad5440.png)
 
 Generation 2,500
 
-![solution_2500](https://user-images.githubusercontent.com/16560492/36948832-3f314b60-1fe9-11e8-8f4a-4d9a53b99f3d.png)
+![solution_2500](images/36948832-3f314b60-1fe9-11e8-8f4a-4d9a53b99f3d.png)
 
 Generation 4,500
 
-![solution_4500](https://user-images.githubusercontent.com/16560492/36948837-53d1849a-1fe9-11e8-9b36-e9e9291e347b.png)
+![solution_4500](images/36948837-53d1849a-1fe9-11e8-9b36-e9e9291e347b.png)
 
 Generation 7,000
 
-![solution_7000](https://user-images.githubusercontent.com/16560492/36948852-66f1b176-1fe9-11e8-9f9b-460804e94004.png)
+![solution_7000](images/36948852-66f1b176-1fe9-11e8-9f9b-460804e94004.png)
 
 Generation 8,000
 
-![solution_8500](https://user-images.githubusercontent.com/16560492/36948865-7fbb5158-1fe9-11e8-8c04-8ac3c1f7b1b1.png)
+![solution_8500](images/36948865-7fbb5158-1fe9-11e8-8c04-8ac3c1f7b1b1.png)
 
 Generation 20,000
 
-![solution](https://user-images.githubusercontent.com/16560492/82232405-e0f63a80-992e-11ea-984f-b6ed76465bd1.png)
+![solution](images/82232405-e0f63a80-992e-11ea-984f-b6ed76465bd1.png)
