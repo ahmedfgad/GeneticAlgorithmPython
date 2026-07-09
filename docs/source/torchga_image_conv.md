@@ -153,7 +153,7 @@ data_outputs = numpy.load("dataset_outputs.npy")
 
 The next figure shows how the fitness value changes.
 
-![PyTorch PyGAD CNN Image Classification 200 Generations](https://user-images.githubusercontent.com/16560492/103469887-c7c4c180-4d38-11eb-98a7-1c5e73e918d0.png)
+![PyTorch PyGAD CNN Image Classification 200 Generations](images/103469887-c7c4c180-4d38-11eb-98a7-1c5e73e918d0.png)
 
 Here are some statistics about the trained model. The model accuracy is 97.5% after the 200 generations. Note that just running the code again may give different results.
 

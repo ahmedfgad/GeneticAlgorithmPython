@@ -192,7 +192,7 @@ ga_instance.plot_fitness(title="PyGAD & Keras - Iteration vs. Fitness", linewidt
 
 Here is the figure.
 
-![pygad_keras_image_regression](https://user-images.githubusercontent.com/16560492/93722638-ac261880-fb98-11ea-95d3-e773deb034f4.png)
+![pygad_keras_image_regression](images/93722638-ac261880-fb98-11ea-95d3-e773deb034f4.png)
 
 To get information about the best solution found by PyGAD, use the `best_solution()` method.
 

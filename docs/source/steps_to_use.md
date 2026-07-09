@@ -156,7 +156,7 @@ There is a method named `plot_fitness()` which creates a figure summarizing how 
 ga_instance.plot_fitness()
 ```
 
-![Fig02](https://user-images.githubusercontent.com/16560492/78830005-93111d00-79e7-11ea-9d8e-a8d8325a6101.png)
+![Fig02](images/78830005-93111d00-79e7-11ea-9d8e-a8d8325a6101.png)
 
 ## Information about the Best Solution
 

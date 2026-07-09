@@ -125,7 +125,7 @@ solution_fitness = 1.0 / (bce(data_outputs, predictions).numpy() + 0.00000001)
 
 After the previous code completes, the next figure shows how the fitness value change by generation.
 
-![pygad_keras_image_classification_XOR](https://user-images.githubusercontent.com/16560492/93722639-b811da80-fb98-11ea-8951-f13a7a266c04.png)
+![pygad_keras_image_classification_XOR](images/93722639-b811da80-fb98-11ea-8951-f13a7a266c04.png)
 
 Here is some information about the trained model. Its fitness value is `739.24`, loss is `0.0013527311` and accuracy is 100%.
 

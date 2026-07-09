@@ -16,7 +16,7 @@ Read the [PyGAD documentation](https://pygad.readthedocs.io/en/latest).
 https://anaconda.org/conda-forge/PyGAD) [![PyPI version](https://badge.fury.io/py/pygad.svg)](https://badge.fury.io/py/pygad)![Docs](https://readthedocs.org/projects/pygad/badge)[![PyGAD PyTest Matrix](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/main.yml) [![Release](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/release.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/release.yml) [![Scorecard supply-chain security](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/scorecard.yml/badge.svg)](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/workflows/scorecard.yml) [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![REUSE](https://api.reuse.software/badge/github.com/ahmedfgad/GeneticAlgorithmPython)](https://api.reuse.software/info/github.com/ahmedfgad/GeneticAlgorithmPython) [![Stack Overflow](https://img.shields.io/badge/stackoverflow-Ask%20questions-blue.svg)](
 https://stackoverflow.com/questions/tagged/pygad) [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ahmedfgad/GeneticAlgorithmPython/badge)](https://securityscorecards.dev/viewer/?uri=github.com/ahmedfgad/GeneticAlgorithmPython) [![DOI](https://zenodo.org/badge/DOI/10.1007/s11042-023-17167-y.svg)](https://doi.org/10.1007/s11042-023-17167-y)
 
-![PYGAD-LOGO](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
+![PYGAD-LOGO](https://github.com/ahmedfgad/GeneticAlgorithmPython/raw/master/docs/source/images/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
 
 [PyGAD](https://pypi.org/project/pygad) supports different types of crossover, mutation, and parent selection. It lets you optimize many types of problems with the genetic algorithm by writing your own fitness function.
 
@@ -242,7 +242,7 @@ To start with coding the genetic algorithm, you can check the tutorial titled [*
 
 [This tutorial](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad) is based on an earlier version of the project, but it is still a good resource to start coding the genetic algorithm.
 
-[![Genetic Algorithm Implementation in Python](https://user-images.githubusercontent.com/16560492/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png)](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad)
+[![Genetic Algorithm Implementation in Python](https://github.com/ahmedfgad/GeneticAlgorithmPython/raw/master/docs/source/images/78830052-a3c19300-79e7-11ea-8b9b-4b343ea4049c.png)](https://www.linkedin.com/pulse/genetic-algorithm-implementation-python-ahmed-gad)
 
 ## Tutorial: Introduction to Genetic Algorithm
 
@@ -252,7 +252,7 @@ Get started with the genetic algorithm by reading the tutorial titled [**Introdu
 * [Towards Data Science](https://towardsdatascience.com/introduction-to-optimization-with-genetic-algorithm-2f5001d9964b)
 * [KDnuggets](https://www.kdnuggets.com/2018/03/introduction-optimization-with-genetic-algorithm.html)
 
-[![Introduction to Genetic Algorithm](https://user-images.githubusercontent.com/16560492/82078259-26252d00-96e1-11ea-9a02-52a99e1054b9.jpg)](https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad)
+[![Introduction to Genetic Algorithm](https://github.com/ahmedfgad/GeneticAlgorithmPython/raw/master/docs/source/images/82078259-26252d00-96e1-11ea-9a02-52a99e1054b9.jpg)](https://www.linkedin.com/pulse/introduction-optimization-genetic-algorithm-ahmed-gad)
 
 ## Tutorial: Optimize Neural Networks with Genetic Algorithm
 
@@ -262,7 +262,7 @@ Read about training neural networks using the genetic algorithm through the tuto
 - [Towards Data Science](https://towardsdatascience.com/artificial-neural-networks-optimization-using-genetic-algorithm-with-python-1fe8ed17733e)
 - [KDnuggets](https://www.kdnuggets.com/2019/03/artificial-neural-networks-optimization-genetic-algorithm-python.html)
 
-[![Training Neural Networks using Genetic Algorithm Python](https://user-images.githubusercontent.com/16560492/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg)](https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad)
+[![Training Neural Networks using Genetic Algorithm Python](https://github.com/ahmedfgad/GeneticAlgorithmPython/raw/master/docs/source/images/82078300-376e3980-96e1-11ea-821c-aa6b8ceb44d4.jpg)](https://www.linkedin.com/pulse/artificial-neural-networks-optimization-using-genetic-ahmed-gad)
 
 ## Book: Practical Computer Vision Applications Using Deep Learning with CNNs
 
@@ -276,7 +276,7 @@ Find the book at these links:
 - [O'Reilly](https://www.oreilly.com/library/view/practical-computer-vision/9781484241677)
 - [Google Books](https://books.google.com.eg/books?id=xLd9DwAAQBAJ)
 
-![Fig04](https://user-images.githubusercontent.com/16560492/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg)
+![Fig04](https://github.com/ahmedfgad/GeneticAlgorithmPython/raw/master/docs/source/images/78830077-ae7c2800-79e7-11ea-980b-53b6bd879eeb.jpg)
 
 # Citing PyGAD - Bibtex Formatted Citation
 

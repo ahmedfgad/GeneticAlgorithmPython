@@ -296,7 +296,7 @@ After the `run()` method completes, the `plot_fitness()` method can be called to
 ga_instance.plot_fitness()
 ```
 
-![GACNN_Fitness](https://user-images.githubusercontent.com/16560492/83429675-ab744580-a434-11ea-8f21-9d3804b50d15.png)
+![GACNN_Fitness](images/83429675-ab744580-a434-11ea-8f21-9d3804b50d15.png)
 
 ### Information about the Best Solution
 

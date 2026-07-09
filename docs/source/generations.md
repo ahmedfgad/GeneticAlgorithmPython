@@ -137,7 +137,7 @@ ga_instance.run()
 
 
 
-![elitism_kills_evolution](https://user-images.githubusercontent.com/16560492/189273225-67ffad41-97ab-45e1-9324-429705e17b20.png)
+![elitism_kills_evolution](images/189273225-67ffad41-97ab-45e1-9324-429705e17b20.png)
 
 ### How the Number of Offspring Is Decided
 

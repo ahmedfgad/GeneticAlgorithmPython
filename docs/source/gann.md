@@ -310,7 +310,7 @@ After the `run()` method completes, the `plot_fitness()` method can be called to
 ga_instance.plot_fitness()
 ```
 
-![XOR_Fitness](https://user-images.githubusercontent.com/16560492/82078638-c11e0700-96e1-11ea-8aa9-c36761c5e9c7.png)
+![XOR_Fitness](images/82078638-c11e0700-96e1-11ea-8aa9-c36761c5e9c7.png)
 
 By running the code again, a different initial population is created, so a classification accuracy of 100 can be reached using fewer generations. On the other hand, a different initial population might cause 100% accuracy to be reached using more generations or not reached at all.
 

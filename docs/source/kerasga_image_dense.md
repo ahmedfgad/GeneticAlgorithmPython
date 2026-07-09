@@ -113,7 +113,7 @@ data_outputs = tensorflow.keras.utils.to_categorical(data_outputs)
 
 The next figure shows how the fitness value changes.
 
-![pygad_keras_image_classification](https://user-images.githubusercontent.com/16560492/93722649-c2cc6f80-fb98-11ea-96e7-3f6ce3cfe1cf.png)
+![pygad_keras_image_classification](images/93722649-c2cc6f80-fb98-11ea-96e7-3f6ce3cfe1cf.png)
 
 Here are some statistics about the trained model.
 

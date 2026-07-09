@@ -115,7 +115,7 @@ The `previous_layer` attribute in the `pygad.nn.DenseLayer` class creates a one 
 
 The last (output) layer indexed N points to layer **N-1**, layer **N-1** points to the layer **N-2**, the layer **N-2** points to the layer **N-3**, and so on until reaching the end of the linked list which is layer 1 (input layer).
 
-![Layers Linked List](https://user-images.githubusercontent.com/16560492/81918975-816af880-95d7-11ea-83e3-34d14c3316db.jpg)
+![Layers Linked List](images/81918975-816af880-95d7-11ea-83e3-34d14c3316db.jpg)
 
 The one way linked list allows returning all properties of all layers in the network architecture by just passing the last layer in the network. The linked list moves from the output layer towards the input layer. 
 

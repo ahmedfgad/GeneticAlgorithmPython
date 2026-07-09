@@ -8,7 +8,7 @@ Bien que la manière standard d'entraîner les réseaux de neurones soit la desc
 
 Utiliser un algorithme génétique pour former un réseau de neurones simple pour résoudre le OpenAI CartPole Jeu. Dans cet article, nous allons former un simple réseau de neurones pour résoudre le OpenAI CartPole . J'utiliserai PyTorch et PyGAD .
 
-[![Cómo los algoritmos genéticos pueden competir con el descenso de gradiente y el backprop](https://user-images.githubusercontent.com/16560492/111009275-3178d180-8361-11eb-9e86-7fb1519acde7.png)](https://www.hebergementwebs.com/nouvelles/comment-les-algorithmes-genetiques-peuvent-rivaliser-avec-la-descente-de-gradient-et-le-backprop)
+[![Cómo los algoritmos genéticos pueden competir con el descenso de gradiente y el backprop](images/111009275-3178d180-8361-11eb-9e86-7fb1519acde7.png)](https://www.hebergementwebs.com/nouvelles/comment-les-algorithmes-genetiques-peuvent-rivaliser-avec-la-descente-de-gradient-et-le-backprop)
 
 ## Spanish
 
@@ -18,13 +18,13 @@ Aunque la forma estandar de entrenar redes neuronales es el descenso de gradient
 
 Usa un algoritmo genetico para entrenar una red neuronal simple para resolver el Juego OpenAI CartPole. En este articulo, entrenaremos una red neuronal simple para resolver el OpenAI CartPole . Usare PyTorch y PyGAD .
 
-[![Cómo los algoritmos genéticos pueden competir con el descenso de gradiente y el backprop](https://user-images.githubusercontent.com/16560492/111009257-232ab580-8361-11eb-99a5-7226efbc3065.png)](https://www.hebergementwebs.com/noticias/como-los-algoritmos-geneticos-pueden-competir-con-el-descenso-de-gradiente-y-el-backprop)
+[![Cómo los algoritmos genéticos pueden competir con el descenso de gradiente y el backprop](images/111009257-232ab580-8361-11eb-99a5-7226efbc3065.png)](https://www.hebergementwebs.com/noticias/como-los-algoritmos-geneticos-pueden-competir-con-el-descenso-de-gradiente-y-el-backprop)
 
 ## Korean
 
 ### [[PyGAD] Python 에서 Genetic Algorithm 을 사용해보기](https://data-newbie.tistory.com/m/685)
 
-[![Korean-1](https://user-images.githubusercontent.com/16560492/108586306-85bd0280-731b-11eb-874c-7ac4ce1326cd.jpg)](https://data-newbie.tistory.com/m/685)
+[![Korean-1](images/108586306-85bd0280-731b-11eb-874c-7ac4ce1326cd.jpg)](https://data-newbie.tistory.com/m/685)
 
 파이썬에서 genetic algorithm을 사용하는 패키지들을 다 사용해보진 않았지만, 확장성이 있어보이고, 시도할 일이 있어서 살펴봤다.
 
@@ -50,7 +50,7 @@ En son PyGAD sürümü 2.8.0 (20 Eylül 2020'de piyasaya sürüldü), Keras mode
 
 Bu öğreticide, PyGAD kullanılarak Keras modellerinin nasıl eğitileceği anlatılmaktadır. Tartışma, Sıralı Modeli veya İşlevsel API’yi kullanarak Keras modellerini oluşturmayı, Keras model parametrelerinin ilk popülasyonunu oluşturmayı, uygun bir uygunluk işlevi oluşturmayı ve daha fazlasını içerir.
 
-[![national-cancer-institute-zz_3tCcrk7o-unsplash](https://user-images.githubusercontent.com/16560492/108586601-85be0200-731d-11eb-98a4-161c75a1f099.jpg)](https://erencan34.medium.com/pygad-ile-genetik-algoritmay%C4%B1-kullanarak-keras-modelleri-nas%C4%B1l-e%C4%9Fitilir-cf92639a478c)
+[![national-cancer-institute-zz_3tCcrk7o-unsplash](images/108586601-85be0200-731d-11eb-98a4-161c75a1f099.jpg)](https://erencan34.medium.com/pygad-ile-genetik-algoritmay%C4%B1-kullanarak-keras-modelleri-nas%C4%B1l-e%C4%9Fitilir-cf92639a478c)
 
 ## Hungarian
 
@@ -62,7 +62,7 @@ A hálózatok tenyésztéséhez a [PyGAD](https://pygad.readthedocs.io/en/latest
 
 Maga a PyGAD egy teljesen általános genetikus algoritmusok futtatására képes rendszer. Ennek a kiterjesztése a KerasGA, ami az általános motor Tensorflow (Keras) neurális hálókon történő futtatását segíti. A 47. sorban létrehozott KerasGA objektum ennek a kiterjesztésnek a része és arra szolgál, hogy a paraméterként átadott modellből a második paraméterben megadott számosságú populációt hozzon létre. Mivel a hálózatunk 386 állítható paraméterrel rendelkezik, ezért a DNS-ünk itt 386 elemből fog állni. A populáció mérete 10 egyed, így a kezdő populációnk egy 10x386 elemű mátrix lesz. Ezt adjuk át az 51. sorban az initial_population paraméterben.
 
-[![](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)](https://thebojda.medium.com/tensorflow-alapoz%C3%B3-10-24f7767d4a2c)
+[![](images/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)](https://thebojda.medium.com/tensorflow-alapoz%C3%B3-10-24f7767d4a2c)
 
 ## Russian
 
@@ -78,4 +78,4 @@ PyGAD — это библиотека для имплементации гене
 
 PyGAD разрабатывали на Python 3.7.3. Зависимости включают в себя NumPy для создания и манипуляции массивами и Matplotlib для визуализации. Один из изкейсов использования инструмента — оптимизация весов, которые удовлетворяют заданной функции.
 
-[![](https://user-images.githubusercontent.com/16560492/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)](https://neurohive.io/ru/frameworki/pygad-biblioteka-dlya-implementacii-geneticheskogo-algoritma)
+[![](images/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)](https://neurohive.io/ru/frameworki/pygad-biblioteka-dlya-implementacii-geneticheskogo-algoritma)

@@ -23,7 +23,7 @@ In PyGAD, if `f=f_avg`, then the solution is regarded as high quality.
 
 The next figure summarizes the previous steps.
 
-![Adaptive-Mutation](https://user-images.githubusercontent.com/16560492/103468973-e3c26600-4d2c-11eb-8af3-b3bb39b50540.jpg)
+![Adaptive-Mutation](images/103468973-e3c26600-4d2c-11eb-8af3-b3bb39b50540.jpg)
 
 This strategy is applied in PyGAD. 
 
