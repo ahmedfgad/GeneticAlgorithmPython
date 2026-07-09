@@ -68,7 +68,7 @@ Please check the **Contact Us** section for more contact details.
 
 The following figure shows the main stages in the life cycle of a `pygad.GA` instance. PyGAD stops when all generations are completed or when the function passed to the `on_generation` parameter returns the string `stop`.
 
-![PyGAD Lifecycle](https://user-images.githubusercontent.com/16560492/220486073-c5b6089d-81e4-44d9-a53c-385f479a7273.jpg)
+![PyGAD Lifecycle](https://github.com/ahmedfgad/GeneticAlgorithmPython/raw/master/docs/source/images/pygad_lifecycle.png)
 
 The following code implements all the callback functions to trace the execution of the genetic algorithm. Each callback function prints its name.
 

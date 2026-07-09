@@ -12,7 +12,13 @@ The main steps of the genetic algorithm in PyGAD.
 
 The next figure shows the same life cycle in more detail, including the callback functions that PyGAD calls at each stage.
 
-![PyGAD Lifecycle](https://user-images.githubusercontent.com/16560492/220486073-c5b6089d-81e4-44d9-a53c-385f479a7273.jpg)
+:::{figure} images/pygad_lifecycle.*
+:alt: The PyGAD life cycle with callback functions
+:width: 480px
+:align: center
+
+The PyGAD life cycle in detail, including the callback functions called at each stage.
+:::
 
 The next code implements all the callback functions to trace the execution of the genetic algorithm. Each callback function prints its name.
 
