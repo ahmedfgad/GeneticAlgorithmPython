@@ -241,6 +241,26 @@ def test_random_mutation_manual_call4():
     for value in comp_sorted:
         assert value in value_space
 
+def test_swap_mutation_manual_call():
+    # Any 2 different genes can be swapped.
+    num_genes = 6
+    result, ga_instance = output_crossover_mutation(gene_type=int,
+                                                    num_genes=num_genes,
+                                                    mutation_type="swap")
+
+    temp_offspring = numpy.array([list(range(num_genes))] * 1000)
+    offspring = ga_instance.swap_mutation(offspring=temp_offspring.copy())
+
+    swapped_pairs = set()
+    for solution in offspring:
+        changed = numpy.flatnonzero(solution != numpy.arange(num_genes))
+        # Exactly 2 genes exchange their values.
+        assert len(changed) == 2
+        assert solution[changed[0]] == changed[1] and solution[changed[1]] == changed[0]
+        swapped_pairs.add(tuple(changed))
+
+    assert len(swapped_pairs) == num_genes * (num_genes - 1) // 2
+
 if __name__ == "__main__":
     #### Single-objective
     print()
@@ -284,4 +304,7 @@ if __name__ == "__main__":
     print()
 
     test_random_mutation_manual_call4()
+    print()
+
+    test_swap_mutation_manual_call()
     print()
