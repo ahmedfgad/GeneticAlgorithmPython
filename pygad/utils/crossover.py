@@ -326,7 +326,12 @@ class Crossover:
                 else:
                     beta_q = pow(1.0 / (2.0 - rand_u * alpha), 1.0 / (eta + 1.0))
 
-                child = 0.5 * ((y1 + y2) - beta_q * (y2 - y1))
+                # SBX makes 2 children, symmetric around the parents' mean.
+                # Pick one of them at random so that the child is not always below the mean.
+                if numpy.random.random() < 0.5:
+                    child = 0.5 * ((y1 + y2) - beta_q * (y2 - y1))
+                else:
+                    child = 0.5 * ((y1 + y2) + beta_q * (y2 - y1))
                 child = numpy.clip(child, lower, upper)
                 offspring[k, gene_idx] = child
 
