@@ -80,6 +80,12 @@ class Mutation:
                                                                     gene_idx=gene_idx,
                                                                     sample_size=self.sample_size)
 
+                if self.allow_duplicate_genes == False and value_from_space == offspring[offspring_idx, gene_idx]:
+                    # No value of the gene space is free (e.g. a permutation): swap the gene with another one instead.
+                    offspring[offspring_idx] = self.swap_gene_by_space(solution=offspring[offspring_idx],
+                                                                       gene_idx=gene_idx)
+                    continue
+
                 # Before assigning the selected value from the space to the gene, change its data type and round it.
                 offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
 
@@ -118,6 +124,12 @@ class Mutation:
                     value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
                                                                         gene_idx=gene_idx,
                                                                         sample_size=self.sample_size)
+
+                    if self.allow_duplicate_genes == False and value_from_space == offspring[offspring_idx, gene_idx]:
+                        # No value of the gene space is free (e.g. a permutation): swap the gene with another one instead.
+                        offspring[offspring_idx] = self.swap_gene_by_space(solution=offspring[offspring_idx],
+                                                                           gene_idx=gene_idx)
+                        continue
 
                     # Assigning the selected value from the space to the gene.
                     offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
@@ -200,6 +212,57 @@ class Mutation:
                                                       sample_size=1)
         # Even though its name is singular, it might hold multiple values.
         return value_selected
+
+    def swap_gene_by_space(self,
+                           solution,
+                           gene_idx):
+        """
+        With ``allow_duplicate_genes=False``, a gene cannot take a new
+        value from its space when all of them are used by other genes,
+        as in a permutation (``gene_space=range(num_genes)``). To still
+        change the solution, swap the gene's value with the value of
+        another gene, picked at random among the genes whose value is
+        in this gene's space and whose space holds this gene's value.
+        The swap keeps the genes unique. Genes with a
+        ``gene_constraint`` are not swapped.
+
+        Parameters
+        ----------
+        solution : numpy.ndarray
+            The solution that owns the gene (modified in place).
+        gene_idx : int
+            Index of the gene inside ``solution``.
+
+        Returns
+        -------
+        solution : numpy.ndarray
+            The solution after the swap, unchanged if no gene qualifies.
+        """
+
+        def gene_space_values(idx):
+            if self.gene_space_nested or not self.gene_type_single:
+                return self.gene_space_unpacked[idx]
+            else:
+                return self.gene_space_unpacked
+
+        def has_constraint(idx):
+            return bool(self.gene_constraint and self.gene_constraint[idx])
+
+        if has_constraint(gene_idx):
+            return solution
+
+        gene_value = solution[gene_idx]
+        candidates = [other_idx for other_idx in range(len(solution))
+                      if solution[other_idx] != gene_value
+                      and not has_constraint(other_idx)
+                      and solution[other_idx] in gene_space_values(gene_idx)
+                      and gene_value in gene_space_values(other_idx)]
+
+        if len(candidates) > 0:
+            other_idx = random.choice(candidates)
+            solution[gene_idx] = solution[other_idx]
+            solution[other_idx] = gene_value
+        return solution
 
     def mutation_randomly(self, offspring):
         """
@@ -698,6 +761,12 @@ class Mutation:
                                                                     gene_idx=gene_idx,
                                                                     sample_size=self.sample_size)
 
+                if self.allow_duplicate_genes == False and value_from_space == offspring[offspring_idx, gene_idx]:
+                    # No value of the gene space is free (e.g. a permutation): swap the gene with another one instead.
+                    offspring[offspring_idx] = self.swap_gene_by_space(solution=offspring[offspring_idx],
+                                                                       gene_idx=gene_idx)
+                    continue
+
                 # Assigning the selected value from the space to the gene.
                 offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
 
@@ -842,6 +911,12 @@ class Mutation:
                     value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
                                                                         gene_idx=gene_idx,
                                                                         sample_size=self.sample_size)
+
+                    if self.allow_duplicate_genes == False and value_from_space == offspring[offspring_idx, gene_idx]:
+                        # No value of the gene space is free (e.g. a permutation): swap the gene with another one instead.
+                        offspring[offspring_idx] = self.swap_gene_by_space(solution=offspring[offspring_idx],
+                                                                           gene_idx=gene_idx)
+                        continue
 
                     # Assigning the selected value from the space to the gene.
                     offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)

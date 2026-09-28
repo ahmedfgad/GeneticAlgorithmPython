@@ -241,6 +241,41 @@ def test_random_mutation_manual_call4():
     for value in comp_sorted:
         assert value in value_space
 
+def random_mutation_permutation(gene_space, mutation_probability=None):
+    # Each solution is a permutation of range(num_genes): no value of the gene space is free.
+    num_genes = 8
+    ga_instance = pygad.GA(num_generations=num_generations,
+                           num_parents_mating=2,
+                           fitness_func=lambda ga, solution, idx: random.random(),
+                           sol_per_pop=4,
+                           num_genes=num_genes,
+                           gene_space=gene_space,
+                           gene_type=int,
+                           allow_duplicate_genes=False,
+                           mutation_type="random",
+                           mutation_probability=mutation_probability,
+                           suppress_warnings=True,
+                           random_seed=1)
+
+    temp_offspring = numpy.array([numpy.random.permutation(num_genes) for _ in range(100)])
+    offspring = ga_instance.random_mutation(offspring=temp_offspring.copy())
+
+    for solution in offspring:
+        # The mutation keeps the permutation.
+        assert sorted(solution) == list(range(num_genes))
+    # The mutation changes the solutions.
+    assert numpy.all(numpy.any(offspring != temp_offspring, axis=1))
+
+def test_random_mutation_permutation():
+    random_mutation_permutation(gene_space=list(range(8)))
+
+def test_random_mutation_permutation_probability():
+    random_mutation_permutation(gene_space=list(range(8)),
+                                mutation_probability=1.0)
+
+def test_random_mutation_permutation_nested_gene_space():
+    random_mutation_permutation(gene_space=[list(range(8))] * 8)
+
 if __name__ == "__main__":
     #### Single-objective
     print()
@@ -284,4 +319,13 @@ if __name__ == "__main__":
     print()
 
     test_random_mutation_manual_call4()
+    print()
+
+    test_random_mutation_permutation()
+    print()
+
+    test_random_mutation_permutation_probability()
+    print()
+
+    test_random_mutation_permutation_nested_gene_space()
     print()
