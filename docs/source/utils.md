@@ -316,6 +316,8 @@ Applies the inversion mutation which selects a subset of genes and inverts them.
 
 Applies the scramble mutation which selects a subset of genes and shuffles their order randomly.
 
+The selected contiguous segment has `num_genes // 2` genes. Its values are shuffled directly, preserving the segment's values and leaving genes outside it unchanged. A shuffle can produce the original order; segments with fewer than two genes stay unchanged. The offspring array is modified in place and returned. The simplified implementation can produce every permutation of the selected segment and changes the random draws compared with earlier versions.
+
 #### `adaptive_mutation()`
 
 Applies the adaptive mutation, which selects the number/percentage of genes to mutate based on the solution's fitness. If the fitness is high (the solution quality is high), then a smaller number/percentage of genes is mutated compared to a solution with low fitness.
@@ -417,6 +419,8 @@ Selects the parents using the roulette wheel selection technique.
 #### `stochastic_universal_selection()`
 
 Selects the parents using the stochastic universal selection technique.
+
+`stochastic_universal_selection(fitness, num_parents)` spaces its pointers according to the requested `num_parents`, even when this differs from `num_parents_mating`. It returns the selected parent array and its population indices. Sampling can select the same row more than once; with equal fitness, the evenly spaced pointers distribute selections as evenly as possible. For multiple objectives, the fitness values are summed per solution before constructing the wheel.
 
 #### `nsga2_selection()`
 

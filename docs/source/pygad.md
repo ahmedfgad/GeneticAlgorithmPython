@@ -838,6 +838,32 @@ Accepts the following parameter:
 
 Returns the genetic algorithm instance.
 
+#### Updating the Fitness Function after Loading
+
+The checkpoint includes the fitness function assigned when `save()` was called. Editing a function in the script does not automatically replace the function in a loaded GA. Assign the updated callable explicitly:
+
+```python
+loaded_ga_instance = pygad.load("saved_ga")
+loaded_ga_instance.fitness_func = updated_fitness_func
+loaded_ga_instance.run()
+```
+
+`updated_fitness_func` must accept the same three fitness arguments and return values compatible with the saved `fitness_batch_size`. For example, adding logging while keeping the fitness formula unchanged allows existing fitness values to be reused. Cached solutions still skip the function; replacing the callable does not force every solution to be reevaluated.
+
+If the new function changes the objective, its data, or the meaning of the fitness values, start a fresh GA using the saved chromosomes as its initial population. This avoids reusing scores calculated for the previous objective:
+
+```python
+new_ga_instance = pygad.GA(
+    num_generations=20,
+    num_parents_mating=5,
+    initial_population=loaded_ga_instance.population.copy(),
+    fitness_func=new_objective_fitness_func,
+)
+new_ga_instance.run()
+```
+
+Set the constructor options needed by the new problem, including `gene_type`, `gene_space`, constraints, operators, and batch settings. This starts new fitness histories and generation counters; it reuses the chromosomes, not the previous run's fitness values. A complete example is available in [`examples/example_load_fitness_function.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_load_fitness_function.py).
+
 ## Using PyGAD
 
 ::::{grid} 1 2 2 2

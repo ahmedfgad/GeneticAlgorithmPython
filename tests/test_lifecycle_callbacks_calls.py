@@ -1,7 +1,66 @@
 import pygad
 import random
+import pytest
 
 num_generations = 100
+
+
+@pytest.mark.parametrize("stop_early", [False, True])
+def test_lifecycle_order_includes_fitness_before_generation_callback(stop_early):
+    events = []
+
+    def fitness_func(ga_instance, solution, solution_idx):
+        events.append("fitness")
+        return float(sum(solution))
+
+    def on_start(ga_instance):
+        events.append("on_start")
+
+    def on_fitness(ga_instance, population_fitness):
+        events.append("on_fitness")
+
+    def on_parents(ga_instance, selected_parents):
+        events.append("on_parents")
+
+    def on_crossover(ga_instance, offspring):
+        events.append("on_crossover")
+
+    def on_mutation(ga_instance, offspring):
+        events.append("on_mutation")
+
+    def on_generation(ga_instance):
+        # Reporting with the existing fitness should not call fitness again.
+        ga_instance.best_solution(pop_fitness=ga_instance.last_generation_fitness)
+        events.append("on_generation")
+        if stop_early:
+            return "stop"
+
+    def on_stop(ga_instance, last_population_fitness):
+        events.append("on_stop")
+
+    ga_instance = pygad.GA(num_generations=2,
+                           num_parents_mating=2,
+                           sol_per_pop=4,
+                           num_genes=2,
+                           fitness_func=fitness_func,
+                           parent_selection_type="tournament",
+                           keep_elitism=0,
+                           keep_parents=0,
+                           on_start=on_start,
+                           on_fitness=on_fitness,
+                           on_parents=on_parents,
+                           on_crossover=on_crossover,
+                           on_mutation=on_mutation,
+                           on_generation=on_generation,
+                           on_stop=on_stop,
+                           mutation_num_genes=1,
+                           random_seed=17)
+    ga_instance.run()
+
+    generation_events = ["on_fitness", "on_parents", "on_crossover", "on_mutation"]
+    generation_events += ["fitness"] * ga_instance.sol_per_pop + ["on_generation"]
+    assert events == (["on_start"] + ["fitness"] * ga_instance.sol_per_pop
+                      + generation_events * ga_instance.generations_completed + ["on_stop"])
 
 def number_lifecycle_callback_functions_calls(stop_criteria=None,
                                               on_generation_stop=None,

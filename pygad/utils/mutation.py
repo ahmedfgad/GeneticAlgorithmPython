@@ -537,7 +537,9 @@ class Mutation:
     def scramble_mutation(self, offspring):
         """
         Pick a slice of genes inside each offspring and shuffle the
-        values in that slice into a new random order.
+        values in that slice. The segment contains num_genes // 2 genes;
+        genes outside it are unchanged. A shuffle may keep the original
+        order, and segments with fewer than two genes cannot change.
 
         Parameters
         ----------
@@ -550,14 +552,14 @@ class Mutation:
             The mutated offspring.
         """
 
-        for idx in range(offspring.shape[0]):
-            mutation_gene1 = numpy.random.randint(low=0, high=numpy.ceil(offspring.shape[1]/2 + 1), size=1)[0]
-            mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
-            genes_range = numpy.arange(start=mutation_gene1, stop=mutation_gene2)
-            numpy.random.shuffle(genes_range)
-            
-            genes_to_scramble = numpy.flip(offspring[idx, genes_range])
-            offspring[idx, genes_range] = genes_to_scramble
+        for offspring_idx in range(offspring.shape[0]):
+            segment_start = numpy.random.randint(low=0, high=numpy.ceil(offspring.shape[1]/2 + 1), size=1)[0]
+            segment_end = segment_start + int(offspring.shape[1]/2)
+            # Shuffle values, not indices, so each permutation of the
+            # selected segment is possible without a separate reversal.
+            genes_to_scramble = offspring[offspring_idx, segment_start:segment_end].copy()
+            numpy.random.shuffle(genes_to_scramble)
+            offspring[offspring_idx, segment_start:segment_end] = genes_to_scramble
         return offspring
 
     def adaptive_mutation_population_fitness(self, offspring):

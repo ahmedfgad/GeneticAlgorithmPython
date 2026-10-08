@@ -193,6 +193,49 @@ Its values can be:
 * `1` or `None`: If the `fitness_batch_size` parameter is assigned the value `1` or `None` (default), then the normal flow is used where the fitness function is called for each individual solution. That is if there are 15 solutions, then the fitness function is called 15 times.
 * `1 < fitness_batch_size <= sol_per_pop`: If the `fitness_batch_size` parameter is assigned a value satisfying this condition `1 < fitness_batch_size <= sol_per_pop`, then the solutions are grouped into batches of size `fitness_batch_size` and the fitness function is called once for each batch. In this case, the fitness function must return a list/tuple/numpy.ndarray with a length equal to the number of solutions passed.
 
+(short-fitness-batches)=
+### Why a Fitness Batch Can Be Smaller
+
+`fitness_batch_size` is the maximum number of solutions passed in one call. The final batch is smaller when the number of solutions needing evaluation is not a multiple of that size. Cached parents, elites, and previously saved solutions can also reduce the number of rows to evaluate.
+
+For example, a population of 100 solutions with `fitness_batch_size=10` initially has ten batches of ten. If one elite's fitness is reused in the next generation and all other rows need evaluation, the remaining 99 solutions form nine batches of ten and a final batch of nine. This is expected behavior.
+
+Use the actual input shape in the fitness function, and return exactly one fitness value for every supplied solution:
+
+```python
+def fitness_func(ga_instance, solutions, solutions_indices):
+    # Works for a full batch and for a shorter final batch.
+    return numpy.sum(solutions, axis=1)
+```
+
+Avoid allocating results or reshaping model inputs with a fixed `fitness_batch_size`. Use `len(solutions)` or `solutions.shape[0]` instead. With multiple objectives, return one objective vector per supplied solution. The ordinary index argument lists the evaluated population rows, which can be non-contiguous when cached rows are skipped. Adaptive offspring evaluation receives `None` for the index argument.
+
+The following example prints `10`, `10`, `10`, and `9` as its batch sizes. The initial population requires 20 evaluations, and the next population reuses one elite's fitness:
+
+```python
+import numpy
+import pygad
+
+
+def fitness_func(ga_instance, solutions, solutions_indices):
+    print(f"Batch size: {len(solutions)}")
+    return numpy.sum(solutions, axis=1)
+
+
+initial_population = numpy.arange(40, dtype=float).reshape(20, 2)
+ga_instance = pygad.GA(num_generations=1,
+                       num_parents_mating=5,
+                       initial_population=initial_population,
+                       fitness_func=fitness_func,
+                       fitness_batch_size=10,
+                       keep_elitism=1,
+                       mutation_num_genes=1,
+                       random_seed=17)
+ga_instance.run()
+```
+
+The runnable script is [`examples/example_fitness_batch_size.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_fitness_batch_size.py). The same variable-batch-size contract applies to serial, thread, and process evaluation.
+
 ### Example without `fitness_batch_size` Parameter
 
 This is an example where the `fitness_batch_size` parameter is given the value `None` (which is the default value). This is equivalent to using the value `1`. In this case, the fitness function will be called for each solution. This means the fitness function `fitness_func` will receive only a single solution. This is an example of the passed arguments to the fitness function:

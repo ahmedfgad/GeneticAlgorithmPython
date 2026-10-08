@@ -30,7 +30,7 @@ def on_generation(ga_instance):
     print("on_generation()")
 
 def on_stop(ga_instance, last_population_fitness):
-    print("on_stop")
+    print("on_stop()")
 
 ga_instance = pygad.GA(num_generations=3,
                        num_parents_mating=5,

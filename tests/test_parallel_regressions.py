@@ -154,6 +154,27 @@ def test_partial_cache_and_partial_batches_keep_population_indices(mode):
 
 
 @pytest.mark.parametrize("mode", MODES)
+def test_retained_elite_leaves_a_short_final_fitness_batch(mode):
+    def fitness(ga, solutions, indices):
+        assert len(solutions) in (10, 9)
+        assert len(solutions) == len(indices)
+        return numpy.sum(solutions, axis=1)
+
+    population = numpy.arange(40, dtype=float).reshape(20, 2)
+    ga = make_ga(mode, initial_population=population, num_genes=2,
+                 fitness_func=fitness, fitness_batch_size=10, keep_elitism=1)
+    expected = numpy.sum(population, axis=1)
+    # Give the retained elite a distinct cached value to detect reevaluation.
+    expected[0] = 999.
+    ga.previous_generation_fitness = expected.copy()
+    ga.last_generation_elitism = ga.population[:1].copy()
+    ga.last_generation_elitism_indices = numpy.array([0])
+
+    numpy.testing.assert_array_equal(ga.cal_pop_fitness(), expected)
+    assert ga.num_fitness_evaluations == 19
+
+
+@pytest.mark.parametrize("mode", MODES)
 def test_adaptive_run_counts_real_evaluations(mode):
     ga = make_ga(mode, mutation_type="adaptive", mutation_probability=[0.3, 0.1])
     ga.run()

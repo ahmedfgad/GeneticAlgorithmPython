@@ -328,7 +328,9 @@ class ParentSelection:
         probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(),
                                                                       num_parents=num_parents)
 
-        pointers_distance = 1.0 / self.num_parents_mating # Distance between different pointers.
+        # Space pointers using the requested count, which can differ from
+        # num_parents_mating when this operator is called directly.
+        pointers_distance = 1.0 / num_parents
         first_pointer = numpy.random.uniform(low=0.0,
                                              high=pointers_distance,
                                              size=1)[0] # Location of the first pointer.

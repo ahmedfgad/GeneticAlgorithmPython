@@ -1,6 +1,6 @@
 # Life Cycle of PyGAD
 
-The next figure shows the main steps in the life cycle of a `pygad.GA` instance. The genetic algorithm starts from an initial population and repeats the same steps once per generation. It measures the fitness of every solution, selects the parents, applies crossover and mutation to make offspring, and then builds the next generation. PyGAD stops when all generations are done or when the function passed to the `on_generation` parameter returns the string `stop`.
+The next figure shows the main steps in the life cycle of a `pygad.GA` instance. The genetic algorithm evaluates its initial population, then repeats parent selection, crossover, mutation, population update, and fitness evaluation for each generation. It can reuse cached fitness values. PyGAD stops when all generations are done, a stopping criterion is met, or the function passed to `on_generation` returns the string `stop`.
 
 :::{figure} images/ga_lifecycle.*
 :alt: The PyGAD genetic algorithm life cycle
@@ -19,6 +19,28 @@ The next figure shows the same life cycle in more detail, including the callback
 
 The PyGAD life cycle in detail, including the callback functions called at each stage.
 :::
+
+## Reporting Progress
+
+Use `on_generation` to report progress once a generation has completed. There is no need to change the fitness function or the GA operators:
+
+```python
+def on_generation(ga_instance):
+    print(f"Generation: {ga_instance.generations_completed}")
+    solution, fitness, solution_idx = ga_instance.best_solution(
+        pop_fitness=ga_instance.last_generation_fitness)
+    print(f"Best fitness in the current population: {fitness}")
+
+
+ga_instance = pygad.GA(..., on_generation=on_generation)
+ga_instance.run()
+```
+
+Passing `last_generation_fitness` avoids calculating fitness again just to print the result. For detailed tracing, use the stage callbacks in the complete example below. `on_start` runs before initial fitness evaluation. Each generation calls `on_fitness`, selects parents, applies crossover and mutation, updates the population, evaluates that population, and then calls `on_generation`. `on_stop` receives the final population fitness when the run completes normally or stops early.
+
+`on_fitness` observes the fitness used for parent selection; `on_generation` observes the updated population and its fitness. The diagram shows this ordering, including evaluation after the population update.
+
+## Tracing Every Stage
 
 The next code implements all the callback functions to trace the execution of the genetic algorithm. Each callback function prints its name.
 
@@ -98,3 +120,5 @@ on_generation()
 
 on_stop()
 ```
+
+The same example is available as [`examples/pygad_lifecycle.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/pygad_lifecycle.py). To stop from `on_generation`, return `"stop"`; otherwise no return value is needed.

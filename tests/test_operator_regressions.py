@@ -1,4 +1,4 @@
-"""Edge cases and invariants for the crossover and swap fixes."""
+"""Edge cases and invariants for the crossover and mutation operators."""
 
 import itertools
 
@@ -167,7 +167,8 @@ def test_sbx_respects_distinct_bounds_for_each_gene():
 
 
 @pytest.mark.parametrize("crossover_type,mutation_type", [
-    ("two_points", "swap"), ("sbx", "polynomial")])
+    ("two_points", "swap"), ("sbx", "polynomial"),
+    ("single_point", "scramble")])
 def test_seeded_runs_are_reproducible_with_corrected_operators(crossover_type,
                                                               mutation_type):
     populations = []
@@ -177,3 +178,52 @@ def test_seeded_runs_are_reproducible_with_corrected_operators(crossover_type,
         assert numpy.isfinite(ga.population).all()
         populations.append(ga.population.copy())
     numpy.testing.assert_array_equal(*populations)
+
+
+@pytest.mark.parametrize("num_genes", [4, 5, 6, 7])
+@pytest.mark.parametrize("gene_type", [int, float])
+@pytest.mark.parametrize("segment_position", ["first", "last"])
+def test_scramble_mutation_preserves_values_and_unselected_genes(
+        monkeypatch, num_genes, gene_type, segment_position):
+    ga = _make_ga(num_genes, gene_type=gene_type, mutation_type="scramble")
+    segment_start = (0 if segment_position == "first"
+                     else int(numpy.ceil(num_genes / 2 + 1)) - 1)
+    segment_end = segment_start + num_genes // 2
+    monkeypatch.setattr(numpy.random, "randint",
+                        lambda **options: numpy.array([segment_start]))
+    original = numpy.tile(numpy.arange(num_genes, dtype=gene_type), (64, 1))
+    offspring = original.copy()
+
+    assert ga.scramble_mutation(offspring) is offspring
+    assert offspring.dtype == original.dtype
+    numpy.testing.assert_array_equal(offspring[:, :segment_start],
+                                     original[:, :segment_start])
+    numpy.testing.assert_array_equal(offspring[:, segment_end:],
+                                     original[:, segment_end:])
+    numpy.testing.assert_array_equal(numpy.sort(offspring, axis=1), original)
+    assert numpy.any(offspring != original)
+
+
+def test_scramble_mutation_can_reach_every_permutation_in_selected_segment(monkeypatch):
+    ga = _make_ga(6, gene_type=int, mutation_type="scramble")
+    monkeypatch.setattr(numpy.random, "randint",
+                        lambda **options: numpy.array([0]))
+    offspring = numpy.tile(numpy.arange(6), (256, 1))
+
+    ga.scramble_mutation(offspring)
+
+    observed = {tuple(row[:3]) for row in offspring}
+    # Shuffling indices followed by reversal cannot produce a three-cycle.
+    assert observed == set(itertools.permutations(range(3)))
+
+
+@pytest.mark.parametrize("num_genes", [1, 2, 3])
+@pytest.mark.parametrize("num_offspring", [0, 1, 4])
+def test_scramble_mutation_keeps_segments_with_fewer_than_two_genes(
+        num_genes, num_offspring):
+    ga = _make_ga(num_genes, gene_type=int, mutation_type="scramble")
+    offspring = numpy.tile(numpy.arange(num_genes), (num_offspring, 1))
+    original = offspring.copy()
+
+    assert ga.scramble_mutation(offspring) is offspring
+    numpy.testing.assert_array_equal(offspring, original)
