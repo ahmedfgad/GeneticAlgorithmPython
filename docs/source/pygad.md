@@ -165,7 +165,7 @@ The upper value of the random range from which the gene values in the initial po
 :::{dropdown} `allow_duplicate_genes=True`: Allow repeated values within a solution.
 :animate: fade-in-slide-down
 
-Added in [PyGAD 2.13.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-13-0). If `True`, then a solution/chromosome may have duplicate gene values. If `False`, then each gene will have a unique value in its solution.
+Added in [PyGAD 2.13.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-13-0). If `True`, then a solution/chromosome may have duplicate gene values. If `False`, PyGAD tries to give each gene a different numeric value after conversion and rounding. Repair can follow chains of replacements using each destination gene's space, range, type, precision, and constraint. If no usable alternative is found, duplicates remain with a warning unless warnings are suppressed. See [Prevent Duplicates in Gene Values](https://pygad.readthedocs.io/en/latest/gene_values.html#prevent-duplicates-in-gene-values).
 
 For permutation encodings where every value in `gene_space` is already used, random and adaptive mutation try a compatible swap instead of keeping the selected gene unchanged. The fallback preserves destination gene types, numeric values, gene spaces, uniqueness, and constraints. Each gene can participate in at most one fallback swap per mutation pass. If no compatible partner exists, the gene stays unchanged. See {ref}`Mutation Methods <mutation-methods>`.
 :::
@@ -176,6 +176,8 @@ For permutation encodings where every value in `gene_space` is already used, ran
 The size of the sample of candidate values PyGAD draws when it needs to pick a gene value. It defaults to `100`.
 
 It is useful when `allow_duplicate_genes=False` or `gene_constraint` is used. If PyGAD cannot find a unique value or a value that meets a constraint, increase this parameter.
+
+Duplicate repair considers finite spaces in full. For constraints depending on other genes, an additional search checks up to `sample_size * num_genes` tentative assignments when replacement chains do not satisfy all constraints.
 
 Added in [PyGAD 3.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0). See the [sample_size Parameter](https://pygad.readthedocs.io/en/latest/gene_values.html#sample-size-parameter) section for more information.
 :::
@@ -580,7 +582,7 @@ Constructor settings and user callables are stored as instance attributes, with 
 - `initial_population`: Frozen copy of the initial population, set after `initialize_population` runs.
 - `pop_size`: A `(sol_per_pop, num_genes)` tuple describing the population shape.
 - `gene_type_single`: `True` when every gene shares the same dtype; `False` when `gene_type` is a list/tuple/numpy.ndarray. Added in [PyGAD 2.14.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-14-0).
-- `gene_space_unpacked`: Unpacked version of `gene_space`. For example, `range(1, 5)` becomes `[1, 2, 3, 4]`; `{'low': 2, 'high': 4}` becomes a finite sample. Added in [PyGAD 3.1.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-1-0).
+- `gene_space_unpacked`: A snapshot of the converted finite values and continuous samples in `gene_space`. Generation reads the original space so `None` entries remain random. For example, `range(1, 5)` becomes `[1, 2, 3, 4]`; `{'low': 2, 'high': 4}` becomes a finite sample. Added in [PyGAD 3.1.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-1-0).
 
 ##### Methods
 
@@ -763,15 +765,21 @@ The {ref}`complete fitness dispatch reference <fitness-evaluation>` documents pa
 - `validate_gene_constraint_callable_output(selected_values, values)`: Sanity-check the return value of a user-defined `gene_constraint`.
 - `filter_gene_values_by_constraint(values, solution, gene_idx)`: Run `gene_constraint[gene_idx]` and return the filtered list.
 - `get_valid_gene_constraint_values(...)`: Sample candidate values until one satisfies the gene constraint.
-- `solve_duplicate_genes_randomly(...)`: Resolve duplicate genes by sampling new values from the random range.
-- `solve_duplicate_genes_by_space(...)`: Resolve duplicate genes by sampling new values from `gene_space`.
-- `solve_duplicates_deeply(...)`: Slow, exhaustive fallback for duplicate resolution.
+- `solve_duplicate_genes(solution, build_initial_pop=False, ...)`: Shared repair for a solution using each gene's space, range, type, precision, and constraint. Returns the repaired copy, remaining duplicate indices, and their count. Can follow chains of replacements.
+- `solve_duplicate_genes_in_population(population, build_initial_pop=False)`: Convert and round population rows before applying the shared repair.
+- `get_duplicate_gene_indices(solution)`: Return the indices after the first occurrence of each repeated value.
+- `solution_satisfies_gene_constraints(solution)`: Check every constraint against a complete candidate solution.
+- `get_gene_space_values(...)`: Return converted finite candidates or fresh continuous candidates for one gene.
+- `is_gene_value_in_space(...)`: Check a swap candidate against the original finite space or continuous bounds.
+- `solve_duplicate_genes_randomly(...)`: Compatibility helper for the shared repair using explicit random ranges.
+- `solve_duplicate_genes_by_space(...)`: Compatibility helper for the shared repair using `gene_space`.
+- `solve_duplicates_deeply(...)`: Compatibility helper for replacement-chain repair. Returns `None` when no duplicates are resolved.
 - `unique_int_gene_from_range(...)`: Pick an integer gene that does not already appear in the solution.
 - `unique_float_gene_from_range(...)`: Pick a float gene that does not already appear in the solution.
 - `unique_gene_by_space(...)`: Pick a unique value from `gene_space`.
 - `unique_genes_by_space(...)`: Pick unique values for several genes from `gene_space`.
-- `select_unique_value(...)`: Sample one value uniformly at random from a list of candidates.
-- `find_two_duplicates(solution)`: Locate the first pair of duplicated indices in a solution.
+- `select_unique_value(...)`: Pick an unused candidate when possible, otherwise keep the current value.
+- `find_two_duplicates(solution, gene_space_unpacked)`: Find a duplicated gene with alternative values in its space.
 - `unpack_gene_space(...)`: Materialize the unpacked `gene_space` (used to build `gene_space_unpacked`).
 
 #### Saving, Loading, and Reporting

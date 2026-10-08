@@ -164,22 +164,10 @@ class GAEngine(FitnessEvaluation):
                             # Error by the user's defined gene constraint callable.
                             raise Exception(f"It is expected to receive a list/numpy.ndarray from the gene_constraint callable that is either empty or has a single value equal, but received a list/numpy.ndarray of length {len(filtered_values)}.")
 
-        # 4) Solve duplicate genes.
+        # 4) Solve duplicate genes using the same rules as manual populations.
         if allow_duplicate_genes == False:
-            for solution_idx in range(self.population.shape[0]):
-                if self.gene_space is None:
-                    self.population[solution_idx], _, _ = self.solve_duplicate_genes_randomly(solution=self.population[solution_idx],
-                                                                                              min_val=self.init_range_low,
-                                                                                              max_val=self.init_range_high,
-                                                                                              gene_type=gene_type,
-                                                                                              mutation_by_replacement=True,
-                                                                                              sample_size=self.sample_size)
-                else:
-                    self.population[solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[solution_idx].copy(),
-                                                                                              gene_type=self.gene_type,
-                                                                                              mutation_by_replacement=True,
-                                                                                              sample_size=self.sample_size,
-                                                                                              build_initial_pop=True)
+            self.population = self.solve_duplicate_genes_in_population(
+                self.population, build_initial_pop=True)
 
         # Change the data type and round all genes within the initial population.
         self.population = self.change_population_dtype_and_round(self.population)
@@ -737,6 +725,13 @@ class GAEngine(FitnessEvaluation):
                 else:
                     raise ValueError(f"The output of on_crossover() is expected to be tuple/list/numpy.ndarray but {type(on_crossover_output)} found.")
 
+        # User operators and callbacks can return duplicates, including
+        # duplicates introduced by conversion to the configured gene types.
+        if not self.allow_duplicate_genes and (callable(self.crossover_type) or self.on_crossover is not None):
+            self.last_generation_offspring_crossover = self.solve_duplicate_genes_in_population(
+                self.last_generation_offspring_crossover,
+                build_initial_pop=self.crossover_type == 'sbx')
+
     def run_mutation(self):
         """
         Run the mutation step of one generation. Mutates the
@@ -797,6 +792,11 @@ class GAEngine(FitnessEvaluation):
                         raise ValueError(f"Size mismatch between the output of on_mutation() {on_mutation_output.shape} and the expected mutation output {self.last_generation_offspring_mutation.shape}.")
                 else:
                     raise ValueError(f"The output of on_mutation() is expected to be tuple/list/numpy.ndarray but {type(on_mutation_output)} found.")
+
+        if not self.allow_duplicate_genes and (callable(self.mutation_type) or self.on_mutation is not None):
+            self.last_generation_offspring_mutation = self.solve_duplicate_genes_in_population(
+                self.last_generation_offspring_mutation,
+                build_initial_pop=self.mutation_type == 'polynomial')
 
     def run_update_population(self):
         """
@@ -1071,27 +1071,5 @@ class GAEngine(FitnessEvaluation):
         return population
 
     def _nsga3_resolve_duplicate_genes(self, population):
-        """
-        Apply the same duplicate-resolution path
-        ``initialize_population`` uses, so the grown rows never carry
-        duplicate genes when ``allow_duplicate_genes`` is False.
-        """
-        for solution_idx in range(population.shape[0]):
-            if self.gene_space is None:
-                population[solution_idx], _, _ = self.solve_duplicate_genes_randomly(
-                    solution=population[solution_idx],
-                    min_val=self.init_range_low,
-                    max_val=self.init_range_high,
-                    gene_type=self.gene_type,
-                    mutation_by_replacement=True,
-                    sample_size=self.sample_size,
-                )
-            else:
-                population[solution_idx], _, _ = self.solve_duplicate_genes_by_space(
-                    solution=population[solution_idx].copy(),
-                    gene_type=self.gene_type,
-                    mutation_by_replacement=True,
-                    sample_size=self.sample_size,
-                    build_initial_pop=True,
-                )
-        return population
+        """Repair newly generated rows using initialization rules."""
+        return self.solve_duplicate_genes_in_population(population, build_initial_pop=True)

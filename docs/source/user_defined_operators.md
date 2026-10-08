@@ -10,6 +10,8 @@ This way, the user can only use the built-in functions for each of these operato
 
 Starting from [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0), the user can create a custom crossover, mutation, and parent selection operators and assign these functions to the above parameters. Thus, a new operator can be plugged easily into the [PyGAD Lifecycle](https://pygad.readthedocs.io/en/latest/lifecycle.html#life-cycle-of-pygad).
 
+When `allow_duplicate_genes=False`, PyGAD applies its shared duplicate repair to custom crossover and mutation outputs after the corresponding callback has finished. Values are converted and rounded before repair. This also handles duplicate values returned or changed in place by `on_crossover` and `on_mutation`. If the configured spaces, ranges, or constraints leave no usable alternative, duplicates can remain with a warning. See [Prevent Duplicates in Gene Values](https://pygad.readthedocs.io/en/latest/gene_values.html#prevent-duplicates-in-gene-values).
+
 This is a sample code that does not use any custom function.
 
 ```python

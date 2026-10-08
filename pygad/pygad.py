@@ -129,7 +129,7 @@ class GA(utils.parent_selection.ParentSelection,
 
         suppress_warnings: Added in PyGAD 2.10.0 and its type is bool. If True, then no warning messages will be displayed. It defaults to False.
 
-        allow_duplicate_genes: Added in PyGAD 2.13.0. If True, then a solution/chromosome may have duplicate gene values. If False, then each gene will have a unique value in its solution.
+        allow_duplicate_genes: Added in PyGAD 2.13.0. If True, then a solution/chromosome may have duplicate gene values. If False, PyGAD tries to give every gene a unique numeric value after conversion and rounding, using replacement chains when needed. Duplicates may remain if the spaces, ranges, constraints, or sampling limit leave no usable alternative.
 
         stop_criteria: Added in PyGAD 2.15.0. It is assigned to some criteria to stop the evolution if at least one criterion holds.
 

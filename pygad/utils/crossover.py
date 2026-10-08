@@ -72,19 +72,7 @@ class Crossover:
             offspring[k, crossover_points[k]:] = parents[parent2_idx, crossover_points[k]:]
 
             if self.allow_duplicate_genes == False:
-                if self.gene_space is None:
-                    offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
-                                                                             min_val=self.random_mutation_min_val,
-                                                                             max_val=self.random_mutation_max_val,
-                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                             gene_type=self.gene_type,
-                                                                             sample_size=self.sample_size)
-                else:
-                    offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
-                                                                             gene_type=self.gene_type,
-                                                                             sample_size=self.sample_size,
-                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                             build_initial_pop=False)
+                offspring[k], _, _ = self.solve_duplicate_genes(solution=offspring[k])
         
         return offspring
 
@@ -162,19 +150,7 @@ class Crossover:
             offspring[k, crossover_points_1[k]:crossover_points_2[k]] = parents[parent2_idx, crossover_points_1[k]:crossover_points_2[k]]
 
             if self.allow_duplicate_genes == False:
-                if self.gene_space is None:
-                    offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
-                                                                             min_val=self.random_mutation_min_val,
-                                                                             max_val=self.random_mutation_max_val,
-                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                             gene_type=self.gene_type,
-                                                                             sample_size=self.sample_size)
-                else:
-                    offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
-                                                                             gene_type=self.gene_type,
-                                                                             sample_size=self.sample_size,
-                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                             build_initial_pop=False)
+                offspring[k], _, _ = self.solve_duplicate_genes(solution=offspring[k])
         return offspring
 
     def uniform_crossover(self, parents, offspring_size):
@@ -239,19 +215,7 @@ class Crossover:
                                           parents[parent2_idx, :])
 
             if self.allow_duplicate_genes == False:
-                if self.gene_space is None:
-                    offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
-                                                                             min_val=self.random_mutation_min_val,
-                                                                             max_val=self.random_mutation_max_val,
-                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                             gene_type=self.gene_type,
-                                                                             sample_size=self.sample_size)
-                else:
-                    offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
-                                                                             gene_type=self.gene_type,
-                                                                             sample_size=self.sample_size,
-                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                             build_initial_pop=False)
+                offspring[k], _, _ = self.solve_duplicate_genes(solution=offspring[k])
 
         return offspring
 
@@ -314,7 +278,7 @@ class Crossover:
 
                 if y2 - y1 < near_zero:
                     # The two parents have the same value on this gene.
-                    offspring[k, gene_idx] = p1
+                    offspring[k, gene_idx] = self.change_gene_dtype_and_round(gene_idx, p1)
                     continue
 
                 range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
@@ -338,22 +302,10 @@ class Crossover:
                 else:
                     child = 0.5 * ((y1 + y2) + beta_q * (y2 - y1))
                 child = numpy.clip(child, lower, upper)
-                offspring[k, gene_idx] = child
+                offspring[k, gene_idx] = self.change_gene_dtype_and_round(gene_idx, child)
 
             if self.allow_duplicate_genes == False:
-                if self.gene_space is None:
-                    offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
-                                                                             min_val=self.random_mutation_min_val,
-                                                                             max_val=self.random_mutation_max_val,
-                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                             gene_type=self.gene_type,
-                                                                             sample_size=self.sample_size)
-                else:
-                    offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
-                                                                             gene_type=self.gene_type,
-                                                                             sample_size=self.sample_size,
-                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                             build_initial_pop=False)
+                offspring[k], _, _ = self.solve_duplicate_genes(solution=offspring[k], build_initial_pop=True)
 
         return offspring
 
@@ -421,17 +373,5 @@ class Crossover:
                                           parents[parent2_idx, :])
 
             if self.allow_duplicate_genes == False:
-                if self.gene_space is None:
-                    offspring[k], _, _ = self.solve_duplicate_genes_randomly(solution=offspring[k],
-                                                                             min_val=self.random_mutation_min_val,
-                                                                             max_val=self.random_mutation_max_val,
-                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                             gene_type=self.gene_type,
-                                                                             sample_size=self.sample_size)
-                else:
-                    offspring[k], _, _ = self.solve_duplicate_genes_by_space(solution=offspring[k],
-                                                                             gene_type=self.gene_type,
-                                                                             sample_size=self.sample_size,
-                                                                             mutation_by_replacement=self.mutation_by_replacement,
-                                                                             build_initial_pop=False)
+                offspring[k], _, _ = self.solve_duplicate_genes(solution=offspring[k])
         return offspring

@@ -228,13 +228,11 @@ Then the value of the first gene in the passed solution is `1`. By filtering the
 
 Sometimes it is normal for PyGAD to fail to find a gene value that satisfies the constraint. For example, if the possible gene values are only `[20,30,40]` and the gene constraint restricts the values to be greater than 50, then it is impossible to meet the constraint.
 
-For some other cases, the constraint can be met but with some changes. For example, increasing the range from which a value is sampled. If the `gene_space` is used and assigned `range(10)`, then the gene constraint can be met by using `range(50)` so that we can find values greater than 50.
+For some other cases, the constraint can be met but with some changes. For example, increasing the range from which a value is sampled. If the `gene_space` is used and assigned `range(10)`, then the gene constraint can be met by using `range(100)` so that we can find values greater than 50.
 
-Even if the gene space is already assigned `range(1000)`, it might still not find values that meet the constraints. This is because PyGAD samples a number of values equal to the `sample_size` parameter which defaults to *100*. 
+Finite gene spaces, such as `range(1000)`, provide their full candidate list for constraint checks. When candidates come from random sampling, a larger `sample_size` can increase the chance of finding a value that meets a narrow constraint.
 
-Out of the range of *1000* numbers, all the 100 values might not be satisfying the constraint. This issue could be solved by simply assigning a larger value for the `sample_size` parameter.
-
-> PyGAD does not yet handle the **dependencies** among the genes in the `gene_constraint` parameter. 
+> Initialization and ordinary mutation apply gene constraints sequentially. They do not determine the dependency order among the genes automatically.
 >
 > This is an example where gene 0 depends on gene 1. To efficiently enforce the constraints, the constraint for gene 1 must be enforced first (if not `None`) then the constraint for gene 0. 
 >
@@ -247,6 +245,8 @@ Out of the range of *1000* numbers, all the 100 values might not be satisfying t
 > ```
 >
 > PyGAD applies constraints sequentially, starting from the first gene to the last. To ensure correct behavior when genes depend on each other, structure your GA problem so that if gene X depends on gene Y, then gene Y appears earlier in the chromosome (solution) than gene X. As a result, its gene constraint will be earlier in the list.
+
+Duplicate repair also checks all constraints against complete candidate solutions before accepting changes. Its additional search for dependent constraints is bounded by `sample_size`; this does not reorder the general initialization or mutation constraint checks.
 
 ### Full Example
 
@@ -270,11 +270,17 @@ If the objective is to find a unique value or enforce the gene constraint, then 
 
 Sometimes 100 values is not enough and PyGAD sometimes fails to find a good value. In this case, it is highly recommended to increase the `sample_size` parameter. This is to create a larger sample to increase the chance of finding a value that meets our objectives.
 
+For duplicate repair, finite spaces are considered in full. These include lists, tuples, NumPy arrays, `range` objects, stepped dictionaries, and integer random ranges. Increasing `sample_size` is useful for continuous candidates and constraints that depend on other genes; it is not needed to explore a larger finite space.
+
+When replacement chains do not satisfy a dependent constraint, PyGAD also tries alternative complete assignments. This additional search considers up to `sample_size * num_genes` tentative gene assignments. A larger value allows more alternatives to be checked. The limit prevents arbitrary constraint functions from requiring an unbounded combinatorial search.
+
 ## Prevent Duplicates in Gene Values
 
 In [PyGAD 2.13.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-13-0), a new bool parameter called `allow_duplicate_genes` is supported to control whether duplicates are supported in the chromosome or not. In other words, whether 2 or more genes might have the same exact value. 
 
-If `allow_duplicate_genes=True` (which is the default case), genes may have the same value. If `allow_duplicate_genes=False`, then no 2 genes will have the same value given that there are enough unique values for the genes.
+If `allow_duplicate_genes=True` (which is the default case), genes may have the same value. If `allow_duplicate_genes=False`, PyGAD tries to give each gene a different numeric value within its solution. Duplicates are checked after applying the configured gene types and rounding. Mixed numeric types are compared by their exact stored values; for example, integer 1 and float 1.0 duplicate each other.
+
+The same repair is used for generated and manually supplied initial populations, crossover, mutation, and NSGA-III population growth. It also checks outputs from custom crossover and mutation functions and the `on_crossover` and `on_mutation` callbacks. Duplicate solutions in different population rows are allowed; this parameter controls repeated values within a single row.
 
 The next code gives an example to use the `allow_duplicate_genes` parameter. A callback generation function is implemented to print the population after each generation. 
 
@@ -398,79 +404,44 @@ Generation 5
  [1 2 4 3]]
 ```
 
-You should give enough values for the genes so that PyGAD can find an alternative when a gene value duplicates another gene.
+(solve-duplicates-using-a-third-gene)=
 
-If PyGAD fails to find a unique gene value while there is still room to find one, then set the `sample_size` parameter to a larger value. Check the [sample_size Parameter](https://pygad.readthedocs.io/en/latest/gene_values.html#sample-size-parameter) section for more information.
+### Repair through Other Genes
 
-### Limitation
+There must be enough distinct values that can be assigned to the individual genes. Counting all values in the combined space is not sufficient. For example, `gene_space=[[0], [0], [1, 2]]` cannot give the first two genes different values.
 
-There might be 2 duplicate genes where changing either of the 2 duplicating genes will not solve the problem. For example, if `gene_space=[[3, 0, 1], [4, 1, 2], [0, 2], [3, 2, 0]]` and the solution is `[3 2 0 0]`, then the values of the last 2 genes duplicate. There are no possible changes in the last 2 genes to solve the problem. 
+Repair first tries unused values. If a needed value is already used by another gene, PyGAD looks for an alternative for that gene. This can involve either duplicate occurrence and a chain of several replacements. The chain is applied together so no temporary duplicate is treated as a finished solution.
 
-This problem can be solved by randomly changing one of the non-duplicating genes to make room for a unique value in one of the 2 duplicating genes. For example, by changing the second gene from 2 to 4, then any of the last 2 genes can take the value 2 and solve the duplicates. The resultant gene is then `[3 4 2 0]`. But this option is not yet supported in PyGAD.
-
-### Solve Duplicates using a Third Gene
-
-When `allow_duplicate_genes=False` and a user-defined `gene_space` is used, it sometimes happens that there is no room to solve the duplicates between the 2 genes by simply replacing the value of one gene with another. In [PyGAD 3.1.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-1-0), the duplicates are solved by looking for a third gene that helps solve them. The following examples explain how it works.
-
-Example 1:
-
-Let's assume that this gene space is used and there is a solution with 2 duplicate genes with the same value 4.
+For example:
 
 ```python
-Gene space: [[2, 3],
-             [3, 4],
-             [4, 5],
-             [5, 6]]
-Solution: [3, 4, 4, 5]
+gene_space = [[0, 1], [1, 2], [2, 3], [0]]
+initial_population = [[0, 1, 2, 0], [0, 1, 2, 0]]
 ```
 
-By checking the gene space, the second gene can have the values `[3, 4]` and the third gene can have the values `[4, 5]`. To solve the duplicates, we change the value of one of these 2 genes.
+The last gene can only keep 0. Repair moves the third gene from 2 to 3, the second gene from 1 to 2, and the first gene from 0 to 1. The repaired solution is `[1, 2, 3, 0]`. Each replacement belongs to its destination gene's space.
 
-If the value of the second gene changes from 4 to 3, then it will duplicate the first gene. If we change the value of the third gene from 4 to 5, then it will duplicate the fourth gene. In short, simply selecting a different value for either the second or third gene will introduce new duplicate genes.
+This behavior also handles third-gene repairs, such as changing `[3, 4, 4, 5]` into `[2, 3, 4, 5]` for `gene_space=[[2, 3], [3, 4], [4, 5], [5, 6]]`.
 
-When there are 2 duplicate genes but there is no way to solve their duplicates, then the solution is to change a third gene that makes a room to solve the duplicates between the 2 genes.
+A runnable example is available in [`examples/example_duplicate_gene_repair.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_duplicate_gene_repair.py).
 
-In our example, duplicates between the second and third genes can be solved by, for example,:
+### Ranges, Types, and Constraints
 
-* Changing the first gene from 3 to 2 then changing the second gene from 4 to 3. 
-* Or changing the fourth gene from 5 to 6 then changing the third gene from 4 to 5. 
+Each replacement uses its own gene's range, type, precision, and constraint. Initialization uses `init_range_low` and `init_range_high` with replacement. Random and adaptive mutation use `random_mutation_min_val` and `random_mutation_max_val`, respecting `mutation_by_replacement`. SBX crossover and polynomial mutation use their per-gene initialization bounds for repair.
 
-Generally, this is how to solve such duplicates:
+An explicit gene-space value replaces the gene regardless of `mutation_by_replacement`. A nested space entry of `None` follows the random-mutation mode. A `None` inside a list, tuple, or array supplies fresh replacement candidates from the relevant initialization or mutation range. It is not frozen into a single cached initial value.
 
-1. For any duplicate gene **GENE1**, select another value.
-2. Check which other gene **GENEX** has duplicate with this new value.
-3. Find if **GENEX** can have another value that will not cause any more duplicates. If so, go to step 7.
-4. If all the other values of **GENEX** will cause duplicates, then try another gene **GENEY**.
-5. Repeat steps 3 and 4 until exploring all the genes. 
-6. If there is no way to solve the duplicates, then we have to keep the duplicate value.
-7. If a value for a gene **GENEM** is found that will not cause more duplicates, then use this value for the gene **GENEM**.
-8. Replace the value of the gene **GENE1** by the old value of the gene **GENEM**. This solves the duplicates.
+Constraints on other genes may depend on a replaced position. PyGAD checks all constraints against a complete repaired solution before accepting it. If the repair would violate another gene's constraint, that assignment is rejected and alternatives are considered.
 
-This is an example to solve the duplicate for the solution `[3, 4, 4, 5]`:
+Manually supplied values and values inherited from parents are kept when possible. Supplying a population does not automatically replace every value outside `gene_space` or the initialization range. New repair values follow the configured destination space or range.
 
-1. Let's use the second gene with value 4. Because the space of this gene is `[3, 4]`, then the only other value we can select is 3.
-2. The first gene also has the value 3.
-3. The first gene has another value 2 that will not cause more duplicates in the solution. Then go to step 7.
-4. Skip.
-5. Skip.
-6. Skip.
-7. The value of the first gene 3 will be replaced by the new value 2. The new solution is [2, 4, 4, 5].
-8. Replace the value of the second gene 4 by the old value of the first gene which is 3. The new solution is [2, 3, 4, 5]. The duplicate is solved.
+### When Duplicates Remain
 
-Example 2:
+Finite spaces without dependent constraints are searched completely, including replacement chains. If no unique assignment exists, repair keeps as many distinct values as possible and reports the remaining duplicates with warnings unless `suppress_warnings=True`.
 
-```python
-Gene space: [[0, 1], 
-             [1, 2], 
-             [2, 3],
-             [3, 4]]
-Solution: [1, 2, 2, 3]
-```
+Continuous ranges are sampled, so finding every possible value cannot be guaranteed. Rounding or a narrow numeric type can also reduce the number of distinct available values. Increase `sample_size` when continuous sampling or the additional search for dependent constraints needs more candidates or alternatives. If no constraint-valid improvement is found, existing values are retained instead of accepting a repair that violates a constraint.
 
-The quick summary is:
-
-* Change the value of the first gene from 1 to 0. The solution becomes [0, 2, 2, 3].
-* Change the value of the second gene from 2 to 1. The solution becomes [0, 1, 2, 3]. The duplicate is solved.
+Changes made directly to the population in other callbacks remain the responsibility of those callbacks. Custom operators still need to generate meaningful values for the problem; duplicate repair is not a general validator of every custom operator output.
 
 ## More about the `gene_type` Parameter
 

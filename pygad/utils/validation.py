@@ -160,7 +160,7 @@ class Validation:
             if len(gene_space) == 0:
                 self.valid_parameters = False
                 raise ValueError("'gene_space' cannot be empty (i.e. its length must be >= 0).")
-        elif type(gene_space) in [list, numpy.ndarray]:
+        elif type(gene_space) in [list, tuple, numpy.ndarray]:
             if len(gene_space) == 0:
                 self.valid_parameters = False
                 raise ValueError("'gene_space' cannot be empty (i.e. its length must be >= 0).")
@@ -508,22 +508,9 @@ class Validation:
             # Change the data type and round all genes within the initial population.
             self.initial_population = self.change_population_dtype_and_round(initial_population)
 
-            # Check if duplicates are allowed. If not, then solve any existing duplicates in the passed initial population.
             if self.allow_duplicate_genes == False:
-                for initial_solution_idx, initial_solution in enumerate(self.initial_population):
-                    if self.gene_space is None:
-                        self.initial_population[initial_solution_idx], _, _ = self.solve_duplicate_genes_randomly(solution=initial_solution,
-                                                                                                                  min_val=self.init_range_low,
-                                                                                                                  max_val=self.init_range_high,
-                                                                                                                  mutation_by_replacement=True,
-                                                                                                                  gene_type=self.gene_type,
-                                                                                                                  sample_size=self.sample_size)
-                    else:
-                        self.initial_population[initial_solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=initial_solution,
-                                                                                                                  gene_type=self.gene_type,
-                                                                                                                  sample_size=self.sample_size,
-                                                                                                                  mutation_by_replacement=True,
-                                                                                                                  build_initial_pop=True)
+                self.initial_population = self.solve_duplicate_genes_in_population(
+                    self.initial_population, build_initial_pop=True)
 
             # A NumPy array holding the initial population.
             self.population = self.initial_population.copy()
@@ -2068,6 +2055,17 @@ class Validation:
                                  num_genes,
                                  initial_population)
 
+        # Repair can call constraints while building either generated or
+        # manually supplied populations. Validate and store them first.
+        if initial_population is not None and numpy.asarray(initial_population).ndim == 2:
+            self.num_genes = numpy.asarray(initial_population).shape[1]
+        else:
+            self.num_genes = num_genes
+        self._validate_gene_constraint(gene_constraint)
+        if self.gene_space_nested and len(gene_space) != self.num_genes:
+            self.valid_parameters = False
+            raise ValueError(f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
+
         # Call the unpack_gene_space() method in the pygad.helper.unique.Unique class.
         self.gene_space_unpacked = self.unpack_gene_space(range_min=self.init_range_low,
                                                           range_max=self.init_range_high)
@@ -2079,16 +2077,8 @@ class Validation:
                                        allow_duplicate_genes,
                                        gene_constraint)
 
-        # In case the 'gene_space' parameter is nested, then make sure the number of its elements equals to the number of genes.
-        if self.gene_space_nested:
-            if len(gene_space) != self.num_genes:
-                self.valid_parameters = False
-                raise ValueError(f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
-
         self._validate_mutation_range(random_mutation_min_val,
                                       random_mutation_max_val)
-
-        self._validate_gene_constraint(gene_constraint)
 
         # Validating the number of parents to be selected for mating (num_parents_mating)
         if num_parents_mating <= 0:
