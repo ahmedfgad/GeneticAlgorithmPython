@@ -47,8 +47,10 @@ class Plot:
         font_size : numeric
             Positive font size. The figure scales with the font size.
         show_parameters : bool
-            If True, include stage parameters and a configuration
-            panel. If False, show a compact chart with handler names.
+            If True, include stage parameters, decision conditions,
+            and a configuration panel. If False, show a compact chart
+            with handler names. Disabled operators and unset callbacks
+            are omitted in either view.
         save_dir : str or None
             If set, save the figure to this path. The extension
             determines the format, for example SVG, PNG, or PDF.

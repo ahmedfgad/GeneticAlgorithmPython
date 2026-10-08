@@ -79,32 +79,29 @@ def _describe_lifecycle(ga_instance, show_parameters=True):
         fitness_parameters.append(f"Batch size: {ga_instance.fitness_batch_size}")
     fitness_parameters.append("Reuse available fitness where applicable")
 
-    add_stage("population", "Population ready", "population",
+    add_stage("population", "Population Ready", "population",
               parameters=[f"Shape: {population_shape}", "Prepared before run()"])
     add_callback("on_start")
-    add_stage("initial_fitness", "Evaluate initial fitness", handler=ga_instance.fitness_func,
+    add_stage("initial_fitness", "Evaluate Initial Fitness", handler=ga_instance.fitness_func,
               parameters=fitness_parameters)
     if ga_instance.parent_selection_type in ("nsga3", "tournament_nsga3"):
-        add_stage("reference_points", "Prepare NSGA-III reference points",
+        add_stage("reference_points", "Prepare NSGA-III Reference Points",
                   parameters=[f"Divisions: {ga_instance.nsga3_num_divisions}",
                               "Grow population and evaluate added solutions if needed"])
 
-    add_stage("generation_check", "Generations remaining?", "decision",
+    add_stage("generation_check", "Generations Remaining?", "decision",
               parameters=[f"{ga_instance.num_generations} generations per run()"])
     add_callback("on_fitness")
 
     selection_parameters = [f"Parents: ({ga_instance.num_parents_mating}, {ga_instance.num_genes})"]
     if ga_instance.parent_selection_type in ("tournament", "tournament_nsga2", "tournament_nsga3"):
         selection_parameters.append(f"Tournament size: {ga_instance.K_tournament}")
-    add_stage("selection", "Select parents", handler=ga_instance.select_parents,
+    add_stage("selection", "Select Parents", handler=ga_instance.select_parents,
               parameters=selection_parameters)
     add_callback("on_parents")
 
     crossover_parameters = [f"Offspring: {offspring_shape}"]
-    if ga_instance.crossover_type is None:
-        add_stage("crossover", "Crossover bypassed", "bypass",
-                  parameters=["Copy existing solutions", f"Offspring: {offspring_shape}"])
-    else:
+    if ga_instance.crossover_type is not None:
         if not callable(ga_instance.crossover_type):
             if ga_instance.crossover_probability is not None:
                 crossover_parameters.append(f"Probability: {ga_instance.crossover_probability}")
@@ -116,10 +113,7 @@ def _describe_lifecycle(ga_instance, show_parameters=True):
     add_callback("on_crossover")
 
     mutation_parameters = [f"Offspring: {offspring_shape}"]
-    if ga_instance.mutation_type is None:
-        add_stage("mutation", "Mutation bypassed", "bypass",
-                  parameters=["Keep offspring unchanged", f"Offspring: {offspring_shape}"])
-    else:
+    if ga_instance.mutation_type is not None:
         if ga_instance.mutation_type in ("random", "adaptive", "polynomial"):
             if ga_instance.mutation_type == "polynomial":
                 probability = ga_instance.mutation_probability
@@ -157,10 +151,10 @@ def _describe_lifecycle(ga_instance, show_parameters=True):
         retention_text = f"Keep {ga_instance.keep_parents} parent(s)"
     else:
         retention_text = "Keep no parents or elite solutions"
-    add_stage("update_population", "Update population",
+    add_stage("update_population", "Update Population",
               parameters=[retention_text, f"Add {ga_instance.num_offspring} offspring",
                           f"Population: {population_shape}"])
-    add_stage("generation_fitness", "Evaluate updated population", handler=ga_instance.fitness_func,
+    add_stage("generation_fitness", "Evaluate Updated Population", handler=ga_instance.fitness_func,
               parameters=fitness_parameters)
     add_callback("on_generation")
 
@@ -171,14 +165,14 @@ def _describe_lifecycle(ga_instance, show_parameters=True):
         for criterion in ga_instance.stop_criteria:
             stopping_parameters.append("_".join(str(value) for value in criterion))
     if stopping_parameters:
-        add_stage("early_stop", "Stop early?", "decision",
-                  parameters=stopping_parameters)
+        add_stage("early_stop", "Stop Early?", "decision",
+                  parameters=["Any condition below:"] + stopping_parameters)
     last_generation_stage = stages[-1]["id"]
 
-    add_stage("finalize", "Finalize results",
+    add_stage("finalize", "Finalize Results",
               parameters=["Refresh final parents and elitism", "Record best solution fitness"])
     add_callback("on_stop")
-    add_stage("complete", "Run complete", "end")
+    add_stage("complete", "Run Complete", "end")
 
     connections = []
     for source, target in zip(stages, stages[1:]):
@@ -192,7 +186,7 @@ def _describe_lifecycle(ga_instance, show_parameters=True):
     connections.append({"source": "generation_check", "target": "finalize",
                         "label": "No", "route": "finish"})
     connections.append({"source": last_generation_stage, "target": "generation_check",
-                        "label": "No" if stopping_parameters else "Next generation",
+                        "label": "No" if stopping_parameters else "Next Generation",
                         "route": "repeat"})
     if stopping_parameters:
         connections.append({"source": "early_stop", "target": "finalize",
@@ -213,14 +207,8 @@ def _describe_lifecycle(ga_instance, show_parameters=True):
         gene_type_text = (gene_type_names[0] if ga_instance.gene_type_single
                           else "Per gene: " + _lifecycle_parameter_text(gene_type_names))
         configuration.extend([("Population", population_shape),
-                              ("Generations per run", str(ga_instance.num_generations)),
-                              ("Gene type", gene_type_text)])
-        if ga_instance.stop_criteria is not None:
-            criteria_text = ["_".join(str(value) for value in criterion)
-                             for criterion in ga_instance.stop_criteria]
-            configuration.append(("Stop when any criterion is met", ", ".join(criteria_text)))
-        if ga_instance.on_generation is not None:
-            configuration.append(("Callback stop", 'on_generation() returns "stop"'))
+                              ("Generations Per Run", str(ga_instance.num_generations)),
+                              ("Gene Type", gene_type_text)])
         if ga_instance.last_generation_fitness is not None:
             first_fitness = ga_instance.last_generation_fitness[0]
             objectives = len(first_fitness) if isinstance(first_fitness, (list, tuple, numpy.ndarray)) else 1
@@ -228,20 +216,20 @@ def _describe_lifecycle(ga_instance, show_parameters=True):
         else:
             configuration.append(("Objectives", "Known after fitness evaluation"))
         if ga_instance.gene_space is not None:
-            configuration.append(("Gene space", _lifecycle_parameter_text(ga_instance.gene_space)))
+            configuration.append(("Gene Space", _lifecycle_parameter_text(ga_instance.gene_space)))
         else:
-            configuration.append(("Initial population range", _lifecycle_parameter_text(
+            configuration.append(("Initial Population Range", _lifecycle_parameter_text(
                 (ga_instance.init_range_low, ga_instance.init_range_high))))
         if ga_instance.gene_constraint is not None:
             constraint_count = sum(constraint is not None for constraint in ga_instance.gene_constraint)
-            configuration.append(("Gene constraints", f"{constraint_count} constrained gene(s)"))
-        configuration.append(("Allow duplicate genes", str(ga_instance.allow_duplicate_genes)))
+            configuration.append(("Gene Constraints", f"{constraint_count} constrained gene(s)"))
+        configuration.append(("Allow Duplicate Genes", str(ga_instance.allow_duplicate_genes)))
         if ga_instance.parallel_processing is not None:
-            configuration.append(("Parallel fitness evaluation", _lifecycle_parameter_text(ga_instance.parallel_processing)))
+            configuration.append(("Parallel Fitness Evaluation", _lifecycle_parameter_text(ga_instance.parallel_processing)))
         if ga_instance.random_seed is not None:
-            configuration.append(("Random seed", str(ga_instance.random_seed)))
-        configuration.extend([("Save solutions", str(ga_instance.save_solutions)),
-                              ("Save best solutions", str(ga_instance.save_best_solutions))])
+            configuration.append(("Random Seed", str(ga_instance.random_seed)))
+        configuration.extend([("Save Solutions", str(ga_instance.save_solutions)),
+                              ("Save Best Solutions", str(ga_instance.save_best_solutions))])
 
     return {"stages": stages, "connections": connections,
             "configuration": configuration}
@@ -293,7 +281,6 @@ def _draw_lifecycle(lifecycle, matplt, title, font_size):
               "population": ("#e8eef9", "#4773ba"),
               "callback": ("#e6f5ef", "#26866c"),
               "decision": ("#fff4da", "#b38325"),
-              "bypass": ("#f1f3f5", "#8492a3"),
               "end": ("#253e65", "#253e65")}
     text_color = "#25354b"
     arrow_color = "#718198"
@@ -307,17 +294,16 @@ def _draw_lifecycle(lifecycle, matplt, title, font_size):
     current_top = 0.82 + 0.27 * len(title_lines)
 
     for stage in lifecycle["stages"]:
-        title_text = wrap_text(stage["title"], stage_width - 0.4, font_size, "bold")
+        # Put decision questions and their conditions inside the middle
+        # half of the diamond, where the sloping sides leave room for text.
+        text_width = stage_width / 2 - 0.2 if stage["kind"] == "decision" else stage_width - 0.4
+        title_text = wrap_text(stage["title"], text_width, font_size, "bold")
         detail_lines = []
-        # Decision settings live in the configuration panel. Keeping
-        # just the question in each diamond avoids crowded corners.
-        if stage["kind"] != "decision":
-            for detail in stage["details"]:
-                detail_lines.extend(wrap_text(detail, stage_width - 0.4, font_size * 0.88))
+        for detail in stage["details"]:
+            detail_lines.extend(wrap_text(detail, text_width, font_size * 0.88))
         stage_height = 0.30 + 0.20 * len(title_text) + 0.17 * len(detail_lines)
         if stage["kind"] == "decision":
-            # A broad diamond keeps its text inside the sloping edges.
-            stage_height = max(0.95, stage_height + 0.45)
+            stage_height = max(0.95, 2 * stage_height)
         stage_positions[stage["id"]] = {"top": current_top, "bottom": current_top + stage_height,
                                          "center": current_top + stage_height / 2,
                                          "height": stage_height}
@@ -340,7 +326,7 @@ def _draw_lifecycle(lifecycle, matplt, title, font_size):
     axes.axis("off")
     axes.text(0.7, 0.28, "\n".join(title_lines), fontsize=font_size * 1.4,
               weight="bold", color=text_color, va="top", parse_math=False)
-    axes.text(0.7, current_top + 0.12, "Configured lifecycle | Operators / callbacks / decisions",
+    axes.text(0.7, current_top + 0.12, "Configured Lifecycle | Operators / Callbacks / Decisions",
               fontsize=font_size * 0.82, color=arrow_color, va="top", parse_math=False)
 
     for stage, title_text, detail_lines in wrapped_stages:
@@ -356,8 +342,7 @@ def _draw_lifecycle(lifecycle, matplt, title, font_size):
             card = FancyBboxPatch((stage_center - stage_width / 2, position["top"]),
                                  stage_width, position["height"],
                                  boxstyle="round,pad=0,rounding_size=0.10",
-                                 facecolor=fill_color, edgecolor=border_color, linewidth=1.2,
-                                 linestyle="--" if stage["kind"] == "bypass" else "-")
+                                 facecolor=fill_color, edgecolor=border_color, linewidth=1.2)
         axes.add_patch(card)
         text_top = position["center"] - (0.20 * len(title_text) + 0.17 * len(detail_lines)) / 2
         stage_text_color = "#ffffff" if stage["kind"] == "end" else text_color

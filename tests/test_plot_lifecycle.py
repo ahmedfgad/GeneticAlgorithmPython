@@ -72,7 +72,7 @@ def test_plot_lifecycle_before_run_has_no_execution_side_effects():
         matplt.close(fig)
 
 
-def test_lifecycle_callback_order_matches_execution_with_bypassed_operators():
+def test_lifecycle_callback_order_matches_execution_with_disabled_operators():
     events = []
 
     def fitness_func_recorded(ga_instance, solution, solution_idx):
@@ -110,8 +110,8 @@ def test_lifecycle_callback_order_matches_execution_with_bypassed_operators():
                                      on_generation=on_generation, on_stop=on_stop)
     lifecycle = _describe_lifecycle(ga_instance)
     stages = {stage["id"]: stage for stage in lifecycle["stages"]}
-    assert stages["crossover"]["kind"] == "bypass"
-    assert stages["mutation"]["kind"] == "bypass"
+    assert "crossover" not in stages
+    assert "mutation" not in stages
     assert stages["generation_fitness"]["details"][0] == "fitness_func_recorded()"
 
     ga_instance.run()
@@ -209,7 +209,7 @@ def test_lifecycle_multi_objective_after_run(parent_selection_type):
         labels = figure_text(fig)
         assert "Population fitness: (8, 2)" in labels
         assert "Known after fitness evaluation" not in labels
-        assert ("Prepare NSGA-III reference points" in labels) == (parent_selection_type == "nsga3")
+        assert ("Prepare NSGA-III Reference Points" in labels) == (parent_selection_type == "nsga3")
         assert ga_instance.num_fitness_evaluations == original_evaluation_count
         numpy.testing.assert_array_equal(ga_instance.last_generation_fitness, original_fitness)
     finally:
@@ -259,6 +259,93 @@ def test_lifecycle_polynomial_mutation_and_sbx_parameters():
         # is supplied, rather than mutation_num_genes.
         assert "Probability per gene: 0.25" in labels
         assert "Genes to mutate:" not in labels
+    finally:
+        matplt.close(fig)
+
+
+@pytest.mark.parametrize("crossover_type,mutation_type", [
+    (None, None), (None, "random"), ("single_point", None), ("single_point", "random"),
+])
+def test_lifecycle_only_shows_enabled_operators(crossover_type, mutation_type):
+    ga_instance = create_ga_instance(crossover_type=crossover_type, mutation_type=mutation_type)
+    lifecycle = _describe_lifecycle(ga_instance)
+    stage_identifiers = {stage["id"] for stage in lifecycle["stages"]}
+    assert ("crossover" in stage_identifiers) == (crossover_type is not None)
+    assert ("mutation" in stage_identifiers) == (mutation_type is not None)
+    # Skipping operators must reconnect the remaining stages without
+    # leaving an arrow to a block that is no longer drawn.
+    for connection in lifecycle["connections"]:
+        assert connection["source"] in stage_identifiers
+        assert connection["target"] in stage_identifiers
+    fig = ga_instance.plot_lifecycle(show=False)
+    try:
+        labels = figure_text(fig).splitlines()
+        assert ("Crossover" in labels) == (crossover_type is not None)
+        assert ("Mutation" in labels) == (mutation_type is not None)
+    finally:
+        matplt.close(fig)
+
+
+@pytest.mark.parametrize("with_callback,stop_criteria", [
+    (False, None), (True, None), (False, ["reach_20", "saturate_3"]),
+    (True, ["reach_20", "time_10", "evaluations_100"]),
+])
+def test_lifecycle_stop_conditions_appear_inside_the_decision(with_callback, stop_criteria):
+    def on_generation(ga_instance):
+        # Drawing cannot predict this callback's result; it should
+        # describe the possible stop even when the function returns None.
+        return None
+
+    ga_instance = create_ga_instance(on_generation=on_generation if with_callback else None,
+                                     stop_criteria=stop_criteria)
+    fig = ga_instance.plot_lifecycle(show=False)
+    try:
+        fig.canvas.draw()
+        renderer = fig.canvas.get_renderer()
+        axes = fig.axes[0]
+        decisions = [card for card in axes.patches if isinstance(card, matplotlib.patches.Polygon)]
+        assert len(decisions) == (2 if with_callback or stop_criteria else 1)
+        if not with_callback and not stop_criteria:
+            assert "Stop Early?" not in figure_text(fig)
+            return
+        stop_decision = decisions[-1]
+        decision_path = stop_decision.get_path().transformed(stop_decision.get_transform())
+        decision_texts = [text for text in axes.texts
+                          if stop_decision.get_window_extent(renderer).contains(
+                              *text.get_window_extent(renderer).get_points()[0])]
+        labels = "\n".join(text.get_text().replace("\n", " ") for text in decision_texts)
+        assert "Stop Early?" in labels
+        assert ('on_generation() returns "stop"' in labels) == with_callback
+        for criterion in ga_instance.stop_criteria or []:
+            assert "_".join(str(value) for value in criterion) in labels
+        for text in decision_texts:
+            text_bounds = text.get_window_extent(renderer)
+            corners = [(text_bounds.x0, text_bounds.y0), (text_bounds.x1, text_bounds.y0),
+                       (text_bounds.x0, text_bounds.y1), (text_bounds.x1, text_bounds.y1)]
+            assert decision_path.contains_points(corners).all(), text.get_text()
+    finally:
+        matplt.close(fig)
+
+
+def test_lifecycle_titles_use_capital_initials_and_preserve_method_names():
+    def on_generation(ga_instance):
+        return None
+
+    ga_instance = create_ga_instance(on_generation=on_generation)
+    lifecycle = _describe_lifecycle(ga_instance)
+    for stage in lifecycle["stages"]:
+        if stage["kind"] == "callback":
+            assert stage["title"] == stage["id"] + "()"
+        else:
+            assert all(word[0].isupper() for word in stage["title"].split())
+    for label, value in lifecycle["configuration"]:
+        assert all(word[0].isupper() for word in label.split())
+    fig = ga_instance.plot_lifecycle(show=False)
+    try:
+        labels = figure_text(fig)
+        assert "fitness_func()" in labels
+        assert "on_generation()" in labels
+        assert "On_Generation()" not in labels
     finally:
         matplt.close(fig)
 

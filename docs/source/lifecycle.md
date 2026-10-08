@@ -28,7 +28,7 @@ Call `plot_lifecycle()` to create a chart adjusted to the operators, callbacks, 
 ga_instance.plot_lifecycle()
 ```
 
-The chart shows the generation loop and exit paths. It includes population replacement and fitness evaluation before `on_generation`, and marks disabled crossover or mutation as bypassed. Configured callbacks still appear at their execution points.
+The chart shows the generation loop and exit paths. It includes population replacement and fitness evaluation before `on_generation`, and omits disabled crossover or mutation. Configured callbacks still appear at their execution points, including `on_crossover` and `on_mutation` when their corresponding operators are disabled. The detailed `Stop Early?` block lists the configured stopping criteria and the possible `"stop"` return from `on_generation`, when that callback is supplied.
 
 Use `show_parameters=False` for a compact chart, or save the figure by passing `save_dir`. The filename extension selects the output format.
 
