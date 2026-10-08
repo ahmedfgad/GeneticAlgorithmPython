@@ -60,7 +60,7 @@ Four stop words are supported:
 - `reach`: stop when the fitness is greater than or equal to a given value. Example: `"reach_40"` stops once the fitness is `>= 40`.
 - `saturate`: stop when the fitness does not change for a given number of generations. Example: `"saturate_7"` stops if the fitness stays the same for 7 generations in a row.
 - `time`: stop when the time spent inside `run()` is at least the given number of seconds. Example: `"time_30"` stops the run after 30 seconds.
-- `evaluations`: stop when the number of fitness function calls made inside `run()` reaches the given count. Example: `"evaluations_1000"` stops the run once 1000 calls have been made.
+- `evaluations`: stop when the number of solutions whose fitness was evaluated inside `run()` reaches the given count. Example: `"evaluations_1000"` stops after at least 1000 solution evaluations. A batch counts once per solution, and adaptive mutation's offspring evaluations are included. Cached fitness values do not count. The criterion is checked at generation boundaries, so the count can exceed the threshold.
 
 You can also pass a list of criteria; the run stops as soon as any one of them is met.
 
@@ -596,6 +596,7 @@ All the parameters and functions passed to the `pygad.GA` class constructor are 
 - `best_solutions_fitness`: Fitness for every entry in `best_solutions`.
 - `solutions`: All visited solutions when `save_solutions=True`.
 - `solutions_fitness`: Fitness for every entry in `solutions`.
+- `num_fitness_evaluations`: Number of solutions whose fitness was evaluated during the current `run()` call, including adaptive offspring and all solutions in fitness batches. Cache hits do not count; each new run resets the counter.
 - `best_solution_generation`: Generation at which the best fitness was reached. `-1` until `run()` completes.
 
 ##### Methods

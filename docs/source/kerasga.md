@@ -127,12 +127,14 @@ The `predict()` function makes a prediction based on a solution. It accepts the 
 2. `solution`: The solution evolved.
 3. `data`: The test data inputs.
 4. `batch_size=None`: The batch size (i.e. number of samples per step or batch).
-5. `verbose=None`: Verbosity mode.
+5. `verbose=0`: Verbosity mode.
 6. `steps=None`: The total number of steps (batches of samples).
 
 Check documentation of the [Keras Model.predict()](https://keras.io/api/models/model_training_apis) method for more information about the `batch_size`, `verbose`, and `steps` parameters. 
 
 It returns the predictions of the data samples.
+
+The model's original weights are restored after prediction, including when prediction raises an exception. Calls to `pygad.kerasga.predict()` sharing the same model are synchronized across threads so one solution cannot overwrite another solution's weights during evaluation. This makes shared-model predictions run one at a time; use separate models per worker when concurrent predictions are needed. Other code that directly calls `model.set_weights()` must manage its own synchronization.
 
 ## Examples
 

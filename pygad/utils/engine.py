@@ -1,9 +1,9 @@
 import numpy
 import random
 import warnings
-import concurrent.futures
+from pygad.utils.parallel import FitnessEvaluation
 
-class GAEngine:
+class GAEngine(FitnessEvaluation):
 
     def round_genes(self, solutions):
         """
@@ -188,270 +188,48 @@ class GAEngine:
         self.initial_population = self.population.copy()
 
     def cal_pop_fitness(self):
-        """
-        Compute the fitness value of every solution in the current
-        population.
-
-        Avoids recomputing the fitness of solutions that were already
-        evaluated as parents in a previous generation: when
-        ``self.last_generation_parents`` is available, the matching
-        rows are reused from ``self.previous_generation_fitness``. The
-        rest are dispatched either sequentially or in parallel
-        depending on ``self.parallel_processing``. When
-        ``self.fitness_batch_size`` is set, solutions are submitted to
-        the fitness function in batches instead of one at a time.
-
-        Returns
-        -------
-        pop_fitness : numpy.ndarray
-            A 1D array of fitness values for single-objective problems
-            or a 2D array of shape ``(sol_per_pop, num_objectives)`` for
-            multi-objective problems.
-
-        Raises
-        ------
-        Exception
-            If ``self.valid_parameters`` is False, meaning the GA
-            instance was created with invalid parameters.
-        ValueError
-            If the fitness function returns a value of an unexpected
-            type or if a batch returns a wrong number of fitness values.
-        TypeError
-            If a batched fitness function does not return a list,
-            tuple, or numpy.ndarray.
-        """
+        """Compute population fitness with the same cache rules in all modes."""
         try:
-            if self.valid_parameters == False:
-                raise Exception("ERROR calling the cal_pop_fitness() method: \nPlease check the parameters passed while creating an instance of the GA class.\n")
+            if not self.valid_parameters:
+                raise Exception("ERROR calling the cal_pop_fitness() method: "
+                                "Please check the parameters passed while creating "
+                                "an instance of the GA class.")
 
-            # 'last_generation_parents_as_list' is the list version of 'self.last_generation_parents'
-            # It is used to return the parent index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
-            if self.last_generation_parents is not None:
-                last_generation_parents_as_list = self.last_generation_parents.tolist()
-            else:
-                last_generation_parents_as_list = []
-
-            # 'last_generation_elitism_as_list' is the list version of 'self.last_generation_elitism'
-            # It is used to return the elitism index using the 'in' membership operator of Python lists. This is much faster than using 'numpy.where()'.
-            if self.last_generation_elitism is not None:
-                last_generation_elitism_as_list = self.last_generation_elitism.tolist()
-            else:
-                last_generation_elitism_as_list = []
-
-            pop_fitness = ["undefined"] * len(self.population)
-            if self.parallel_processing is None:
-                # Calculating the fitness value of each solution in the current population.
-                for sol_idx, sol in enumerate(self.population):
-                    # Check if the `save_solutions` parameter is `True` and whether the solution already exists in the `solutions` list. If so, use its fitness rather than calculating it again.
-                    # The functions numpy.any()/numpy.all()/numpy.where()/numpy.equal() are very slow.
-                    # So, list membership operator 'in' is used to check if the solution exists in the 'self.solutions' list.
-                    # Make sure that both the solution and 'self.solutions' are of type 'list' not 'numpy.ndarray'.
-                    # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(self.solutions == numpy.array(sol), axis=1)))
-                    # if (self.save_solutions) and (len(self.solutions) > 0) and (numpy.any(numpy.all(numpy.equal(self.solutions, numpy.array(sol)), axis=1)))
-
-                    # Make sure self.best_solutions is a list of lists before proceeding.
-                    # Because the second condition expects that best_solutions is a list of lists.
-                    if type(self.best_solutions) is numpy.ndarray:
-                        self.best_solutions = self.best_solutions.tolist()
-
-                    if (self.save_solutions) and (len(self.solutions) > 0) and (list(sol) in self.solutions):
-                        solution_idx = self.solutions.index(list(sol))
-                        fitness = self.solutions_fitness[solution_idx]
-                    elif (self.save_best_solutions) and (len(self.best_solutions) > 0) and (list(sol) in self.best_solutions):
-                        solution_idx = self.best_solutions.index(list(sol))
-                        fitness = self.best_solutions_fitness[solution_idx]
-                    elif (self.keep_elitism > 0) and (self.last_generation_elitism is not None) and (len(self.last_generation_elitism) > 0) and (list(sol) in last_generation_elitism_as_list):
-                        # Return the index of the elitism from the elitism array 'self.last_generation_elitism'.
-                        # This is not its index within the population. It is just its index in the 'self.last_generation_elitism' array.
-                        elitism_idx = last_generation_elitism_as_list.index(list(sol))
-                        # Use the returned elitism index to return its index in the last population.
-                        elitism_idx = self.last_generation_elitism_indices[elitism_idx]
-                        # Use the elitism's index to return its pre-calculated fitness value.
-                        fitness = self.previous_generation_fitness[elitism_idx]
-                    # If the solutions are not saved (i.e. `save_solutions=False`), check if this solution is a parent from the previous generation and its fitness value is already calculated. If so, use the fitness value instead of calling the fitness function.
-                    # We cannot use the `numpy.where()` function directly because it does not support the `axis` parameter. This is why the `numpy.all()` function is used to match the solutions on axis=1.
-                    # elif (self.last_generation_parents is not None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
-                    elif ((self.keep_parents == -1) or (self.keep_parents > 0)) and (self.last_generation_parents is not None) and (len(self.last_generation_parents) > 0) and (list(sol) in last_generation_parents_as_list):
-                        # Index of the parent in the 'self.last_generation_parents' array.
-                        # This is not its index within the population. It is just its index in the 'self.last_generation_parents' array.
-                        # parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
-                        parent_idx = last_generation_parents_as_list.index(list(sol))
-                        # Use the returned parent index to return its index in the last population.
-                        parent_idx = self.last_generation_parents_indices[parent_idx]
-                        # Use the parent's index to return its pre-calculated fitness value.
-                        fitness = self.previous_generation_fitness[parent_idx]
-                    else:
-                        # Check if batch processing is used. If not, then calculate this missing fitness value.
-                        if self.fitness_batch_size in [1, None]:
-                            fitness = self.fitness_func(self, sol, sol_idx)
-                            self.num_fitness_evaluations += 1
-                            if type(fitness) in self.supported_int_float_types:
-                                # The fitness function returns a single numeric value.
-                                # This is a single-objective optimization problem.
-                                pass
-                            elif type(fitness) in [list, tuple, numpy.ndarray]:
-                                # The fitness function returns a list/tuple/numpy.ndarray.
-                                # This is a multi-objective optimization problem.
-                                pass
-                            else:
-                                raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {fitness} of type {type(fitness)} found.")
-                        else:
-                            # Reaching this point means that batch processing is in effect to calculate the fitness values.
-                            # Do not continue the loop as no fitness is calculated. The fitness will be calculated later in batch mode.
-                            continue
-
-                    # This is only executed if the fitness value was already calculated.
-                    pop_fitness[sol_idx] = fitness
-
-                if self.fitness_batch_size not in [1, None]:
-                    # Reaching this block means that batch fitness calculation is used.
-
-                    # Indices of the solutions to calculate their fitness.
-                    solutions_indices = [idx for idx, fit in enumerate(pop_fitness) if type(fit) is str and fit == "undefined"]
-                    # Number of batches.
-                    num_batches = int(numpy.ceil(len(solutions_indices) / self.fitness_batch_size))
-                    # For each batch, get its indices and call the fitness function.
-                    for batch_idx in range(num_batches):
-                        batch_first_index = batch_idx * self.fitness_batch_size
-                        batch_last_index = (batch_idx + 1) * self.fitness_batch_size
-                        batch_indices = solutions_indices[batch_first_index:batch_last_index]
-                        batch_solutions = self.population[batch_indices, :]
-
-                        batch_fitness = self.fitness_func(
-                            self, batch_solutions, batch_indices)
-                        self.num_fitness_evaluations += len(batch_indices)
-                        if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
-                            raise TypeError(f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
-                        elif len(numpy.array(batch_fitness)) != len(batch_indices):
-                            raise ValueError(f"There is a mismatch between the number of solutions passed to the fitness function ({len(batch_indices)}) and the number of fitness values returned ({len(batch_fitness)}). They must match.")
-
-                        for index, fitness in zip(batch_indices, batch_fitness):
-                            if type(fitness) in self.supported_int_float_types:
-                                # The fitness function returns a single numeric value.
-                                # This is a single-objective optimization problem.
-                                pop_fitness[index] = fitness
-                            elif type(fitness) in [list, tuple, numpy.ndarray]:
-                                # The fitness function returns a list/tuple/numpy.ndarray.
-                                # This is a multi-objective optimization problem.
-                                pop_fitness[index] = fitness
-                            else:
-                                raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {fitness} of type {type(fitness)} found.")
-            else:
-                # Calculating the fitness value of each solution in the current population.
-                for sol_idx, sol in enumerate(self.population):
-                    # Check if the `save_solutions` parameter is `True` and whether the solution already exists in the `solutions` list. If so, use its fitness rather than calculating it again.
-                    # The functions numpy.any()/numpy.all()/numpy.where()/numpy.equal() are very slow.
-                    # So, list membership operator 'in' is used to check if the solution exists in the 'self.solutions' list.
-                    # Make sure that both the solution and 'self.solutions' are of type 'list' not 'numpy.ndarray'.
-                    if (self.save_solutions) and (len(self.solutions) > 0) and (list(sol) in self.solutions):
-                        solution_idx = self.solutions.index(list(sol))
-                        fitness = self.solutions_fitness[solution_idx]
-                        pop_fitness[sol_idx] = fitness
-                    elif (self.keep_elitism > 0) and (self.last_generation_elitism is not None) and (len(self.last_generation_elitism) > 0) and (list(sol) in last_generation_elitism_as_list):
-                        # Return the index of the elitism from the elitism array 'self.last_generation_elitism'.
-                        # This is not its index within the population. It is just its index in the 'self.last_generation_elitism' array.
-                        elitism_idx = last_generation_elitism_as_list.index(
-                            list(sol))
-                        # Use the returned elitism index to return its index in the last population.
-                        elitism_idx = self.last_generation_elitism_indices[elitism_idx]
-                        # Use the elitism's index to return its pre-calculated fitness value.
-                        fitness = self.previous_generation_fitness[elitism_idx]
-
-                        pop_fitness[sol_idx] = fitness
-                    # If the solutions are not saved (i.e. `save_solutions=False`), check if this solution is a parent from the previous generation and its fitness value is already calculated. If so, use the fitness value instead of calling the fitness function.
-                    # We cannot use the `numpy.where()` function directly because it does not support the `axis` parameter. This is why the `numpy.all()` function is used to match the solutions on axis=1.
-                    # elif (self.last_generation_parents is not None) and len(numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0] > 0):
-                    elif ((self.keep_parents == -1) or (self.keep_parents > 0)) and (self.last_generation_parents is not None) and (len(self.last_generation_parents) > 0) and (list(sol) in last_generation_parents_as_list):
-                        # Index of the parent in the 'self.last_generation_parents' array.
-                        # This is not its index within the population. It is just its index in the 'self.last_generation_parents' array.
-                        # parent_idx = numpy.where(numpy.all(self.last_generation_parents == sol, axis=1))[0][0]
-                        parent_idx = last_generation_parents_as_list.index(
-                            list(sol))
-                        # Use the returned parent index to return its index in the last population.
-                        parent_idx = self.last_generation_parents_indices[parent_idx]
-                        # Use the parent's index to return its pre-calculated fitness value.
-                        fitness = self.previous_generation_fitness[parent_idx]
-
-                        pop_fitness[sol_idx] = fitness
-
-                # Decide which class to use based on whether the user selected "process" or "thread"
-                if self.parallel_processing[0] == "process":
-                    ExecutorClass = concurrent.futures.ProcessPoolExecutor
+            if type(self.best_solutions) is numpy.ndarray:
+                self.best_solutions = self.best_solutions.tolist()
+            saved_solutions = (self.solutions.tolist()
+                               if type(self.solutions) is numpy.ndarray
+                               else self.solutions)
+            parents = (self.last_generation_parents.tolist()
+                       if self.last_generation_parents is not None else [])
+            elites = (self.last_generation_elitism.tolist()
+                      if self.last_generation_elitism is not None else [])
+            pop_fitness = [None] * len(self.population)
+            missing_indices = []
+            for index, solution in enumerate(self.population):
+                values = solution.tolist()
+                if self.save_solutions and values in saved_solutions:
+                    fitness = self.solutions_fitness[saved_solutions.index(values)]
+                elif self.save_best_solutions and values in self.best_solutions:
+                    fitness = self.best_solutions_fitness[self.best_solutions.index(values)]
+                elif self.keep_elitism > 0 and values in elites:
+                    previous_index = self.last_generation_elitism_indices[elites.index(values)]
+                    fitness = self.previous_generation_fitness[previous_index]
+                elif self.keep_parents != 0 and values in parents:
+                    previous_index = self.last_generation_parents_indices[parents.index(values)]
+                    fitness = self.previous_generation_fitness[previous_index]
                 else:
-                    ExecutorClass = concurrent.futures.ThreadPoolExecutor
+                    missing_indices.append(index)
+                    continue
+                pop_fitness[index] = fitness
 
-                # We can use a with statement to ensure threads are cleaned up promptly (https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor-example)
-                with ExecutorClass(max_workers=self.parallel_processing[1]) as executor:
-                    solutions_to_submit_indices = []
-                    solutions_to_submit = []
-                    for sol_idx, sol in enumerate(self.population):
-                        # The "undefined" value means that the fitness of this solution must be calculated.
-                        if type(pop_fitness[sol_idx]) is str:
-                            if pop_fitness[sol_idx] == "undefined":
-                                solutions_to_submit.append(sol.copy())
-                                solutions_to_submit_indices.append(sol_idx)
-                        elif type(pop_fitness[sol_idx]) in [list, tuple, numpy.ndarray]:
-                            # This is a multi-objective problem. The fitness is already calculated. Nothing to do.
-                            pass
-
-                    # Check if batch processing is used. If not, then calculate the fitness value for individual solutions.
-                    if self.fitness_batch_size in [1, None]:
-                        self.num_fitness_evaluations += len(solutions_to_submit_indices)
-                        for index, fitness in zip(solutions_to_submit_indices, executor.map(self.fitness_func, [self]*len(solutions_to_submit_indices), solutions_to_submit, solutions_to_submit_indices)):
-                            if type(fitness) in self.supported_int_float_types:
-                                # The fitness function returns a single numeric value.
-                                # This is a single-objective optimization problem.
-                                pop_fitness[index] = fitness
-                            elif type(fitness) in [list, tuple, numpy.ndarray]:
-                                # The fitness function returns a list/tuple/numpy.ndarray.
-                                # This is a multi-objective optimization problem.
-                                pop_fitness[index] = fitness
-                            else:
-                                raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {fitness} of type {type(fitness)} found.")
-                    else:
-                        # Reaching this block means that batch processing is used. The fitness values are calculated in batches.
-
-                        # Number of batches.
-                        num_batches = int(numpy.ceil(len(solutions_to_submit_indices) / self.fitness_batch_size))
-                        # Each element of the `batches_solutions` list represents the solutions in one batch.
-                        batches_solutions = []
-                        # Each element of the `batches_indices` list represents the solutions' indices in one batch.
-                        batches_indices = []
-                        # For each batch, get its indices and call the fitness function.
-                        for batch_idx in range(num_batches):
-                            batch_first_index = batch_idx * self.fitness_batch_size
-                            batch_last_index = (batch_idx + 1) * self.fitness_batch_size
-                            batch_indices = solutions_to_submit_indices[batch_first_index:batch_last_index]
-                            batch_solutions = self.population[batch_indices, :]
-
-                            batches_solutions.append(batch_solutions)
-                            batches_indices.append(batch_indices)
-
-                        self.num_fitness_evaluations += sum(len(b) for b in batches_indices)
-                        for batch_indices, batch_fitness in zip(batches_indices, executor.map(self.fitness_func, [self]*len(solutions_to_submit_indices), batches_solutions, batches_indices)):
-                            if type(batch_fitness) not in [list, tuple, numpy.ndarray]:
-                                raise TypeError(f"Expected to receive a list, tuple, or numpy.ndarray from the fitness function but the value ({batch_fitness}) of type {type(batch_fitness)}.")
-                            elif len(numpy.array(batch_fitness)) != len(batch_indices):
-                                raise ValueError(f"There is a mismatch between the number of solutions passed to the fitness function ({len(batch_indices)}) and the number of fitness values returned ({len(batch_fitness)}). They must match.")
-
-                            for index, fitness in zip(batch_indices, batch_fitness):
-                                if type(fitness) in self.supported_int_float_types:
-                                    # The fitness function returns a single numeric value.
-                                    # This is a single-objective optimization problem.
-                                    pop_fitness[index] = fitness
-                                elif type(fitness) in [list, tuple, numpy.ndarray]:
-                                    # The fitness function returns a list/tuple/numpy.ndarray.
-                                    # This is a multi-objective optimization problem.
-                                    pop_fitness[index] = fitness
-                                else:
-                                    raise ValueError(f"The fitness function should return a number or an iterable (list, tuple, or numpy.ndarray) but the value {fitness} of type {type(fitness)} found.")
-
-            pop_fitness = numpy.array(pop_fitness)
+            fitness_values = self._evaluate_fitness(self.population, missing_indices)
+            for index, fitness in zip(missing_indices, fitness_values):
+                pop_fitness[index] = fitness
+            return numpy.array(pop_fitness)
         except Exception as ex:
             self.logger.exception(ex)
-            # sys.exit(-1)
-            raise ex
-        return pop_fitness
+            raise
 
     def run(self):
         """
@@ -479,6 +257,7 @@ class GAEngine:
             If the ``stop_criteria`` parameter is malformed for the
             current number of objectives.
         """
+        self._fitness_run_active = True
         try:
             if self.valid_parameters == False:
                 raise Exception("Error calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
@@ -714,6 +493,10 @@ class GAEngine:
             self.logger.exception(ex)
             # sys.exit(-1)
             raise ex
+
+        finally:
+            self._fitness_run_active = False
+            self._shutdown_fitness_executor()
 
     def run_loop_head(self, best_solution_fitness):
         """

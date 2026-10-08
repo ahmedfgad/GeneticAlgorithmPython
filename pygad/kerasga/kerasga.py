@@ -1,6 +1,22 @@
 import copy
+import threading
+import weakref
 import numpy
 import tensorflow.keras
+
+_model_locks = weakref.WeakKeyDictionary()
+_model_locks_guard = threading.Lock()
+
+
+def _model_lock(model):
+    # Keep locks outside model state so Keras models remain serializable.
+    # Weak keys also let models and their locks be released together.
+    with _model_locks_guard:
+        lock = _model_locks.get(model)
+        if lock is None:
+            lock = threading.RLock()
+            _model_locks[model] = lock
+        return lock
 
 def model_weights_as_vector(model):
     """
@@ -81,6 +97,7 @@ def predict(model,
     Load the given solution as the model's weights and run a forward
     pass on ``data``. The model's original weights are restored
     afterwards, so the model passed by the caller is not changed.
+    Calls sharing the same model are synchronized across threads.
 
     Parameters
     ----------
@@ -102,27 +119,21 @@ def predict(model,
     predictions : numpy.ndarray
         The Keras model output for ``data``.
     """
-    # Fetch the parameters of the best solution.
-    solution_weights = model_weights_as_matrix(model=model,
-                                               weights_vector=solution)
-
-    # Set the solution as the model weights, then put the original weights
-    # back at the end. The model is not cloned because cloning it on every
-    # call is slow when predict() is used inside a fitness function.
-    original_weights = model.get_weights()
-    model.set_weights(solution_weights)
-    try:
-        if batch_size is None and steps is None:
-            # When no batching is asked for, call the model directly. This
-            # is faster than model.predict() when called once per solution.
-            predictions = numpy.array(model(data, training=False))
-        else:
-            predictions = model.predict(x=data,
-                                        batch_size=batch_size,
-                                        verbose=verbose,
-                                        steps=steps)
-    finally:
-        model.set_weights(original_weights)
+    with _model_lock(model):
+        solution_weights = model_weights_as_matrix(model=model,
+                                                   weights_vector=solution)
+        original_weights = model.get_weights()
+        try:
+            model.set_weights(solution_weights)
+            if batch_size is None and steps is None:
+                predictions = numpy.array(model(data, training=False))
+            else:
+                predictions = model.predict(x=data,
+                                            batch_size=batch_size,
+                                            verbose=verbose,
+                                            steps=steps)
+        finally:
+            model.set_weights(original_weights)
 
     return predictions
 

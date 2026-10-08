@@ -55,114 +55,49 @@ These are examples of the values assigned to the `parallel_processing` parameter
 * `parallel_processing=["process", 8]`: Use parallel processing with 8 processes.
 * `parallel_processing=["process", 0]`: As the second element is given the value 0, this means do not use parallel processing. This is identical to `parallel_processing=None`.
 
-### Examples
+### Choosing Serial, Threads, Processes, or Batches
 
-These examples will help you see the difference between using processes and threads. They also give an idea of when parallel processing makes a difference and reduces the time. These are dummy examples where the fitness function always returns 0.
+Start with serial evaluation and measure a complete `run()` using the workload you actually need. A vectorized fitness function with `fitness_batch_size` often helps cheap NumPy calculations more than adding workers.
 
-The first example uses 10 genes, 5 solutions in the population where only 3 solutions mate, and 9999 generations. The fitness function uses a `for` loop with 100 iterations just to have some calculations. In the constructor of the `pygad.GA` class, `parallel_processing=None` means no parallel processing is used.
+- **Threads** are useful for I/O waits and native calculations that release Python's GIL. Fitness functions share the GA and other Python objects, so changes to shared state must be synchronized.
+- **Processes** are useful for expensive Python CPU work. Each task receives a snapshot of the GA; worker changes do not update the parent instance. Transferring chromosomes, saved histories, and custom attributes costs time and memory, so small fitness calculations can be slower than serial evaluation.
+- **Batch fitness** reduces the number of function calls and can use vectorized operations. The last batch can be smaller than `fitness_batch_size`, particularly when cached solutions are skipped. See [Batch Fitness Calculation](#batch-fitness-calculation).
+
+PyGAD uses `concurrent.futures` and reuses one executor during each `run()` call. Ordinary population evaluation and adaptive mutation's offspring evaluation share it. Workers are shut down after completion, early stopping, or an exception. Calling `cal_pop_fitness()` outside a run uses a temporary executor. A population whose fitness is completely cached creates no executor.
+
+Process tasks transport their fitness function and GA state with cloudpickle. This supports local functions, callable instances, bound methods, and loading a saved GA before continuing with process workers. The state is refreshed for every evaluation round, so changes to custom GA attributes or the fitness function in a callback reach the next round. Each process task has its own GA snapshot. Live executors are excluded from checkpoints. External resources attached to the GA must still be serializable; cloudpickle cannot make every file handle, lock, or framework session transferable.
+
+Process tasks are grouped internally to reduce repeated state transfers. This scheduling does not change the scalar fitness signature. `fitness_batch_size`, in contrast, explicitly changes that signature to batches. During adaptive mutation, offspring have no current-population row yet: both scalar and batch fitness calls receive `None` for their index argument in every execution mode. The passed offspring values must be used to evaluate them.
+
+Serial, thread, and process modes use the same cached-fitness rules. `num_fitness_evaluations` counts evaluated solutions, including adaptive offspring; a batch contributes its number of solutions, and cache hits contribute zero. The `evaluations_<N>` stop criterion checks this count at generation boundaries.
+
+Use a main guard when starting a process-based GA, especially on Windows and macOS:
 
 ```python
+import numpy
 import pygad
-import time
+
 
 def fitness_func(ga_instance, solution, solution_idx):
-    for _ in range(99):
-        pass
-    return 0
+    # Replace this cheap example with your actual expensive CPU workload.
+    return -float(numpy.sum(solution * solution))
 
-ga_instance = pygad.GA(num_generations=9999,
-                       num_parents_mating=3,
-                       sol_per_pop=5,
-                       num_genes=10,
-                       fitness_func=fitness_func,
-                       suppress_warnings=True,
-                       parallel_processing=None)
 
-if __name__ == '__main__':
-    t1 = time.time()
-
+if __name__ == "__main__":
+    ga_instance = pygad.GA(num_generations=20,
+                           sol_per_pop=40,
+                           num_parents_mating=10,
+                           num_genes=10,
+                           fitness_func=fitness_func,
+                           parallel_processing=["process", 4])
     ga_instance.run()
-
-    t2 = time.time()
-    print("Time is", t2-t1)
 ```
 
-When parallel processing is not used, the time it takes to run the genetic algorithm is `1.5` seconds.
+Compare this with `parallel_processing=None` and `["thread", 4]`, keeping the population, seed, stopping criteria, and fitness workload the same. Worker startup is included in the total time of a run. Repeated calls to `run()` create separate pools, so short runs still pay startup costs. If fitness already uses BLAS, OpenMP, TensorFlow, or another parallel library, avoid giving every GA worker another full set of CPU threads.
 
-For comparison, let us run a second experiment where parallel processing is used with 5 threads. In this case, it takes `5` seconds.
+The repository's `examples/benchmarks/parallel_processing.py` measures complete runs with CPU, simulated I/O, and cheap NumPy workloads. For example, run `python examples/benchmarks/parallel_processing.py --workload cpu`. It reports three timing samples for serial, thread, and process modes; the NumPy workload also includes vectorized batch evaluation. Results are checked against the serial final population.
 
-```python
-...
-ga_instance = pygad.GA(...,
-                       parallel_processing=5)
-...
-```
-
-For the third experiment, processes instead of threads are used. Also, only 99 generations are used instead of 9999. The time it takes is `99` seconds.
-
-```python
-...
-ga_instance = pygad.GA(num_generations=99,
-                       ...,
-                       parallel_processing=["process", 5])
-...
-```
-
-This is the summary of the 3 experiments:
-
-1. No parallel processing & 9999 generations: 1.5 seconds.
-2. Parallel processing with 5 threads & 9999 generations: 5 seconds
-3. Parallel processing with 5 processes & 99 generations: 99 seconds
-
-Because the fitness function does not need much CPU time, the normal processing takes the least time. Running processes for this simple problem takes 99 compared to only 5 seconds for threads because managing processes is much heavier than managing threads. Thus, most of the CPU time is for swapping the processes instead of executing the code.
-
-In the second example, the loop makes 99999999 iterations and only 5 generations are used. With no parallelization, it takes 22 seconds.
-
-```python
-import pygad
-import time
-
-def fitness_func(ga_instance, solution, solution_idx):
-    for _ in range(99999999):
-        pass
-    return 0
-
-ga_instance = pygad.GA(num_generations=5,
-                       num_parents_mating=3,
-                       sol_per_pop=5,
-                       num_genes=10,
-                       fitness_func=fitness_func,
-                       suppress_warnings=True,
-                       parallel_processing=None)
-
-if __name__ == '__main__':
-    t1 = time.time()
-    ga_instance.run()
-    t2 = time.time()
-    print("Time is", t2-t1)
-```
-
-It takes 15 seconds when 10 processes are used.
-
-```python
-...
-ga_instance = pygad.GA(...,
-                       parallel_processing=["process", 10])
-...
-```
-
-This is compared to 20 seconds when 10 threads are used.
-
-```python
-...
-ga_instance = pygad.GA(...,
-                       parallel_processing=["thread", 10])
-...
-```
-
-Based on the second example, using parallel processing with 10 processes takes the least time because there is a lot of CPU work. Generally, processes are preferred over threads when most of the work is on the CPU. Threads are preferred over processes in some situations, like doing input/output operations.
-
-*Before releasing [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), [László Fazekas](https://www.linkedin.com/in/l%C3%A1szl%C3%B3-fazekas-2429a912) wrote an article to parallelize the fitness function with PyGAD. Check it: [How Genetic Algorithms Can Compete with Gradient Descent and Backprop](https://hackernoon.com/how-genetic-algorithms-can-compete-with-gradient-descent-and-backprop-9m9t33bq)*.
+For Keras, calls to `pygad.kerasga.predict()` sharing one model are synchronized; they preserve each solution's weights but run one at a time. Separate models are needed for concurrent predictions. Direct changes to shared models outside that helper require their own synchronization.
 
 ## Solve Non-Deterministic Problems
 
@@ -246,6 +181,7 @@ ga_instance = pygad.GA(...,
                        ...)
 ```
 
+(batch-fitness-calculation)=
 ## Batch Fitness Calculation
 
 In [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0), a new optional parameter called `fitness_batch_size` is supported to calculate the fitness function in batches. Thanks to [Linan Qiu](https://github.com/linanqiu) for opening the [GitHub issue #136](https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/136).

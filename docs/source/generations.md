@@ -31,11 +31,13 @@ It takes this form:
 "word_num"
 ```
 
-The current 2 supported words are `reach` and `saturate`. 
+The supported words are `reach`, `saturate`, `time`, and `evaluations`.
 
 The `reach` word stops the `run()` method if the fitness value is equal to or greater than a given fitness value. An example for `reach` is `"reach_40"` which stops the evolution if the fitness is >= 40.
 
 `saturate` stops the evolution if the fitness saturates for a given number of consecutive generations. An example for `saturate` is `"saturate_7"` which means stop the `run()` method if the fitness does not change for 7 consecutive generations. 
+
+`time` stops after the elapsed runtime reaches the specified seconds, for example `"time_30"`. `evaluations` stops after the number of evaluated solutions reaches its threshold, for example `"evaluations_1000"`. This count includes adaptive mutation's offspring evaluations and counts every solution in a fitness batch. Reusing a cached fitness value contributes zero. Both criteria are checked after a generation, so runtime and evaluation count can exceed their thresholds.
 
 Here is an example that stops the evolution if either the fitness value reached `127.4` or if the fitness saturates for `15` generations.
 
