@@ -9,4 +9,4 @@ from pygad.utils import report
 from pygad.utils import validation
 from pygad.utils import engine
 
-__version__ = "1.5.1"
+__version__ = "1.5.2"

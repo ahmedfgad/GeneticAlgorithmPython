@@ -6,8 +6,16 @@ name: PR change chart
 # the PR API, so there is no checkout, no build, and no third-party action.
 
 on:
-  pull_request:
+  # Use the trusted base workflow so fork PRs can receive a summary comment.
+  # This job must never check out or execute code from the pull request.
+  pull_request_target:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      pull_request_number:
+        description: Pull request to summarize
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -26,11 +34,15 @@ jobs:
             const MARKER = '<!-- pr-change-chart -->';
             const TOP = 15; // cap rows so the chart/table stay readable
             const { owner, repo } = context.repo;
-            const pr = context.payload.pull_request;
+            const pullNumber = Number(context.payload.pull_request?.number
+              ?? context.payload.inputs?.pull_request_number);
+            if (!Number.isSafeInteger(pullNumber) || pullNumber <= 0) {
+              throw new Error('A positive pull request number is required.');
+            }
 
             // Per-file additions/deletions come straight from the PR API.
             const files = await github.paginate(github.rest.pulls.listFiles, {
-              owner, repo, pull_number: pr.number, per_page: 100,
+              owner, repo, pull_number: pullNumber, per_page: 100,
             });
 
             let totalAdd = 0, totalDel = 0;
@@ -86,11 +98,11 @@ jobs:
 
             // Upsert: update our marked comment if it exists, else create it.
             const comments = await github.paginate(github.rest.issues.listComments, {
-              owner, repo, issue_number: pr.number, per_page: 100,
+              owner, repo, issue_number: pullNumber, per_page: 100,
             });
             const mine = comments.find(c => c.body && c.body.includes(MARKER));
             if (mine) {
               await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
             } else {
-              await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+              await github.rest.issues.createComment({ owner, repo, issue_number: pullNumber, body });
             }
