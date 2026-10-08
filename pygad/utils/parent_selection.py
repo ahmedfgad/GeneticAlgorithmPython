@@ -45,9 +45,9 @@ class ParentSelection:
     def rank_selection(self, fitness, num_parents):
         """
         Select the parents using the rank selection technique. Solutions
-        are first sorted by fitness; rank 1 is given to the worst and
-        rank N to the best. The chance of being picked is proportional to
-        the rank.
+        are first sorted from best to worst. Rank 1 is given to the worst
+        and rank N to the best. The chance of being picked is proportional
+        to the rank.
 
         Parameters
         ----------
@@ -68,10 +68,11 @@ class ParentSelection:
         # This function works with both single- and multi-objective optimization problems.
         fitness_sorted = self.sort_solutions_nsga2(fitness=fitness)
 
-        # Rank the solutions based on their fitness. The worst is given rank 1. The best is given rank N.
-        rank = numpy.arange(1, self.sol_per_pop+1)
+        # The sorted list starts with the best solution, so its selection
+        # rank must be the largest. The last (worst) solution gets rank 1.
+        selection_ranks = numpy.arange(self.sol_per_pop, 0, -1)
 
-        probs = rank / numpy.sum(rank)
+        probs = selection_ranks / numpy.sum(selection_ranks)
 
         probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(),
                                                                       num_parents=num_parents)

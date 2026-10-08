@@ -404,6 +404,8 @@ Selects the parents using the steady-state selection technique.
 
 Selects the parents using the rank selection technique.
 
+Solutions are sorted from best to worst. For a population of `N` solutions, the selection weights in that order are `N, N-1, ..., 1`, and the probabilities are those weights divided by their sum. For example, fitness values `[1, 2, 3, 4]` give the corresponding population rows probabilities `[0.1, 0.2, 0.3, 0.4]`. Larger fitness is favored even when the values are negative. For multiple objectives, the order comes from non-dominated sorting and crowding distance. Returned indices refer to the original population rows. Selection remains random and can select the same row more than once; it does not guarantee selecting the best solution every time.
+
 #### `random_selection()`
 
 Selects the parents randomly.
