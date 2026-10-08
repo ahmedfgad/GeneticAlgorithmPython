@@ -364,6 +364,7 @@ class Mutation:
         """
         Swap the values of two genes inside each offspring. The two
         genes are 2 different genes picked at random.
+        Offspring with fewer than two genes are returned unchanged.
 
         Parameters
         ----------
@@ -375,6 +376,9 @@ class Mutation:
         offspring : numpy.ndarray
             The mutated offspring.
         """
+
+        if offspring.shape[1] < 2:
+            return offspring
 
         for idx in range(offspring.shape[0]):
             mutation_gene1, mutation_gene2 = numpy.random.choice(offspring.shape[1], size=2, replace=False)

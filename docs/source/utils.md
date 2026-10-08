@@ -166,6 +166,10 @@ Applies the single-point crossover. It selects a point randomly at which crossov
 
 Applies the 2 points crossover. It selects the 2 points randomly at which crossover takes place between the pairs of parents.
 
+The two distinct cut points are selected from `0` through `num_genes`, including both ends. Every pair is equally likely, and the segment copied from the second parent can contain between one and all genes. With a single gene, that gene is copied from the second parent.
+
+The corrected two-point crossover, swap mutation, and SBX crossover use different random draws from earlier versions. Runs remain reproducible with the same `random_seed` within this version, but their results can differ from earlier versions.
+
 #### `uniform_crossover()`
 
 Applies the uniform crossover. For each gene, a parent out of the 2 mating parents is selected randomly and the gene is copied from it.
@@ -217,6 +221,8 @@ For each gene, a random value is selected according to the range specified by th
 #### `swap_mutation()`
 
 Applies the swap mutation which interchanges the values of 2 randomly selected genes.
+
+Any pair of distinct positions can be selected. An offspring with only one gene is returned unchanged because there is no second gene to swap.
 
 #### `inversion_mutation()`
 
