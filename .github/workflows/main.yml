@@ -16,6 +16,18 @@ on:
       - 'pygad/**'
       - 'tests/**'
       - 'examples/**'
+      - 'requirements.txt'
+      - 'pyproject.toml'
+      - '.github/workflows/main.yml'
+  # Test relevant pull requests, including fork contributions, against master.
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'pygad/**'
+      - 'tests/**'
+      - 'examples/**'
+      - 'requirements.txt'
       - 'pyproject.toml'
       - '.github/workflows/main.yml'
   # Allows manual triggering of the workflow from the GitHub Actions tab.
