@@ -16,6 +16,8 @@ on:
       - 'pygad/**'
       - 'tests/**'
       - 'examples/**'
+      - 'pyproject.toml'
+      - '.github/workflows/main.yml'
   # Allows manual triggering of the workflow from the GitHub Actions tab.
   workflow_dispatch:
 
@@ -86,10 +88,14 @@ jobs:
       - name: Install PyGAD from Wheel
         run: |
           WHEEL=$(ls dist/*.whl)
-          pip install "${WHEEL}[visualize]"
+          pip install "${WHEEL}[visualize,report]"
 
       - name: Install PyTest
-        run: pip install pytest
+        run: |
+          pip install pytest responses
+          if [ "${{ matrix.python-version }}" != "3.8" ]; then
+            pip install 'vilvik>=0.5.4'
+          fi
 
       # Run the entire test suite using PyTest.
       # PyTest automatically discovers all test files in the 'tests/' directory.
