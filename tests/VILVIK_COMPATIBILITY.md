@@ -27,6 +27,10 @@ workflow explicitly installs and imports both, so missing dependencies fail CI.
 The release workflow also runs these tests with the latest released SDK before
 building/publishing PyGAD.
 
+One batch-fitness regression is a strict expected failure for SDK 0.5.3, which
+omits `fitness_batch_size` during export. It must pass with SDK 0.5.4 and newer
+and with the SDK development branch. No other failures are suppressed.
+
 The SDK repository has the reciprocal suite: its current source is tested
 against released and development PyGAD versions. A failing compatibility job
 must be resolved before releasing the affected package. Neither suite replaces

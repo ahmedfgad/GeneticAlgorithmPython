@@ -24,6 +24,10 @@ def multi_fitness(ga_instance, solution, solution_idx):
     return [float(sum(solution)), -float(sum(value * value for value in solution))]
 
 
+def batch_fitness(ga_instance, solutions, solution_indices):
+    return [float(sum(solution)) for solution in solutions]
+
+
 def generation_callback(ga_instance):
     ga_instance.compatibility_callback_calls = getattr(ga_instance, "compatibility_callback_calls", 0) + 1
 
@@ -139,6 +143,18 @@ def test_callback_source_and_population_opt_out():
     payload = import_run(ga, include_population=False)
     assert "population" not in payload["result"]
     assert "best_solution" in payload["result"]
+
+
+@pytest.mark.xfail(vilvik.__version__ == "0.5.3", strict=True,
+                   reason="SDK 0.5.3 drops fitness_batch_size; fixed in 0.5.4")
+def test_sdk_preserves_batch_fitness_for_continuation():
+    ga = make_ga(fitness_func=batch_fitness, fitness_batch_size=2)
+    ga.run()
+    payload = import_run(ga)
+    assert payload["ga_parameters"].get("fitness_batch_size") == 2
+    continued = reconstruct(payload)
+    continued.run()
+    assert continued.generations_completed == 1
 
 
 def test_dry_run_requires_no_credentials_or_http(monkeypatch):
