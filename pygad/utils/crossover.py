@@ -114,17 +114,22 @@ class Crossover:
         else:
             offspring = numpy.empty(offspring_size, dtype=object)
 
-        # Randomly generate all the first K points at which crossover takes place between each two parents. 
-        # This saves time by calling the numpy.random.randint() function only once.
-        if (parents.shape[1] == 1): # If the chromosome has only a single gene. In this case, this gene is copied from the second parent.
-            crossover_points_1 = numpy.zeros(offspring_size[0])
-        else:
-            crossover_points_1 = numpy.random.randint(low=0, 
-                                                      high=numpy.ceil(parents.shape[1]/2 + 1), 
-                                                      size=offspring_size[0])
+        # Randomly generate all the K pairs of points at which crossover takes place between each two parents.
+        # This saves time by calling the numpy.random.randint() function only twice.
+        # The 2 points of a pair are different values in [0, num_genes], and every such pair is equally likely.
+        # If the chromosome has only a single gene, the points are 0 and 1: the gene is copied from the second parent.
+        points_a = numpy.random.randint(low=0,
+                                        high=parents.shape[1] + 1,
+                                        size=offspring_size[0])
+        points_b = numpy.random.randint(low=0,
+                                        high=parents.shape[1],
+                                        size=offspring_size[0])
+        # Skip the value of the first point so that the 2 points differ.
+        points_b[points_b >= points_a] += 1
 
         # The second point must always be greater than the first point.
-        crossover_points_2 = crossover_points_1 + int(parents.shape[1]/2) 
+        crossover_points_1 = numpy.minimum(points_a, points_b)
+        crossover_points_2 = numpy.maximum(points_a, points_b)
 
         for k in range(offspring_size[0]):
 

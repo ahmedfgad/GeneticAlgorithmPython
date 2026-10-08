@@ -241,6 +241,32 @@ def test_random_mutation_manual_call4():
     for value in comp_sorted:
         assert value in value_space
 
+def test_two_points_crossover_manual_call():
+    # Both points are random: the genes between them form 1 segment of any length from 1 to num_genes.
+    num_genes = 10
+    num_offspring = 1000
+    result, ga_instance = output_crossover_mutation(gene_type=int,
+                                                    crossover_type="two_points")
+
+    parents = numpy.array([[0] * num_genes,
+                           [1] * num_genes])
+    offspring = ga_instance.two_points_crossover(parents=parents,
+                                                 offspring_size=(num_offspring, num_genes))
+
+    # Without crossover_probability, the first parent of offspring k is parents[k % 2].
+    # Mark the genes that come from the second parent with 1.
+    from_second_parent = numpy.array([child if k % 2 == 0 else 1 - child for k, child in enumerate(offspring)])
+
+    segment_lengths = set()
+    for child in from_second_parent:
+        segment = numpy.flatnonzero(child)
+        # The genes from the second parent are consecutive.
+        assert len(segment) > 0
+        assert segment[-1] - segment[0] + 1 == len(segment)
+        segment_lengths.add(len(segment))
+
+    assert segment_lengths == set(range(1, num_genes + 1))
+
 if __name__ == "__main__":
     #### Single-objective
     print()
@@ -284,4 +310,7 @@ if __name__ == "__main__":
     print()
 
     test_random_mutation_manual_call4()
+    print()
+
+    test_two_points_crossover_manual_call()
     print()
