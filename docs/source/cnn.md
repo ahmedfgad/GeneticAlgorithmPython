@@ -179,6 +179,10 @@ The following instance attributes exist:
 
 The `pygad.cnn.Sigmoid` class is similar to the `pygad.cnn.ReLU` class except that it applies the sigmoid function rather than the ReLU function.
 
+#### `sigmoid_layer(layer_input)`
+
+Applies the sigmoid function to every element in the passed NumPy array. The method saves the resulting array in `layer_output` and sets `layer_output_size` to the number of input elements. It returns `None`; retrieve the result from the instance's `layer_output` attribute. The model calls this method when propagating data through a sigmoid layer.
+
 ### `pygad.cnn.Dense` Class
 
 The `pygad.cnn.Dense` class implement the dense layer. Its constructor accepts the following parameters:

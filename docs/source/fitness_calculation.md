@@ -2,6 +2,7 @@
 
 This page covers how PyGAD calculates the fitness efficiently: parallel processing, non-deterministic problems, reusing fitness values, and batch fitness calculation.
 
+(parallel-processing-guide)=
 ## Parallel Processing in PyGAD
 
 Starting from [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), parallel processing is supported. This section explains how to use parallel processing in PyGAD.
@@ -99,6 +100,7 @@ The repository's `examples/benchmarks/parallel_processing.py` measures complete 
 
 For Keras, calls to `pygad.kerasga.predict()` sharing one model are synchronized; they preserve each solution's weights but run one at a time. Separate models are needed for concurrent predictions. Direct changes to shared models outside that helper require their own synchronization.
 
+(non-deterministic-fitness)=
 ## Solve Non-Deterministic Problems
 
 PyGAD can be used to solve both deterministic and non-deterministic problems. Deterministic problems are those that return the same fitness for the same solution. For non-deterministic problems, a different fitness value may be returned for the same solution.

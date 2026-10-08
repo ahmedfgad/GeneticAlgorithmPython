@@ -2,7 +2,7 @@
 
 This section of the documentation discusses the [**pygad.kerasga**](https://pygad.readthedocs.io/en/latest/kerasga.html) module. 
 
-The `pygad.kerasga` module has a helper class and 2 functions to train Keras models using the genetic algorithm (PyGAD). The Keras model can be built using either the [Sequential Model](https://keras.io/guides/sequential_model) or the [Functional API](https://keras.io/guides/functional_api).
+The `pygad.kerasga` module has a helper class and 3 public functions to train Keras models using the genetic algorithm (PyGAD). The Keras model can be built using either the [Sequential Model](https://keras.io/guides/sequential_model) or the [Functional API](https://keras.io/guides/functional_api).
 
 The contents of this module are:
 
@@ -82,9 +82,9 @@ All parameters in the `pygad.kerasga.KerasGA` class constructor are used as inst
 
 Here is a list of all instance attributes:
 
-- `model`
-- `num_solutions`
-- `population_weights`: A nested list holding the weights of all solutions in the population.
+- `model`: The Keras model passed to the constructor.
+- `num_solutions`: Number of chromosomes to create.
+- `population_weights`: A list of one-dimensional NumPy arrays, one trainable-weight vector per solution. The first vector contains the model's current weights; each subsequent vector adds independent uniform noise in `[-1, 1]` to those weights. Non-trainable layers are excluded from the chromosome.
 
 ### Methods in the `KerasGA` Class
 
@@ -92,7 +92,7 @@ This section discusses the methods available for instances of the `pygad.kerasga
 
 #### `create_population()`
 
-The `create_population()` method creates the initial population of the genetic algorithm as a list of solutions where each solution represents different model parameters. The list of networks is assigned to the `population_weights` attribute of the instance.
+`create_population()` accepts no arguments and returns a new list of one-dimensional NumPy weight vectors. The constructor assigns this list to `population_weights`. Calling the method later returns a new population without updating that attribute; assign its result explicitly to replace the stored population. The model's weights are read without changing them.
 
 ## Functions in the `pygad.kerasga` Module
 
@@ -125,16 +125,30 @@ The `predict()` function makes a prediction based on a solution. It accepts the 
 
 1. `model`: The Keras model.
 2. `solution`: The solution evolved.
-3. `data`: The test data inputs.
+3. `data`: Input data accepted by the selected Keras execution path below.
 4. `batch_size=None`: The batch size (i.e. number of samples per step or batch).
 5. `verbose=0`: Verbosity mode.
 6. `steps=None`: The total number of steps (batches of samples).
 
 Check documentation of the [Keras Model.predict()](https://keras.io/api/models/model_training_apis) method for more information about the `batch_size`, `verbose`, and `steps` parameters. 
 
-It returns the predictions of the data samples.
+When `batch_size` and `steps` are both `None`, the helper calls `model(data, training=False)` directly and converts its output to a NumPy array. This path avoids `Model.predict()` overhead; `verbose` is not used. Supply inputs supported by the model's direct call, such as NumPy arrays or tensors.
+
+If either `batch_size` or `steps` is specified, the helper calls `model.predict(x=data, batch_size=batch_size, verbose=verbose, steps=steps)`. In this path, the inputs and options follow Keras `Model.predict()` semantics, including dataset inputs. The helper returns the predictions produced by the selected path.
 
 The model's original weights are restored after prediction, including when prediction raises an exception. Calls to `pygad.kerasga.predict()` sharing the same model are synchronized across threads so one solution cannot overwrite another solution's weights during evaluation. This makes shared-model predictions run one at a time; use separate models per worker when concurrent predictions are needed. Other code that directly calls `model.set_weights()` must manage its own synchronization.
+
+The protected operation includes weight conversion, loading the solution, inference, and restoring original weights. Exceptions from weight conversion or inference propagate to the caller; when inference fails, the `finally` block still attempts to restore the original weights. This synchronization does not make every operation on a Keras model thread-safe.
+
+### Internal Synchronization Helpers
+
+These names are defined in `pygad.kerasga.kerasga`, rather than exported as public helpers by `pygad.kerasga`. They are documented for completeness and are not stable API.
+
+- `_model_lock(model)`: Returns the `threading.RLock` associated with the passed model, creating it on first use. `predict()` holds this lock throughout its temporary weight changes and prediction.
+- `_model_locks`: Module-level `weakref.WeakKeyDictionary` mapping models to locks. Weak keys allow a model's entry to be released when the model is no longer referenced. Locks are stored outside model state so this mechanism does not add a lock to serialized model attributes.
+- `_model_locks_guard`: Module-level `threading.Lock` protecting lookup and creation of entries in `_model_locks`.
+
+These objects are local to a Python process. They are module attributes, not additional `KerasGA` instance attributes, and callers should use `predict()` rather than access the registry directly.
 
 ## Examples
 

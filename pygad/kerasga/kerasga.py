@@ -9,6 +9,20 @@ _model_locks_guard = threading.Lock()
 
 
 def _model_lock(model):
+    """Return the process-local prediction lock for a Keras model.
+
+    Parameters
+    ----------
+    model : tensorflow.keras.Model
+        Model whose temporary weight changes need synchronization.
+
+    Returns
+    -------
+    lock : threading.RLock
+        The existing lock for this model, or a newly registered lock.
+        Weak keys let the registry release entries with their models;
+        keeping locks outside model state preserves model serialization.
+    """
     # Keep locks outside model state so Keras models remain serializable.
     # Weak keys also let models and their locks be released together.
     with _model_locks_guard:
@@ -62,7 +76,7 @@ def model_weights_as_matrix(model, weights_vector):
     Returns
     -------
     weights_matrix : list of numpy.ndarray
-        One matrix per layer, ready to be passed to
+        One array per weight tensor, ready to be passed to
         ``model.set_weights``.
     """
     weights_matrix = []
@@ -105,19 +119,32 @@ def predict(model,
         The reference Keras model.
     solution : array-like
         A 1D weights vector returned by the GA.
-    data : numpy.ndarray or tf.data.Dataset
-        Input data passed to ``Model.predict``.
+    data : array-like or input supported by the Keras execution path
+        Input passed directly to the model when batch_size and steps are
+        both None. Otherwise passed to Model.predict, which also accepts
+        inputs such as tf.data.Dataset.
     batch_size : int or None
-        Number of samples per step. Forwarded to ``Model.predict``.
+        Number of samples per step. If set, selects Model.predict rather
+        than calling the model directly.
     verbose : int
-        Verbosity level. Forwarded to ``Model.predict``.
+        Verbosity level forwarded to Model.predict. Not used when calling
+        the model directly.
     steps : int or None
-        Number of steps (batches). Forwarded to ``Model.predict``.
+        Number of steps (batches). If set, selects Model.predict rather
+        than calling the model directly.
 
     Returns
     -------
-    predictions : numpy.ndarray
-        The Keras model output for ``data``.
+    predictions : numpy.ndarray or Keras prediction output
+        The direct model output converted to a NumPy array, or the result
+        returned by Model.predict when batch_size or steps is specified.
+
+    Notes
+    -----
+    The model lock covers weight conversion, temporary weight assignment,
+    inference, and restoration. Original weights are restored in a finally
+    block, including when inference raises an exception. Direct calls to
+    model.set_weights outside this helper need their own synchronization.
     """
     with _model_lock(model):
         solution_weights = model_weights_as_matrix(model=model,

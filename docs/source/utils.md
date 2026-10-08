@@ -6,21 +6,25 @@ PyGAD supports different types of operators for selecting the parents, applying 
 
 The submodules in the `pygad.utils` module are:
 
-1. `engine`: The core engine of the library. It has the `GAEngine` class implementing the main loop and related functions.
-2. `crossover`: Has the `Crossover` class that implements the crossover operators.
-3. `mutation`: Has the `Mutation` class that implements the mutation operators.
-4. `parent_selection`: Has the `ParentSelection` class that implements the parent selection operators.
-5. `nsga2`: Has the `NSGA2` class that implements the Non-Dominated Sorting Genetic Algorithm II (NSGA-II).
-6. `nsga3`: Has the `NSGA3` class that implements the Non-Dominated Sorting Genetic Algorithm III (NSGA-III).
-7. `quality_indicators`: Has functions to measure the quality of a Pareto front: `hypervolume`, `inverted_generational_distance`, `generational_distance`, and `spacing`.
+1. `engine`: Has the `GAEngine` class implementing the main loop and related functions.
+2. `parallel`: Has the `FitnessEvaluation` class implementing serial, thread, and process fitness dispatch and worker lifecycle management.
+3. `validation`: Has the `Validation` class validating constructor parameters and selecting operators.
+4. `crossover`: Has the `Crossover` class implementing crossover operators.
+5. `mutation`: Has the `Mutation` class implementing mutation operators.
+6. `parent_selection`: Has the `ParentSelection` class implementing parent selection operators.
+7. `nsga`: Has the `NSGA` class implementing shared non-dominated sorting operations.
+8. `nsga2`: Has the `NSGA2` class implementing the Non-Dominated Sorting Genetic Algorithm II (NSGA-II).
+9. `nsga3`: Has the `NSGA3` class implementing the Non-Dominated Sorting Genetic Algorithm III (NSGA-III).
+10. `report`: Has the `Report` class generating PDF reports.
+11. `quality_indicators`: Has functions measuring the quality of a Pareto front: `hypervolume`, `inverted_generational_distance`, `generational_distance`, and `spacing`.
 
-Note that the `pygad.GA` class extends all of these classes. So, the user can access any of the methods in such classes directly by the instance/object of the `pygad.GA` class.
+The `pygad.GA` class inherits the classes listed above, including `FitnessEvaluation` through `GAEngine`. Their methods are accessible through a GA instance. The functions in `quality_indicators` are standalone functions called through that module.
 
 The next sections discuss each submodule.
 
 ## `pygad.utils.engine` Submodule
 
-The `pygad.utils.engine` module has the `GAEngine` class that implements the engine of the library. The methods in this class are:
+The `pygad.utils.engine` module has the `GAEngine` class that implements the engine of the library. It inherits fitness dispatch and serialization methods from {ref}`FitnessEvaluation <fitness-evaluation>`. The main methods defined in `GAEngine` are:
 
 1. `initialize_population()`
 2. `cal_pop_fitness()`
@@ -50,27 +54,27 @@ This method assigns the values of the following 3 instance attributes:
 
 ### `cal_pop_fitness()`
 
-The `cal_pop_fitness()` method calculates and returns the fitness values of the solutions in the current population. 
+`cal_pop_fitness()` accepts no arguments and returns a NumPy array in current-population order: shape `(sol_per_pop,)` for single-objective fitness, or `(sol_per_pop, num_objectives)` for multi-objective fitness. It returns the values without assigning them to `last_generation_fitness`; `run()` performs that assignment.
 
-This function is optimized to save time by making fewer calls to the fitness function. It follows this process:
+For each solution, it checks the following sources in order:
 
-1. If the `save_solutions` parameter is set to `True`, then it checks if the solution is already explored and saved in the `solutions` instance attribute. If so, then it just retrieves its fitness from the `solutions_fitness` instance attribute without calling the fitness function.
-2. If `save_solutions` is set to `False` or if it is `True` but the solution was not explored yet, then the `cal_pop_fitness()` method checks if the `keep_elitism` parameter is set to a positive integer. If so, then it checks if the solution is saved into the `last_generation_elitism` instance attribute. If so, then it retrieves its fitness from the `previous_generation_fitness` instance attribute.
-3. If neither of the above 3 conditions apply (1. `save_solutions` is set to `False` or 2. if it is `True` but the solution was not explored yet or 3. `keep_elitism` is set to zero), then the `cal_pop_fitness()` method checks if the `keep_parents` parameter is set to `-1` or a positive integer. If so, then it checks if the solution is saved into the `last_generation_parents` instance attribute. If so, then it retrieves its fitness from the `previous_generation_fitness` instance attribute.
-4. If neither of the above 4 conditions apply, then we have to call the fitness function to calculate the fitness for the solution. This is by calling the function assigned to the `fitness_func` parameter. 
+1. `solutions` and `solutions_fitness`, when `save_solutions=True`.
+2. `best_solutions` and `best_solutions_fitness`, when `save_best_solutions=True`.
+3. Retained elites, when `keep_elitism > 0`. `last_generation_elitism_indices` maps each elite back to its value in `previous_generation_fitness`.
+4. Retained parents, when `keep_parents != 0`. `last_generation_parents_indices` maps each parent back to its value in `previous_generation_fitness`.
+5. The fitness function, for solutions with no cached value.
 
-This function takes into consideration:
+These cache rules apply in serial, thread, and process modes. Only uncached rows are passed to `_evaluate_fitness()`, which respects `fitness_batch_size`, validates returned values, and increments `num_fitness_evaluations` by the number of evaluated solutions. Cached rows contribute zero to that counter. These rules assume that a solution's fitness can be reused; see {ref}`non-deterministic problems <non-deterministic-fitness>` for settings that disable reuse.
 
-1. The `parallel_processing` parameter to check whether parallel processing is in effect.
-2. The `fitness_batch_size` parameter to check if the fitness should be calculated in batches of solutions.
-
-It returns a vector of the solutions' fitness values.
+During `run()`, evaluations reuse the run's worker pool. Outside `run()`, parallel evaluation creates and closes a temporary pool. If all fitness values are cached, no pool is created. Fitness-function exceptions and invalid return values propagate to the caller after being logged. See the {ref}`fitness dispatch reference <fitness-evaluation>` for return-value validation.
 
 ### `run()`
 
 Runs the genetic algorithm. This is the main method in which the genetic algorithm is evolved through some generations. It accepts no parameters as it uses the instance to access all of its requirements.
 
-For each generation, the fitness values of all solutions within the population are calculated according to the `cal_pop_fitness()` method which internally just calls the function assigned to the `fitness_func` parameter in the `pygad.GA` class constructor for each solution.
+The initial population and each updated population are evaluated using `cal_pop_fitness()`, which reuses cached values and evaluates remaining solutions individually or in batches. Adaptive mutation also evaluates offspring before mutating them.
+
+Each call resets `num_fitness_evaluations` after `on_start` and captures `run_start_time` before initial fitness evaluation. A worker pool is created only when parallel work is needed, shared with adaptive evaluation, and shut down in a `finally` block on completion, early stopping, or an exception. A later `run()` call creates a new pool as needed.
 
 According to the fitness values of all solutions, the parents are selected using the `select_parents()` method. This method's behavior is determined by the parent selection type in the `parent_selection_type` parameter in the `pygad.GA` class constructor.
 
@@ -95,13 +99,14 @@ Note that the `run()` method is calling 5 different methods during the loop:
 4. `run_mutation()`
 5. `run_update_population()`
 
+(current-population-best-solution)=
 ### `best_solution()`
 
-Returns information about the best solution found by the genetic algorithm. 
+Returns information about the best solution in the **current population**. Single-objective problems use the maximum fitness; multi-objective problems use the first solution in the NSGA-II ordering (non-dominated front, then crowding distance). This method does not search all saved generations.
 
 It accepts the following parameters:
 
-* `pop_fitness=None`: An optional parameter that accepts a list of the fitness values of the solutions in the population. If `None`, then the `cal_pop_fitness()` method is called to calculate the fitness values of the population.
+* `pop_fitness=None`: Optional `list`, `tuple`, or NumPy array of fitness values matching the current population's length and row order. If `None`, `cal_pop_fitness()` is called, potentially performing additional evaluations. Passing an incompatible type or length raises `ValueError`.
 
 It returns the following:
 
@@ -114,6 +119,70 @@ It returns the following:
 ### `round_genes()`
 
 A method to round the genes in the passed solutions. It loops through each gene across all the passed solutions and rounds their values if applicable. 
+
+(fitness-evaluation)=
+## `pygad.utils.parallel` Submodule
+
+This module contains the `FitnessEvaluation` mixin and the process-worker function `_process_fitness_chunk()`. A mixin is a class that provides methods for another class to inherit. `GAEngine` inherits this mixin, so `pygad.GA` inherits its methods indirectly. Configure evaluation through `fitness_func`, `fitness_batch_size`, and `parallel_processing`; see the {ref}`parallel processing guide <parallel-processing-guide>` for examples and performance tradeoffs.
+
+The methods and worker attributes below are internal implementation details, documented for completeness. Their signatures and lifetime are not a stable public API.
+
+### `FitnessEvaluation` Methods
+
+#### `__getstate__()`
+
+Returns a shallow copy of the instance's attribute dictionary, excluding `_fitness_executor`, `_fitness_executor_config`, and `_fitness_run_active`. Cloudpickle uses this state for `GA.save()` and for GA snapshots sent to process workers. Live locks and worker handles are therefore not included in a checkpoint. Other instance attributes must still be serializable. Loading the saved GA preserves its optimization state; the next run creates workers as needed.
+
+#### `_shutdown_fitness_executor()`
+
+Detaches the current run's executor, sets `_fitness_executor` and `_fitness_executor_config` to `None`, and calls `executor.shutdown(wait=True)` when an executor exists. It returns `None` and can be called when no pool exists. Shutdown waits for submitted work to finish.
+
+#### `_fitness_pool()`
+
+A context manager yielding a `concurrent.futures.ThreadPoolExecutor` or `ProcessPoolExecutor`, selected by the normalized `parallel_processing` value `(mode, max_workers)`. A worker count of `None` uses the executor's default.
+
+Outside a run, the pool exists only within the context and is closed when the context exits. During a run, it is stored on the GA and reused by later evaluations. If the normalized mode or worker count changes, the previous pool is shut down and a new one is created when parallel evaluation next needs it. This helper expects parallel processing to be enabled.
+
+#### `_map_fitness(tasks)`
+
+Accepts a list of `(solution, index_argument)` pairs and yields fitness-function results in task order. A solution is either a single chromosome or a batch, as prepared by `_evaluate_fitness()`. An empty task list performs no evaluations and creates no pool.
+
+Serial evaluation calls `fitness_func(self, solution, index_argument)` directly and closes any existing run pool when parallelism has been disabled. Thread tasks share the parent GA instance. Process evaluation serializes `(fitness_func, self)` with cloudpickle once per evaluation round, groups tasks to reduce repeated state transfers, and calls `_process_fitness_chunk()` in the workers. Each process task receives a separate snapshot; worker changes do not update the parent GA or other tasks. Updates to the fitness function or custom GA attributes before the next round are included in its new snapshot.
+
+Internal process grouping preserves the scalar fitness signature. Only `fitness_batch_size` changes the function's input to a batch. Fitness-function and serialization exceptions propagate while results are consumed.
+
+(evaluate-selected-fitness)=
+#### `_evaluate_fitness(population, indices, adaptive=False)`
+
+Parameters:
+
+- `population`: A two-dimensional NumPy array of chromosomes to evaluate. For adaptive mutation, this is the temporary population containing retained solutions and actual offspring.
+- `indices`: A list of row indices to evaluate, in the desired result order. An empty list returns `[]` without creating a pool.
+- `adaptive=False`: With `False`, the fitness function receives each row's index, or a list of row indices for a batch. With `True`, it receives `None` in both scalar and batch modes because the offspring do not yet have indices in the current GA population.
+
+Returns a list containing one fitness value per requested row, in `indices` order. Each value is a supported numeric scalar or a `list`, `tuple`, or NumPy array of objective values. With `fitness_batch_size=None` or `1`, calls are scalar. Larger batch sizes group only the requested rows; the final batch can be smaller. A batch call must return a `list`, `tuple`, or NumPy array containing one fitness value per solution.
+
+For each returned task result, `num_fitness_evaluations` increases by the number of solutions in that task before return-value validation. This counter measures solutions, not function calls, and is not a count of every task submitted to a worker. A failed fitness call has no returned result to count.
+
+Batch return types outside `list`, `tuple`, and NumPy array raise `TypeError`; a batch length mismatch or unsupported individual fitness type raises `ValueError`. Fitness-function exceptions propagate. The result generator is closed even if validation fails, ensuring temporary pools are cleaned up. Run-owned pools are cleaned up by `run()`.
+
+Serial scalar calls receive a row view of the passed population. Parallel scalar calls receive row copies, and batch calls use NumPy indexing to create copies in every mode. Fitness functions should treat the supplied solutions as inputs and avoid mutating them.
+
+### Process-Worker Function
+
+`_process_fitness_chunk(payload, tasks)` is a module-level internal worker entry point. `payload` is cloudpickle-serialized bytes containing `(fitness_func, ga_instance)`; `tasks` is a list of `(solution, index_argument)` pairs. It deserializes a fresh function and GA snapshot for each task, calls the fitness function, and returns a list of results in task order. Fitness-function and deserialization exceptions propagate through the executor. This function performs neither caching nor fitness validation.
+
+### Runtime Instance Attributes
+
+These attributes belong to the GA instance through `FitnessEvaluation`; they are omitted from serialized state and may be absent before first use or immediately after loading a checkpoint.
+
+| Attribute | Value and lifetime |
+| --- | --- |
+| `_fitness_run_active` | Set to `True` when `run()` starts and to `False` in its `finally` block. Selects whether pools are run-owned or temporary. |
+| `_fitness_executor` | The lazily created executor for the current run, or `None` after shutdown. Temporary executors used outside `run()` are not stored here. |
+| `_fitness_executor_config` | Tuple `(mode, max_workers)` for the stored executor, or `None` after shutdown. Used to detect configuration changes between evaluation rounds. |
+
+`FitnessEvaluation` also uses the existing GA attributes `fitness_func`, `fitness_batch_size`, `parallel_processing`, `supported_int_float_types`, and `num_fitness_evaluations`. The counter is reset by `run()`; direct evaluations outside a run increment its current value.
 
 ## `pygad.utils.validation` Submodule
 
@@ -194,6 +263,7 @@ The `pygad.utils.mutation` module has a class named `Mutation` with the supporte
 3. Inversion: Implemented using the `inversion_mutation()` method.
 4. Scramble: Implemented using the `scramble_mutation()` method.
 5. Adaptive: Implemented using the `adaptive_mutation()` method.
+6. Polynomial: Implemented using the `polynomial_mutation()` method.
 
 Mutation makes small random changes to the offspring so the search can explore new values. The next figure shows random mutation, where a few genes are picked at random and their values are changed.
 
@@ -252,6 +322,10 @@ Applies the adaptive mutation, which selects the number/percentage of genes to m
 
 The count-based and probability-based adaptive mutation methods use the same compatible-swap fallback for permutations as random mutation. Their fitness-based controls select which genes can initiate a mutation; swapped partners are not mutated again in the same pass.
 
+#### `polynomial_mutation(offspring)`
+
+Applies polynomial mutation to the passed two-dimensional offspring array in place and returns it. Each gene is selected with `mutation_probability`, or with probability `1 / num_genes` when that parameter is `None`. `polynomial_mutation_eta` controls the size of the change; higher values favor smaller changes. Bounds come from `init_range_low` and `init_range_high` for each gene, and mutated values are clipped to those bounds. Genes whose range has effectively zero width are skipped. When `allow_duplicate_genes=False`, the existing random duplicate-resolution helper is applied after changing a gene.
+
 ### Mutation Helper Methods
 
 The `pygad.utils.mutation` module has some helper methods to assist applying the mutation operation:
@@ -261,12 +335,29 @@ The `pygad.utils.mutation` module has some helper methods to assist applying the
 3. `mutation_process_gene_value()`: Generate/select values for the gene that satisfy the constraint. The values could be generated randomly or from the gene space. 
 4. `mutation_randomly()`: Applies the random mutation.
 5. `mutation_probs_randomly()`: Uses the mutation probabilities in the `mutation_probabilities` instance attribute to apply the random mutation. For each gene, if its probability is <= the mutation probability, then it will be mutated randomly.
-6. `adaptive_mutation_population_fitness()`: A helper method to calculate the average fitness of the solutions before applying the adaptive mutation.
+6. `adaptive_mutation_population_fitness(offspring)`: Calculate average population fitness and offspring fitness before applying adaptive mutation. See the detailed reference below.
 7. `adaptive_mutation_by_space()`: Applies the adaptive mutation based on the `gene_space` parameter. A number of genes are selected randomly for mutation. This number depends on the fitness of the solution. The random values are selected from the `gene_space` parameter.
 8. `adaptive_mutation_probs_by_space()`: Uses the mutation probabilities to decide which genes to apply the adaptive mutation by space.
 9. `adaptive_mutation_randomly()`: Applies the adaptive mutation randomly. A number of genes are selected randomly for mutation. This number depends on the fitness of the solution. The random values are selected based on the 2 parameters `random_mutation_min_val` and `random_mutation_max_val`.
 10. `adaptive_mutation_probs_randomly()`: Uses the mutation probabilities to decide which genes to apply the adaptive mutation randomly.
 11. `swap_gene_by_space(solution, gene_idx, swapped_genes=None)`: Swap one gene with a compatible partner while preserving gene types, numeric values, gene spaces, uniqueness, and constraints. The solution is modified in place. The optional `swapped_genes` set tracks both positions already swapped in the same offspring's mutation pass; start with a new set for each pass.
+
+(adaptive-offspring-fitness)=
+#### `adaptive_mutation_population_fitness(offspring)`
+
+Accepts a two-dimensional NumPy array of offspring before mutation, with one chromosome per row. It builds a temporary population containing retained solutions followed by these actual offspring, without replacing `self.population`. The number of offspring must match the available rows after retention, as prepared by PyGAD's crossover step.
+
+Retention follows the GA configuration: positive `keep_elitism` selects the best elites; otherwise `keep_parents=-1` retains all selected parents, a positive `keep_parents` selects that many best solutions, and `0` retains none. Retained fitness is read from `last_generation_fitness` using the corresponding original population indices. Only offspring are evaluated through `_evaluate_fitness(..., adaptive=True)`.
+
+Returns `(average_fitness, offspring_fitness)`. For a single objective, the average is a scalar and offspring fitness is a one-dimensional NumPy array. For multiple objectives, the average is a vector and offspring fitness has one row per offspring and one column per objective. The average includes both retained solutions and offspring. NumPy infers a common fitness dtype, preserving fractional offspring values when earlier population fitness was integer-valued.
+
+All execution modes and batch sizes evaluate the same offspring values. The fitness function receives `None` as its index argument in both scalar and batch calls. It must use the supplied chromosomes rather than indexing the current `ga_instance.population`. Every evaluated offspring contributes to `num_fitness_evaluations`; retained fitness does not. During a run, these calls reuse the same executor as ordinary population evaluation. Return validation and propagated exceptions are described in {ref}`_evaluate_fitness() <evaluate-selected-fitness>`.
+
+#### `swap_gene_by_space(solution, gene_idx, swapped_genes=None)`
+
+This helper provides a permutation-preserving fallback for random and adaptive mutation when unique replacement values are unavailable in `gene_space`. `solution` is a chromosome modified in place, and `gene_idx` is the position initiating the swap. The optional `swapped_genes` set records both positions after a successful swap; reuse it within one offspring's mutation pass and start a fresh set for each new pass.
+
+The partner is selected randomly from compatible, not-yet-swapped genes. Both values must remain numerically unchanged after conversion and rounding for their destination gene types, and must belong to the destination gene spaces. Genes with their own constraint are excluded from swapping, and constraints on other genes are checked against the complete proposed chromosome. If no compatible partner exists, the solution is left unchanged. The method returns the solution in either case. Invalid constraint output raises an exception through the existing constraint validator.
 
 ## `pygad.utils.parent_selection` Submodule
 

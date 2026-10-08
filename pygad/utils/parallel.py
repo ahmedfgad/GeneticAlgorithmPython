@@ -17,6 +17,20 @@ def _process_fitness_chunk(payload, tasks):
     executor's normal pickle transport. Grouping tasks amortizes transfer
     of the snapshot without allowing worker-side GA changes to leak into
     the next fitness call.
+
+    Parameters
+    ----------
+    payload : bytes
+        Cloudpickle-serialized pair of the fitness callable and current GA.
+    tasks : list of tuple
+        Pairs of solution data and its fitness index argument. Solution
+        data can be one chromosome or a batch; adaptive indices are None.
+
+    Returns
+    -------
+    results : list
+        Fitness results in task order. Deserialization and fitness-call
+        exceptions propagate to the parent through the process executor.
     """
     results = []
     for solution, index in tasks:
@@ -26,7 +40,24 @@ def _process_fitness_chunk(payload, tasks):
 
 
 class FitnessEvaluation:
+    """Share fitness evaluation and worker cleanup across GA operations.
+
+    GAEngine inherits this mixin so ordinary population evaluation and
+    adaptive offspring evaluation use the same dispatch and validation.
+    Users configure these operations through the GA constructor; the
+    methods beginning with an underscore are internal helpers.
+    """
+
     def __getstate__(self):
+        """Return instance state without live worker resources.
+
+        Returns
+        -------
+        state : dict
+            A shallow copy of instance attributes excluding the executor,
+            its configuration, and the active-run flag. Cloudpickle uses
+            it for checkpoints and GA snapshots sent to process workers.
+        """
         # Executors contain locks and worker handles. Neither checkpoints
         # nor GA snapshots sent to workers should contain these resources.
         state = self.__dict__.copy()
@@ -36,6 +67,11 @@ class FitnessEvaluation:
         return state
 
     def _shutdown_fitness_executor(self):
+        """Detach the run's executor and wait for submitted work to finish.
+
+        Clears the stored executor and configuration even if no pool
+        exists. Returns None; it is safe to call again after shutdown.
+        """
         executor = getattr(self, "_fitness_executor", None)
         self._fitness_executor = None
         self._fitness_executor_config = None
@@ -44,6 +80,21 @@ class FitnessEvaluation:
 
     @contextmanager
     def _fitness_pool(self):
+        """Provide the executor selected by normalized parallel_processing.
+
+        Yields
+        ------
+        executor : concurrent.futures.Executor
+            A temporary thread or process pool outside run(), or the pool
+            reused during an active run. A configuration change closes the
+            stored pool before creating its replacement. Temporary pools
+            close on context exit; run() closes its own pool on exit.
+
+        Notes
+        -----
+        This context manager expects parallel processing to be enabled.
+        A worker count of None uses the selected executor's default.
+        """
         config = tuple(self.parallel_processing)
         executor_class = (concurrent.futures.ProcessPoolExecutor
                           if config[0] == "process"
@@ -60,7 +111,28 @@ class FitnessEvaluation:
         yield self._fitness_executor
 
     def _map_fitness(self, tasks):
-        """Yield ordered results without changing the fitness API."""
+        """Dispatch fitness calls and yield their results in task order.
+
+        Parameters
+        ----------
+        tasks : list of tuple
+            Pairs of solution data and its fitness index argument, prepared
+            by _evaluate_fitness(). An empty list creates no worker pool.
+
+        Yields
+        ------
+        fitness : numeric or array-like
+            One result per task, including a batch of fitness values when
+            the task contains multiple solutions. Validation and counting
+            are handled by _evaluate_fitness(), not by this dispatcher.
+
+        Notes
+        -----
+        Threads share this GA instance. Process tasks receive separate GA
+        snapshots refreshed each evaluation round. Grouping process tasks
+        reduces state transfers without changing the fitness signature.
+        Fitness and serialization exceptions propagate to the caller.
+        """
         if not tasks:
             return
         if self.parallel_processing is None:
@@ -93,6 +165,36 @@ class FitnessEvaluation:
 
         Adaptive offspring do not yet have population indices. Their
         fitness function therefore receives None in scalar and batch mode.
+
+        Parameters
+        ----------
+        population : numpy.ndarray
+            Two-dimensional array containing the chromosomes to evaluate.
+        indices : list of int
+            Rows to evaluate, in result order. An empty list returns [].
+        adaptive : bool, default False
+            Pass None as the fitness index argument instead of population
+            row indices when evaluating offspring for adaptive mutation.
+
+        Returns
+        -------
+        fitness_values : list
+            One scalar or objective vector per requested row. A batch can
+            be smaller than fitness_batch_size after cached rows are skipped.
+
+        Raises
+        ------
+        TypeError
+            If a batch call returns neither list, tuple, nor numpy.ndarray.
+        ValueError
+            If a batch's result length differs from its solution count,
+            or an individual fitness value has an unsupported type.
+
+        Notes
+        -----
+        Counts solutions in each returned result before validation, rather
+        than counting fitness-function calls. Exceptions propagate, and
+        the result generator is closed to clean up temporary pools.
         """
         if not indices:
             return []

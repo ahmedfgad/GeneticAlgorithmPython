@@ -72,15 +72,17 @@ Added in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pyg
 :::{dropdown} `fitness_func`: Function that scores each solution.
 :animate: fade-in-slide-down
 
-The function (or method) that calculates the fitness of a solution. This is the one parameter you almost always need to set.
+The function, bound method, or callable instance that calculates the fitness of a solution. This is the one parameter you almost always need to set.
 
 A fitness **function** must accept 3 parameters:
 
 1. The instance of the `pygad.GA` class.
 2. A single solution.
-3. The index of the solution in the population.
+3. The index of the solution in the population. Adaptive mutation passes `None` because its offspring do not yet have a current-population index; calculate their fitness from the passed solution.
 
 If you pass a **method**, it takes a fourth parameter for the method's class instance.
+
+A callable instance's `__call__(self, ga_instance, solution, solution_idx)` uses the same three fitness arguments after `self`. Process evaluation transports the callable and current GA state with cloudpickle; custom attributes and resources must be serializable. Thread evaluation shares the GA instance, so changes to shared state need synchronization.
 
 Return a single number for a single-objective problem, or a `list`, `tuple`, or `numpy.ndarray` for a multi-objective problem (supported since [PyGAD 3.2.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-2-0)).
 
@@ -94,6 +96,8 @@ Calculates the fitness in batches instead of one solution at a time.
 
 - `1` or `None` (default): the fitness function is called once per solution.
 - An integer where `1 < fitness_batch_size <= sol_per_pop`: solutions are grouped into batches of this size, and the fitness function is called once per batch.
+
+In batch mode, the second fitness argument is a two-dimensional array of solutions and the third is a list of their population indices. Adaptive mutation passes `None` as the third argument instead. Return a `list`, `tuple`, or NumPy array with one fitness value per solution (a scalar for each single-objective solution, or an objective vector for each multi-objective solution). Cached rows are skipped, so batches can contain non-contiguous indices and the final batch can be smaller than the configured size.
 
 See [Batch Fitness Calculation](https://pygad.readthedocs.io/en/latest/fitness_calculation.html#batch-fitness-calculation) for details and examples. Added in [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0).
 :::
@@ -473,7 +477,9 @@ Runs the fitness calculation in parallel. It defaults to `None` (no parallel pro
 You can set it to:
 
 - **A positive integer:** the number of threads. Example: `parallel_processing=5` uses 5 threads (the same as `["thread", 5]`).
-- **A list/tuple of 2 elements:** the first is `"process"` or `"thread"`; the second is the number of processes or threads. Example: `parallel_processing=["process", 10]` uses 10 processes.
+- **A list/tuple of 2 elements:** the first is `"process"` or `"thread"`; the second is a positive maximum worker count, `None` for the executor's default, or `0` to disable parallel processing. Example: `parallel_processing=["process", 10]` uses up to 10 processes.
+
+Validation normalizes a positive integer to `["thread", count]` and a zero worker count to `None`. Workers are created only for uncached fitness work and reused during one `run()`, including adaptive offspring evaluation. Completion, early stopping, and exceptions shut down the pool. Calling `cal_pop_fitness()` outside a run uses a temporary pool. Process-based scripts should start the GA under `if __name__ == "__main__":`.
 
 Added in [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0). See [Parallel Processing in PyGAD](https://pygad.readthedocs.io/en/latest/fitness_calculation.html#parallel-processing-in-pygad) for more information.
 :::
@@ -525,6 +531,8 @@ Here is the list of scripts and the classes that the `pygad.GA` class extends:
 12. `visualize/plot.py`
     1. `visualize.plot.Plot`: All plot methods. See [`pygad.visualize`](https://pygad.readthedocs.io/en/latest/visualize.html).
 
+`utils.engine.GAEngine` also extends `utils.parallel.FitnessEvaluation`, so `pygad.GA` indirectly inherits its fitness dispatch and serialization methods. See the {ref}`pygad.utils.parallel reference <fitness-evaluation>` for all of its methods, the process-worker function, and runtime attributes.
+
 Since the `pygad.GA` class extends such classes, the attributes and methods inside them can be retrieved by instances of the `pygad.GA` class.
 
 ### Class Attributes
@@ -535,7 +543,7 @@ Since the `pygad.GA` class extends such classes, the attributes and methods insi
 
 ### Other Instance Attributes & Methods
 
-All the parameters and functions passed to the `pygad.GA` class constructor are used as class attributes and methods in the instances of the `pygad.GA` class. In addition to such attributes, there are other attributes and methods added to the instances of the `pygad.GA` class.
+Constructor settings and user callables are stored as instance attributes, with some values normalized during validation. Active operators are exposed as `select_parents`, `crossover`, and `mutation`. The following sections describe additional instance attributes and inherited methods; the supported numeric type lists above are class attributes.
 
 > The `GA` class gains the attributes of its parent classes via inheritance, making them accessible through the `GA` object even if they are defined externally to its specific class body.
 
@@ -548,7 +556,7 @@ All the parameters and functions passed to the `pygad.GA` class constructor are 
 - `generations_completed`: Number of the last completed generation.
 - `run_completed`: Set to `True` only after the `run()` method completes gracefully.
 - `valid_parameters`: Set to `True` when all the parameters passed in the `GA` class constructor are valid.
-- `run_start_time`: Monotonic clock value captured right before the generation loop starts. Internal.
+- `run_start_time`: Monotonic clock value captured after `on_start` and before initial fitness evaluation in each `run()`. Used by the `time_<seconds>` stop criterion; it is not a wall-clock timestamp. Internal.
 - `logger`: Logger object from the `logging` module. Supported in [PyGAD 3.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-0-0).
 
 ##### Methods
@@ -591,19 +599,38 @@ All the parameters and functions passed to the `pygad.GA` class constructor are 
 
 - `last_generation_fitness`: Fitness values of the solutions in the last generation. Added in [PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
 - `previous_generation_fitness`: Fitness of the population one step before `last_generation_fitness`. Used to skip re-evaluating solutions PyGAD has already seen. Added in [PyGAD 2.16.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-2).
-- `best_solutions_fitness`: List of best-solution fitness per generation.
+- `best_solutions_fitness`: Fitness history of the best solution per generation, including the final population. Recorded even when `save_best_solutions=False`; with saving enabled, entries correspond to `best_solutions`.
 - `best_solutions`: A NumPy array of the best solution per generation. Only populated when `save_best_solutions=True`.
-- `best_solutions_fitness`: Fitness for every entry in `best_solutions`.
 - `solutions`: All visited solutions when `save_solutions=True`.
 - `solutions_fitness`: Fitness for every entry in `solutions`.
-- `num_fitness_evaluations`: Number of solutions whose fitness was evaluated during the current `run()` call, including adaptive offspring and all solutions in fitness batches. Cache hits do not count; each new run resets the counter.
+- `num_fitness_evaluations`: Number of solutions evaluated during the current `run()`, including adaptive offspring and every solution in returned fitness batches. Cache hits do not count. Each run resets the counter after `on_start`; direct fitness evaluations outside a run increment the existing count. `evaluations_<N>` checks the count at generation boundaries, so the run can exceed the requested budget by a generation's work.
 - `best_solution_generation`: Generation at which the best fitness was reached. `-1` until `run()` completes.
 
 ##### Methods
 
 - `cal_pop_fitness()`: Compute the fitness of every solution in the current population, reusing previously calculated values where possible.
-- `best_solution(pop_fitness=None)`: Return the best solution, its fitness, and its population index.
-- `adaptive_mutation_population_fitness(offspring)`: Average fitness used by adaptive mutation to split solutions into low / high quality.
+- `best_solution(pop_fitness=None)`: Return the best solution in the current population, its fitness, and its population index. Pass the current population's fitness to avoid additional evaluation. See {ref}`best_solution() <current-population-best-solution>` for single-objective and multi-objective selection rules.
+- `adaptive_mutation_population_fitness(offspring)`: Return `(average_fitness, offspring_fitness)` using retained solutions and actual offspring before mutation. See the {ref}`adaptive fitness reference <adaptive-offspring-fitness>`.
+
+#### Fitness Worker Lifecycle (internal)
+
+The `FitnessEvaluation` mixin manages these attributes and methods. They may not exist on a newly constructed or loaded GA until first use; use the public configuration parameters to control evaluation.
+
+##### Attributes
+
+- `_fitness_run_active`: `True` while `run()` is active; set to `False` on exit, including errors.
+- `_fitness_executor`: Lazily created run-owned thread or process executor, or `None` after shutdown. Pools for direct evaluations outside a run are temporary and not stored here.
+- `_fitness_executor_config`: Normalized `(mode, max_workers)` tuple for the active pool, or `None` after shutdown.
+
+##### Methods
+
+- `__getstate__()`: Return serializable instance state excluding the three runtime worker attributes.
+- `_shutdown_fitness_executor()`: Detach the run-owned executor and wait for submitted work to finish.
+- `_fitness_pool()`: Context manager supplying a reusable run-owned pool or a temporary pool outside a run.
+- `_map_fitness(tasks)`: Yield fitness results in task order using serial calls, threads, or process snapshots.
+- `_evaluate_fitness(population, indices, adaptive=False)`: Evaluate selected rows, prepare scalar or batch arguments, validate results, and update the evaluation count.
+
+The {ref}`complete fitness dispatch reference <fitness-evaluation>` documents parameters, return values, exceptions, process isolation, and attribute lifetimes.
 
 #### Parent Selection (general)
 
@@ -764,6 +791,8 @@ Accepts the following parameter:
 
 * `filename`: Name of the file to save the instance. No extension is needed.
 
+The file is written as `filename + ".pkl"` using cloudpickle. Saving during a run excludes live worker handles and the active-run flag through `__getstate__()`. The remaining GA state, including custom attributes, must be serializable. {ref}`pygad.load() <loading-ga-checkpoint>` restores the saved optimization state; the next `run()` creates a new pool when needed. A checkpoint does not contain in-flight worker tasks.
+
 (generate-report)=
 ### `generate_report()`
 
@@ -798,6 +827,7 @@ The title page shows the PyGAD logo. The image ships with the package, so it wor
 
 Besides the methods available in the `pygad.GA` class, this section discusses the functions available in `pygad`. Up to this time, there is only a single function named `load()`.
 
+(loading-ga-checkpoint)=
 ### `pygad.load()`
 
 Reads a saved instance of the genetic algorithm. This is not a method but a function that is indented under the `pygad` module. So, it could be called by the pygad module as follows: `pygad.load(filename)`.

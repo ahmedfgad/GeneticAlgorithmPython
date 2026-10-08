@@ -2,7 +2,7 @@
 
 PyGAD bundles common benchmark problems under `pygad.benchmarks`. Each problem is a class callable with `(ga, solution, sol_idx)` and returns a fitness in PyGAD's maximisation format. Minimisation values are negated.
 
-Class attributes for setting up the GA:
+Attributes for setting up the GA (some are class attributes and others are set on each problem instance):
 
 - `num_genes`: number of decision variables.
 - `num_objectives`: number of objectives (`1` for single-objective).
@@ -83,7 +83,23 @@ ga.run()
 
 In `pygad.benchmarks.tsp`. Build `TSP` from either a 2D `coordinates` array or a square `distance_matrix`. A solution is a permutation of city indices and the fitness is the negative tour length (the tour closes back to the start). Non-permutation candidates get a large negative penalty.
 
-Class attributes `gene_space=list(range(num_cities))`, `gene_type=int`, and `allow_duplicate_genes=False` keep the permutation constraint:
+The attributes `gene_space=list(range(num_cities))`, `gene_type=int`, and `allow_duplicate_genes=False` keep the permutation constraint:
+
+#### `TSP` Attributes
+
+- `coordinates`: NumPy array of city coordinates, or `None` when the problem is built from a distance matrix.
+- `distance_matrix`: NumPy array of distances between cities, computed from the coordinates or supplied to the constructor.
+- `num_genes`: Number of cities, set from the distance matrix's size.
+- `gene_space`: List of city indices from `0` through `num_genes - 1`.
+- `num_objectives=1`, `gene_type=int`, and `allow_duplicate_genes=False`: Class attributes defining the fitness and permutation encoding.
+
+#### `tour_length(tour)`
+
+Accepts a one-dimensional sequence of city indices and returns the closed tour's length as a Python `float`. Distances are summed between consecutive cities, including the return from the last city to the first. For example, `problem.tour_length([0, 1, 2, 3])` measures that route without calling the fitness function.
+
+This method converts the indices to integers and directly indexes `distance_matrix`; it does not validate that every city is visited exactly once. Pass a valid permutation to measure a TSP solution. The fitness callable `problem(ga, solution, sol_idx)` checks the converted tour's length, uniqueness, and index bounds, returning a negative penalty for invalid tours and `-problem.tour_length(solution)` for valid tours. The `ga` and `sol_idx` arguments are accepted for compatibility with PyGAD and are not used in the calculation.
+
+#### Permutation Mutation
 
 Every city index is already present in a valid tour, so random mutation has no unused replacement value. Its compatible-swap fallback exchanges two city positions instead, keeping the tour valid. Adaptive mutation uses the same fallback. Each position can be swapped at most once in a mutation pass, preventing a second swap from immediately undoing the first.
 
