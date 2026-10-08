@@ -162,6 +162,8 @@ The upper value of the random range from which the gene values in the initial po
 :animate: fade-in-slide-down
 
 Added in [PyGAD 2.13.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-13-0). If `True`, then a solution/chromosome may have duplicate gene values. If `False`, then each gene will have a unique value in its solution.
+
+For permutation encodings where every value in `gene_space` is already used, random and adaptive mutation try a compatible swap instead of keeping the selected gene unchanged. The fallback preserves destination gene types, numeric values, gene spaces, uniqueness, and constraints. Each gene can participate in at most one fallback swap per mutation pass. If no compatible partner exists, the gene stays unchanged. See {ref}`Mutation Methods <mutation-methods>`.
 :::
 
 :::{dropdown} `sample_size=100`: Sample size used when searching for a valid value.
@@ -266,6 +268,8 @@ If `crossover_type=None`, the crossover step is skipped and no offspring are cre
 :animate: fade-in-slide-down
 
 Only used when `crossover_type` is `'sbx'`. Sets how close the children stay to the parents. A higher value means children stay closer. Must be a positive number. Defaults to `30`.
+
+Each crossed gene selects the lower or upper SBX child with equal probability. This avoids consistently moving genes below their parents' midpoint. The bounds are taken from `init_range_low` and `init_range_high`.
 :::
 
 :::{dropdown} `crossover_probability=None`: Chance a parent is used for crossover.
@@ -706,6 +710,7 @@ All the parameters and functions passed to the `pygad.GA` class constructor are 
 
 - `mutation()`: Active mutation operator. Bound during validation according to `mutation_type`.
 - `random_mutation(offspring)`: Random mutation (replaces or adds a uniform random value).
+- `swap_gene_by_space(solution, gene_idx, swapped_genes=None)`: Compatible-swap fallback when a unique replacement cannot be selected from the gene space. Modifies the solution in place and optionally records the swapped positions for the current mutation pass.
 - `swap_mutation(offspring)`: Swap mutation.
 - `inversion_mutation(offspring)`: Inversion mutation.
 - `scramble_mutation(offspring)`: Scramble mutation.

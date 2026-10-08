@@ -720,3 +720,15 @@ Watch the release video on [YouTube](https://youtu.be/EXMy37crL7c).
 36. The PDF report built by `generate_report()` now shows the PyGAD logo on its title page. The logo image ships with the package, so no network access is needed. If the image file is missing, the report is built without it.
 37. Two private helper functions are added to the `pygad/utils/report.py` script for the logo. `_pdf_report_read_logo_bytes()` reads the bundled logo file and returns its bytes, or `None` if the file is missing. `_pdf_report_build_logo_image()` builds the image that is placed on the title page, or returns `None` so the report still builds without the logo.
 38. The private helper functions in the `pygad/utils/report.py` script are renamed to start with the `_pdf_report_` prefix so their purpose is clear from the name. For example, `_build_title_section()` becomes `_pdf_report_build_title_section()` and `_render_plot_to_png()` becomes `_pdf_report_render_plot_to_png()`.
+
+## Unreleased
+
+These changes are available in the repository after PyGAD 3.7.0 and will be included in a future release.
+
+1. Two-point crossover selects two distinct random cut points from `0` through `num_genes`, with every pair equally likely. The segment length can vary from one to all genes, and the single-gene case no longer raises a slicing error. See [PR #371](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/371).
+2. Swap mutation can select any pair of distinct gene positions, matching its documentation. Single-gene offspring are returned unchanged. See [PR #375](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/375).
+3. SBX crossover selects the lower or upper child with equal probability, removing the bias toward lower gene values. See [PR #376](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/376).
+4. Random and adaptive mutation can change permutations when `allow_duplicate_genes=False` leaves no unused replacement value. The fallback swaps compatible genes while preserving their numeric values, destination types, gene spaces, uniqueness, and constraints. Swapped genes are tracked within each mutation pass to prevent immediately undoing a swap. See [PR #373](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/373).
+5. Regression tests cover single-gene behavior, cut-point and swap-pair coverage, SBX symmetry and bounds, mixed gene types, constrained permutations, both adaptive mutation controls, and reproducibility. The `pygad.utils` submodule version is `1.5.2`.
+
+The operators consume different random draws from earlier versions. Runs with the same `random_seed` remain reproducible within the same version and environment, but can produce different results from earlier versions.

@@ -74,7 +74,11 @@ class Mutation:
         # For each offspring, a value from the gene space is selected randomly and assigned to the selected mutated gene.
         for offspring_idx in range(offspring.shape[0]):
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), self.mutation_num_genes))
+            swapped_genes = set()
             for gene_idx in mutation_indices:
+
+                if gene_idx in swapped_genes:
+                    continue
 
                 value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
                                                                     gene_idx=gene_idx,
@@ -83,7 +87,8 @@ class Mutation:
                 if self.allow_duplicate_genes == False and value_from_space == offspring[offspring_idx, gene_idx]:
                     # No value of the gene space is free (e.g. a permutation): swap the gene with another one instead.
                     offspring[offspring_idx] = self.swap_gene_by_space(solution=offspring[offspring_idx],
-                                                                       gene_idx=gene_idx)
+                                                                       gene_idx=gene_idx,
+                                                                       swapped_genes=swapped_genes)
                     continue
 
                 # Before assigning the selected value from the space to the gene, change its data type and round it.
@@ -118,7 +123,11 @@ class Mutation:
         # For each offspring, a value from the gene space is selected randomly and assigned to the selected mutated gene.
         for offspring_idx in range(offspring.shape[0]):
             probs = numpy.random.random(size=offspring.shape[1])
+            swapped_genes = set()
             for gene_idx in range(offspring.shape[1]):
+
+                if gene_idx in swapped_genes:
+                    continue
 
                 if probs[gene_idx] <= self.mutation_probability:
                     value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
@@ -128,7 +137,8 @@ class Mutation:
                     if self.allow_duplicate_genes == False and value_from_space == offspring[offspring_idx, gene_idx]:
                         # No value of the gene space is free (e.g. a permutation): swap the gene with another one instead.
                         offspring[offspring_idx] = self.swap_gene_by_space(solution=offspring[offspring_idx],
-                                                                           gene_idx=gene_idx)
+                                                                           gene_idx=gene_idx,
+                                                                           swapped_genes=swapped_genes)
                         continue
 
                     # Assigning the selected value from the space to the gene.
@@ -215,16 +225,20 @@ class Mutation:
 
     def swap_gene_by_space(self,
                            solution,
-                           gene_idx):
+                           gene_idx,
+                           swapped_genes=None):
         """
         With ``allow_duplicate_genes=False``, a gene cannot take a new
         value from its space when all of them are used by other genes,
         as in a permutation (``gene_space=range(num_genes)``). To still
         change the solution, swap the gene's value with the value of
-        another gene, picked at random among the genes whose value is
-        in this gene's space and whose space holds this gene's value.
-        The swap keeps the genes unique. Genes with a
-        ``gene_constraint`` are not swapped.
+        another compatible gene, picked at random. Both values are
+        cast and rounded for their destination genes. A swap is only
+        allowed if this preserves their numeric values and both gene
+        spaces, so it also preserves uniqueness. Genes with a
+        ``gene_constraint`` are not swapped, and any constraints on
+        other genes must still hold after the swap. Each gene
+        participates in at most one fallback swap per mutation pass.
 
         Parameters
         ----------
@@ -232,6 +246,10 @@ class Mutation:
             The solution that owns the gene (modified in place).
         gene_idx : int
             Index of the gene inside ``solution``.
+        swapped_genes : set, optional
+            Indices already swapped in this offspring's mutation
+            pass. Updated in place after a successful swap. Omit it
+            when calling this helper independently.
 
         Returns
         -------
@@ -248,20 +266,62 @@ class Mutation:
         def has_constraint(idx):
             return bool(self.gene_constraint and self.gene_constraint[idx])
 
-        if has_constraint(gene_idx):
+        if swapped_genes is None:
+            swapped_genes = set()
+
+        if gene_idx in swapped_genes or has_constraint(gene_idx):
             return solution
 
         gene_value = solution[gene_idx]
-        candidates = [other_idx for other_idx in range(len(solution))
-                      if solution[other_idx] != gene_value
-                      and not has_constraint(other_idx)
-                      and solution[other_idx] in gene_space_values(gene_idx)
-                      and gene_value in gene_space_values(other_idx)]
+        candidates = []
+        for other_idx, other_value in enumerate(solution):
+            if (other_idx in swapped_genes or other_value == gene_value
+                    or has_constraint(other_idx)):
+                continue
+
+            try:
+                new_gene_value = self.change_gene_dtype_and_round(gene_idx, other_value)
+                new_other_value = self.change_gene_dtype_and_round(other_idx, gene_value)
+            except (OverflowError, ValueError, TypeError):
+                # A value that cannot be represented by the destination
+                # dtype cannot be part of a permutation-preserving swap.
+                continue
+
+            # Preserve the original set of numeric values. In particular,
+            # casting or rounding must not turn a value into a duplicate.
+            if new_gene_value != other_value or new_other_value != gene_value:
+                continue
+            if (new_gene_value not in gene_space_values(gene_idx)
+                    or new_other_value not in gene_space_values(other_idx)):
+                continue
+
+            # A constraint on a different gene may depend on either
+            # swapped position. Validate the complete candidate solution.
+            if self.gene_constraint:
+                candidate_solution = solution.copy()
+                candidate_solution[gene_idx] = new_gene_value
+                candidate_solution[other_idx] = new_other_value
+                constraints_satisfied = True
+                for idx, constraint in enumerate(self.gene_constraint):
+                    if constraint is None:
+                        continue
+                    values = numpy.array([candidate_solution[idx]])
+                    selected_values = constraint(candidate_solution.copy(), values.copy())
+                    if not self.validate_gene_constraint_callable_output(selected_values, values):
+                        raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is a subset of the passed values (second argument).")
+                    if len(selected_values) == 0:
+                        constraints_satisfied = False
+                        break
+                if not constraints_satisfied:
+                    continue
+
+            candidates.append((other_idx, new_gene_value, new_other_value))
 
         if len(candidates) > 0:
-            other_idx = random.choice(candidates)
-            solution[gene_idx] = solution[other_idx]
-            solution[other_idx] = gene_value
+            other_idx, new_gene_value, new_other_value = random.choice(candidates)
+            solution[gene_idx] = new_gene_value
+            solution[other_idx] = new_other_value
+            swapped_genes.update((gene_idx, other_idx))
         return solution
 
     def mutation_randomly(self, offspring):
@@ -757,7 +817,11 @@ class Mutation:
                     adaptive_mutation_num_genes = self.mutation_num_genes[1]
 
             mutation_indices = numpy.array(random.sample(range(0, self.num_genes), adaptive_mutation_num_genes))
+            swapped_genes = set()
             for gene_idx in mutation_indices:
+
+                if gene_idx in swapped_genes:
+                    continue
 
                 value_from_space = self.mutation_process_gene_value(solution=offspring[offspring_idx],
                                                                     gene_idx=gene_idx,
@@ -766,7 +830,8 @@ class Mutation:
                 if self.allow_duplicate_genes == False and value_from_space == offspring[offspring_idx, gene_idx]:
                     # No value of the gene space is free (e.g. a permutation): swap the gene with another one instead.
                     offspring[offspring_idx] = self.swap_gene_by_space(solution=offspring[offspring_idx],
-                                                                       gene_idx=gene_idx)
+                                                                       gene_idx=gene_idx,
+                                                                       swapped_genes=swapped_genes)
                     continue
 
                 # Assigning the selected value from the space to the gene.
@@ -906,7 +971,11 @@ class Mutation:
                     adaptive_mutation_probability = self.mutation_probability[1]
 
             probs = numpy.random.random(size=offspring.shape[1])
+            swapped_genes = set()
             for gene_idx in range(offspring.shape[1]):
+
+                if gene_idx in swapped_genes:
+                    continue
 
                 if probs[gene_idx] <= adaptive_mutation_probability:
 
@@ -917,7 +986,8 @@ class Mutation:
                     if self.allow_duplicate_genes == False and value_from_space == offspring[offspring_idx, gene_idx]:
                         # No value of the gene space is free (e.g. a permutation): swap the gene with another one instead.
                         offspring[offspring_idx] = self.swap_gene_by_space(solution=offspring[offspring_idx],
-                                                                           gene_idx=gene_idx)
+                                                                           gene_idx=gene_idx,
+                                                                           swapped_genes=swapped_genes)
                         continue
 
                     # Assigning the selected value from the space to the gene.

@@ -174,7 +174,9 @@ lambda solution,values: [val for val in values if val<5]
 
 The first parameter is the solution where the target gene exists. It is passed just in case you would like to compare the gene value with other genes. The second parameter is the list of candidate values for the gene. The objective of the lambda function is to filter the values and return only the valid values that are less than 5.
 
-#### What does the `solution` parameter hold?
+For the permutation mutation fallback, genes with their own constraints are excluded from swaps. Constraints on other genes are checked against a candidate solution containing both proposed swapped values. The swap is committed only if those constraints still hold, so a constraint that depends on another gene is not invalidated by the fallback.
+
+### What does the `solution` parameter hold?
 
 The `solution` passed to the callable is **not** a fixed snapshot taken before the operation started. PyGAD processes the genes one at a time and writes each gene's chosen value back into the solution *in place* before moving on to the next gene. So the `solution` is updated incrementally, and the state it is in when a given gene's constraint runs depends on which genes were already processed in the current step:
 

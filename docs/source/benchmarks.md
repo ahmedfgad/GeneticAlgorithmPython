@@ -85,6 +85,8 @@ In `pygad.benchmarks.tsp`. Build `TSP` from either a 2D `coordinates` array or a
 
 Class attributes `gene_space=list(range(num_cities))`, `gene_type=int`, and `allow_duplicate_genes=False` keep the permutation constraint:
 
+Every city index is already present in a valid tour, so random mutation has no unused replacement value. Its compatible-swap fallback exchanges two city positions instead, keeping the tour valid. Adaptive mutation uses the same fallback. Each position can be swapped at most once in a mutation pass, preventing a second swap from immediately undoing the first.
+
 ```python
 import pygad
 from pygad.benchmarks.tsp import TSP

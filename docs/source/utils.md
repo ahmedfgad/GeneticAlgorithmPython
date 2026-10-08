@@ -131,6 +131,7 @@ The `pygad.utils.crossover` module has a class named `Crossover` with the suppor
 2. Two points: Implemented using the `two_points_crossover()` method.
 3. Uniform: Implemented using the `uniform_crossover()` method.
 4. Scattered: Implemented using the `scattered_crossover()` method.
+5. Simulated binary: Implemented using the `sbx_crossover()` method.
 
 Crossover takes two parents and builds a child by mixing their genes. The next figure shows how single-point, two-point, and uniform crossover do this.
 
@@ -168,7 +169,7 @@ Applies the 2 points crossover. It selects the 2 points randomly at which crosso
 
 The two distinct cut points are selected from `0` through `num_genes`, including both ends. Every pair is equally likely, and the segment copied from the second parent can contain between one and all genes. With a single gene, that gene is copied from the second parent.
 
-The corrected two-point crossover, swap mutation, and SBX crossover use different random draws from earlier versions. Runs remain reproducible with the same `random_seed` within this version, but their results can differ from earlier versions.
+The corrected two-point crossover, swap mutation, SBX crossover, and permutation mutation fallback use different random draws from earlier versions. Runs remain reproducible with the same `random_seed` within the same version and environment, but their results can differ from earlier versions.
 
 #### `uniform_crossover()`
 
@@ -177,6 +178,12 @@ Applies the uniform crossover. For each gene, a parent out of the 2 mating paren
 #### `scattered_crossover()`
 
 Applies the scattered crossover. It randomly selects the gene from one of the 2 parents. 
+
+#### `sbx_crossover()`
+
+Applies simulated binary crossover for numeric genes. The `sbx_crossover_eta` parameter controls the spread: larger values keep children closer to their parents. Bounds come from `init_range_low` and `init_range_high`, which can specify a separate range for each gene.
+
+For each crossed gene, SBX produces two possible values on opposite sides of the parents' midpoint. PyGAD selects either value with probability `0.5`, avoiding the downward bias from always selecting the lower child. Equal parent values are copied unchanged.
 
 ## `pygad.utils.mutation` Submodule
 
@@ -202,6 +209,7 @@ All mutation methods accept this parameter:
 
 1. `offspring`: The offspring to mutate.
 
+(mutation-methods)=
 ### Mutation Methods
 
 The `Mutation` class in the `pygad.utils.mutation` module supports several methods for applying mutation. All of these methods accept the same parameter which is:
@@ -215,6 +223,12 @@ The next subsections list the supported methods for mutation.
 #### `random_mutation()`
 
 Applies the random mutation which changes the values of some genes randomly. The number of genes is specified according to either the `mutation_num_genes` or the `mutation_percent_genes` attributes.
+
+When `allow_duplicate_genes=False` and every value in a gene's space is already used, a replacement cannot be selected. Random mutation then tries a compatible swap instead. This allows permutation encodings, such as TSP tours, to change even when there are no unused values.
+
+Both swapped values must keep their numeric values after conversion to their destination gene types and rounding, and must belong to both destination gene spaces. Genes with a `gene_constraint` are excluded from swaps, and any constraints on other genes must remain satisfied. If no compatible partner exists, the gene stays unchanged.
+
+Each gene participates in at most one fallback swap per offspring per mutation pass, so selecting both genes of a two-gene permutation does not undo the swap. A fallback swap changes two positions; `mutation_num_genes` or `mutation_probability` selects the genes that can initiate mutation, rather than guaranteeing the number of changed positions. A swap partner can be outside the selected mutation indices.
 
 For each gene, a random value is selected according to the range specified by the 2 attributes `random_mutation_min_val` and `random_mutation_max_val`. The random value is added to the selected gene.
 
@@ -236,6 +250,8 @@ Applies the scramble mutation which selects a subset of genes and shuffles their
 
 Applies the adaptive mutation, which selects the number/percentage of genes to mutate based on the solution's fitness. If the fitness is high (the solution quality is high), then a smaller number/percentage of genes is mutated compared to a solution with low fitness.
 
+The count-based and probability-based adaptive mutation methods use the same compatible-swap fallback for permutations as random mutation. Their fitness-based controls select which genes can initiate a mutation; swapped partners are not mutated again in the same pass.
+
 ### Mutation Helper Methods
 
 The `pygad.utils.mutation` module has some helper methods to assist applying the mutation operation:
@@ -250,6 +266,7 @@ The `pygad.utils.mutation` module has some helper methods to assist applying the
 8. `adaptive_mutation_probs_by_space()`: Uses the mutation probabilities to decide which genes to apply the adaptive mutation by space.
 9. `adaptive_mutation_randomly()`: Applies the adaptive mutation randomly. A number of genes are selected randomly for mutation. This number depends on the fitness of the solution. The random values are selected based on the 2 parameters `random_mutation_min_val` and `random_mutation_max_val`.
 10. `adaptive_mutation_probs_randomly()`: Uses the mutation probabilities to decide which genes to apply the adaptive mutation randomly.
+11. `swap_gene_by_space(solution, gene_idx, swapped_genes=None)`: Swap one gene with a compatible partner while preserving gene types, numeric values, gene spaces, uniqueness, and constraints. The solution is modified in place. The optional `swapped_genes` set tracks both positions already swapped in the same offspring's mutation pass; start with a new set for each pass.
 
 ## `pygad.utils.parent_selection` Submodule
 
