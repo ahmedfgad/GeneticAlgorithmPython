@@ -1,6 +1,6 @@
 # `pygad.visualize` Module
 
-The `pygad.visualize.plot.Plot` class is mixed into `pygad.GA`. Each method below is callable on a GA instance after `run()`.
+The `pygad.visualize.plot.Plot` class is mixed into `pygad.GA`. Each method below is callable on a GA instance after `run()`. `plot_lifecycle()` can also be called before `run()` because it draws the configured execution flow.
 
 Every method returns the `matplotlib.figure.Figure` it created and optionally writes it to disk via `save_dir`. A runnable script for each plot lives under [`examples/plots/`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/plots).
 
@@ -8,6 +8,7 @@ Every method returns the `matplotlib.figure.Figure` it created and optionally wr
 
 | Method | Works for | Needs `save_solutions=True` |
 |---|---|---|
+| `plot_lifecycle()` | SOO + MOO, before or after `run()` | no |
 | `plot_fitness()` | SOO + MOO | no |
 | `plot_new_solution_rate()` | SOO + MOO | yes |
 | `plot_genes()` | SOO + MOO | yes (`solutions="all"`) or `save_best_solutions=True` (`solutions="best"`) |
@@ -20,7 +21,40 @@ Every method returns the `matplotlib.figure.Figure` it created and optionally wr
 | `plot_population_diversity()` | SOO + MOO | yes |
 | `plot_pareto_front_evolution()` | MOO (M=2 or M=3) | yes |
 
-Every method requires at least one completed generation. Each one raises `RuntimeError` with a clear message if it is called too early, on a single-objective problem when MOO is required, or without the `save_solutions` flag when one is required.
+Except for `plot_lifecycle()`, every method requires at least one completed generation. Each one raises `RuntimeError` with a clear message if it is called too early, on a single-objective problem when MOO is required, or without the `save_solutions` flag when one is required.
+
+(plot-lifecycle)=
+## `plot_lifecycle()`
+
+Draw the lifecycle configured for a GA instance: initial fitness evaluation, parent selection, crossover, mutation, population update, fitness reevaluation, and the generation loop. The chart includes the configured callbacks at their execution points, a generation-limit decision, and early stopping when a stopping criterion is set or `on_generation` can return `"stop"`.
+
+```python
+ga_instance.plot_lifecycle()
+```
+
+![plot_lifecycle](figures/plot_lifecycle.png)
+
+Operator cards show handler names, relevant probabilities, and parent or offspring shapes. The population update shows the effective retention policy: `keep_elitism` takes precedence over `keep_parents`. The configuration panel shows population size, generations per `run()`, gene types and precision, gene space or initialization range, constraints, and saving settings. Fitness batching and parallel processing appear when configured. Long gene configurations are abbreviated to keep the chart readable.
+
+Callbacks appear only when supplied. If `crossover_type=None` or `mutation_type=None`, the corresponding card is marked as bypassed. Configured `on_crossover` and `on_mutation` callbacks still appear because they run even when the operator is disabled. Adaptive mutation includes its additional offspring fitness evaluation, and NSGA-III includes reference-point preparation. NSGA-III may grow the population during this preparation; shapes in a chart drawn before `run()` describe the current configuration.
+
+Parameters: `title` (default `"PyGAD - Lifecycle"`), `font_size` (default `11`, finite and positive), `show_parameters` (default `True`), `save_dir` (default `None`), `show` (default `True`).
+
+Use `show_parameters=False` for a compact chart that keeps handler names and control flow. Set `show=False` to create or save a chart without displaying it. The method always returns the figure, so it can be customized further.
+
+```python
+# Save a detailed chart. The filename extension selects SVG, PNG, or PDF.
+fig = ga_instance.plot_lifecycle(title="PyGAD - Scheduling Optimization",
+                                 save_dir="lifecycle.svg",
+                                 show=False)
+
+# Display a compact chart.
+ga_instance.plot_lifecycle(show_parameters=False)
+```
+
+The method reads the current GA configuration without evaluating fitness, calling operators or callbacks, or changing GA state. It describes the configured flow rather than recording the path taken during a run. Before fitness is available, the objective count is marked as unknown. After a run, the chart can show the known objective count and fitness shape. Each `run()` call uses the configured generation count, including when continuing a previous run.
+
+Install the optional plotting dependency with `pip install pygad[visualize]`. A complete example is available at [`examples/plots/example_plot_lifecycle.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/plots/example_plot_lifecycle.py).
 
 ## `plot_fitness()`
 

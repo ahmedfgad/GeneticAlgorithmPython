@@ -20,6 +20,26 @@ The next figure shows the same life cycle in more detail, including the callback
 The PyGAD life cycle in detail, including the callback functions called at each stage.
 :::
 
+## Plotting the Configured Lifecycle
+
+Call `plot_lifecycle()` to create a chart adjusted to the operators, callbacks, gene settings, and stopping conditions of a GA instance. It can be called before or after `run()`.
+
+```python
+ga_instance.plot_lifecycle()
+```
+
+The chart shows the generation loop and exit paths. It includes population replacement and fitness evaluation before `on_generation`, and marks disabled crossover or mutation as bypassed. Configured callbacks still appear at their execution points.
+
+Use `show_parameters=False` for a compact chart, or save the figure by passing `save_dir`. The filename extension selects the output format.
+
+```python
+ga_instance.plot_lifecycle(title="PyGAD - My Optimization Problem",
+                           save_dir="lifecycle.svg",
+                           show=False)
+```
+
+Drawing the chart does not run the GA or call user functions. See {ref}`plot_lifecycle() <plot-lifecycle>` for the parameters, a sample chart, and a runnable example. To print a text description, use {ref}`summary() <print-lifecycle-summary>`.
+
 ## Reporting Progress
 
 Use `on_generation` to report progress once a generation has completed. There is no need to change the fitness function or the GA operators:

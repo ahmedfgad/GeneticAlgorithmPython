@@ -530,6 +530,8 @@ Here is the list of scripts and the classes that the `pygad.GA` class extends:
     1. `helper.misc.Helper`: Generic helpers used across the library (population dtype handling, per-gene value generation, constraint sampling, lifecycle summary).
 12. `visualize/plot.py`
     1. `visualize.plot.Plot`: All plot methods. See [`pygad.visualize`](https://pygad.readthedocs.io/en/latest/visualize.html).
+13. `visualize/lifecycle.py`
+    1. Internal helpers that describe the configured lifecycle and draw its flowchart without running the GA or calling user functions.
 
 `utils.engine.GAEngine` also extends `utils.parallel.FitnessEvaluation`, so `pygad.GA` indirectly inherits its fitness dispatch and serialization methods. See the {ref}`pygad.utils.parallel reference <fitness-evaluation>` for all of its methods, the process-worker function, and runtime attributes.
 
@@ -568,6 +570,7 @@ Constructor settings and user callables are stored as instance attributes, with 
 - `run_mutation()`: Apply mutation and call `on_mutation` when defined. Internal. Added in [PyGAD 3.3.1](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1).
 - `run_update_population()`: Replace `self.population` with the crossed-over and mutated offspring. Internal. Added in [PyGAD 3.3.1](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1).
 - `summary(...)`: Prints a Keras-like summary of the PyGAD lifecycle. Added in [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0). See [Print Lifecycle Summary](https://pygad.readthedocs.io/en/latest/logging.html#print-lifecycle-summary).
+- `plot_lifecycle(title="PyGAD - Lifecycle", font_size=11, show_parameters=True, save_dir=None, show=True)`: Draws the configured lifecycle with operators, callbacks, population replacement, and stopping decisions. Works before or after `run()` and returns a matplotlib figure. See {ref}`plot_lifecycle() <plot-lifecycle>`.
 
 #### Population and Initialization
 

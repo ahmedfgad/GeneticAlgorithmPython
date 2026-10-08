@@ -2,6 +2,7 @@
 
 This page covers how to see what PyGAD is doing: printing a lifecycle summary and logging the outputs.
 
+(print-lifecycle-summary)=
 ## Print Lifecycle Summary
 
 In [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0), a new method called `summary()` is supported. It prints a Keras-like summary of the PyGAD lifecycle showing the steps, callback functions, parameters, etc.
@@ -120,6 +121,16 @@ On Generation          on_gen()                           None
 ----------------------------------------------------------------------
 ======================================================================
 ```
+
+## Plot Lifecycle Chart
+
+Use `plot_lifecycle()` to draw the configured lifecycle as a flowchart with operators, callbacks, population replacement, and stopping decisions. It works before or after `run()`.
+
+```python
+ga_instance.plot_lifecycle(save_dir="lifecycle.svg")
+```
+
+The method returns a matplotlib figure. Use `show_parameters=False` for a compact chart or `show=False` to save without displaying it. See {ref}`plot_lifecycle() <plot-lifecycle>` for the full description and an example.
 
 ## Logging Outputs
 

@@ -26,6 +26,77 @@ class Plot:
     def __init__():
         pass
 
+    def plot_lifecycle(self,
+                       title="PyGAD - Lifecycle",
+                       font_size=11,
+                       show_parameters=True,
+                       save_dir=None,
+                       show=True):
+        """
+        Draw the configured lifecycle, including active operators,
+        callbacks, the generation loop, and stopping conditions.
+
+        Can be called before or after ``run()``. Drawing the chart
+        does not evaluate fitness, call callbacks, or change GA state.
+        Objective counts are shown only when fitness is already known.
+
+        Parameters
+        ----------
+        title : str
+            Figure title. Use a problem name to identify the chart.
+        font_size : numeric
+            Positive font size. The figure scales with the font size.
+        show_parameters : bool
+            If True, include stage parameters and a configuration
+            panel. If False, show a compact chart with handler names.
+        save_dir : str or None
+            If set, save the figure to this path. The extension
+            determines the format, for example SVG, PNG, or PDF.
+        show : bool
+            If True, display the figure. Set to False when saving
+            charts in scripts, notebooks, or reports without showing
+            a window. The figure is returned in either case.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib figure that was created.
+
+        Raises
+        ------
+        TypeError
+            If a parameter has an unsupported type.
+        ValueError
+            If ``font_size`` is not finite and positive.
+        ImportError
+            If the optional matplotlib dependency is not installed.
+        """
+        if not isinstance(title, str):
+            raise TypeError("The title parameter must be a string.")
+        if isinstance(font_size, bool) or not isinstance(font_size, (int, float, numpy.integer, numpy.floating)):
+            raise TypeError("The font_size parameter must be a positive number.")
+        if not numpy.isfinite(font_size) or font_size <= 0:
+            raise ValueError("The font_size parameter must be finite and greater than 0.")
+        if not isinstance(show_parameters, bool) or not isinstance(show, bool):
+            raise TypeError("The show_parameters and show parameters must be bool values.")
+
+        # Keep chart construction separate from rendering so its flow
+        # can be checked without importing matplotlib or running a GA.
+        from pygad.visualize.lifecycle import _describe_lifecycle, _draw_lifecycle
+        lifecycle = _describe_lifecycle(self, show_parameters=show_parameters)
+        try:
+            matplt = get_matplotlib()
+        except ImportError as exc:
+            raise ImportError("plot_lifecycle requires matplotlib. Install it with: "
+                              "pip install pygad[visualize] (or pip install matplotlib).") from exc
+
+        fig = _draw_lifecycle(lifecycle, matplt, title, font_size)
+        if save_dir is not None:
+            fig.savefig(fname=save_dir, bbox_inches="tight")
+        if show:
+            matplt.show()
+        return fig
+
     def plot_fitness(self, 
                      title="PyGAD - Generation vs. Fitness", 
                      xlabel="Generation", 
