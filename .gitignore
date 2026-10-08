@@ -43,6 +43,9 @@ examples/data/*.npy
 # =============================================================================
 release_video/
 .pytest_cache/
+*.egg-info/
+build/
+dist/
 .claude/
 
 # Superpowers brainstorming companion

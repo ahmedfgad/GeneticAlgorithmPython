@@ -1,0 +1,44 @@
+name: Vilvik SDK compatibility
+
+on:
+  push:
+    branches: [master, github-actions]
+    paths: ['pygad/**', 'tests/**', 'pyproject.toml', '.github/workflows/vilvik-compatibility.yml']
+  pull_request:
+    paths: ['pygad/**', 'tests/**', 'pyproject.toml', '.github/workflows/vilvik-compatibility.yml']
+  schedule:
+    - cron: '23 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.9', '3.12']
+        sdk: [minimum, latest, development]
+    name: Python ${{ matrix.python }} / SDK ${{ matrix.sdk }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install PyGAD and test dependencies
+        run: python -m pip install . pytest responses
+      - name: Install SDK under test
+        env:
+          SDK_CHANNEL: ${{ matrix.sdk }}
+        run: |
+          case "$SDK_CHANNEL" in
+            minimum) python -m pip install 'vilvik==0.5.3' ;;
+            latest) python -m pip install --upgrade vilvik ;;
+            development) python -m pip install 'git+https://github.com/VilvikInc/vilvik-python.git@main' ;;
+          esac
+      - name: Verify real dependencies and run contract tests
+        run: |
+          python -c "import pygad, vilvik, responses; print('PyGAD', pygad.__version__, 'SDK', vilvik.__version__)"
+          python -m pytest tests/test_push_to_vilvik.py tests/test_vilvik_compatibility.py -q -ra

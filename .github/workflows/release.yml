@@ -21,7 +21,8 @@ jobs:
           python-version: "3.12"
       - name: Build distributions
         run: |
-          pip install build
+          pip install build . pytest responses 'vilvik>=0.5.3'
+          python -m pytest tests/test_push_to_vilvik.py tests/test_vilvik_compatibility.py -q
           python -m build
       - name: Check distributions
         run: |

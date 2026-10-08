@@ -425,9 +425,9 @@ class Mutation:
 
     def swap_mutation(self, offspring):
         """
-        Swap the values of two genes inside each offspring. One gene is
-        picked at random from the first half of the chromosome; the
-        other is its mirror in the second half.
+        Swap the values of two genes inside each offspring. The two
+        genes are 2 different genes picked at random.
+        Offspring with fewer than two genes are returned unchanged.
 
         Parameters
         ----------
@@ -440,9 +440,11 @@ class Mutation:
             The mutated offspring.
         """
 
+        if offspring.shape[1] < 2:
+            return offspring
+
         for idx in range(offspring.shape[0]):
-            mutation_gene1 = numpy.random.randint(low=0, high=offspring.shape[1]/2, size=1)[0]
-            mutation_gene2 = mutation_gene1 + int(offspring.shape[1]/2)
+            mutation_gene1, mutation_gene2 = numpy.random.choice(offspring.shape[1], size=2, replace=False)
 
             temp = offspring[idx, mutation_gene1]
             offspring[idx, mutation_gene1] = offspring[idx, mutation_gene2]
