@@ -83,8 +83,9 @@ publication is authorized. Pushing that tag publishes automatically.
 The previous source project was found at
 https://github.com/ahmedfgad/PyGADReleaseVideo and cloned as a sibling at
 `D:/Projects/PyGADReleaseVideo`. New work is on `codex/pygad-3.8.0-video`.
-It reuses the original animation kit, fonts and logo. The revised soundtrack
-uses calm synthesized pads and the user-approved soft wooden tap cues.
+It reuses the original animation kit, fonts, logo, background music, typing
+sounds and transition effects. Only the bell cues are replaced with the
+user-approved soft wooden tap.
 Runnable on-screen examples, real output, chapters and draft social posts
 are in `content/3.8.0/`. See that repository's `RELEASE_3.8.0.md` for builds.
 
@@ -94,7 +95,8 @@ on that repository's video branch, with MP4 files stored through Git LFS:
 https://github.com/ahmedfgad/PyGADReleaseVideo/tree/codex/pygad-3.8.0-video/PyGAD_3.8.0
 All four MP4 objects uploaded successfully and local Git LFS integrity checks
 passed. A fresh authenticated download of the preview matched its SHA-256 hash.
-The three full videos are 131 seconds each, and the preview is 25.5 seconds.
+The three full videos are 127 seconds each, and the preview is 21.5 seconds.
+The opening shows the logo and version for 5.5 seconds, down from 9.5 seconds.
 All four run at 60 fps,
 with H.264 video and AAC stereo audio. Every encoded frame decoded successfully;
 contact sheets from all nine segments were visually checked in all orientations.
@@ -104,7 +106,8 @@ no videos have been published to social platforms.
 
 The October 9 revisions move section takeaways into larger, high-contrast
 callouts above the output and enlarge the history chart in every orientation.
-Plots come from 360 dpi exports. Final audio checks passed for all four videos;
-the full videos measure -18.39 LUFS, and each reveal tap is at least 8.81 dB
-above the preceding music. Layout and audio measurements are included in the
+Plots come from 360 dpi exports. Audio checks verify that the original music
+and non-bell effects are preserved, including all 417 typing clicks. Encoded
+music, typing transients, tap levels, loudness and peaks are checked in all four
+videos. Layout and audio measurements are included in the
 video repository's `PyGAD_3.8.0/layout_review.json` and `audio_validation.json`.
