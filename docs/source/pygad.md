@@ -45,6 +45,8 @@ Number of genes in the solution/chromosome. This parameter is not needed if the 
 
 A population you provide yourself to start the run instead of a random one. It defaults to `None`, in which case PyGAD builds the initial population from the `sol_per_pop` and `num_genes` parameters.
 
+Pass a non-empty rectangular 2D list, tuple, or NumPy array of numeric values. PyGAD infers both dimensions from its shape, overriding any explicit `sol_per_pop` and `num_genes` values. It copies and converts the values using `gene_type`, applies `gene_constraint`, and repairs duplicates when `allow_duplicate_genes=False`. Supplied values may lie outside the gene space or initialization ranges; replacements follow the initialization settings. See [Creating the Initial Population](https://pygad.readthedocs.io/en/latest/gene_values.html#creating-the-initial-population).
+
 If `initial_population` is `None` and either `sol_per_pop` or `num_genes` is also `None`, an exception is raised.
 
 Introduced in [PyGAD 2.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-0-0) and higher.
@@ -153,13 +155,13 @@ Added in [PyGAD 3.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pyga
 :::{dropdown} `init_range_low=-4`: Lower bound for the initial gene values.
 :animate: fade-in-slide-down
 
-The lower value of the random range from which the gene values in the initial population are selected. `init_range_low` defaults to `-4`. Available in [PyGAD 1.0.20](https://pygad.readthedocs.io/en/latest/releases.html#pygad-1-0-20) and higher. This parameter has no action if the `initial_population` parameter exists.
+The lower value of the random range from which the gene values in the initial population are selected. `init_range_low` defaults to `-4`. Available in [PyGAD 1.0.20](https://pygad.readthedocs.io/en/latest/releases.html#pygad-1-0-20) and higher. Supplied values are preserved, but this bound is used when replacing a value to satisfy a constraint or repair duplicates. Generated range values stay within their bounds after conversion and rounding. See [Creating the Initial Population](https://pygad.readthedocs.io/en/latest/gene_values.html#creating-the-initial-population).
 :::
 
 :::{dropdown} `init_range_high=4`: Upper bound for the initial gene values.
 :animate: fade-in-slide-down
 
-The upper value of the random range from which the gene values in the initial population are selected. `init_range_high` defaults to `+4`. Available in [PyGAD 1.0.20](https://pygad.readthedocs.io/en/latest/releases.html#pygad-1-0-20) and higher. This parameter has no action if the `initial_population` parameter exists.
+The upper value of the random range from which the gene values in the initial population are selected. `init_range_high` defaults to `+4`. Available in [PyGAD 1.0.20](https://pygad.readthedocs.io/en/latest/releases.html#pygad-1-0-20) and higher. Supplied values are preserved, but this bound is used when replacing a value to satisfy a constraint or repair duplicates. Generated range values stay within their bounds after conversion and rounding. See [Creating the Initial Population](https://pygad.readthedocs.io/en/latest/gene_values.html#creating-the-initial-population).
 :::
 
 :::{dropdown} `allow_duplicate_genes=True`: Allow repeated values within a solution.
@@ -587,6 +589,11 @@ Constructor settings and user callables are stored as instance attributes, with 
 ##### Methods
 
 - `initialize_population(allow_duplicate_genes, gene_type, gene_constraint)`: Build the initial population, apply gene types and constraints, resolve duplicates when not allowed.
+- `generate_initial_population(num_solutions)`: Sample new population values in bulk and prepare the resulting solutions. Also used by NSGA-III population growth.
+- `prepare_initial_population(population)`: Convert generated or supplied rows, apply constraints, and repair duplicates.
+- `apply_initial_population_gene_constraints(population)`: Replace rejected values using initialization candidates, warning when no candidate satisfies a constraint.
+- `sample_initial_population_gene_values(gene_index, num_values)`: Sample one column from its space or initialization range.
+- `get_initial_population_gene_candidates(gene_index, sample_size, all_integer_values=True)`: Return converted replacement candidates for initialization constraints and duplicate repair.
 - `initialize_parents_array(shape)`: Allocate an empty parents (or offspring) array with the right dtype.
 - `change_population_dtype_and_round(population)`: Cast a 2D population to the dtype encoded in `self.gene_type` and round non-integer genes.
 - `change_gene_dtype_and_round(gene_index, gene_value)`: Same as above, but for a single gene value.

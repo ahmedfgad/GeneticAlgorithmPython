@@ -79,13 +79,13 @@ class GA(utils.parent_selection.ParentSelection,
         fitness_func: Accepts a function/method and returns the fitness value of the solution. In PyGAD 2.20.0, a third parameter is passed referring to the 'pygad.GA' instance.
         fitness_batch_size: Added in PyGAD 2.19.0. Supports calculating the fitness in batches. If the value is 1 or None, then the fitness function is called for each individual solution. If given another value X where X is neither 1 nor None (e.g. X=3), then the fitness function is called once for each X (3) solutions.
 
-        initial_population: A user-defined initial population. It is useful when the user wants to start the generations with a custom initial population. It defaults to None which means no initial population is specified by the user. In this case, PyGAD creates an initial population using the 'sol_per_pop' and 'num_genes' parameters. An exception is raised if the 'initial_population' is None while any of the 2 parameters ('sol_per_pop' or 'num_genes') is also None.
+        initial_population: A user-defined initial population. It is useful when the user wants to start the generations with a custom initial population. It defaults to None which means no initial population is specified by the user. In this case, PyGAD creates an initial population using the 'sol_per_pop' and 'num_genes' parameters. An exception is raised if the 'initial_population' is None while any of the 2 parameters ('sol_per_pop' or 'num_genes') is also None. A supplied population must be a non-empty rectangular 2D numeric list, tuple, or NumPy array. Its shape determines sol_per_pop and num_genes before per-gene validation. The input is copied, converted, checked against gene constraints, and repaired for duplicates when required.
         sol_per_pop: Number of solutions in the population. 
         num_genes: Number of genes in the solution.
 
         init_range_low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
         init_range_high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to 4. Available in PyGAD 1.0.20.
-        It is OK for the 2 parameters ('init_range_low' and 'init_range_high') to be equal, or for one to be higher or lower than the other (i.e. 'init_range_low' does not need to be lower than 'init_range_high').
+        It is OK for the 2 parameters ('init_range_low' and 'init_range_high') to be equal, or for one to be higher or lower than the other (i.e. 'init_range_low' does not need to be lower than 'init_range_high'). Generated range values remain inside the interval after conversion and rounding; an error is raised if the type and precision cannot represent any valid value.
 
         gene_type: The type of the gene. It is assigned to any of these types (int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, float, numpy.float16, numpy.float32, numpy.float64) and forces all the genes to be of that type.
 

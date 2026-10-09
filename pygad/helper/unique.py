@@ -94,7 +94,9 @@ class Unique:
         candidate_values = []
         for gene_index, gene_value in enumerate(new_solution):
             dtype = self.get_gene_dtype(gene_index)
-            if self.gene_space is None:
+            if build_initial_pop and min_val is None:
+                values = self.get_initial_population_gene_candidates(gene_index, sample_size)
+            elif self.gene_space is None:
                 if min_val is None:
                     if build_initial_pop:
                         range_min, range_max = self.get_initial_population_range(gene_index)
@@ -371,13 +373,19 @@ class Unique:
             else:
                 low, high = range_min[gene_index], range_max[gene_index]
             space = self.gene_space[gene_index] if self.gene_space_nested else self.gene_space
-            dtype = self.get_gene_dtype(gene_index)
-            if type(space) is dict and 'step' not in space and dtype[0] not in pygad.GA.supported_int_types:
-                # A deterministic inspection snapshot must not consume the
-                # random draws used to build and evolve the population.
-                values = numpy.linspace(space['low'], space['high'],
-                                        num=sample_size_from_inf_range, endpoint=False)
-                unpacked_spaces.append(self.change_gene_dtype_and_round(gene_index, values))
+            # Continuous spaces and None entries are inspection samples.
+            # They must not allocate a large integer range or consume the
+            # random draws used to generate the population.
+            if space is None or (type(space) is dict and 'step' not in space):
+                if type(space) is dict:
+                    low, high = space['low'], space['high']
+                unpacked_spaces.append(self._initial_population_range_snapshot(
+                    gene_index, low, high, sample_size_from_inf_range))
+            elif type(space) in [list, tuple, numpy.ndarray] and any(value is None for value in space):
+                values = [value for value in space if value is not None]
+                values.extend(self._initial_population_range_snapshot(
+                    gene_index, low, high, sample_size_from_inf_range))
+                unpacked_spaces.append(numpy.unique(self.change_gene_dtype_and_round(gene_index, values)))
             else:
                 unpacked_spaces.append(self.get_gene_space_values(
                     gene_index, sample_size=sample_size_from_inf_range,

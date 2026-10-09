@@ -178,42 +178,14 @@ class Validation:
                     elif type(el) == type(None):
                         pass
                     elif type(el) is dict:
-                        if len(el.items()) == 2:
-                            if ('low' in el.keys()) and ('high' in el.keys()):
-                                pass
-                            else:
-                                self.valid_parameters = False
-                                raise ValueError(f"When an element in the 'gene_space' parameter is of type dict, then it can have the keys 'low', 'high', and 'step' (optional) but the following keys found: {el.keys()}")
-                        elif len(el.items()) == 3:
-                            if ('low' in el.keys()) and ('high' in el.keys()) and ('step' in el.keys()):
-                                pass
-                            else:
-                                self.valid_parameters = False
-                                raise ValueError(f"When an element in the 'gene_space' parameter is of type dict, then it can have the keys 'low', 'high', and 'step' (optional) but the following keys found: {el.keys()}")
-                        else:
-                            self.valid_parameters = False
-                            raise ValueError(f"When an element in the 'gene_space' parameter is of type dict, then it must have only 2 items but ({len(el.items())}) items found.")
+                        self._validate_gene_space_dictionary(el)
                         self.gene_space_nested = True
                     elif not (type(el) in self.supported_int_float_types):
                         self.valid_parameters = False
                         raise TypeError(f"Unexpected type {type(el)} for the element indexed {index} of 'gene_space'. The accepted types are list/tuple/range/numpy.ndarray of numbers, a single number (int/float), or None.")
 
         elif type(gene_space) is dict:
-            if len(gene_space.items()) == 2:
-                if ('low' in gene_space.keys()) and ('high' in gene_space.keys()):
-                    pass
-                else:
-                    self.valid_parameters = False
-                    raise ValueError(f"When the 'gene_space' parameter is of type dict, then it can have only the keys 'low', 'high', and 'step' (optional) but the following keys found: {gene_space.keys()}")
-            elif len(gene_space.items()) == 3:
-                if ('low' in gene_space.keys()) and ('high' in gene_space.keys()) and ('step' in gene_space.keys()):
-                    pass
-                else:
-                    self.valid_parameters = False
-                    raise ValueError(f"When the 'gene_space' parameter is of type dict, then it can have only the keys 'low', 'high', and 'step' (optional) but the following keys found: {gene_space.keys()}")
-            else:
-                self.valid_parameters = False
-                raise ValueError(f"When the 'gene_space' parameter is of type dict, then it must have only 2 items but ({len(gene_space.items())}) items found.")
+            self._validate_gene_space_dictionary(gene_space)
 
         else:
             self.valid_parameters = False
@@ -221,11 +193,29 @@ class Validation:
 
         self.gene_space = gene_space
 
+    def _validate_gene_space_dictionary(self, space):
+        """Validate range bounds and an optional step in a gene-space dict."""
+        if set(space) not in [{'low', 'high'}, {'low', 'high', 'step'}]:
+            self.valid_parameters = False
+            raise ValueError("A gene_space dictionary must have 'low' and 'high' keys and may also have 'step'.")
+        for name, value in space.items():
+            if type(value) not in self.supported_int_float_types:
+                self.valid_parameters = False
+                raise TypeError(f"The '{name}' value in a gene_space dictionary must be numeric but {type(value)} found.")
+            if type(value) in self.supported_float_types and not numpy.isfinite(value):
+                self.valid_parameters = False
+                raise ValueError(f"The '{name}' value in a gene_space dictionary must be finite but {value} found.")
+        if 'step' in space:
+            if (space['step'] == 0
+                    or (space['step'] > 0 and space['high'] <= space['low'])
+                    or (space['step'] < 0 and space['high'] >= space['low'])):
+                self.valid_parameters = False
+                raise ValueError("The step in a gene_space dictionary must be non-zero and lead from low towards high so the space is not empty.")
+
     def _validate_init_range(self,
                              init_range_low,
                              init_range_high,
-                             num_genes,
-                             initial_population):
+                             num_genes):
         """
         Validate the ``init_range_low`` and ``init_range_high``
         parameters used to build the initial population when the user
@@ -241,13 +231,9 @@ class Validation:
             Lower bound(s) for the random initial gene values.
         init_range_high : numeric or iterable
             Upper bound(s) for the random initial gene values.
-        num_genes : int or None
-            Number of genes per solution. Used to check the length of
-            the per-gene iterables.
-        initial_population : list / numpy.ndarray or None
-            The user-provided initial population, if any. Only used to
-            skip the length check when the population is being
-            inferred from it.
+        num_genes : int
+            Resolved number of genes per solution, inferred from the
+            supplied population when one is available.
 
         Raises
         ------
@@ -257,64 +243,36 @@ class Validation:
             If the per-gene iterables have a length different from
             ``num_genes``.
         """
-        # Validate init_range_low and init_range_high
-        if type(init_range_low) in self.supported_int_float_types:
-            if type(init_range_high) in self.supported_int_float_types:
-                if init_range_low == init_range_high:
-                    if not self.suppress_warnings:
-                        warnings.warn("The values of the 2 parameters 'init_range_low' and 'init_range_high' are equal and this might return the same value for some genes in the initial population.")
-            else:
-                self.valid_parameters = False
-                raise TypeError(f"Type mismatch between the 2 parameters 'init_range_low' {type(init_range_low)} and 'init_range_high' {type(init_range_high)}.")
-        elif type(init_range_low) in [list, tuple, numpy.ndarray]:
-            # Get the number of genes before validating the num_genes parameter.
-            if num_genes is None:
-                if initial_population is None:
+        low_is_scalar = type(init_range_low) in self.supported_int_float_types
+        high_is_scalar = type(init_range_high) in self.supported_int_float_types
+        if low_is_scalar and high_is_scalar:
+            bounds = [('init_range_low', [init_range_low]), ('init_range_high', [init_range_high])]
+            if init_range_low == init_range_high and not self.suppress_warnings:
+                warnings.warn("The values of the 2 parameters 'init_range_low' and 'init_range_high' are equal and this might return the same value for some genes in the initial population.")
+        elif (type(init_range_low) in [list, tuple, numpy.ndarray]
+              and type(init_range_high) in [list, tuple, numpy.ndarray]):
+            bounds = [('init_range_low', init_range_low), ('init_range_high', init_range_high)]
+            for parameter_name, values in bounds:
+                if numpy.asarray(values, dtype=object).ndim != 1 or len(values) != num_genes:
                     self.valid_parameters = False
-                    raise TypeError("When the parameter 'initial_population' is None, then the 2 parameters 'sol_per_pop' and 'num_genes' cannot be None too.")
-                elif not len(init_range_low) == len(initial_population[0]):
-                    self.valid_parameters = False
-                    raise ValueError(f"The length of the 'init_range_low' parameter is {len(init_range_low)} which is different from the number of genes {len(initial_population[0])}.")
-            elif not len(init_range_low) == num_genes:
-                self.valid_parameters = False
-                raise ValueError(f"The length of the 'init_range_low' parameter is {len(init_range_low)} which is different from the number of genes {num_genes}.")
-
-            if type(init_range_high) in [list, tuple, numpy.ndarray]:
-                if len(init_range_low) == len(init_range_high):
-                    pass
-                else:
-                    self.valid_parameters = False
-                    raise ValueError(f"Size mismatch between the 2 parameters 'init_range_low' {len(init_range_low)} and 'init_range_high' {len(init_range_high)}.")
-
-                # Validate the values in init_range_low
-                for val in init_range_low:
-                    if type(val) in self.supported_int_float_types:
-                        pass
-                    else:
-                        self.valid_parameters = False
-                        raise TypeError(f"When an iterable (list/tuple/numpy.ndarray) is assigned to the 'init_range_low' parameter, its elements must be numeric but the value {val} of type {type(val)} found.")
-
-                # Validate the values in init_range_high
-                for val in init_range_high:
-                    if type(val) in self.supported_int_float_types:
-                        pass
-                    else:
-                        self.valid_parameters = False
-                        raise TypeError(f"When an iterable (list/tuple/numpy.ndarray) is assigned to the 'init_range_high' parameter, its elements must be numeric but the value {val} of type {type(val)} found.")
-            else:
-                self.valid_parameters = False
-                raise TypeError(f"Type mismatch between the 2 parameters 'init_range_low' {type(init_range_low)} and 'init_range_high' {type(init_range_high)}. Both of them can be either numeric or iterable (list/tuple/numpy.ndarray).")
+                    raise ValueError(f"{parameter_name} must be a 1D list, tuple, or NumPy array with length equal to the number of genes ({num_genes}).")
         else:
             self.valid_parameters = False
-            raise TypeError(f"The expected type of the 'init_range_low' parameter is numeric or list/tuple/numpy.ndarray but {type(init_range_low)} found.")
-
+            raise TypeError("init_range_low and init_range_high must both be numeric or both be lists, tuples, or NumPy arrays.")
+        for parameter_name, values in bounds:
+            for value in values:
+                if type(value) not in self.supported_int_float_types:
+                    self.valid_parameters = False
+                    raise TypeError(f"The values of {parameter_name} must be numeric but {value} of type {type(value)} found.")
+                if type(value) in self.supported_float_types and not numpy.isfinite(value):
+                    self.valid_parameters = False
+                    raise ValueError(f"The values of {parameter_name} must be finite but {value} found.")
         self.init_range_low = init_range_low
         self.init_range_high = init_range_high
-    
+
     def _validate_gene_type(self,
                             gene_type,
-                            num_genes,
-                            initial_population):
+                            num_genes):
         """
         Validate the ``gene_type`` parameter and store it on the GA
         instance. A gene type may be:
@@ -329,12 +287,9 @@ class Validation:
         ----------
         gene_type : type, list, or tuple
             The gene type specification.
-        num_genes : int or None
-            Number of genes per solution. Used to check the length of
-            a per-gene specification.
-        initial_population : list / numpy.ndarray or None
-            The user-provided initial population, if any. Used to
-            decide whether ``num_genes`` is already known.
+        num_genes : int
+            Resolved number of genes per solution, inferred from the
+            supplied population when one is available.
 
         Raises
         ------
@@ -345,6 +300,13 @@ class Validation:
             If the per-gene specification has a length different from
             ``num_genes``, or the precision is not an integer.
         """
+        if type(gene_type) in [list, tuple, numpy.ndarray]:
+            gene_type = [list(value) if type(value) in [list, tuple, numpy.ndarray] else value
+                         for value in gene_type]
+        elif gene_type not in self.supported_int_float_types:
+            self.valid_parameters = False
+            raise TypeError(f"gene_type must be a supported numeric type or a list, tuple, or NumPy array, but {type(gene_type)} found.")
+
         # Validate gene_type
         if gene_type in self.supported_int_float_types:
             self.gene_type = [gene_type, None]
@@ -362,17 +324,9 @@ class Validation:
             self.gene_type_single = False
             raise ValueError(f"Integers cannot have precision. Please use the integer data type directly instead of {gene_type}.")
         elif type(gene_type) in [list, tuple, numpy.ndarray]:
-            # Get the number of genes before validating the num_genes parameter.
-            if num_genes is None:
-                if initial_population is None:
-                    self.valid_parameters = False
-                    raise TypeError("When the parameter 'initial_population' is None, then the 2 parameters 'sol_per_pop' and 'num_genes' cannot be None too.")
-                elif not len(gene_type) == len(initial_population[0]):
-                    self.valid_parameters = False
-                    raise ValueError(f"When the parameter 'gene_type' is nested, then it can be either [float, int<precision>] or with length equal to the number of genes parameter. Instead, value {gene_type} with len(gene_type) ({len(gene_type)}) != number of genes ({len(initial_population[0])}) found.")
-            elif not len(gene_type) == num_genes:
+            if len(gene_type) != num_genes:
                 self.valid_parameters = False
-                raise ValueError(f"When the parameter 'gene_type' is nested, then it can be either [float, int<precision>] or with length equal to the value passed to the 'num_genes' parameter. Instead, value {gene_type} with len(gene_type) ({len(gene_type)}) != len(num_genes) ({num_genes}) found.")
+                raise ValueError(f"When gene_type specifies a type for each gene, its length ({len(gene_type)}) must equal the number of genes ({num_genes}).")
             for gene_type_idx, gene_type_val in enumerate(gene_type):
                 if gene_type_val in self.supported_int_float_types:
                     # If the gene type is float and no precision is passed or an integer, set its precision to None.
@@ -381,7 +335,7 @@ class Validation:
                     # A float type is expected in a list/tuple/numpy.ndarray of length 2.
                     if len(gene_type_val) == 2:
                         if gene_type_val[0] in self.supported_float_types:
-                            if type(gene_type_val[1]) in self.supported_int_types:
+                            if gene_type_val[1] is None or type(gene_type_val[1]) in self.supported_int_types:
                                 pass
                             else:
                                 self.valid_parameters = False
@@ -409,122 +363,63 @@ class Validation:
             raise ValueError(f"The value passed to the 'gene_type' parameter must be either a single integer, floating-point, list, tuple, or numpy.ndarray but ({gene_type}) of type {type(gene_type)} found.")
     
     
-    def _build_initial_population(self,
-                                  initial_population,
-                                  sol_per_pop,
-                                  num_genes,
-                                  gene_space,
-                                  allow_duplicate_genes,
-                                  gene_constraint):
+    def _validate_initial_population_shape(self, initial_population, sol_per_pop, num_genes):
         """
-        Build or accept the initial population and store it on the GA
-        instance. When ``initial_population`` is None, the population
-        is generated from scratch by ``initialize_population`` using
-        ``sol_per_pop`` and ``num_genes``. Otherwise the user-provided
-        array is validated, cast to the right gene types, and
-        de-duplicated when ``allow_duplicate_genes`` is False.
-
-        Sets ``self.population``, ``self.initial_population``,
-        ``self.sol_per_pop``, ``self.num_genes`` and ``self.pop_size``
-        as side effects.
-
-        Parameters
-        ----------
-        initial_population : list / numpy.ndarray or None
-            User-provided initial population. When None, the
-            population is built from ``sol_per_pop`` and ``num_genes``.
-        sol_per_pop : int or None
-            Number of solutions per population. Required when
-            ``initial_population`` is None.
-        num_genes : int or None
-            Number of genes per solution. Required when
-            ``initial_population`` is None.
-        gene_space : see ``_validate_gene_space``
-            The gene space used by the duplicate resolver.
-        allow_duplicate_genes : bool
-            If False, duplicate genes inside a single solution are
-            resolved.
-        gene_constraint : list or None
-            Per-gene callable constraints; passed through to
-            ``initialize_population``.
-
-        Raises
-        ------
-        TypeError
-            If ``initial_population`` is not a list / tuple /
-            numpy.ndarray, or its values are not numeric.
-        ValueError
-            If ``sol_per_pop`` or ``num_genes`` is non-positive, or
-            ``initial_population`` is not 2-dimensional.
+        Validate the population dimensions before any per-gene settings.
+        A supplied population determines both dimensions, regardless of
+        the values passed to ``sol_per_pop`` and ``num_genes``. Return an
+        independent object array so mixed numeric values remain exact.
         """
-        # Build the initial population
         if initial_population is None:
-            if (sol_per_pop is None) or (num_genes is None):
+            if sol_per_pop is None or num_genes is None:
                 self.valid_parameters = False
-                raise TypeError("Error creating the initial population:\n\nWhen the parameter 'initial_population' is None, then the 2 parameters 'sol_per_pop' and 'num_genes' cannot be None too.\nThere are 2 options to prepare the initial population:\n1) Assigning the initial population to the 'initial_population' parameter. In this case, the values of the 2 parameters sol_per_pop and num_genes will be deduced.\n2) Assign integer values to the 'sol_per_pop' and 'num_genes' parameters so that PyGAD can create the initial population automatically.")
-            elif (type(sol_per_pop) is int) and (type(num_genes) is int):
-                # Validating the number of solutions in the population (sol_per_pop)
-                if sol_per_pop <= 0:
+                raise TypeError("When initial_population is None, both sol_per_pop and num_genes must be specified.")
+            for parameter_name, parameter_value in [('sol_per_pop', sol_per_pop), ('num_genes', num_genes)]:
+                if type(parameter_value) is not int:
                     self.valid_parameters = False
-                    raise ValueError(f"The number of solutions in the population (sol_per_pop) must be > 0 but ({sol_per_pop}) found. \nThe following parameters must be > 0: \n1) Population size (i.e. number of solutions per population) (sol_per_pop).\n2) Number of selected parents in the mating pool (num_parents_mating).\n")
-                # Validating the number of gene.
-                if (num_genes <= 0):
+                    raise TypeError(f"The expected type of the {parameter_name} parameter is int but {type(parameter_value)} found.")
+                if parameter_value <= 0:
                     self.valid_parameters = False
-                    raise ValueError(f"The number of genes cannot be <= 0 but ({num_genes}) found.\n")
-                # When initial_population=None and the 2 parameters sol_per_pop and num_genes have valid integer values, then the initial population is created.
-                # Inside the initialize_population() method, the initial_population attribute is assigned to keep the initial population accessible.
-                self.num_genes = num_genes  # Number of genes in the solution.
-
-                # In case the 'gene_space' parameter is nested, then make sure the number of its elements equals to the number of genes.
-                if self.gene_space_nested:
-                    if len(gene_space) != self.num_genes:
-                        self.valid_parameters = False
-                        raise ValueError(f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
-
-                # Number of solutions in the population.
-                self.sol_per_pop = sol_per_pop
-                self.initialize_population(allow_duplicate_genes=allow_duplicate_genes,
-                                           gene_type=self.gene_type,
-                                           gene_constraint=gene_constraint)
-            else:
-                self.valid_parameters = False
-                raise TypeError(f"The expected type of both the sol_per_pop and num_genes parameters is int but {type(sol_per_pop)} and {type(num_genes)} found.")
-        elif not type(initial_population) in [list, tuple, numpy.ndarray]:
-            self.valid_parameters = False
-            raise TypeError(f"The value assigned to the 'initial_population' parameter is expected to be of type list, tuple, or ndarray but {type(initial_population)} found.")
-        elif numpy.array(initial_population).ndim != 2:
-            self.valid_parameters = False
-            raise ValueError(f"A 2D list is expected to the initial_population parameter but a ({numpy.array(initial_population).ndim}-D) list found.")
+                    raise ValueError(f"The value of {parameter_name} must be > 0 but {parameter_value} found.")
+            population = None
         else:
-            # Validate the type of each value in the 'initial_population' parameter.
-            for row_idx in range(len(initial_population)):
-                for col_idx in range(len(initial_population[0])):
-                    if type(initial_population[row_idx][col_idx]) in self.supported_int_float_types:
-                        pass
-                    else:
-                        self.valid_parameters = False
-                        raise TypeError(f"The values in the initial population can be integers or floats but the value ({initial_population[row_idx][col_idx]}) of type {type(initial_population[row_idx][col_idx])} found.")
+            if type(initial_population) not in [list, tuple, numpy.ndarray]:
+                self.valid_parameters = False
+                raise TypeError(f"The value assigned to the 'initial_population' parameter is expected to be of type list, tuple, or ndarray but {type(initial_population)} found.")
+            try:
+                population = numpy.array(initial_population, dtype=object, copy=True)
+            except ValueError as error:
+                self.valid_parameters = False
+                raise ValueError("initial_population must be a rectangular 2D list, tuple, or NumPy array.") from error
+            if population.ndim != 2 or 0 in population.shape:
+                self.valid_parameters = False
+                raise ValueError("initial_population must be a non-empty rectangular 2D list, tuple, or NumPy array.")
+            for value in population.flat:
+                if type(value) not in self.supported_int_float_types:
+                    self.valid_parameters = False
+                    raise TypeError(f"The values in the initial population can be integers or floats but the value ({value}) of type {type(value)} found.")
+            sol_per_pop, num_genes = population.shape
 
-            # Change the data type and round all genes within the initial population.
-            self.initial_population = self.change_population_dtype_and_round(initial_population)
+        self.sol_per_pop = sol_per_pop
+        self.num_genes = num_genes
+        self.pop_size = (sol_per_pop, num_genes)
+        return population
 
-            if self.allow_duplicate_genes == False:
-                self.initial_population = self.solve_duplicate_genes_in_population(
-                    self.initial_population, build_initial_pop=True)
+    def _build_initial_population(self, initial_population):
+        """
+        Store a generated or supplied population after applying gene types,
+        constraints, and duplicate repair. Dimensions and numeric values
+        are validated before this method is called. Supplied values are
+        preserved even outside the generation range or gene space; only
+        replacements use the configured generation settings.
+        """
+        if initial_population is None:
+            self.initialize_population(self.allow_duplicate_genes, self.gene_type, self.gene_constraint)
+        else:
+            self.population = self.prepare_initial_population(initial_population)
+            # Keep separate arrays so evolution cannot modify this snapshot.
+            self.initial_population = self.population.copy()
 
-            # A NumPy array holding the initial population.
-            self.population = self.initial_population.copy()
-            # Number of genes in the solution.
-            self.num_genes = self.initial_population.shape[1]
-            # Number of solutions in the population.
-            self.sol_per_pop = self.initial_population.shape[0]
-            # The population size.
-            self.pop_size = (self.sol_per_pop, self.num_genes)
-
-        # Change the data type and round all genes within the initial population.
-        self.initial_population = self.change_population_dtype_and_round(self.initial_population)
-        self.population = self.initial_population.copy()
-    
     def _validate_mutation_range(self,
                                  random_mutation_min_val,
                                  random_mutation_max_val):
@@ -2044,38 +1939,21 @@ class Validation:
                               sample_size,
                               allow_duplicate_genes)
 
+        # Establish dimensions first, especially when the supplied population
+        # overrides sol_per_pop and num_genes.
+        initial_population = self._validate_initial_population_shape(
+            initial_population, sol_per_pop, num_genes)
         self._validate_gene_space(gene_space)
-
-        self._validate_init_range(init_range_low,
-                                  init_range_high,
-                                  num_genes,
-                                  initial_population)
-
-        self._validate_gene_type(gene_type,
-                                 num_genes,
-                                 initial_population)
-
-        # Repair can call constraints while building either generated or
-        # manually supplied populations. Validate and store them first.
-        if initial_population is not None and numpy.asarray(initial_population).ndim == 2:
-            self.num_genes = numpy.asarray(initial_population).shape[1]
-        else:
-            self.num_genes = num_genes
+        self._validate_init_range(init_range_low, init_range_high, self.num_genes)
+        self._validate_gene_type(gene_type, self.num_genes)
         self._validate_gene_constraint(gene_constraint)
         if self.gene_space_nested and len(gene_space) != self.num_genes:
             self.valid_parameters = False
-            raise ValueError(f"When the parameter 'gene_space' is nested, then its length must be equal to the value passed to the 'num_genes' parameter. Instead, length of gene_space ({len(gene_space)}) != num_genes ({self.num_genes})")
+            raise ValueError(f"When gene_space is nested, its length ({len(gene_space)}) must equal the number of genes ({self.num_genes}).")
 
-        # Call the unpack_gene_space() method in the pygad.helper.unique.Unique class.
-        self.gene_space_unpacked = self.unpack_gene_space(range_min=self.init_range_low,
-                                                          range_max=self.init_range_high)
-
-        self._build_initial_population(initial_population,
-                                       sol_per_pop,
-                                       num_genes,
-                                       gene_space,
-                                       allow_duplicate_genes,
-                                       gene_constraint)
+        self.gene_space_unpacked = self.unpack_gene_space(
+            range_min=self.init_range_low, range_max=self.init_range_high)
+        self._build_initial_population(initial_population)
 
         self._validate_mutation_range(random_mutation_min_val,
                                       random_mutation_max_val)
