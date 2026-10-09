@@ -113,9 +113,13 @@ Sets the data type (and optional precision) of the genes. It defaults to `float`
 
 You can set it to:
 
-- **One type for all genes:** a numeric type such as `int`, `float`, or any `numpy.int/uint/float(8-64)` type. Example: `gene_type=int`.
+- **One type for all genes:** `int`, `float`, NumPy signed or unsigned integer types with widths of 8, 16, 32, or 64 bits, or `numpy.float16`, `numpy.float32`, or `numpy.float64`. Example: `gene_type=int`.
 - **A type per gene:** a `list`, `tuple`, or `numpy.ndarray` with one type per gene. Example: `gene_type=[int, float, numpy.int8]`.
 - **A float precision:** pair a `float` type with the number of decimal places. Example: `gene_type=[float, 2]`.
+
+Integer conversion truncates towards zero. Floating-point values are rounded before casting, using nearest-even rounding at halfway points. Precision can be `None` to leave values unrounded, or an integer including `0` and negative values. For example, `[float, -1]` rounds to tens. Integer types may only be paired with `None`.
+
+The same rules apply to initialization, mutation, custom operators, and the outputs of `on_parents`, `on_crossover`, and `on_mutation`, independently of `allow_duplicate_genes`. Per-gene type specifications and saved best solutions preserve mixed scalar types using object arrays. See [Conversion and Rounding Rules](https://pygad.readthedocs.io/en/latest/gene_values.html#conversion-and-rounding-rules).
 
 Version history:
 
@@ -596,8 +600,9 @@ Constructor settings and user callables are stored as instance attributes, with 
 - `get_initial_population_gene_candidates(gene_index, sample_size, all_integer_values=True)`: Return converted replacement candidates for initialization constraints and duplicate repair.
 - `initialize_parents_array(shape)`: Allocate an empty parents (or offspring) array with the right dtype.
 - `change_population_dtype_and_round(population)`: Cast a 2D population to the dtype encoded in `self.gene_type` and round non-integer genes.
-- `change_gene_dtype_and_round(gene_index, gene_value)`: Same as above, but for a single gene value.
-- `round_genes(solutions)`: Round genes in a 2D array according to `self.gene_type` precision.
+- `change_gene_dtype_and_round(gene_index, gene_value)`: Apply one gene's type and precision to a scalar or an array of candidates, preserving the input shape.
+- `round_genes(solutions)`: Convert and round genes in a 2D array according to `self.gene_type`. Update the input array when its dtype matches the converted output.
+- `prepare_operator_output(population, build_initial_pop=False)`: Apply gene types and precision, then repair duplicates if `allow_duplicate_genes=False`. SBX and polynomial mutation use initialization bounds for repair.
 - `get_initial_population_range(gene_index)`: Return the `[init_range_low, init_range_high]` window for a specific gene.
 - `get_random_mutation_range(gene_index)`: Return the `[random_mutation_min_val, random_mutation_max_val]` window for a specific gene.
 - `get_gene_dtype(gene_index)`: Return the `(type, precision)` pair for a specific gene.

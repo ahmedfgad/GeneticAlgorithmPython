@@ -185,7 +185,7 @@ For the second gene, its space is set to `None`. So, traditional mutation happen
 1. Generating a random value from the range defined by the `random_mutation_min_val` and `random_mutation_max_val` parameters.
 2. Adding this random value to the current gene's value.
 
-If its current value is 5 and the random value is `-0.5`, then the new value is 4.5. If the gene type is integer, then the value will be rounded.
+If its current value is 5 and the random value is `-0.5`, then the new value is 4.5. If the gene type is integer, then conversion truncates the fractional part, giving 4.
 
 On the other hand, if a gene has a **continuous space** defined in the `gene_space` parameter, then mutation occurs by adding a random value to the current gene value.
 
@@ -507,6 +507,21 @@ The `gene_type` parameter allows the user to control the data type for all genes
 
 Let us look at some examples.
 
+### Conversion and Rounding Rules
+
+PyGAD applies the same conversion rules to generated and supplied initial populations, mutation candidates, and custom operator outputs. `on_parents`, `on_crossover`, and `on_mutation` receive converted values; any replacements returned or made in place by these callbacks are converted again before use. These rules apply whether `allow_duplicate_genes` is `True` or `False`.
+
+- Integer conversion truncates the fractional part towards zero. For example, `1.9` becomes `1` and `-1.9` becomes `-1`. Additive mutation adds the random value before converting the result.
+- Floating-point precision rounds before casting to the requested type. This avoids rounding in a narrow type such as `numpy.float16` before the final conversion.
+- Precision must be an integer or `None`. `None` keeps the value unrounded, `0` rounds to whole numbers, and a negative precision rounds to positions before the decimal point. For example, `[float, -1]` rounds to tens. Integer types may only be paired with `None`.
+- Rounding uses NumPy's nearest-even rule at halfway points: `0.5` rounds to `0.0` and `1.5` rounds to `2.0` with precision `0`.
+
+Floating-point types use binary representations, so a stored value can differ slightly from its decimal representation. Requested precision does not increase the accuracy or range of the selected type. For unusually large values or precisions where NumPy's intermediate decimal scaling overflows, PyGAD uses scalar rounding to preserve finite values before the final cast.
+
+When types are specified per gene, population arrays use `dtype=object` so each column can retain its requested Python or NumPy scalar type. Saved best solutions retain these types too. This also preserves large integers when other genes are floating-point values. A NumPy array constructed without `dtype=object` can already lose integer precision through conversion to a shared floating-point type; use a list or an object array for mixed input values that must remain exact.
+
+The new `examples/example_gene_type_conversion.py` demonstrates mixed types, rounding, and a custom mutation function.
+
 ### Data Type for All Genes without Precision
 
 The data type for all genes can be specified by assigning the numeric data type directly to the `gene_type` parameter. This is an example to make all genes of `int` data types.
@@ -515,7 +530,7 @@ The data type for all genes can be specified by assigning the numeric data type 
 gene_type=int
 ```
 
-Given that the supported numeric data types of PyGAD include Python's `int` and `float` in addition to all numeric types of `NumPy`, then any of these types can be assigned to the `gene_type` parameter.
+The supported numeric types include Python's `int` and `float`, NumPy's signed and unsigned integer types with widths of 8, 16, 32, and 64 bits, and `numpy.float16`, `numpy.float32`, and `numpy.float64`. Any of these types can be assigned to `gene_type`.
 
 If no precision is specified for a `float` data type, then the complete floating-point number is kept.
 

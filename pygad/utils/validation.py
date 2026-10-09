@@ -270,99 +270,68 @@ class Validation:
         self.init_range_low = init_range_low
         self.init_range_high = init_range_high
 
-    def _validate_gene_type(self,
-                            gene_type,
-                            num_genes):
+    def _validate_gene_type(self, gene_type, num_genes):
         """
-        Validate the ``gene_type`` parameter and store it on the GA
-        instance. A gene type may be:
-
-        - a single Python or numpy numeric type that applies to every
-          gene (``self.gene_type_single`` is set to True);
-        - a ``[type, precision]`` pair applied to every gene;
-        - a per-gene list of types or ``[type, precision]`` pairs
-          (``self.gene_type_single`` is set to False).
-
-        Parameters
-        ----------
-        gene_type : type, list, or tuple
-            The gene type specification.
-        num_genes : int
-            Resolved number of genes per solution, inferred from the
-            supplied population when one is available.
-
-        Raises
-        ------
-        TypeError
-            If ``gene_type`` (or any of its elements) is not a
-            supported numeric type.
-        ValueError
-            If the per-gene specification has a length different from
-            ``num_genes``, or the precision is not an integer.
+        Normalize one type, a [type, precision] pair, or a per-gene
+        specification into independent [type, precision] lists. A pair
+        such as [float, int] specifies two gene types, while [float, 2]
+        specifies one floating-point type with decimal precision.
         """
-        if type(gene_type) in [list, tuple, numpy.ndarray]:
-            gene_type = [list(value) if type(value) in [list, tuple, numpy.ndarray] else value
-                         for value in gene_type]
-        elif gene_type not in self.supported_int_float_types:
-            self.valid_parameters = False
-            raise TypeError(f"gene_type must be a supported numeric type or a list, tuple, or NumPy array, but {type(gene_type)} found.")
-
-        # Validate gene_type
-        if gene_type in self.supported_int_float_types:
+        if any(gene_type is supported_type for supported_type in self.supported_int_float_types):
             self.gene_type = [gene_type, None]
             self.gene_type_single = True
-        # A single data type of float with precision.
-        elif len(gene_type) == 2 and gene_type[0] in self.supported_float_types and (type(gene_type[1]) in self.supported_int_types or gene_type[1] is None):
-            self.gene_type = gene_type
-            self.gene_type_single = True
-        # A single data type of integer with precision None ([int, None]).
-        elif len(gene_type) == 2 and gene_type[0] in self.supported_int_types and gene_type[1] is None:
-            self.gene_type = gene_type
-            self.gene_type_single = True
-        # Raise an exception for a single data type of int with integer precision.
-        elif len(gene_type) == 2 and gene_type[0] in self.supported_int_types and (type(gene_type[1]) in self.supported_int_types or gene_type[1] is None):
-            self.gene_type_single = False
-            raise ValueError(f"Integers cannot have precision. Please use the integer data type directly instead of {gene_type}.")
-        elif type(gene_type) in [list, tuple, numpy.ndarray]:
-            if len(gene_type) != num_genes:
-                self.valid_parameters = False
-                raise ValueError(f"When gene_type specifies a type for each gene, its length ({len(gene_type)}) must equal the number of genes ({num_genes}).")
-            for gene_type_idx, gene_type_val in enumerate(gene_type):
-                if gene_type_val in self.supported_int_float_types:
-                    # If the gene type is float and no precision is passed or an integer, set its precision to None.
-                    gene_type[gene_type_idx] = [gene_type_val, None]
-                elif type(gene_type_val) in [list, tuple, numpy.ndarray]:
-                    # A float type is expected in a list/tuple/numpy.ndarray of length 2.
-                    if len(gene_type_val) == 2:
-                        if gene_type_val[0] in self.supported_float_types:
-                            if gene_type_val[1] is None or type(gene_type_val[1]) in self.supported_int_types:
-                                pass
-                            else:
-                                self.valid_parameters = False
-                                raise TypeError(f"In the 'gene_type' parameter, the precision for float gene data types must be an integer but the element {gene_type_val} at index {gene_type_idx} has a precision of {gene_type_val[1]} with type {gene_type_val[0]}.")
-                        elif gene_type_val[0] in self.supported_int_types:
-                            if gene_type_val[1] is None:
-                                pass
-                            else:
-                                self.valid_parameters = False
-                                raise TypeError(f"In the 'gene_type' parameter, either do not set a precision for integer data types or set it to None. But the element {gene_type_val} at index {gene_type_idx} has a precision of {gene_type_val[1]} with type {gene_type_val[0]}.")
-                        else:
-                            self.valid_parameters = False
-                            raise TypeError(
-                                f"In the 'gene_type' parameter, a precision is expected only for float gene data types but the element {gene_type_val} found at index {gene_type_idx}.\nNote that the data type must be at index 0 of the item followed by precision at index 1.")
-                    else:
-                        self.valid_parameters = False
-                        raise ValueError(f"In the 'gene_type' parameter, a precision is specified in a list/tuple/numpy.ndarray of length 2 but value ({gene_type_val}) of type {type(gene_type_val)} with length {len(gene_type_val)} found at index {gene_type_idx}.")
-                else:
-                    self.valid_parameters = False
-                    raise ValueError(f"When a list/tuple/numpy.ndarray is assigned to the 'gene_type' parameter, then its elements must be of integer, floating-point, list, tuple, or numpy.ndarray data types but the value ({gene_type_val}) of type {type(gene_type_val)} found at index {gene_type_idx}.")
-            self.gene_type = gene_type
-            self.gene_type_single = False
-        else:
+            return
+        if type(gene_type) not in [list, tuple, numpy.ndarray]:
             self.valid_parameters = False
-            raise ValueError(f"The value passed to the 'gene_type' parameter must be either a single integer, floating-point, list, tuple, or numpy.ndarray but ({gene_type}) of type {type(gene_type)} found.")
-    
-    
+            raise TypeError("gene_type must be a supported numeric type, list, tuple, or NumPy array.")
+        if isinstance(gene_type, numpy.ndarray) and gene_type.ndim == 0:
+            self.valid_parameters = False
+            raise ValueError("gene_type must contain a type or a sequence of types, not a 0D NumPy array.")
+
+        specification = list(gene_type)
+        first_is_type = len(specification) > 0 and any(
+            specification[0] is supported_type for supported_type in self.supported_int_float_types)
+        second_is_type = len(specification) == 2 and any(
+            specification[1] is supported_type for supported_type in self.supported_int_float_types)
+        second_is_sequence = len(specification) == 2 and type(specification[1]) in [list, tuple, numpy.ndarray]
+        if len(specification) == 2 and first_is_type and not second_is_type and not second_is_sequence:
+            self.gene_type = self._normalize_gene_type_entry(specification, 'gene_type')
+            self.gene_type_single = True
+        else:
+            if len(specification) != num_genes:
+                self.valid_parameters = False
+                raise ValueError(f"When gene_type specifies a type for each gene, its length ({len(specification)}) must equal the number of genes ({num_genes}).")
+            self.gene_type = [self._normalize_gene_type_entry(entry, f'gene_type at index {gene_index}')
+                              for gene_index, entry in enumerate(specification)]
+            self.gene_type_single = False
+
+    def _normalize_gene_type_entry(self, specification, parameter_name):
+        """Return an independent type/precision pair for one specification."""
+        if any(specification is supported_type for supported_type in self.supported_int_float_types):
+            return [specification, None]
+        if type(specification) not in [list, tuple, numpy.ndarray]:
+            self.valid_parameters = False
+            raise TypeError(f"{parameter_name} must be a supported numeric type or a [type, precision] pair.")
+        if isinstance(specification, numpy.ndarray) and specification.ndim != 1:
+            self.valid_parameters = False
+            raise ValueError(f"A type/precision pair in {parameter_name} must be a 1D sequence of 2 elements.")
+        if len(specification) != 2:
+            self.valid_parameters = False
+            raise ValueError(f"A type/precision pair in {parameter_name} must have 2 elements.")
+        gene_dtype, precision = specification
+        if not any(gene_dtype is supported_type for supported_type in self.supported_int_float_types):
+            self.valid_parameters = False
+            raise TypeError(f"The data type in {parameter_name} must be a supported numeric type.")
+        if precision is not None:
+            if gene_dtype not in self.supported_float_types:
+                self.valid_parameters = False
+                raise ValueError(f"Integers cannot have precision in {parameter_name}. Use the integer type directly or pair it with None.")
+            if type(precision) not in self.supported_int_types or type(precision) is object:
+                self.valid_parameters = False
+                raise TypeError(f"The precision in {parameter_name} must be an integer or None.")
+            precision = int(precision)
+        return [gene_dtype, precision]
+
     def _validate_initial_population_shape(self, initial_population, sol_per_pop, num_genes):
         """
         Validate the population dimensions before any per-gene settings.

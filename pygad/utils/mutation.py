@@ -90,8 +90,7 @@ class Mutation:
                                                                        swapped_genes=swapped_genes)
                     continue
 
-                # Before assigning the selected value from the space to the gene, change its data type and round it.
-                offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
+                offspring[offspring_idx, gene_idx] = value_from_space
 
                 if self.allow_duplicate_genes == False:
                     offspring[offspring_idx], _, _ = self.solve_duplicate_genes(solution=offspring[offspring_idx])
@@ -137,7 +136,7 @@ class Mutation:
                         continue
 
                     # Assigning the selected value from the space to the gene.
-                    offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
+                    offspring[offspring_idx, gene_idx] = value_from_space
 
                     if self.allow_duplicate_genes == False:
                         offspring[offspring_idx], _, _ = self.solve_duplicate_genes(solution=offspring[offspring_idx])
@@ -211,8 +210,10 @@ class Mutation:
                                                       solution=solution,
                                                       mutation_by_replacement=self.mutation_by_replacement,
                                                       sample_size=1)
-        # Even though its name is singular, it might hold multiple values.
-        return value_selected
+        # Candidate arrays use NumPy scalar types. Match the declared
+        # Python or NumPy scalar type before storing the selected value.
+        dtype = self.get_gene_dtype(gene_idx)[0]
+        return value_selected if dtype is object else dtype(value_selected)
 
     def swap_gene_by_space(self,
                            solution,
@@ -468,8 +469,7 @@ class Mutation:
             temp = offspring[idx, mutation_gene1]
             offspring[idx, mutation_gene1] = offspring[idx, mutation_gene2]
             offspring[idx, mutation_gene2] = temp
-        if self.allow_duplicate_genes == False:
-            offspring[:] = self.solve_duplicate_genes_in_population(offspring)
+        offspring[:] = self.prepare_operator_output(offspring)
         return offspring
 
     def inversion_mutation(self, offspring):
@@ -494,8 +494,7 @@ class Mutation:
 
             genes_to_scramble = numpy.flip(offspring[idx, mutation_gene1:mutation_gene2])
             offspring[idx, mutation_gene1:mutation_gene2] = genes_to_scramble
-        if self.allow_duplicate_genes == False:
-            offspring[:] = self.solve_duplicate_genes_in_population(offspring)
+        offspring[:] = self.prepare_operator_output(offspring)
         return offspring
 
     def scramble_mutation(self, offspring):
@@ -524,8 +523,7 @@ class Mutation:
             genes_to_scramble = offspring[offspring_idx, segment_start:segment_end].copy()
             numpy.random.shuffle(genes_to_scramble)
             offspring[offspring_idx, segment_start:segment_end] = genes_to_scramble
-        if self.allow_duplicate_genes == False:
-            offspring[:] = self.solve_duplicate_genes_in_population(offspring)
+        offspring[:] = self.prepare_operator_output(offspring)
         return offspring
 
     def adaptive_mutation_population_fitness(self, offspring):
@@ -668,7 +666,7 @@ class Mutation:
                     continue
 
                 # Assigning the selected value from the space to the gene.
-                offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
+                offspring[offspring_idx, gene_idx] = value_from_space
 
                 if self.allow_duplicate_genes == False:
                     offspring[offspring_idx], _, _ = self.solve_duplicate_genes(solution=offspring[offspring_idx])
@@ -815,7 +813,7 @@ class Mutation:
                         continue
 
                     # Assigning the selected value from the space to the gene.
-                    offspring[offspring_idx, gene_idx] = self.change_gene_dtype_and_round(gene_idx, value_from_space)
+                    offspring[offspring_idx, gene_idx] = value_from_space
 
                     if self.allow_duplicate_genes == False:
                         offspring[offspring_idx], _, _ = self.solve_duplicate_genes(solution=offspring[offspring_idx])

@@ -7,8 +7,8 @@ class GAEngine(FitnessEvaluation):
 
     def round_genes(self, solutions):
         """
-        Round the genes in ``solutions`` according to the precision
-        encoded in ``self.gene_type``. When ``gene_type_single`` is
+        Convert and round genes in ``solutions`` using ``self.gene_type``.
+        When ``gene_type_single`` is
         True, the same dtype and precision are applied to every gene;
         otherwise the per-gene dtype / precision pair is used.
 
@@ -20,19 +20,14 @@ class GAEngine(FitnessEvaluation):
         Returns
         -------
         solutions : numpy.ndarray
-            The same array with the rounding applied.
+            The converted and rounded array. The original array is
+            updated when its dtype can hold the configured gene types.
         """
-        if self.gene_type_single:
-            if not self.gene_type[1] is None:
-                solutions = numpy.round(numpy.asarray(solutions, dtype=self.gene_type[0]),
-                                        self.gene_type[1])
-        else:
-            for gene_idx in range(self.num_genes):
-                if not self.gene_type[gene_idx][1] is None:
-                    solutions[:, gene_idx] = numpy.round(numpy.asarray(solutions[:, gene_idx],
-                                                                       dtype=self.gene_type[gene_idx][0]),
-                                                         self.gene_type[gene_idx][1])
-        return solutions
+        converted_solutions = self.change_population_dtype_and_round(solutions)
+        if isinstance(solutions, numpy.ndarray) and solutions.dtype == converted_solutions.dtype:
+            solutions[:] = converted_solutions
+            return solutions
+        return converted_solutions
 
     def initialize_population(self, allow_duplicate_genes, gene_type, gene_constraint):
         """
@@ -432,7 +427,7 @@ class GAEngine(FitnessEvaluation):
                 self.on_stop(self, self.last_generation_fitness)
 
             # Converting the 'best_solutions' list into a NumPy array.
-            self.best_solutions = numpy.array(self.best_solutions)
+            self.best_solutions = numpy.array(self.best_solutions, dtype=self.population.dtype)
 
             # Update previous_generation_fitness because it is used to get the fitness of the parents.
             self.previous_generation_fitness = self.last_generation_fitness.copy()
@@ -562,6 +557,9 @@ class GAEngine(FitnessEvaluation):
         elif len(self.last_generation_parents_indices) != self.num_parents_mating:
             raise ValueError(f"The iterable holding the selected parents indices is expected to have ({self.num_parents_mating}) values but ({len(self.last_generation_parents_indices)}) found.")
 
+        if callable(self.parent_selection_type):
+            self.last_generation_parents = self.change_population_dtype_and_round(self.last_generation_parents)
+
         if call_on_parents:
             if not (self.on_parents is None):
                 on_parents_output = self.on_parents(self, 
@@ -580,7 +578,7 @@ class GAEngine(FitnessEvaluation):
                                 raise ValueError("The returned outputs of on_parents() cannot be None but the first output is None.")
                     else:
                         if type(on_parents_selected_parents) in [tuple, list, numpy.ndarray]:
-                            on_parents_selected_parents = numpy.array(on_parents_selected_parents)
+                            on_parents_selected_parents = numpy.asarray(on_parents_selected_parents, dtype=object)
                             if on_parents_selected_parents.shape == self.last_generation_parents.shape:
                                 self.last_generation_parents = on_parents_selected_parents
                             else:
@@ -604,6 +602,9 @@ class GAEngine(FitnessEvaluation):
     
                 else:
                     raise TypeError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but {type(on_parents_output)} found.")
+
+        if call_on_parents and self.on_parents is not None:
+            self.last_generation_parents = self.change_population_dtype_and_round(self.last_generation_parents)
 
     def run_crossover(self):
         """
@@ -671,6 +672,10 @@ class GAEngine(FitnessEvaluation):
                 elif self.last_generation_offspring_crossover.shape[1] != self.num_genes:
                     raise ValueError(f"Size mismatch between the crossover output {self.last_generation_offspring_crossover.shape} and the expected crossover output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_crossover.shape[1]}) produced.")
 
+        if callable(self.crossover_type) and self.on_crossover is not None:
+            self.last_generation_offspring_crossover = self.change_population_dtype_and_round(
+                self.last_generation_offspring_crossover)
+
         # PyGAD 2.18.2 // The on_crossover() callback function is called even if crossover_type is None.
         if not (self.on_crossover is None):
             on_crossover_output = self.on_crossover(self, 
@@ -679,7 +684,7 @@ class GAEngine(FitnessEvaluation):
                 pass
             else:
                 if type(on_crossover_output) in [tuple, list, numpy.ndarray]:
-                    on_crossover_output = numpy.array(on_crossover_output)
+                    on_crossover_output = numpy.asarray(on_crossover_output, dtype=object)
                     if on_crossover_output.shape == self.last_generation_offspring_crossover.shape:
                         self.last_generation_offspring_crossover = on_crossover_output
                     else:
@@ -687,10 +692,8 @@ class GAEngine(FitnessEvaluation):
                 else:
                     raise ValueError(f"The output of on_crossover() is expected to be tuple/list/numpy.ndarray but {type(on_crossover_output)} found.")
 
-        # User operators and callbacks can return duplicates, including
-        # duplicates introduced by conversion to the configured gene types.
-        if not self.allow_duplicate_genes and (callable(self.crossover_type) or self.on_crossover is not None):
-            self.last_generation_offspring_crossover = self.solve_duplicate_genes_in_population(
+        if callable(self.crossover_type) or self.on_crossover is not None:
+            self.last_generation_offspring_crossover = self.prepare_operator_output(
                 self.last_generation_offspring_crossover,
                 build_initial_pop=self.crossover_type == 'sbx')
 
@@ -738,6 +741,10 @@ class GAEngine(FitnessEvaluation):
                 elif self.last_generation_offspring_mutation.shape[1] != self.num_genes:
                     raise ValueError(f"Size mismatch between the mutation output {self.last_generation_offspring_mutation.shape} and the expected mutation output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_mutation.shape[1]}) produced.")
 
+        if callable(self.mutation_type) and self.on_mutation is not None:
+            self.last_generation_offspring_mutation = self.change_population_dtype_and_round(
+                self.last_generation_offspring_mutation)
+
         # PyGAD 2.18.2 // The on_mutation() callback function is called even if mutation_type is None.
         if not (self.on_mutation is None):
             on_mutation_output = self.on_mutation(self, 
@@ -747,7 +754,7 @@ class GAEngine(FitnessEvaluation):
                 pass
             else:
                 if type(on_mutation_output) in [tuple, list, numpy.ndarray]:
-                    on_mutation_output = numpy.array(on_mutation_output)
+                    on_mutation_output = numpy.asarray(on_mutation_output, dtype=object)
                     if on_mutation_output.shape == self.last_generation_offspring_mutation.shape:
                         self.last_generation_offspring_mutation = on_mutation_output
                     else:
@@ -755,10 +762,33 @@ class GAEngine(FitnessEvaluation):
                 else:
                     raise ValueError(f"The output of on_mutation() is expected to be tuple/list/numpy.ndarray but {type(on_mutation_output)} found.")
 
-        if not self.allow_duplicate_genes and (callable(self.mutation_type) or self.on_mutation is not None):
-            self.last_generation_offspring_mutation = self.solve_duplicate_genes_in_population(
+        if callable(self.mutation_type) or self.on_mutation is not None:
+            self.last_generation_offspring_mutation = self.prepare_operator_output(
                 self.last_generation_offspring_mutation,
                 build_initial_pop=self.mutation_type == 'polynomial')
+
+    def prepare_operator_output(self, population, build_initial_pop=False):
+        """
+        Convert an operator's population using the configured gene types
+        and precision, then repair duplicates if they are disallowed.
+
+        Parameters
+        ----------
+        population : numpy.ndarray
+            Parents or offspring to prepare without modifying the input.
+        build_initial_pop : bool
+            Use initialization bounds for duplicate repair, as required
+            for SBX crossover and polynomial mutation.
+
+        Returns
+        -------
+        numpy.ndarray
+            The converted population, with duplicate repair applied when
+            allow_duplicate_genes is False.
+        """
+        if self.allow_duplicate_genes:
+            return self.change_population_dtype_and_round(population)
+        return self.solve_duplicate_genes_in_population(population, build_initial_pop=build_initial_pop)
 
     def run_update_population(self):
         """

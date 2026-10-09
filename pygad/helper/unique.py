@@ -110,7 +110,7 @@ class Unique:
                     range_min=range_min, range_max=range_max,
                     gene_value=gene_value, gene_idx=gene_index,
                     mutation_by_replacement=mutation_by_replacement,
-                    sample_size=None if dtype[0] in pygad.GA.supported_int_types else sample_size)
+                    sample_size=None if numpy.issubdtype(numpy.dtype(dtype[0]), numpy.integer) else sample_size)
             else:
                 values = self.get_gene_space_values(
                     gene_idx=gene_index,
@@ -120,7 +120,7 @@ class Unique:
 
             # Compare converted values: rounding and casting can turn
             # different candidates into the same numeric value.
-            values = list(dict.fromkeys(dtype[0](value) for value in numpy.atleast_1d(values)))
+            values = list(dict.fromkeys((value if dtype[0] is object else dtype[0](value)) for value in numpy.atleast_1d(values)))
             values = [value for value in values if value != gene_value]
             random.shuffle(values)
             # Keep manually supplied values and values inherited from parents.
@@ -136,7 +136,7 @@ class Unique:
                 selected_values = self.filter_gene_values_by_constraint(
                     numpy.array(values), new_solution, gene_index, warn=False)
                 dtype = self.get_gene_dtype(gene_index)
-                constrained_values.append([] if selected_values is None else [dtype[0](value) for value in selected_values])
+                constrained_values.append([] if selected_values is None else [(value if dtype[0] is object else dtype[0](value)) for value in selected_values])
             else:
                 constrained_values.append(values)
         repaired_solution = self._assign_unique_gene_values(new_solution, constrained_values)

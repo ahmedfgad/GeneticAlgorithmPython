@@ -308,79 +308,86 @@ class Helper:
         """
 
         if self.gene_type_single:
-            dtype, precision = self.gene_type
-            if precision is None:
-                return numpy.array(population, dtype=dtype, copy=True)
-            # Round before casting so narrow NumPy types do not lose
-            # precision before the requested decimal rounding is applied.
-            population_new = numpy.round(numpy.asarray(population, dtype=float), precision)
-            return numpy.asarray(population_new, dtype=dtype)
+            return self._convert_gene_values(population, self.gene_type)
 
-        # Keep each input value exact until its own column is converted.
-        # A shared floating dtype could lose large integer values in
-        # solutions containing both integer and floating-point genes.
+        # An object array keeps each value exact until its own type is
+        # applied. Group matching types and precisions to convert whole
+        # blocks instead of converting every scalar separately.
         population = numpy.asarray(population, dtype=object)
         population_new = numpy.empty(population.shape, dtype=object)
-        for gene_index in range(population.shape[1]):
-            values = self.change_gene_dtype_and_round(gene_index, population[:, gene_index])
-            dtype = self.gene_type[gene_index][0]
-            for solution_index, value in enumerate(values):
-                # Assign scalars individually to preserve their configured
-                # types in the object array, including NumPy numeric types.
-                population_new[solution_index, gene_index] = dtype(value)
+        gene_columns_by_type = {}
+        for gene_index, gene_type in enumerate(self.gene_type):
+            gene_columns_by_type.setdefault(tuple(gene_type), []).append(gene_index)
+        for gene_type, gene_indices in gene_columns_by_type.items():
+            values = self._convert_gene_values(population[:, gene_indices], gene_type)
+            dtype = gene_type[0]
+            if dtype in [int, float, object]:
+                population_new[:, gene_indices] = values.astype(object)
+            else:
+                # astype(object) alone turns NumPy scalars into Python
+                # numbers. Preserve explicitly requested NumPy types.
+                population_new[:, gene_indices] = numpy.frompyfunc(dtype, 1, 1)(values)
         return population_new
 
-    def change_gene_dtype_and_round(self,
-                                    gene_index,
-                                    gene_value):
+    def change_gene_dtype_and_round(self, gene_index, gene_value):
         """
-        Cast and round one or more candidate values that all belong
-        to the same gene index. Useful when generating mutation
-        values for a specific gene.
+        Convert a scalar or an array of candidates using one gene's type
+        and precision. Return a scalar for a scalar input, or an array
+        with the input shape. The input is not modified.
 
         Parameters
         ----------
         gene_index : int
-            Index of the gene whose dtype / precision should be used.
+            Index of the gene whose type and precision are applied.
         gene_value : numeric or iterable
-            Either a single value or a vector of values for that
-            gene.
+            A single value or an array of candidate values for this gene.
 
         Returns
         -------
-        gene_value_new : numeric
-            The first (or only) value after casting and rounding.
+        numeric or numpy.ndarray
+            The converted scalar or array of candidates.
         """
+        return self._convert_gene_values(gene_value, self.get_gene_dtype(gene_index))
 
-        if self.gene_type_single == True:
-            dtype = self.gene_type[0]
-            if self.gene_type[1] is None:
-                # No rounding for this gene. Use the old gene value.
-                round_precision = None
-            else:
-                round_precision = self.gene_type[1]
+    def _convert_gene_values(self, values, gene_type):
+        """
+        Apply the shared conversion rule: round floating-point values
+        before casting to the requested type. Integer casts truncate
+        towards zero. None precision leaves values unrounded. NumPy's
+        rounding rule selects the nearest even value at halfway points.
+        """
+        dtype, precision = gene_type
+        if precision is None:
+            if numpy.isscalar(values):
+                return values if dtype is object else dtype(values)
+            converted_values = numpy.array(values, dtype=dtype, copy=True)
         else:
-            dtype = self.gene_type[gene_index][0]
-            if self.gene_type[gene_index][1] is None:
-                # No rounding for this gene. Use the old gene value.
-                round_precision = None
-            else:
-                round_precision = self.gene_type[gene_index][1]
+            rounded_values = self._round_gene_values(numpy.asarray(values, dtype=float), precision)
+            converted_values = numpy.asarray(rounded_values, dtype=dtype)
+        if converted_values.ndim == 0:
+            value = converted_values[()]
+            return value if dtype is object else dtype(value)
+        return converted_values
 
-        # Sometimes the values represent the gene_space when it is not nested (e.g. gene_space=range(10))
-        # Copy it to avoid changing the original gene_space.
-        gene_value = [gene_value].copy()
-
-        # Round the number before changing its data type to avoid precision loss for some data types like numpy.float32.
-        if round_precision is None:
-            pass
-        else:
-            gene_value = numpy.round(numpy.asarray(gene_value, dtype=float), round_precision)
-
-        gene_value_new = numpy.asarray(gene_value, dtype=dtype)
-        gene_value_new = gene_value_new[0]
-
-        return gene_value_new
+    def _round_gene_values(self, values, precision):
+        """
+        Use NumPy's array rounding, preserving finite inputs when its
+        decimal scaling overflows. Python's scalar round handles those
+        uncommon values without the intermediate scaling operation.
+        """
+        try:
+            with numpy.errstate(over='ignore', invalid='ignore', divide='ignore'):
+                rounded_values = numpy.round(values, precision)
+        except OverflowError:
+            # NumPy limits decimals to a C integer; Python round accepts
+            # the full integer precision supplied by the user.
+            return numpy.asarray(numpy.frompyfunc(lambda value: round(float(value), precision), 1, 1)(values), dtype=float)
+        invalid_results = numpy.isfinite(values) & ~numpy.isfinite(rounded_values)
+        if numpy.any(invalid_results):
+            rounded_values = numpy.asarray(rounded_values).copy()
+            rounded_values[invalid_results] = [round(float(value), precision)
+                                              for value in numpy.atleast_1d(values[invalid_results])]
+        return rounded_values
 
     def mutation_change_gene_dtype_and_round(self,
                                              random_value,
@@ -413,15 +420,19 @@ class Helper:
         """
 
         if mutation_by_replacement:
-            # If the mutation_by_replacement attribute is True, then the random value replaces the current gene value.
-            gene_value = random_value
+            mutated_value = random_value
         else:
-            # If the mutation_by_replacement attribute is False, then the random value is added to the gene value.
-            gene_value = gene_value + random_value
-
-        gene_value_new = self.change_gene_dtype_and_round(gene_index=gene_index,
-                                                          gene_value=gene_value)
-        return gene_value_new
+            # NumPy can add narrow scalars in their original dtype, losing
+            # precision or overflowing before the final cast. Python
+            # numeric values keep integer addition exact and float
+            # addition in the working precision used by the converter.
+            gene_value = gene_value.item() if isinstance(gene_value, numpy.generic) else gene_value
+            if numpy.ndim(random_value) == 0:
+                random_value = random_value.item() if isinstance(random_value, (numpy.generic, numpy.ndarray)) else random_value
+                mutated_value = gene_value + random_value
+            else:
+                mutated_value = gene_value + numpy.asarray(random_value, dtype=object)
+        return self.change_gene_dtype_and_round(gene_index, mutated_value)
 
     def validate_gene_constraint_callable_output(self,
                                                  selected_values,
@@ -677,7 +688,7 @@ class Helper:
         """
         lower, upper = sorted([lower, upper])
         dtype = self.get_gene_dtype(gene_index)[0]
-        if dtype in self.supported_int_types:
+        if numpy.issubdtype(numpy.dtype(dtype), numpy.integer):
             first_value, last_value = self._initial_population_integer_bounds(gene_index, lower, upper)
             if first_value > last_value:
                 raise ValueError(f"The initialization range [{lower}, {upper}) has no value representable by gene_type for the gene at index {gene_index}.")
@@ -693,6 +704,10 @@ class Helper:
 
     def _initial_population_integer_bounds(self, gene_index, lower, upper):
         """Return the first and last representable integers in an interval."""
+        # Python math functions may coerce NumPy integers to floats.
+        # Use their exact Python values before computing integer bounds.
+        lower = lower.item() if isinstance(lower, numpy.generic) else lower
+        upper = upper.item() if isinstance(upper, numpy.generic) else upper
         lower, upper = sorted([lower, upper])
         type_limits = numpy.iinfo(self.get_gene_dtype(gene_index)[0])
         first_value = max(math.ceil(lower), int(type_limits.min))
@@ -704,7 +719,7 @@ class Helper:
     def _initial_population_range_snapshot(self, gene_index, lower, upper, sample_size):
         """Create an inspection sample without allocating a range or drawing random values."""
         dtype = self.get_gene_dtype(gene_index)[0]
-        if dtype in self.supported_int_types:
+        if numpy.issubdtype(numpy.dtype(dtype), numpy.integer):
             first_value, last_value = self._initial_population_integer_bounds(gene_index, lower, upper)
             count = min(sample_size, last_value - first_value + 1)
             if count <= 0:
@@ -723,30 +738,40 @@ class Helper:
         lower = lower.item() if isinstance(lower, numpy.generic) else lower
         upper = upper.item() if isinstance(upper, numpy.generic) else upper
         dtype, precision = self.get_gene_dtype(gene_index)
+        if dtype is object:
+            dtype = float
         # Rounding or a narrow NumPy dtype can reach the excluded upper
         # bound. Keep sampled values within the representable interval.
         first_value = self.change_gene_dtype_and_round(gene_index, lower)
         last_value = self.change_gene_dtype_and_round(gene_index, upper)
         if lower != upper:
-            if precision is None:
+            # At 324 decimal places, a decimal step is smaller than the
+            # smallest positive float64 value used during rounding.
+            if precision is None or precision >= 324:
                 if float(first_value) < lower:
                     first_value = numpy.nextafter(first_value, dtype(numpy.inf), dtype=dtype)
                 if float(last_value) >= upper:
                     last_value = numpy.nextafter(last_value, dtype(-numpy.inf), dtype=dtype)
             else:
-                precision_step = 10.0 ** -precision
+                if float(first_value) < lower or float(last_value) >= upper:
+                    try:
+                        precision_step = 10.0 ** -precision
+                    except OverflowError:
+                        raise ValueError(f"The initialization range [{lower}, {upper}) has no value representable by gene_type and its precision for the gene at index {gene_index}.") from None
                 if float(first_value) < lower:
                     first_unrounded_value = dtype(lower)
                     if float(first_unrounded_value) < lower:
                         first_unrounded_value = numpy.nextafter(first_unrounded_value, dtype(numpy.inf), dtype=dtype)
-                    first_value = self.change_gene_dtype_and_round(
-                        gene_index, numpy.ceil(float(first_unrounded_value) / precision_step) * precision_step)
+                    decimal_units = float(first_unrounded_value) / precision_step
+                    rounded_bound = numpy.ceil(decimal_units) * precision_step if numpy.isfinite(decimal_units) else first_unrounded_value
+                    first_value = self.change_gene_dtype_and_round(gene_index, rounded_bound)
                 if float(last_value) >= upper:
                     last_unrounded_value = dtype(upper)
                     if float(last_unrounded_value) >= upper:
                         last_unrounded_value = numpy.nextafter(last_unrounded_value, dtype(-numpy.inf), dtype=dtype)
-                    last_value = self.change_gene_dtype_and_round(
-                        gene_index, numpy.floor(float(last_unrounded_value) / precision_step) * precision_step)
+                    decimal_units = float(last_unrounded_value) / precision_step
+                    rounded_bound = numpy.floor(decimal_units) * precision_step if numpy.isfinite(decimal_units) else last_unrounded_value
+                    last_value = self.change_gene_dtype_and_round(gene_index, rounded_bound)
         if (not numpy.isfinite(first_value) or not numpy.isfinite(last_value)
                 or float(first_value) < lower or first_value > last_value
                 or (lower != upper and float(last_value) >= upper)
@@ -800,18 +825,20 @@ class Helper:
             values = self.generate_gene_value_randomly(
                 range_min, range_max, gene_value, gene_idx,
                 mutation_by_replacement,
-                sample_size=None if dtype[0] in pygad.GA.supported_int_types else sample_size)
+                sample_size=None if numpy.issubdtype(numpy.dtype(dtype[0]), numpy.integer) else sample_size)
         elif type(space) is dict:
             if 'step' in space:
                 values = numpy.arange(space['low'], space['high'], space['step'])
-            elif dtype[0] in pygad.GA.supported_int_types:
+            elif numpy.issubdtype(numpy.dtype(dtype[0]), numpy.integer):
                 # A continuous dictionary with fractional bounds can cast
                 # to an integer near either end, not just values on a grid
                 # starting at low. Include every representable integer.
                 lower, upper = sorted([space['low'], space['high']])
-                first_value = int(numpy.trunc(lower))
-                last_value = int(numpy.trunc(numpy.nextafter(float(upper), -numpy.inf)))
-                values = numpy.arange(first_value, last_value + 1)
+                lower = lower.item() if isinstance(lower, numpy.generic) else lower
+                upper = upper.item() if isinstance(upper, numpy.generic) else upper
+                first_value = math.trunc(lower)
+                last_value = math.ceil(upper) - 1 if upper > 0 else math.trunc(upper)
+                values = numpy.arange(first_value, last_value + 1, dtype=dtype[0])
             else:
                 values = numpy.random.uniform(space['low'], space['high'], size=sample_size)
         elif type(space) in pygad.GA.supported_int_float_types:
@@ -822,24 +849,22 @@ class Helper:
                 random_values = self.generate_gene_value_randomly(
                     range_min, range_max, gene_value, gene_idx,
                     True,
-                    sample_size=None if dtype[0] in pygad.GA.supported_int_types else sample_size)
+                    sample_size=None if numpy.issubdtype(numpy.dtype(dtype[0]), numpy.integer) else sample_size)
                 values.extend(numpy.atleast_1d(random_values))
 
-        values = self.change_gene_dtype_and_round(gene_idx, numpy.atleast_1d(values))
-        if type(space) is dict and 'step' not in space and dtype[0] not in pygad.GA.supported_int_types:
+        # Convert directly from the input values so mixed finite spaces
+        # do not promote large integers to a shared floating-point type.
+        values = self.change_gene_dtype_and_round(gene_idx, values)
+        if type(space) is dict and 'step' not in space and not numpy.issubdtype(numpy.dtype(dtype[0]), numpy.integer):
             # Rounding may reach the excluded upper bound. Such a value
             # cannot be selected from this continuous space.
-            values = values[(values >= space['low']) & (values < space['high'])]
+            compared_values = values.astype(float)
+            values = values[(compared_values >= space['low']) & (compared_values < space['high'])]
             if len(values) == 0:
                 # A single sample can round to the upper bound. Use a
                 # representable in-range value instead of failing randomly.
-                lower = space['low']
-                if dtype[1] is not None:
-                    precision_step = 10.0 ** -dtype[1]
-                    lower = numpy.ceil(lower / precision_step) * precision_step
-                value = self.change_gene_dtype_and_round(gene_idx, lower)
-                if space['low'] <= value < space['high']:
-                    values = numpy.atleast_1d(value)
+                values = self._convert_initial_population_range_values(
+                    gene_idx, space['low'], space['high'], [space['low']])
         return numpy.unique(values)
 
     def is_gene_value_in_space(self, gene_idx, gene_value, current_gene_value):
@@ -850,7 +875,7 @@ class Helper:
         """
         space = self.gene_space[gene_idx] if self.gene_space_nested else self.gene_space
         dtype = self.get_gene_dtype(gene_idx)
-        if type(space) is dict and 'step' not in space and dtype[0] not in pygad.GA.supported_int_types:
+        if type(space) is dict and 'step' not in space and not numpy.issubdtype(numpy.dtype(dtype[0]), numpy.integer):
             return space['low'] <= gene_value < space['high']
         has_none = space is None
         if type(space) in [list, tuple, numpy.ndarray, range]:
@@ -862,7 +887,7 @@ class Helper:
         if has_none:
             range_min, range_max = self.get_random_mutation_range(gene_idx)
             replacement = self.mutation_by_replacement if space is None else True
-            if dtype[0] in pygad.GA.supported_int_types:
+            if numpy.issubdtype(numpy.dtype(dtype[0]), numpy.integer):
                 values = self.generate_gene_value_randomly(
                     range_min, range_max, current_gene_value, gene_idx,
                     replacement, sample_size=None)
@@ -962,16 +987,13 @@ class Helper:
         """
 
         gene_type = self.get_gene_dtype(gene_index=gene_idx)
-        if gene_type[0] in pygad.GA.supported_int_types:
+        if numpy.issubdtype(numpy.dtype(gene_type[0]), numpy.integer):
             if range_min == range_max:
-                random_value = numpy.asarray([range_min], dtype=gene_type[0])
+                random_value = numpy.asarray([range_min])
             else:
                 if step > 0:
                     range_min, range_max = min(range_min, range_max), max(range_min, range_max)
-                random_value = numpy.asarray(numpy.arange(range_min,
-                                                          range_max,
-                                                          step=step),
-                                             dtype=gene_type[0])
+                random_value = numpy.arange(range_min, range_max, step=step)
             if sample_size is None:
                 # Keep all the values.
                 pass
@@ -981,7 +1003,7 @@ class Helper:
                     # Makes no sense to create a larger sample out of the population because it just creates redundant values.
                     pass
                 else:
-                    # Set replace=True to avoid selecting the same value more than once.
+                    # Sample without replacement to avoid repeated candidates.
                     random_value = numpy.random.choice(random_value, 
                                                        size=sample_size,
                                                        replace=False)
@@ -992,12 +1014,9 @@ class Helper:
                                                               size=1 if sample_size is None else sample_size),
                                          dtype=object)
 
-        # Change the random mutation value data type.
-        for idx, val in enumerate(random_value):
-            random_value[idx] = self.mutation_change_gene_dtype_and_round(random_value[idx],
-                                                                          gene_idx,
-                                                                          gene_value,
-                                                                          mutation_by_replacement=mutation_by_replacement)
+        # Apply the offset and convert the entire candidate array once.
+        random_value = self.mutation_change_gene_dtype_and_round(
+            random_value, gene_idx, gene_value, mutation_by_replacement)
 
         # Rounding different values could return the same value multiple times.
         # For example, 2.8 and 2.7 will be 3.0.

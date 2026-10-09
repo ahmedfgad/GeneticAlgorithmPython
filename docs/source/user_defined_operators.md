@@ -12,6 +12,8 @@ Starting from [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.htm
 
 When `allow_duplicate_genes=False`, PyGAD applies its shared duplicate repair to custom crossover and mutation outputs after the corresponding callback has finished. Values are converted and rounded before repair. This also handles duplicate values returned or changed in place by `on_crossover` and `on_mutation`. If the configured spaces, ranges, or constraints leave no usable alternative, duplicates can remain with a warning. See [Prevent Duplicates in Gene Values](https://pygad.readthedocs.io/en/latest/gene_values.html#prevent-duplicates-in-gene-values).
 
+PyGAD applies `gene_type` and its precision to custom parent selection, crossover, and mutation outputs before the corresponding callback receives them. Values returned or changed in place by `on_parents`, `on_crossover`, and `on_mutation` are converted again before use, even when duplicates are allowed. When constructing an output array containing both large integers and floating-point values, use `numpy.array(values, dtype=object)` to preserve the original values until each gene's type is applied. See [Conversion and Rounding Rules](https://pygad.readthedocs.io/en/latest/gene_values.html#conversion-and-rounding-rules).
+
 This is a sample code that does not use any custom function.
 
 ```python
