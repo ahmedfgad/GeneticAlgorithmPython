@@ -65,10 +65,10 @@ myst_enable_extensions = [
     'dollarmath',
 ]
 
-# Do NOT set myst_heading_anchors. Leaving it unset keeps Sphinx using the
-# docutils section IDs (for example "PyGAD 2.18.0" -> "pygad-2-18-0"), which
-# are the anchors the live site already links to. Turning it on would switch
-# to GitHub-style slugs and break those links.
+# Resolve Markdown links such as [Plot Lifecycle](visualize.md#plot_lifecycle)
+# using GitHub-style heading anchors at every heading level. MyST maps these
+# anchors to the existing Sphinx section IDs, preserving published links.
+myst_heading_anchors = 6
 
 # -- Options for HTML output -------------------------------------------------
 
