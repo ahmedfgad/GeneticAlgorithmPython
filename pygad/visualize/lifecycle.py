@@ -400,4 +400,19 @@ def _draw_lifecycle(lifecycle, matplt, title, font_size):
                       linespacing=1.2, parse_math=False)
             configuration_top += 0.20 * len(label_lines) + 0.17 * len(value_lines) + 0.17
 
+    # Axes with axis("off") still occupy their full canvas in a tight export.
+    # Fit the canvas to the actual labels, cards, and connectors instead.
+    from matplotlib.transforms import Bbox
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    bounds = Bbox.union([artist.get_window_extent(renderer)
+                         for artist in list(axes.texts) + list(axes.patches)])
+    data_bounds = bounds.transformed(axes.transData.inverted())
+    margin = 0.08
+    left, right = data_bounds.xmin - margin, data_bounds.xmax + margin
+    top, bottom = data_bounds.ymin - margin, data_bounds.ymax + margin
+    axes.set_xlim(left, right)
+    axes.set_ylim(bottom, top)
+    fig.set_size_inches((right - left) * figure_scale,
+                        (bottom - top) * figure_scale)
     return fig

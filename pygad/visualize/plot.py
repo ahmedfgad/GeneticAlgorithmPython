@@ -31,7 +31,8 @@ class Plot:
                        font_size=11,
                        show_parameters=True,
                        save_dir=None,
-                       show=True):
+                       show=True,
+                       transparent=False):
         """
         Draw the configured lifecycle, including active operators,
         callbacks, the generation loop, and stopping conditions.
@@ -58,6 +59,9 @@ class Plot:
             If True, display the figure. Set to False when saving
             charts in scripts, notebooks, or reports without showing
             a window. The figure is returned in either case.
+        transparent : bool
+            If True, use a transparent figure background when displaying
+            or exporting the chart. Stage cards retain their fill colors.
 
         Returns
         -------
@@ -79,8 +83,8 @@ class Plot:
             raise TypeError("The font_size parameter must be a positive number.")
         if not numpy.isfinite(font_size) or font_size <= 0:
             raise ValueError("The font_size parameter must be finite and greater than 0.")
-        if not isinstance(show_parameters, bool) or not isinstance(show, bool):
-            raise TypeError("The show_parameters and show parameters must be bool values.")
+        if not all(isinstance(value, bool) for value in (show_parameters, show, transparent)):
+            raise TypeError("The show_parameters, show, and transparent parameters must be bool values.")
 
         # Keep chart construction separate from rendering so its flow
         # can be checked without importing matplotlib or running a GA.
@@ -93,8 +97,13 @@ class Plot:
                               "pip install pygad[visualize] (or pip install matplotlib).") from exc
 
         fig = _draw_lifecycle(lifecycle, matplt, title, font_size)
+        if transparent:
+            fig.patch.set_alpha(0)
+            for axes in fig.axes:
+                axes.patch.set_alpha(0)
         if save_dir is not None:
-            fig.savefig(fname=save_dir, bbox_inches="tight")
+            fig.savefig(fname=save_dir, bbox_inches="tight", pad_inches=0.02,
+                        transparent=transparent)
         if show:
             matplt.show()
         return fig

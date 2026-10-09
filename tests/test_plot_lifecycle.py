@@ -397,6 +397,44 @@ def test_lifecycle_export_and_display_control(tmp_path, monkeypatch, extension):
     matplt.close(fig)
 
 
+@pytest.mark.parametrize("show_parameters", [True, False])
+def test_lifecycle_transparent_export_has_small_outer_margins(tmp_path, show_parameters):
+    from PIL import Image
+
+    path = tmp_path / "transparent.png"
+    fig = create_ga_instance().plot_lifecycle(show_parameters=show_parameters,
+                                             transparent=True, save_dir=path, show=False)
+    try:
+        assert fig.patch.get_alpha() == 0
+        with Image.open(path) as image:
+            alpha = image.convert("RGBA").getchannel("A")
+            left, top, right, bottom = alpha.getbbox()
+            assert alpha.getextrema() == (0, 255)
+            # Default exports use 100 dpi; a content crop leaves about ten
+            # pixels of safety padding, rather than an unused axes canvas.
+            assert max(left, top, image.width-right, image.height-bottom) <= 15
+        fig.canvas.draw()
+        renderer = fig.canvas.get_renderer()
+        for text in fig.axes[0].texts:
+            bounds = text.get_window_extent(renderer)
+            assert fig.bbox.contains(*bounds.get_points()[0]), text.get_text()
+            assert fig.bbox.contains(*bounds.get_points()[1]), text.get_text()
+    finally:
+        matplt.close(fig)
+
+
+def test_lifecycle_default_export_keeps_opaque_background(tmp_path):
+    from PIL import Image
+
+    path = tmp_path / "opaque.png"
+    fig = create_ga_instance().plot_lifecycle(save_dir=path, show=False)
+    try:
+        with Image.open(path) as image:
+            assert image.convert("RGBA").getchannel("A").getextrema() == (255, 255)
+    finally:
+        matplt.close(fig)
+
+
 @pytest.mark.parametrize("parameters,error", [
     ({"title": None}, TypeError),
     ({"font_size": "large"}, TypeError),
@@ -407,6 +445,7 @@ def test_lifecycle_export_and_display_control(tmp_path, monkeypatch, extension):
     ({"font_size": numpy.inf}, ValueError),
     ({"show_parameters": "yes"}, TypeError),
     ({"show": None}, TypeError),
+    ({"transparent": "yes"}, TypeError),
 ])
 def test_lifecycle_parameter_validation(parameters, error):
     with pytest.raises(error):

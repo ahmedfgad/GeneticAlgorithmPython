@@ -44,9 +44,11 @@ Callbacks appear only when supplied. If `crossover_type=None` or `mutation_type=
 
 In the detailed view, the `Stop Early?` block lists the configured `stop_criteria` and, when an `on_generation` callback is supplied, the possible condition `on_generation() returns "stop"`. Any one of these conditions ends the run. The chart does not analyze the callback's code or assume that it will return `"stop"`. The block is omitted when neither early stopping mechanism is configured. Built-in block and configuration titles capitalize the first letter of each word; method and handler names retain their original spelling.
 
-Parameters: `title` (default `"PyGAD - Lifecycle"`), `font_size` (default `11`, finite and positive), `show_parameters` (default `True`), `save_dir` (default `None`), `show` (default `True`).
+Parameters: `title` (default `"PyGAD - Lifecycle"`), `font_size` (default `11`, finite and positive), `show_parameters` (default `True`), `save_dir` (default `None`), `show` (default `True`), `transparent` (default `False`).
 
 Use `show_parameters=False` for a compact chart that keeps handler names and control flow. Set `show=False` to create or save a chart without displaying it. The method always returns the figure, so it can be customized further.
+
+Charts fit their labels, cards, and connectors with small outer margins. Set `transparent=True` to remove the background for embedding in slides, videos, or web pages; the stage cards keep their fill colors.
 
 ```python
 # Save a detailed chart. The filename extension selects SVG, PNG, or PDF.
