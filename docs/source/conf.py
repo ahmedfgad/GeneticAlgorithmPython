@@ -9,9 +9,6 @@ project = 'PyGAD'
 copyright = '2026, Ahmed Fawzy Gad'
 author = 'Ahmed Fawzy Gad'
 
-# The full version, including alpha/beta/rc tags.
-release = '3.7.0'
-
 master_doc = 'index'
 
 # -- General configuration ---------------------------------------------------
@@ -20,6 +17,10 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import runpy
+
+# Read the package version without importing optional package dependencies.
+release = runpy.run_path(str(Path(__file__).resolve().parents[2] / 'pygad' / '_version.py'))['__version__']
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 

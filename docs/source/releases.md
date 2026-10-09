@@ -6,7 +6,13 @@ Release notes are listed from newest to oldest. Unreleased contains changes plan
 
 ## Unreleased
 
-These changes are available in the repository after PyGAD 3.7.0 and will be included in a future release.
+No changes yet.
+
+## PyGAD 3.8.0
+
+Release Date: pending publication.
+
+These changes are prepared on the `github-actions` branch. PyGAD 3.8.0 has not been published yet.
 
 1. [Two-point crossover](utils.md#two_points_crossover) selects two distinct random cut points from `0` through `num_genes`, with every pair equally likely. The segment length can vary from one to all genes, and the single-gene case no longer raises a slicing error. See [PR #371](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/371).
 2. [Swap mutation](utils.md#swap_mutation) can select any pair of distinct gene positions, matching its documentation. Single-gene offspring are returned unchanged. See [PR #375](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/375).
@@ -51,6 +57,8 @@ These changes are available in the repository after PyGAD 3.7.0 and will be incl
 33. A new [Examples index](examples.md) connects all 81 repository Python scripts and the TSP notebook to their documentation guides. Shared Python example cards link scripts beside the relevant explanations, use compact tables for larger groups, and provide expandable run instructions, requirements, and working directories. Self-contained scripts can be downloaded directly from the built documentation; examples needing data link to their folders and dataset setup instructions. One catalog and shared templates keep descriptions and links consistent, and the documentation build rejects missing scripts, uncataloged Python files, unknown example references, and missing guides. GitHub links match the documentation checkout. The TSP notebook's Colab-specific CSV path and local adaptation requirements are clarified. Earlier entries describe the regression tests and runnable examples added with the library changes.
 
 34. Documentation guides also render directly on GitHub and in compatible Markdown previews. Internal references use Markdown links; parameter descriptions use expandable details; navigation lists and PNG diagrams remain visible; and Sphinx-only labels, toctrees, and video embeds are hidden from previews. All Python example sections and the Examples index include checked-in Markdown generated from the shared catalog and templates, with script links, requirements, dataset setup, and run instructions. A Python-only command updates these sections, and builds reject stale content or incomplete section comments. Built documentation retains its cards, dropdowns, figures, downloads, navigation, and published anchors.
+
+35. Package metadata declares Python 3.8 or newer, matching the minimum version in the test matrix. Documentation reads the package version from `pygad/_version.py`. Release tags must match that version, and publication requires the Python 3.8 through 3.14 test matrix and a documentation build with warnings treated as errors. The matrix imports the installed wheel from outside the checkout. A GitHub Release is created only after PyPI publication succeeds.
 
 The operators consume different random draws from earlier versions. Runs with the same `random_seed` remain reproducible within the same version and environment, but can produce different results from earlier versions.
 

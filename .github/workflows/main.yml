@@ -18,7 +18,9 @@ on:
       - 'examples/**'
       - 'requirements.txt'
       - 'pyproject.toml'
+      - 'setup.py'
       - '.github/workflows/main.yml'
+      - '.github/workflows/release.yml'
   # Test relevant pull requests, including fork contributions, against master.
   pull_request:
     branches:
@@ -29,9 +31,13 @@ on:
       - 'examples/**'
       - 'requirements.txt'
       - 'pyproject.toml'
+      - 'setup.py'
       - '.github/workflows/main.yml'
+      - '.github/workflows/release.yml'
   # Allows manual triggering of the workflow from the GitHub Actions tab.
   workflow_dispatch:
+  # Release tags run this same matrix before publishing.
+  workflow_call:
 
 jobs:
   pytest:
@@ -114,8 +120,13 @@ jobs:
       # This includes our new tests for visualization, operators, parallel processing, etc.
       - name: Run Tests
         run: |
+          # Run outside the checkout so imports exercise the installed wheel.
+          cd "$RUNNER_TEMP"
+          python -c "import pygad; print('Testing installed package:', pygad.__file__)"
           if [ "${{ matrix.python-version }}" == "3.14" ] || [ "${{ matrix.python-version }}" == "3.8" ]; then
-            pytest --ignore=tests/test_kerasga.py --ignore=tests/test_torchga.py
+            python -m pytest "$GITHUB_WORKSPACE/tests" \
+              --ignore="$GITHUB_WORKSPACE/tests/test_kerasga.py" \
+              --ignore="$GITHUB_WORKSPACE/tests/test_torchga.py"
           else
-            pytest
+            python -m pytest "$GITHUB_WORKSPACE/tests"
           fi

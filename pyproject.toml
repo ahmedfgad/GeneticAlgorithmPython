@@ -12,7 +12,7 @@ name = "pygad"
 dynamic = ["version"]
 description = "PyGAD: A Python Library for Building the Genetic Algorithm and Training Machine Learning Algoithms (Keras & PyTorch)."
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3"
+requires-python = ">=3.8"
 license = {file = "LICENSE"}
 # license = "BSD-3-Clause"
 # license-files = ["LICENSE"]

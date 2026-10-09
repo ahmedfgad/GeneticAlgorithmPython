@@ -11,14 +11,33 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
 
+permissions:
+  contents: read
+
 jobs:
+  tests:
+    uses: ./.github/workflows/main.yml
+    permissions:
+      contents: read
+
   build:
+    needs: tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Verify release tag matches package version
+        run: |
+          python - <<'PY'
+          import os
+          import runpy
+          version = runpy.run_path("pygad/_version.py")["__version__"]
+          tag = os.environ["GITHUB_REF_NAME"]
+          if tag != version:
+              raise SystemExit(f"Release tag {tag} does not match package version {version}")
+          PY
       - name: Build distributions
         run: |
           pip install build . pytest responses 'vilvik>=0.5.3'
@@ -28,6 +47,11 @@ jobs:
         run: |
           pip install twine
           python -m twine check dist/*
+      - name: Check documentation
+        run: |
+          pip install -r docs/requirements.txt
+          python docs/markdown_compatibility.py
+          python -m sphinx -b html -W --keep-going docs/source docs/build/html
       - uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -48,7 +72,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
 
   github-release:
-    needs: build
+    needs: [build, publish]
     runs-on: ubuntu-latest
     permissions:
       contents: write
