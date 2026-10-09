@@ -18,19 +18,22 @@ directly so documentation and package versions cannot drift.
 
 ## Validation
 
-- Source checkout: 1,871 tests passed, one skipped, on Python 3.11.13 with
+- Release preparation baseline: 1,871 tests passed, one skipped, on Python 3.11.13 with
   NumPy 2.4.4. The skip is the unavailable Windows `fork` process start method.
 - TensorFlow/Keras and PyTorch tests were excluded locally because those
   optional frameworks are absent. They are covered by the existing remote
   matrix on its supported framework versions.
-- Release preparation matrix: all Python 3.8 through 3.14 jobs passed at commit
-  `6f31df251d4faca89571573ffac5a8e53f3ffe1d`, using the changed workflow and
+- Latest matrix: all seven Python 3.8 through 3.14 jobs passed at commit
+  `adde6bfe83f1e8b2ba8a3c8f73205f2dbcab8951`, including the lifecycle export fix,
+  using the changed workflow and
   installed 3.8.0 wheels:
-  https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/runs/37972271705
-  The following commit only updates this readiness report.
-- SDK compatibility: all four minimum/latest SDK jobs on Python 3.11 and 3.12
-  passed for that same release preparation commit:
-  https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/runs/37972271741
+  https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/runs/37995352872
+- SDK compatibility: all six minimum/latest/development SDK jobs on Python 3.9
+  and 3.12 passed for that same commit:
+  https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/runs/37995352864
+- The lifecycle fix passed all 41 focused lifecycle tests locally, related
+  report tests, and a strict Sphinx build with `-n -W --keep-going`.
+  Transparent PNG tests verify alpha, small margins and unclipped chart text.
 - Wheel and source distribution built as 3.8.0 and both passed `twine check`.
   The wheel contains the logo needed by PDF reports and declares its extras.
 - Installed wheel: 1,871 tests passed, one skipped, in a separate virtual
@@ -83,9 +86,12 @@ publication is authorized. Pushing that tag publishes automatically.
 The previous source project was found at
 https://github.com/ahmedfgad/PyGADReleaseVideo and cloned as a sibling at
 `D:/Projects/PyGADReleaseVideo`. New work is on `codex/pygad-3.8.0-video`.
-It reuses the original animation kit, fonts, logo, background music, typing
-sounds and transition effects. Only the bell cues are replaced with the
-user-approved soft wooden tap.
+It reuses the original animation kit, fonts, logo, typing sounds and transition
+effects. Bell cues use the user-approved soft wooden tap. The revised background
+music is the user-approved A: Warm keys. C: Floating ambient and the original
+release music are retained as separate three-minute WAV and MP3 tracks, with
+their synthesis code, in `Music_Library_3.8.0/`.
+https://github.com/ahmedfgad/PyGADReleaseVideo/tree/codex/pygad-3.8.0-video/Music_Library_3.8.0
 Runnable on-screen examples, real output, chapters and draft social posts
 are in `content/3.8.0/`. See that repository's `RELEASE_3.8.0.md` for builds.
 
@@ -93,12 +99,14 @@ The landscape (3840x2160), vertical (2160x3840), and square (2160x2160)
 videos are complete. The announcement kit was uploaded to `PyGAD_3.8.0/`
 on that repository's video branch, with MP4 files stored through Git LFS:
 https://github.com/ahmedfgad/PyGADReleaseVideo/tree/codex/pygad-3.8.0-video/PyGAD_3.8.0
+The revised video commit is `f31aaad8ff7c9bc7b02fa956b6a010848fc9ee16`,
+using the library implementation at `adde6bfe`.
 All four MP4 objects uploaded successfully and local Git LFS integrity checks
 passed. A fresh authenticated download of the preview matched its SHA-256 hash.
-The three full videos are 127 seconds each, and the preview is 21.5 seconds.
+The three full videos are 134.13 seconds each, and the preview is 22.5 seconds.
 The opening shows the logo and version for 5.5 seconds, down from 9.5 seconds.
 All four run at 60 fps,
-with H.264 video and AAC stereo audio. Every encoded frame decoded successfully;
+with H.264 video and 48 kHz AAC stereo audio. Every encoded frame decoded successfully;
 contact sheets from all nine segments were visually checked in all orientations.
 Thumbnails, a Reel cover, chapter timestamps, title captions, draft social posts,
 and machine-readable media validation are included. Social posts remain drafts;
@@ -106,8 +114,17 @@ no videos have been published to social platforms.
 
 The October 9 revisions move section takeaways into larger, high-contrast
 callouts above the output and enlarge the history chart in every orientation.
-Plots come from 360 dpi exports. Audio checks verify that the original music
-and non-bell effects are preserved, including all 417 typing clicks. Encoded
+Plots come from 360 dpi exports. All section titles are uppercase. Code typing
+is reduced from 60 to 44 characters per second, and the documentation command
+from 34 to 30. The permutation demo highlights and prints its initial row.
+The lifecycle call is fully highlighted, and the library now exports its chart
+with small margins and optional transparency. The video uses that actual export.
+The worker demo explains a target sum of 20 and illustrates two real process
+workers reused over four generations; a pool/PID audit is included. The
+documentation demo uses an actual screenshot and its complete example command.
+
+Audio checks verify the approved music and preserved non-bell effects,
+including all 469 typing clicks. Encoded
 music, typing transients, tap levels, loudness and peaks are checked in all four
 videos. Layout and audio measurements are included in the
 video repository's `PyGAD_3.8.0/layout_review.json` and `audio_validation.json`.
