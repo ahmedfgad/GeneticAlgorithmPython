@@ -636,7 +636,7 @@ Constructor settings and user callables are stored as instance attributes, with 
 - `solutions_fitness`: Fitness for every entry in `solutions`.
 - `solutions_generations`: One generation number per saved population when `save_solutions=True`. The solutions and their fitness retain one entry per solution.
 - `num_fitness_evaluations`: Number of solutions evaluated during the current `run()`, including adaptive offspring and every solution in returned fitness batches. Cache hits do not count. Each run resets the counter after `on_start`; direct fitness evaluations outside a run increment the existing count. `evaluations_<N>` checks the count at generation boundaries, so the run can exceed the requested budget by a generation's work.
-- `best_solution_generation`: Actual generation at which the best saved fitness was reached, using the same single-objective or NSGA-II ordering as `best_solution()`. `-1` until `run()` completes, or when an older checkpoint lacks the winning snapshot's generation number. See [Saved Fitness across Repeated Runs](fitness_calculation.md#saved-fitness-across-repeated-runs).
+- `best_solution_generation`: Actual generation at which the best saved fitness was reached, using the same single-objective or NSGA-II ordering as `best_solution()`. `-1` until `run()` completes, or when an older checkpoint lacks the winning snapshot's generation number. See {ref}`Saved Fitness across Repeated Runs <saved-fitness-across-repeated-runs>`.
 
 ##### Methods
 
