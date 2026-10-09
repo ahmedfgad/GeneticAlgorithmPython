@@ -70,6 +70,8 @@ You can also pass a list, tuple, or 1D NumPy array of criteria; the run stops as
 
 The counts for `saturate` and `evaluations` must be positive integers. Fractional counts are rejected. The threshold for `reach` must be finite, and the duration for `time` must be finite and non-negative; `time_0` stops at the first stopping check. Scientific notation is accepted, for example `evaluations_1e3` or `time_1e-2`. For multi-objective problems, `reach_10_20` requires both objective thresholds to be met; a single threshold applies to every objective.
 
+`saturate_N` counts consecutive completed generations whose best fitness equals the preceding population's best fitness, including the initial population as the baseline. `saturate_1` stops after one unchanged generation. Any change resets the count, so matching endpoints with changes in between do not count as saturation. Multi-objective problems compare the whole best-fitness vector. Each `run()` starts a new saturation count while `generations_completed` continues increasing across runs.
+
 Added in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0). The `time` and `evaluations` keywords were added in PyGAD 3.6.0.
 :::
 
@@ -400,9 +402,9 @@ Added in [PyGAD 2.6.0](https://pygad.readthedocs.io/en/latest/releases.html#pyga
 :::{dropdown} `on_fitness=None`: Called after the fitness is calculated.
 :animate: fade-in-slide-down
 
-A function (or method) called after the fitness of all solutions is calculated.
+A function (or method) called before parent selection after the fitness of all solutions is calculated. It receives `on_fitness(ga_instance, population_fitness)` and may return replacement fitness with the same shape, or modify the supplied array in place and return `None`. Both forms are validated before selection, and saved best solutions are updated to agree with the resulting fitness.
 
-- As a **function**, it takes 2 parameters: a list of all the solutions' fitness values, and the instance of the genetic algorithm.
+- As a **function**, it takes 2 parameters: the instance of the genetic algorithm, and a NumPy array of all the solutions' fitness values.
 - As a **method**, it takes a third parameter for the method's object.
 
 Added in [PyGAD 2.6.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-6-0).
@@ -466,7 +468,7 @@ Supported in [PyGAD 2.9.0](https://pygad.readthedocs.io/en/latest/releases.html#
 :::{dropdown} `save_solutions=False`: Save every solution of each generation.
 :animate: fade-in-slide-down
 
-If `True`, then all solutions in each generation are appended into an attribute called `solutions` which is NumPy array. Supported in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0).
+If `True`, then all solutions in each generation are appended into the `solutions` list, with their fitness in `solutions_fitness`. Each run includes its starting and final populations. `solutions_generations` records one generation number per saved population. Supported in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0).
 :::
 
 :::{dropdown} `logger=None`: Custom logger for the outputs.
@@ -628,11 +630,13 @@ Constructor settings and user callables are stored as instance attributes, with 
 - `last_generation_fitness`: Fitness values of the solutions in the last generation. Added in [PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
 - `previous_generation_fitness`: Fitness of the population one step before `last_generation_fitness`. Used to skip re-evaluating solutions PyGAD has already seen. Added in [PyGAD 2.16.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-2).
 - `best_solutions_fitness`: Fitness history of the best solution per generation, including the final population. Recorded even when `save_best_solutions=False`; with saving enabled, entries correspond to `best_solutions`.
+- `best_solutions_generations`: The actual generation number for each entry in `best_solutions_fitness`. Repeated runs retain both the final and starting snapshots at their boundary.
 - `best_solutions`: A NumPy array of the best solution per generation. Only populated when `save_best_solutions=True`.
 - `solutions`: All visited solutions when `save_solutions=True`.
 - `solutions_fitness`: Fitness for every entry in `solutions`.
+- `solutions_generations`: One generation number per saved population when `save_solutions=True`. The solutions and their fitness retain one entry per solution.
 - `num_fitness_evaluations`: Number of solutions evaluated during the current `run()`, including adaptive offspring and every solution in returned fitness batches. Cache hits do not count. Each run resets the counter after `on_start`; direct fitness evaluations outside a run increment the existing count. `evaluations_<N>` checks the count at generation boundaries, so the run can exceed the requested budget by a generation's work.
-- `best_solution_generation`: Generation at which the best fitness was reached. `-1` until `run()` completes.
+- `best_solution_generation`: Actual generation at which the best saved fitness was reached, using the same single-objective or NSGA-II ordering as `best_solution()`. `-1` until `run()` completes, or when an older checkpoint lacks the winning snapshot's generation number. See [Saved Fitness across Repeated Runs](fitness_calculation.md#saved-fitness-across-repeated-runs).
 
 ##### Methods
 

@@ -69,17 +69,16 @@ def _dtlz2_max_fitness(ga, solution, sol_idx):
 
 def _polynomial_mutation(offspring, ga_instance):
     """
-    Polynomial mutation operator used in the Deb & Jain paper. PyGAD
-    only ships a uniform random mutation which is not strong enough to
-    drive DTLZ2 to convergence in a reasonable number of generations.
+    Polynomial mutation operator used in the Deb & Jain paper. Use the
+    GA's generator so random_seed controls this custom operator too.
     """
     per_gene_probability = 1.0 / offspring.shape[1]
     eta_plus_one = 1.0 + POLY_MUTATION_ETA
     for solution_index in range(offspring.shape[0]):
         for gene_index in range(offspring.shape[1]):
-            if numpy.random.random() >= per_gene_probability:
+            if ga_instance.numpy_random_generator.random() >= per_gene_probability:
                 continue
-            u = numpy.random.random()
+            u = ga_instance.numpy_random_generator.random()
             if u < 0.5:
                 delta = pow(2.0 * u, 1.0 / eta_plus_one) - 1.0
             else:
@@ -104,6 +103,24 @@ def _make_dtlz2_ga():
                     mutation_type=_polynomial_mutation,
                     random_seed=RANDOM_SEED,
                     suppress_warnings=True)
+
+
+def test_custom_mutation_uses_instance_seed_despite_global_random_draws():
+    first = _make_dtlz2_ga()
+    second = _make_dtlz2_ga()
+    first.num_generations = second.num_generations = 5
+    global_state = numpy.random.get_state()
+    try:
+        numpy.random.seed(1)
+        first.run()
+        numpy.random.seed(123)
+        numpy.random.random(1000)
+        second.run()
+        numpy.testing.assert_array_equal(first.population, second.population)
+        numpy.testing.assert_array_equal(first.last_generation_fitness,
+                                         second.last_generation_fitness)
+    finally:
+        numpy.random.set_state(global_state)
 
 
 def _evaluate_final_fitness(ga):

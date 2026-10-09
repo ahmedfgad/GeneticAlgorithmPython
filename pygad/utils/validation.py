@@ -639,6 +639,11 @@ class Validation:
         # Even though this parameter is declared in the class header, it is assigned to the object here to access it after saving the object.
         # A list holding the fitness value of the best solution for each generation.
         self.best_solutions_fitness = []
+        # Histories retain the final and starting snapshots of repeated runs.
+        # Their positions are therefore different from generation numbers.
+        self.best_solutions_generations = []
+        self.solutions_generations = []
+        self._saved_population_sizes = []
 
         # The generation number at which the best fitness value is reached. It is only assigned the generation number after the `run()` method completes. Otherwise, its value is -1.
         self.best_solution_generation = -1

@@ -7,6 +7,7 @@ class GAEngine(FitnessEvaluation):
 
     def __setstate__(self, state):
         """Restore generator states, initializing them for older checkpoints."""
+        legacy_history = 'best_solutions_generations' not in state
         self.__dict__.update(state)
         for name in ['random_seed', 'num_generations', 'num_parents_mating', 'sol_per_pop',
                      'num_genes', 'K_tournament', 'nsga3_num_divisions', 'sample_size',
@@ -20,6 +21,77 @@ class GAEngine(FitnessEvaluation):
             self.python_random_generator = random.Random(self.random_seed)
         if not hasattr(self, 'mutation_control_explicitly_set'):
             self.mutation_control_explicitly_set = False
+        self._restore_history_generations()
+        if legacy_history and self.run_completed and len(self.best_solutions_fitness) > 0:
+            self._update_best_solution_generation()
+
+    def _restore_history_generations(self):
+        """Supply history metadata for checkpoints saved before it existed.
+
+        A single-run history has an unambiguous generation sequence. Older
+        repeated-run checkpoints did not save their run boundaries; None
+        marks generation numbers that cannot be recovered reliably.
+        """
+        count = len(self.best_solutions_fitness)
+        if (not hasattr(self, 'best_solutions_generations')
+                or len(self.best_solutions_generations) != count):
+            self.best_solutions_generations = (list(range(count))
+                if count == self.generations_completed + 1 else [None] * count)
+        if (not hasattr(self, '_saved_population_sizes')
+                or sum(self._saved_population_sizes) != len(self.solutions)):
+            count = len(self.solutions) // self.sol_per_pop
+            self._saved_population_sizes = [self.sol_per_pop] * count
+        count = len(self._saved_population_sizes)
+        if (not hasattr(self, 'solutions_generations')
+                or len(self.solutions_generations) != count):
+            self.solutions_generations = (list(range(count))
+                if count == self.generations_completed + 1 else [None] * count)
+
+    def _history_generation_numbers(self, generations):
+        """Use snapshot positions only for unknown legacy generation numbers."""
+        return [index if generation is None else generation
+                for index, generation in enumerate(generations)]
+
+    def _update_best_solution_generation(self):
+        """Find the best history entry using the same ordering as best_solution()."""
+        fitness = numpy.asarray(self.best_solutions_fitness)
+        if fitness.ndim == 1:
+            index = int(numpy.argmax(fitness))
+        else:
+            index = self.sort_solutions_nsga2(fitness=fitness,
+                                             find_best_solution=True)[0]
+        generation = self.best_solutions_generations[index]
+        self.best_solution_generation = -1 if generation is None else generation
+
+    def _saved_fitness_index(self, name, solutions, fitness):
+        """Index saved solutions incrementally, retaining the first match.
+
+        Rebuild outside run() so edits to public history arrays are honored.
+        During a run, only newly appended snapshots need indexing. Fitness
+        is read from the source list on each hit, so changes to saved scores
+        are also respected without duplicating those scores in the index.
+        """
+        indexes = getattr(self, '_saved_fitness_indexes', {})
+        self._saved_fitness_indexes = indexes
+        count = min(len(solutions), len(fitness))
+        indexed_solutions, indexed_count, lookup = indexes.get(name, (None, 0, {}))
+        if (not getattr(self, '_fitness_run_active', False)
+                or indexed_solutions is not solutions or indexed_count > count):
+            indexed_count, lookup = 0, {}
+        for index in range(indexed_count, count):
+            lookup.setdefault(tuple(solutions[index]), index)
+        indexes[name] = (solutions, count, lookup)
+        return lookup
+
+    def _save_population_snapshot(self):
+        """Append independent population and fitness snapshots with their generation."""
+        if self.save_solutions:
+            # Building each row preserves NumPy scalar types. tolist()
+            # would convert narrow NumPy types into Python int or float.
+            self.solutions.extend([list(solution) for solution in self.population])
+            self.solutions_fitness.extend(self.last_generation_fitness.copy())
+            self.solutions_generations.append(self.generations_completed)
+            self._saved_population_sizes.append(len(self.population))
 
     def round_genes(self, solutions):
         """
@@ -158,31 +230,41 @@ class GAEngine(FitnessEvaluation):
 
             if type(self.best_solutions) is numpy.ndarray:
                 self.best_solutions = self.best_solutions.tolist()
-            saved_solutions = (self.solutions.tolist()
-                               if type(self.solutions) is numpy.ndarray
-                               else self.solutions)
+            saved_solutions = self.solutions
+            saved_index = (self._saved_fitness_index('solutions', saved_solutions,
+                            self.solutions_fitness) if self.save_solutions else {})
+            best_index = (self._saved_fitness_index('best_solutions', self.best_solutions,
+                            self.best_solutions_fitness) if self.save_best_solutions else {})
             parents = (self.last_generation_parents.tolist()
                        if self.last_generation_parents is not None else [])
             elites = (self.last_generation_elitism.tolist()
                       if self.last_generation_elitism is not None else [])
+            parent_index = {}
+            elite_index = {}
+            for index, solution in enumerate(parents):
+                parent_index.setdefault(tuple(solution), index)
+            for index, solution in enumerate(elites):
+                elite_index.setdefault(tuple(solution), index)
             pop_fitness = [None] * len(self.population)
             missing_indices = []
+            if not getattr(self, '_fitness_run_active', False):
+                self._fitness_value_shape = None
             for index, solution in enumerate(self.population):
-                values = solution.tolist()
-                if self.save_solutions and values in saved_solutions:
-                    fitness = self.solutions_fitness[saved_solutions.index(values)]
-                elif self.save_best_solutions and values in self.best_solutions:
-                    fitness = self.best_solutions_fitness[self.best_solutions.index(values)]
-                elif self.keep_elitism > 0 and values in elites:
-                    previous_index = self.last_generation_elitism_indices[elites.index(values)]
+                values = tuple(solution)
+                if values in saved_index:
+                    fitness = self.solutions_fitness[saved_index[values]]
+                elif values in best_index:
+                    fitness = self.best_solutions_fitness[best_index[values]]
+                elif self.keep_elitism > 0 and values in elite_index:
+                    previous_index = self.last_generation_elitism_indices[elite_index[values]]
                     fitness = self.previous_generation_fitness[previous_index]
-                elif self.keep_parents != 0 and values in parents:
-                    previous_index = self.last_generation_parents_indices[parents.index(values)]
+                elif self.keep_parents != 0 and values in parent_index:
+                    previous_index = self.last_generation_parents_indices[parent_index[values]]
                     fitness = self.previous_generation_fitness[previous_index]
                 else:
                     missing_indices.append(index)
                     continue
-                pop_fitness[index] = fitness
+                pop_fitness[index] = self._validate_fitness_value(fitness, 'cached fitness')
 
             fitness_values = self._evaluate_fitness(self.population, missing_indices)
             for index, fitness in zip(missing_indices, fitness_values):
@@ -219,12 +301,15 @@ class GAEngine(FitnessEvaluation):
             current number of objectives.
         """
         self._fitness_run_active = True
+        self._saved_fitness_indexes = {}
+        self._fitness_value_shape = None
         try:
             if self.valid_parameters == False:
                 raise Exception("Error calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
 
             # Starting from PyGAD 2.18.0, the 4 properties (best_solutions, best_solutions_fitness, solutions, and solutions_fitness) are no longer reset with each call to the run() method. Instead, they are extended.
-            # For example, if there are 50 generations and the user set save_best_solutions=True, then the length of the 2 properties best_solutions and best_solutions_fitness will be 50 after the first call to the run() method, then 100 after the second call, 150 after the third, and so on.
+            # Each run retains its starting population and every completed generation.
+            self._restore_history_generations()
 
             # self.best_solutions: Holds the best solution in each generation.
             if type(self.best_solutions) is numpy.ndarray:
@@ -288,9 +373,12 @@ class GAEngine(FitnessEvaluation):
             if self.save_best_solutions:
                 self.best_solutions.append(list(best_solution))
 
+            unchanged_generations = 0
+
             for generation in range(generation_first_idx, generation_last_idx):
 
                 self.run_loop_head(best_solution_fitness)
+                previous_best_fitness = self.best_solutions_fitness[-1]
 
                 # Call the 'run_select_parents()' method to select the parents.
                 # It edits these 2 instance attributes:
@@ -314,6 +402,15 @@ class GAEngine(FitnessEvaluation):
                     # 1) population: A NumPy array of the population of solutions/chromosomes.
                 self.run_update_population()
 
+                # User operators and callbacks may edit the public histories.
+                # Rebuild their indexes after those calls; ordinary built-in
+                # evolution keeps the incremental indexes between generations.
+                if (any(callable(operator) for operator in
+                        (self.parent_selection_type, self.crossover_type, self.mutation_type))
+                        or any(callback is not None for callback in
+                               (self.on_parents, self.on_crossover, self.on_mutation))):
+                    self._saved_fitness_indexes = {}
+
                 # The generations_completed attribute holds the number of the last completed generation.
                 self.generations_completed = generation + 1
 
@@ -323,6 +420,10 @@ class GAEngine(FitnessEvaluation):
 
                 best_solution, best_solution_fitness, best_match_idx = self.best_solution(
                     pop_fitness=self.last_generation_fitness)
+                if numpy.array_equal(previous_best_fitness, best_solution_fitness):
+                    unchanged_generations += 1
+                else:
+                    unchanged_generations = 0
 
                 # Appending the best solution in the current generation to the best_solutions list.
                 if self.save_best_solutions:
@@ -332,6 +433,7 @@ class GAEngine(FitnessEvaluation):
                 # If the on_generation attribute is not None, then call the callback function after the generation.
                 if not (self.on_generation is None):
                     r = self.on_generation(self)
+                    self._saved_fitness_indexes = {}
                     if type(r) is str and r.lower() == "stop":
                         break
 
@@ -376,22 +478,9 @@ class GAEngine(FitnessEvaluation):
                                         stop_run = False
                                         break
                         elif criterion[0] == "saturate":
-                            criterion[1] = int(criterion[1])
-                            if self.generations_completed >= criterion[1]:
-                                # Single-objective problem.
-                                if type(self.last_generation_fitness[0]) in self.supported_int_float_types:
-                                    if (self.best_solutions_fitness[self.generations_completed - criterion[1]] - self.best_solutions_fitness[self.generations_completed - 1]) == 0:
-                                        stop_run = True
-                                        break
-                                # Multi-objective problem.
-                                elif type(self.last_generation_fitness[0]) in [list, tuple, numpy.ndarray]:
-                                    stop_run = True
-                                    for obj_idx in range(len(self.last_generation_fitness[0])):
-                                        if (self.best_solutions_fitness[self.generations_completed - criterion[1]][obj_idx] - self.best_solutions_fitness[self.generations_completed - 1][obj_idx]) == 0:
-                                            pass
-                                        else:
-                                            stop_run = False
-                                            break
+                            if unchanged_generations >= criterion[1]:
+                                stop_run = True
+                                break
                         elif criterion[0] == "time":
                             # Stop when the time spent inside run()
                             # passes the user limit.
@@ -410,13 +499,7 @@ class GAEngine(FitnessEvaluation):
                     break
 
             # Save the fitness of the last generation.
-            if self.save_solutions:
-                # self.solutions.extend(self.population.copy())
-                population_as_list = self.population.copy()
-                population_as_list = [list(item) for item in population_as_list]
-                self.solutions.extend(population_as_list)
-
-                self.solutions_fitness.extend(self.last_generation_fitness)
+            self._save_population_snapshot()
 
             # Call the run_select_parents() method to update these 2 attributes according to the 'last_generation_fitness' attribute:
                 # 1) last_generation_parents 2) last_generation_parents_indices
@@ -429,12 +512,15 @@ class GAEngine(FitnessEvaluation):
                                                                                                                  num_parents=self.keep_elitism)
 
             # Save the fitness value of the best solution.
-            _, best_solution_fitness, _ = self.best_solution(
+            best_solution, best_solution_fitness, _ = self.best_solution(
                 pop_fitness=self.last_generation_fitness)
-            self.best_solutions_fitness.append(best_solution_fitness)
+            if self.save_best_solutions:
+                self.best_solutions[-1] = best_solution.tolist()
+            self.best_solutions_fitness.append(numpy.copy(best_solution_fitness)
+                if isinstance(best_solution_fitness, numpy.ndarray) else best_solution_fitness)
+            self.best_solutions_generations.append(self.generations_completed)
 
-            self.best_solution_generation = numpy.where(numpy.array(
-                self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
+            self._update_best_solution_generation()
             # After the run() method completes, the run_completed flag is changed from False to True.
             # Set to True only after the run() method completes gracefully.
             self.run_completed = True
@@ -463,7 +549,7 @@ class GAEngine(FitnessEvaluation):
         """
         Run the bookkeeping that takes place at the top of every
         generation: call ``self.on_fitness`` if set (with optional
-        validation of the returned values), append the running best
+        validation of returned or edited values), recompute and append the best
         fitness to ``self.best_solutions_fitness``, and append the
         current population and fitness to ``self.solutions`` /
         ``self.solutions_fitness`` when ``self.save_solutions`` is
@@ -474,7 +560,8 @@ class GAEngine(FitnessEvaluation):
         Parameters
         ----------
         best_solution_fitness : numeric or numpy.ndarray
-            Fitness of the best solution in the previous generation.
+            Retained for compatibility. The best fitness is recomputed
+            after on_fitness so it agrees with the saved solution.
 
         Raises
         ------
@@ -483,8 +570,10 @@ class GAEngine(FitnessEvaluation):
             match the population fitness, or an unsupported type.
         """
         if not (self.on_fitness is None):
+            expected_shape = self.last_generation_fitness.shape
             on_fitness_output = self.on_fitness(self, 
                                                 self.last_generation_fitness)
+            self._saved_fitness_indexes = {}
 
             if on_fitness_output is None:
                 pass
@@ -497,18 +586,25 @@ class GAEngine(FitnessEvaluation):
                         raise ValueError(f"Size mismatch between the output of on_fitness() {on_fitness_output.shape} and the expected fitness output {self.last_generation_fitness.shape}.")
                 else:
                     raise ValueError(f"The output of on_fitness() is expected to be tuple/list/range/numpy.ndarray but {type(on_fitness_output)} found.")
+            self.last_generation_fitness = self._validate_population_fitness(
+                self.last_generation_fitness, 'on_fitness output')
+            if self.last_generation_fitness.shape != expected_shape:
+                raise ValueError(f"Size mismatch between the output of on_fitness() {self.last_generation_fitness.shape} and the expected fitness output {expected_shape}.")
 
         # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
-        self.best_solutions_fitness.append(best_solution_fitness)
+        if self.on_fitness is not None:
+            best_solution, best_solution_fitness, _ = self.best_solution(
+                pop_fitness=self.last_generation_fitness)
+        self.best_solutions_fitness.append(numpy.copy(best_solution_fitness)
+            if isinstance(best_solution_fitness, numpy.ndarray) else best_solution_fitness)
+        self.best_solutions_generations.append(self.generations_completed)
+        if self.save_best_solutions and self.on_fitness is not None:
+            # This snapshot was appended before on_fitness ran. The callback
+            # may change which solution is best, so update the matching entry.
+            self.best_solutions[-1] = best_solution.tolist()
 
         # Appending the solutions in the current generation to the solutions list.
-        if self.save_solutions:
-            # self.solutions.extend(self.population.copy())
-            population_as_list = self.population.copy()
-            population_as_list = [list(item) for item in population_as_list]
-            self.solutions.extend(population_as_list)
-
-            self.solutions_fitness.extend(self.last_generation_fitness)
+        self._save_population_snapshot()
 
     def run_select_parents(self, call_on_parents=True):
         """
@@ -886,24 +982,24 @@ class GAEngine(FitnessEvaluation):
                 pop_fitness = self.cal_pop_fitness()
             # Verify the type of the 'pop_fitness' parameter.
             elif type(pop_fitness) in [tuple, list, numpy.ndarray]:
+                if isinstance(pop_fitness, numpy.ndarray) and pop_fitness.ndim == 0:
+                    raise ValueError("pop_fitness must contain one fitness value per population solution.")
                 # Verify that the length of the passed population fitness matches the length of the 'self.population' attribute.
                 if len(pop_fitness) == len(self.population):
                     # This successfully verifies the 'pop_fitness' parameter.
-                    pass
+                    pop_fitness = self._validate_population_fitness(
+                        pop_fitness, 'pop_fitness', check_shape=False)
                 else:
                     raise ValueError(f"The length of the list/tuple/numpy.ndarray passed to the 'pop_fitness' parameter ({len(pop_fitness)}) must match the length of the 'self.population' attribute ({len(self.population)}).")
             else:
                 raise ValueError(f"The type of the 'pop_fitness' parameter is expected to be list, tuple, or numpy.ndarray but ({type(pop_fitness)}) found.")
 
-            # Return the index of the best solution that has the best fitness value.
-            # For multi-objective optimization: find the index of the solution with the maximum fitness in the first objective,
-            # break ties using the second objective, then third, etc.
+            # Use the same ordering as parent selection for multi-objective fitness.
             pop_fitness_arr = numpy.array(pop_fitness)
             # Get the indices that would sort by all objectives in descending order
             if pop_fitness_arr.ndim == 1:
                 # Single-objective optimization.
-                best_match_idx = numpy.where(
-                 pop_fitness == numpy.max(pop_fitness))[0][0]
+                best_match_idx = int(numpy.argmax(pop_fitness_arr))
             elif pop_fitness_arr.ndim == 2:
                 # Multi-objective optimization.
                 # Use NSGA-2 to sort the solutions using the fitness.

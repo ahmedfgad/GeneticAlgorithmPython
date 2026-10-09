@@ -23,6 +23,8 @@ Every method returns the `matplotlib.figure.Figure` it created and optionally wr
 
 Except for `plot_lifecycle()`, every method requires at least one completed generation. Each one raises `RuntimeError` with a clear message if it is called too early, on a single-objective problem when MOO is required, or without the `save_solutions` flag when one is required.
 
+After repeated `run()` calls, fitness plots, best-solution gene plots, and population diagnostics use the actual generation numbers. Histories retain both snapshots at a run boundary, so two points can have the same generation number. Population diagnostics also retain each snapshot's population size. `plot_new_solution_rate()` uses the latest saved population once per generation and excludes the final population, as in a single run. `plot_pareto_front_evolution(every_k=N)` selects actual generation numbers divisible by `N`, uses the latest snapshot at repeated boundaries, and always includes the final population. These plots also work in generated PDF reports.
+
 (plot-lifecycle)=
 ## `plot_lifecycle()`
 
