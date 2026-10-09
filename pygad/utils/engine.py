@@ -5,6 +5,22 @@ from pygad.utils.parallel import FitnessEvaluation
 
 class GAEngine(FitnessEvaluation):
 
+    def __setstate__(self, state):
+        """Restore generator states, initializing them for older checkpoints."""
+        self.__dict__.update(state)
+        for name in ['random_seed', 'num_generations', 'num_parents_mating', 'sol_per_pop',
+                     'num_genes', 'K_tournament', 'nsga3_num_divisions', 'sample_size',
+                     'fitness_batch_size', 'keep_parents', 'keep_elitism']:
+            value = getattr(self, name, None)
+            if isinstance(value, numpy.integer):
+                setattr(self, name, int(value))
+        if not hasattr(self, 'numpy_random_generator'):
+            self.numpy_random_generator = numpy.random.RandomState(self.random_seed)
+        if not hasattr(self, 'python_random_generator'):
+            self.python_random_generator = random.Random(self.random_seed)
+        if not hasattr(self, 'mutation_control_explicitly_set'):
+            self.mutation_control_explicitly_set = False
+
     def round_genes(self, solutions):
         """
         Convert and round genes in ``solutions`` using ``self.gene_type``.
@@ -72,7 +88,7 @@ class GAEngine(FitnessEvaluation):
                 upper = max(self.gene_space['low'], self.gene_space['high'])
             # A single draw retains the traditional solution-then-gene
             # order for continuous populations while avoiding scalar calls.
-            population = numpy.random.uniform(lower, upper, size=(num_solutions, self.num_genes))
+            population = self.numpy_random_generator.uniform(lower, upper, size=(num_solutions, self.num_genes))
             for gene_index in range(self.num_genes):
                 if self.gene_space is None:
                     gene_lower, gene_upper = self.get_initial_population_range(gene_index)
@@ -102,7 +118,7 @@ class GAEngine(FitnessEvaluation):
                 population, build_initial_pop=True)
         return population
 
-    def apply_initial_population_gene_constraints(self, population):
+    def apply_initial_population_gene_constraints(self, population, warn=True):
         """
         Replace values rejected by their constraints using converted
         initialization candidates. Constraints see the complete solution
@@ -126,10 +142,10 @@ class GAEngine(FitnessEvaluation):
                 accepted_values = self.filter_gene_values_by_constraint(
                     candidates, solution, gene_index, warn=False)
                 if accepted_values is None:
-                    if not self.suppress_warnings:
+                    if warn and not self.suppress_warnings:
                         warnings.warn(f"No value satisfied the constraint for the gene at index {gene_index} with value {solution[gene_index]} while creating the initial population.")
                 else:
-                    solution[gene_index] = random.choice(accepted_values)
+                    solution[gene_index] = self.python_random_generator.choice(accepted_values)
         return population
 
     def cal_pop_fitness(self):

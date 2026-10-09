@@ -1,5 +1,7 @@
 """Conversion, rounding, and gene-type preservation across the GA lifecycle."""
 
+from unittest.mock import Mock
+
 import copy
 
 import numpy
@@ -287,7 +289,8 @@ def test_generated_integer_ranges_preserve_exact_numpy_bounds(dtype):
 @pytest.mark.parametrize("dtype,precision", [(numpy.float32, 2), (float, 400), (float, 2**40)])
 def test_continuous_space_fallback_respects_stored_value_bounds(dtype, precision, monkeypatch):
     ga_instance = make_ga(gene_type=[dtype, precision], gene_space={'low': 0.9, 'high': 1.0})
-    monkeypatch.setattr(numpy.random, 'uniform', lambda *args, **kwargs: numpy.ones(kwargs['size']))
+    monkeypatch.setattr(ga_instance, 'numpy_random_generator', Mock(wraps=ga_instance.numpy_random_generator))
+    monkeypatch.setattr(ga_instance.numpy_random_generator, 'uniform', lambda *args, **kwargs: numpy.ones(kwargs['size']))
     values = ga_instance.get_gene_space_values(0, sample_size=1)
     assert len(values) == 1
     assert 0.9 <= float(values[0]) < 1.0

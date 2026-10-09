@@ -97,14 +97,14 @@ class GA(utils.parent_selection.ParentSelection,
         keep_elitism: Added in PyGAD 2.18.0. It can take the value 0 or a positive integer that satisfies (0 <= keep_elitism <= sol_per_pop). It defaults to 1 which means only the best solution in the current generation is kept in the next generation. If assigned 0, this means it has no effect. If assigned a positive integer K, then the best K solutions are kept in the next generation. It cannot be assigned a value greater than the value assigned to the sol_per_pop parameter. If this parameter has a value different from 0, then it takes precedence over the keep_parents parameter, which will have no effect (a warning is raised if keep_parents was explicitly set in this case). To use keep_parents instead, set keep_elitism=0.
 
         crossover_type: Type of the crossover operator. If  crossover_type=None, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
-        crossover_probability: The probability of selecting a solution for the crossover operation. If the solution probability is <= crossover_probability, the solution is selected. The value must be between 0 and 1 inclusive.
+        crossover_probability: The probability of selecting a solution for the crossover operation. If the generated value is < crossover_probability, the solution is selected. The value must be between 0 and 1 inclusive.
         sbx_crossover_eta: Only used when 'crossover_type' is 'sbx'. The distribution index that controls how close the children stay to the parents (higher value = closer). Defaults to 30.
 
         mutation_type: Type of the mutation operator. If mutation_type=None, then the mutation step is bypassed which means no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
-        mutation_probability: The probability of selecting a gene for the mutation operation. If the gene probability is <= mutation_probability, the gene is selected. It accepts either a single value for fixed mutation or a list/tuple/numpy.ndarray of 2 values for adaptive mutation. The values must be between 0 and 1 inclusive. If specified, then no need for the 2 parameters mutation_percent_genes and mutation_num_genes.
+        mutation_probability: The probability of selecting a gene for the mutation operation. If the generated value is < mutation_probability, the gene is selected. Zero leaves offspring unchanged. It accepts either a single value for fixed mutation or a list/tuple/numpy.ndarray of 2 values for adaptive mutation. The values must be between 0 and 1 inclusive. If specified, then no need for the 2 parameters mutation_percent_genes and mutation_num_genes.
         polynomial_mutation_eta: Only used when 'mutation_type' is 'polynomial'. The distribution index that controls how small the mutation step is (higher value = smaller step). Defaults to 20.
 
-        mutation_by_replacement: An optional bool parameter. It works only when the selected type of mutation is random (mutation_type="random"). In this case, setting mutation_by_replacement=True means replace the gene by the randomly generated value. If False, then it has no effect and random mutation works by adding the random value to the gene.
+        mutation_by_replacement: An optional bool parameter. It applies when random or adaptive mutation draws random values. In this case, setting mutation_by_replacement=True means replace the gene by the randomly generated value. If False, then it has no effect and random mutation works by adding the random value to the gene.
 
         mutation_percent_genes: Percentage of genes to mutate which defaults to the string 'default' which means 10%. This parameter has no action if any of the 2 parameters mutation_probability or mutation_num_genes exist.
         mutation_num_genes: Number of genes to mutate which defaults to None. If the parameter mutation_num_genes exists, then no need for the parameter mutation_percent_genes. This parameter has no action if the mutation_probability parameter exists.
@@ -135,7 +135,7 @@ class GA(utils.parent_selection.ParentSelection,
 
         parallel_processing: Added in PyGAD 2.17.0. Defaults to `None` which means no parallel processing is used. If a positive integer is assigned, it specifies the number of threads to be used. If a list or a tuple of exactly 2 elements is assigned, then: 1) The first element can be either "process" or "thread" to specify whether processes or threads are used, respectively. 2) The second element can be: 1) A positive integer to select the maximum number of processes or threads to be used. 2) 0 to indicate that parallel processing is not used. This is identical to setting 'parallel_processing=None'. 3) None to use the default value as calculated by the concurrent.futures module.
 
-        random_seed: Added in PyGAD 2.18.0. It defines the random seed to be used by the random function generators (we use random functions in the NumPy and random modules). This helps to reproduce the same results by setting the same random seed.
+        random_seed: Added in PyGAD 2.18.0. It accepts None or a Python/NumPy integer from 0 through 2**32-1. Each GA owns numpy_random_generator and python_random_generator; their states continue across runs and checkpoints. Custom operators can use these generators for reproducible random draws.
 
         logger: Added in PyGAD 2.20.0. It accepts a logger object of the 'logging.Logger' class to log the messages. If no logger is passed, then a default logger is created to log/print the messages to the console exactly like using the 'print()' function.
         """
@@ -185,7 +185,8 @@ class GA(utils.parent_selection.ParentSelection,
                                      random_seed=random_seed,
                                      logger=logger)
         except Exception as e:
-            self.logger.exception(e)
+            if hasattr(self, 'logger'):
+                self.logger.exception(e)
             # sys.exit(-1)
             raise e
 

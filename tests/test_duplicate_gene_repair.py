@@ -1,5 +1,7 @@
 """Regression tests for duplicate repair across the GA lifecycle."""
 
+from unittest.mock import Mock
+
 import copy
 import itertools
 import random
@@ -95,7 +97,7 @@ def test_mutation_repairs_each_gene_using_its_own_range(method, monkeypatch):
                           mutation_num_genes=[1, 1] if adaptive else 1,
                           random_mutation_min_val=[1, 10],
                           random_mutation_max_val=[3, 12])
-    monkeypatch.setattr(random, 'sample', lambda values, count: [0])
+    monkeypatch.setattr(ga_instance.python_random_generator, 'sample', lambda values, count: [0])
     monkeypatch.setattr(ga_instance, 'mutation_process_gene_value',
                         lambda solution, gene_idx, **kwargs: 2 if gene_idx == 0 else solution[gene_idx])
     if adaptive:
@@ -213,12 +215,13 @@ def test_permutation_mutation_repairs_duplicates_created_by_destination_casts(me
                                                                              monkeypatch):
     ga_instance = make_ga(num_genes=4, gene_type=[float, int, int, int], mutation_type=method.split('_')[0],
                           initial_population=[[0.5, 1, 0, 2], [0.5, 1, 0, 2]])
+    monkeypatch.setattr(ga_instance, 'numpy_random_generator', Mock(wraps=ga_instance.numpy_random_generator))
     if method == 'swap_mutation':
-        monkeypatch.setattr(numpy.random, 'choice', lambda *args, **kwargs: numpy.array([0, 1]))
+        monkeypatch.setattr(ga_instance.numpy_random_generator, 'choice', lambda *args, **kwargs: numpy.array([0, 1]))
     else:
-        monkeypatch.setattr(numpy.random, 'randint', lambda *args, **kwargs: numpy.array([0]))
+        monkeypatch.setattr(ga_instance.numpy_random_generator, 'randint', lambda *args, **kwargs: numpy.array([0]))
         if method == 'scramble_mutation':
-            monkeypatch.setattr(numpy.random, 'shuffle', lambda values: values.__setitem__(slice(None), values[::-1].copy()))
+            monkeypatch.setattr(ga_instance.numpy_random_generator, 'shuffle', lambda values: values.__setitem__(slice(None), values[::-1].copy()))
     result = getattr(ga_instance, method)(ga_instance.population.copy())
     for solution in result:
         assert len(set(solution)) == 4
@@ -291,7 +294,8 @@ def test_integer_none_mutation_adds_the_offset_before_casting(monkeypatch):
                           initial_population=[[-2, 100, 200], [-2, 100, 200]],
                           mutation_by_replacement=False,
                           random_mutation_min_val=-1, random_mutation_max_val=1)
-    monkeypatch.setattr(numpy.random, 'uniform', lambda *args, **kwargs: 0.75)
+    monkeypatch.setattr(ga_instance, 'numpy_random_generator', Mock(wraps=ga_instance.numpy_random_generator))
+    monkeypatch.setattr(ga_instance.numpy_random_generator, 'uniform', lambda *args, **kwargs: 0.75)
     value = ga_instance.generate_gene_value_from_space(
         0, False, ga_instance.population[0], gene_value=-2, sample_size=1)
     assert value == -1

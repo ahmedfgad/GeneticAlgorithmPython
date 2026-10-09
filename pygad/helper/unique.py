@@ -5,7 +5,6 @@ The pygad.helper.unique module has helper methods to solve duplicate genes and m
 from collections import deque
 import numpy
 import warnings
-import random
 import pygad
 
 
@@ -122,7 +121,7 @@ class Unique:
             # different candidates into the same numeric value.
             values = list(dict.fromkeys((value if dtype[0] is object else dtype[0](value)) for value in numpy.atleast_1d(values)))
             values = [value for value in values if value != gene_value]
-            random.shuffle(values)
+            self.python_random_generator.shuffle(values)
             # Keep manually supplied values and values inherited from parents.
             # Only a replacement must come from the current domain.
             candidate_values.append([gene_value] + values)
@@ -132,7 +131,7 @@ class Unique:
         # Keep the full domains for constraints depending on changed genes.
         constrained_values = []
         for gene_index, values in enumerate(candidate_values):
-            if self.gene_constraint and self.gene_constraint[gene_index]:
+            if self.gene_constraint and self.gene_constraint[gene_index] is not None:
                 selected_values = self.filter_gene_values_by_constraint(
                     numpy.array(values), new_solution, gene_index, warn=False)
                 dtype = self.get_gene_dtype(gene_index)
@@ -306,17 +305,17 @@ class Unique:
         values_to_select_from = list({self._gene_value_key(value): value for value in gene_values
                                       if self._gene_value_key(value) not in used_values}.values())
         if values_to_select_from:
-            return random.choice(values_to_select_from)
+            return self.python_random_generator.choice(values_to_select_from)
         if solution[gene_index] is None:
             if not gene_values:
                 raise ValueError(f"There are no values to select for the gene at index {gene_index}.")
-            return random.choice(gene_values)
+            return self.python_random_generator.choice(gene_values)
         return solution[gene_index]
 
     def _select_unique_value_by_constraint(self, values, solution, gene_index):
         """Filter candidates before selecting an unused value for one gene."""
         values = numpy.atleast_1d(values)
-        if self.gene_constraint and self.gene_constraint[gene_index]:
+        if self.gene_constraint and self.gene_constraint[gene_index] is not None:
             values = self.filter_gene_values_by_constraint(values, solution, gene_index)
             if values is None:
                 return solution[gene_index]
@@ -373,10 +372,15 @@ class Unique:
             else:
                 low, high = range_min[gene_index], range_max[gene_index]
             space = self.gene_space[gene_index] if self.gene_space_nested else self.gene_space
-            # Continuous spaces and None entries are inspection samples.
-            # They must not allocate a large integer range or consume the
-            # random draws used to generate the population.
-            if space is None or (type(space) is dict and 'step' not in space):
+            # Large ranges and stepped spaces remain compact inspection
+            # snapshots. Repair reads the original space in full when needed.
+            if isinstance(space, range) or (isinstance(space, dict) and 'step' in space):
+                count = self._finite_gene_space_length(space)
+                sample_count = min(count, sample_size_from_inf_range)
+                indices = [index * (count - 1) // max(1, sample_count - 1) for index in range(sample_count)]
+                values = [self._finite_gene_space_value(space, index) for index in indices]
+                unpacked_spaces.append(numpy.unique(self.change_gene_dtype_and_round(gene_index, values)))
+            elif space is None or (type(space) is dict and 'step' not in space):
                 if type(space) is dict:
                     low, high = space['low'], space['high']
                 unpacked_spaces.append(self._initial_population_range_snapshot(

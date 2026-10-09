@@ -49,7 +49,7 @@ Supplied values can lie outside `gene_space` and the initialization ranges. They
 
 ### Constraints and Duplicates
 
-Both generated and supplied populations are converted before checking `gene_constraint`. Constraints are applied in gene-index order to complete solutions. Finite choices are searched in full; continuous intervals and large integer intervals contribute up to `sample_size` candidates. If no candidate satisfies a constraint, the existing value remains and PyGAD warns unless `suppress_warnings=True`.
+Both generated and supplied populations are converted before checking `gene_constraint`. Constraints are applied in gene-index order to complete solutions. Explicit lists and small finite domains are searched in full; continuous intervals and large ranges or stepped dictionaries contribute up to `sample_size` candidates for constraint checks. If no candidate satisfies a constraint, the existing value remains and PyGAD warns unless `suppress_warnings=True`.
 
 Constraints depending on other genes should follow the dependency order: a gene should depend on earlier genes, as explained in the [Gene Constraint](https://pygad.readthedocs.io/en/latest/gene_values.html#gene-constraint) section. Initialization does not solve arbitrary systems of dependent constraints.
 
@@ -285,7 +285,7 @@ Sometimes it is normal for PyGAD to fail to find a gene value that satisfies the
 
 For some other cases, the constraint can be met but with some changes. For example, increasing the range from which a value is sampled. If the `gene_space` is used and assigned `range(10)`, then the gene constraint can be met by using `range(100)` so that we can find values greater than 50.
 
-Finite gene spaces, such as `range(1000)`, provide their full candidate list for constraint checks. When candidates come from random sampling, a larger `sample_size` can increase the chance of finding a value that meets a narrow constraint.
+Explicit lists provide their full candidate list for constraint checks. Ranges, stepped dictionaries, and integer intervals are sampled by index when only a small candidate set is needed, avoiding allocation of the entire domain. When candidates come from random sampling, a larger `sample_size` can increase the chance of finding a value that meets a narrow constraint.
 
 > Initialization and ordinary mutation apply gene constraints sequentially. They do not determine the dependency order among the genes automatically.
 >
@@ -300,6 +300,8 @@ Finite gene spaces, such as `range(1000)`, provide their full candidate list for
 > ```
 >
 > PyGAD applies constraints sequentially, starting from the first gene to the last. To ensure correct behavior when genes depend on each other, structure your GA problem so that if gene X depends on gene Y, then gene Y appears earlier in the chromosome (solution) than gene X. As a result, its gene constraint will be earlier in the list.
+
+Swap, inversion, and scramble mutation also check constraints against the complete proposed solution after destination conversion. SBX and polynomial mutation use shared space, type, precision, constraint, and duplicate checks. Proposals that cannot be made valid leave the original solution unchanged.
 
 Duplicate repair also checks all constraints against complete candidate solutions before accepting changes. Its additional search for dependent constraints is bounded by `sample_size`; this does not reorder the general initialization or mutation constraint checks.
 

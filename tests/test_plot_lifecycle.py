@@ -241,7 +241,7 @@ def test_lifecycle_mixed_genes_batching_constraints_and_stopping():
         assert "decimal places" in labels
         assert "1 constrained gene(s)" in labels
         assert "['thread', 2]" in labels
-        for criterion in ["reach_20.0", "saturate_3.0", "time_10.0", "evaluations_100.0"]:
+        for criterion in ["reach_20.0", "saturate_3", "time_10.0", "evaluations_100"]:
             assert criterion in labels
     finally:
         matplt.close(fig)
