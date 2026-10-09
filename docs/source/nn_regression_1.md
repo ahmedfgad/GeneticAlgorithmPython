@@ -69,6 +69,29 @@ abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
 print(f"Absolute error : {abs_error}.")
 ```
 
-:::{python-examples}
+<!-- python-examples
 nn/example_regression.py
-:::
+-->
+
+**Python example**
+
+**[Regression](../../examples/nn/example_regression.py)**
+
+Fit a neural network to a small numeric regression problem.
+
+`examples/nn/example_regression.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/nn/example_regression.py
+```
+
+</details>
+
+<!-- /python-examples -->

@@ -34,7 +34,7 @@ In [PyGAD 2.10.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-1
 1. In the constructor of the `pygad.GA` class, set `mutation_type="adaptive"` to specify that the type of mutation is adaptive.
 2. Specify the mutation rates for the low and high quality solutions using one of these 3 parameters according to your preference: `mutation_probability`, `mutation_num_genes`, and `mutation_percent_genes`. Please check the [documentation of each of these parameters](https://pygad.readthedocs.io/en/latest/pygad.html#init) for more information. 
 
-For permutations with `allow_duplicate_genes=False` and no unused values in `gene_space`, both adaptive mutation controls use a compatible-swap fallback. The configured rates select the genes that can initiate mutation. A fallback swap changes two positions and can involve a partner that was not selected by the mutation rate. Each gene participates in at most one fallback swap per mutation pass. See {ref}`Mutation Methods <mutation-methods>` for the type, gene-space, and constraint checks.
+For permutations with `allow_duplicate_genes=False` and no unused values in `gene_space`, both adaptive mutation controls use a compatible-swap fallback. The configured rates select the genes that can initiate mutation. A fallback swap changes two positions and can involve a partner that was not selected by the mutation rate. Each gene participates in at most one fallback swap per mutation pass. See [Mutation Methods](utils.md#mutation-methods) for the type, gene-space, and constraint checks.
 
 When adaptive mutation is used, then the value assigned to any of the 3 parameters can be of any of these data types:
 

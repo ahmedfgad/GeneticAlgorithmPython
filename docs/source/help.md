@@ -2,39 +2,16 @@
 
 This section collects extra information about PyGAD: where to get help, how to contribute, and resources that use or explain PyGAD. Pick a topic:
 
-::::{grid} 1 2 2 2
-:gutter: 3
+<!-- navigation-grid: 1 2 2 2 -->
 
-:::{grid-item-card} Getting Help
-:link: help_support
-:link-type: doc
+- [Getting Help](help_support.md) — Submit issues, request features, ask on Stack Overflow, and contact us.
+- [Tutorials and Resources](help_tutorials.md) — Tutorials, articles, and a book about PyGAD.
+- [Projects and Research](help_projects.md) — PyGAD projects, projects built with PyGAD, and research papers.
+- [PyGAD in Other Languages](help_languages.md) — Read about PyGAD in several languages.
 
-Submit issues, request features, ask on Stack Overflow, and contact us.
-:::
+<!-- /navigation-grid -->
 
-:::{grid-item-card} Tutorials and Resources
-:link: help_tutorials
-:link-type: doc
-
-Tutorials, articles, and a book about PyGAD.
-:::
-
-:::{grid-item-card} Projects and Research
-:link: help_projects
-:link-type: doc
-
-PyGAD projects, projects built with PyGAD, and research papers.
-:::
-
-:::{grid-item-card} PyGAD in Other Languages
-:link: help_languages
-:link-type: doc
-
-Read about PyGAD in several languages.
-:::
-
-::::
-
+<!-- sphinx
 :::{toctree}
 :hidden:
 
@@ -43,3 +20,4 @@ help_tutorials
 help_projects
 help_languages
 :::
+-->

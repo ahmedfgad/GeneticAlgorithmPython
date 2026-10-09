@@ -2,7 +2,9 @@
 
 This page covers how PyGAD calculates the fitness efficiently: parallel processing, non-deterministic problems, reusing fitness values, and batch fitness calculation.
 
+<!-- sphinx
 (fitness-output-validation)=
+-->
 ## Fitness Output Validation
 
 For a single-objective problem, `fitness_func` returns one numeric value per solution. For a multi-objective problem, it returns a non-empty, one-dimensional list, tuple, or NumPy array of numeric objective values. Every solution must return the same number of objectives throughout a run, including cached solutions and offspring evaluated for adaptive mutation. Empty vectors, nested vectors, non-numeric values, and inconsistent objective counts raise a descriptive error before parent selection.
@@ -11,7 +13,9 @@ For a single-objective problem, `fitness_func` returns one numeric value per sol
 
 Batch evaluation returns one such fitness value per supplied solution, including a smaller final batch. Sequential, threaded, and process evaluation use the same validation. `on_fitness` outputs are validated too, whether the callback returns replacement values or edits the supplied array in place.
 
+<!-- sphinx
 (saved-fitness-across-repeated-runs)=
+-->
 ## Saved Fitness across Repeated Runs
 
 Calling `run()` again continues from `generations_completed` and extends the existing histories. Each run saves its starting population and final population. For two runs of 2 generations, `best_solutions_generations` contains `[0, 1, 2, 2, 3, 4]`. Both snapshots of generation 2 remain available. The corresponding `best_solutions_fitness` entries have the same positions, and `best_solutions` uses those positions when `save_best_solutions=True`.
@@ -22,11 +26,36 @@ When `save_solutions=True`, `solutions_generations` contains one generation numb
 
 Checkpoints preserve the generation numbers and population boundaries. Older checkpoints containing a single-run history recover the generation numbers automatically. Older repeated-run checkpoints did not record run boundaries, so unavailable generation numbers are represented by `None`; `best_solution_generation` is `-1` if the winning snapshot has an unknown generation. New snapshots have their actual generation numbers. Plots use snapshot positions only for those unknown legacy entries.
 
+<!-- sphinx
 (parallel-processing-guide)=
+-->
 
-:::{python-examples}
+<!-- python-examples
 example_repeated_runs.py
-:::
+-->
+
+**Python example**
+
+**[Repeated runs and checkpoints](../../examples/example_repeated_runs.py)**
+
+Continue from a saved GA and inspect the actual generation numbers in its histories.
+
+`examples/example_repeated_runs.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_repeated_runs.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Parallel Processing in PyGAD
 
@@ -125,12 +154,56 @@ The repository's `examples/benchmarks/parallel_processing.py` measures complete 
 
 For Keras, calls to `pygad.kerasga.predict()` sharing one model are synchronized; they preserve each solution's weights but run one at a time. Separate models are needed for concurrent predictions. Direct changes to shared models outside that helper require their own synchronization.
 
+<!-- sphinx
 (non-deterministic-fitness)=
+-->
 
-:::{python-examples}
+<!-- python-examples
 example_parallel_processing.py
 benchmarks/parallel_processing.py
-:::
+-->
+
+**Python examples**
+
+**[Parallel fitness](../../examples/example_parallel_processing.py)**
+
+Evaluate population fitness with process workers and report the run time.
+
+`examples/example_parallel_processing.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_parallel_processing.py
+```
+
+</details>
+
+**[Compare fitness execution modes](../../examples/benchmarks/parallel_processing.py)**
+
+Measure complete runs for CPU, I/O, and NumPy workloads with serial, thread, process, and batch evaluation.
+
+`examples/benchmarks/parallel_processing.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/parallel_processing.py --workload cpu
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Solve Non-Deterministic Problems
 
@@ -163,7 +236,9 @@ ga_instance = pygad.GA(...,
 
 This way, PyGAD will not save any explored solution, so the fitness function has to be called for each individual solution.
 
+<!-- sphinx
 (fitness-cache-reuse)=
+-->
 ## Reuse the Fitness instead of Calling the Fitness Function
 
 Saved solutions are indexed by their complete gene values to avoid scanning the entire history for every population member. Built-in evolution indexes new snapshots incrementally. Cache precedence remains saved solutions, saved best solutions, retained elites, then retained parents, using the first matching entry in each source. Duplicate solutions that have not been evaluated or saved are still evaluated independently.
@@ -219,7 +294,9 @@ ga_instance = pygad.GA(...,
                        ...)
 ```
 
+<!-- sphinx
 (batch-fitness-calculation)=
+-->
 ## Batch Fitness Calculation
 
 In [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0), a new optional parameter called `fitness_batch_size` is supported to calculate the fitness function in batches. Thanks to [Linan Qiu](https://github.com/linanqiu) for opening the [GitHub issue #136](https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/136).
@@ -229,7 +306,9 @@ Its values can be:
 * `1` or `None`: If the `fitness_batch_size` parameter is assigned the value `1` or `None` (default), then the normal flow is used where the fitness function is called for each individual solution. That is if there are 15 solutions, then the fitness function is called 15 times.
 * `1 < fitness_batch_size <= sol_per_pop`: If the `fitness_batch_size` parameter is assigned a value satisfying this condition `1 < fitness_batch_size <= sol_per_pop`, then the solutions are grouped into batches of size `fitness_batch_size` and the fitness function is called once for each batch. In this case, the fitness function must return a list/tuple/numpy.ndarray with a length equal to the number of solutions passed.
 
+<!-- sphinx
 (short-fitness-batches)=
+-->
 ### Why a Fitness Batch Can Be Smaller
 
 `fitness_batch_size` is the maximum number of solutions passed in one call. The final batch is smaller when the number of solutions needing evaluation is not a multiple of that size. Cached parents, elites, and previously saved solutions can also reduce the number of rows to evaluate.
@@ -272,9 +351,32 @@ ga_instance.run()
 
 The same variable-batch-size contract applies to serial, thread, and process evaluation.
 
-:::{python-examples}
+<!-- python-examples
 example_fitness_batch_size.py
-:::
+-->
+
+**Python example**
+
+**[Batch fitness](../../examples/example_fitness_batch_size.py)**
+
+Return one fitness result per solution, including a shorter final batch.
+
+`examples/example_fitness_batch_size.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_fitness_batch_size.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ### Example without `fitness_batch_size` Parameter
 

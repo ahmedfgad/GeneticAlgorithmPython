@@ -10,13 +10,13 @@
 
 > Run PyGAD in the cloud with [Vilvik](https://vilvik.com): push your PyGAD problem to Vilvik, let it run in the cloud, and get the results back.
 
-:::{figure} images/pygad_vilvik_cloud.*
-:alt: Run PyGAD in the cloud with Vilvik
-:width: 100%
-:align: center
+<!-- documentation-figure: 100% -->
+
+![Run PyGAD in the cloud with Vilvik](images/pygad_vilvik_cloud.png)
 
 Push your PyGAD problem to [Vilvik](https://vilvik.com) and run it in the cloud. To get started, follow this tutorial: [Push your PyGAD problem to Vilvik in 10 minutes](https://vilvik.com/blog/@vilvik/pygad-to-vilvik-in-10-minutes).
-:::
+
+<!-- /documentation-figure -->
 
 [PyGAD](https://github.com/ahmedfgad/GeneticAlgorithmPython) supports different types of crossover, mutation, and parent selection operators. It lets you optimize many types of problems with the genetic algorithm by writing your own fitness function. It works with both single-objective and multi-objective optimization problems.
 
@@ -174,7 +174,15 @@ If you used PyGAD, please consider citing its paper with the following details:
 }
 ```
 
+**Genetic Algorithm**
+
+- [`pygad` Module](pygad.md)
+- [More About PyGAD](pygad_more.md)
+- [Examples](examples.md)
+
+<!-- sphinx
 ```{toctree}
+:hidden:
 :maxdepth: 1
 :caption: Genetic Algorithm
 
@@ -182,8 +190,17 @@ pygad
 pygad_more
 examples
 ```
+-->
 
+**Operators & Visualization**
+
+- [`pygad.utils` Module](utils.md)
+- [`pygad.visualize` Module](visualize.md)
+- [`pygad.helper` Module](helper.md)
+
+<!-- sphinx
 ```{toctree}
+:hidden:
 :maxdepth: 1
 :caption: Operators & Visualization
 
@@ -191,8 +208,18 @@ utils
 visualize
 helper
 ```
+-->
 
+**Neural Networks**
+
+- [`pygad.nn` Module](nn.md)
+- [`pygad.gann` Module](gann.md)
+- [`pygad.cnn` Module](cnn.md)
+- [`pygad.gacnn` Module](gacnn.md)
+
+<!-- sphinx
 ```{toctree}
+:hidden:
 :maxdepth: 1
 :caption: Neural Networks
 
@@ -201,25 +228,48 @@ gann
 cnn
 gacnn
 ```
+-->
 
+**Keras & PyTorch**
+
+- [`pygad.kerasga` Module](kerasga.md)
+- [`pygad.torchga` Module](torchga.md)
+
+<!-- sphinx
 ```{toctree}
+:hidden:
 :maxdepth: 1
 :caption: Keras & PyTorch
 
 kerasga
 torchga
 ```
+-->
 
+**Releases**
+
+- [Release History](releases.md)
+
+<!-- sphinx
 ```{toctree}
+:hidden:
 :maxdepth: 1
 :caption: Releases
 
 releases
 ```
+-->
 
+**Help & Resources**
+
+- [Help & Resources](help.md)
+
+<!-- sphinx
 ```{toctree}
+:hidden:
 :maxdepth: 1
 :caption: Help & Resources
 
 help
 ```
+-->

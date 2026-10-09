@@ -2,16 +2,28 @@
 
 `python_examples.json` is the shared catalog for the Examples index and the Python example cards in the guides. Keep the descriptions and requirements here rather than copying them into each guide. Paths are relative to the repository's `examples/` directory.
 
+For the general documentation conventions, see [Writing Documentation in Markdown](MARKDOWN.md).
+
 To show one or more examples beside a relevant explanation, use this template in a documentation page:
 
 ```markdown
-:::{python-examples}
+<!-- python-examples
 example_initial_population.py
 example_gene_type_conversion.py
-:::
+-->
+
+<!-- /python-examples -->
 ```
 
-For larger groups, the same directive uses a compact table inside the card. Run instructions remain in a dropdown. The Examples index uses `python-examples-index` to list every entry by topic, with links back to its guide.
+After changing the catalog or adding a section, update the checked-in Markdown from the repository root:
+
+```console
+python docs/markdown_compatibility.py --update-examples
+```
+
+The generated section contains ordinary Markdown links, descriptions, and expandable run instructions. It is readable on GitHub and in Markdown previews before any build. Do not edit the generated text directly; edit the catalog or shared templates, then regenerate it. To check that the generated sections are current, run `python docs/markdown_compatibility.py`.
+
+For larger groups, the section uses a compact table with expandable run instructions. The Examples index uses `python-examples-index` comments to list every entry by topic, with links back to its guide. Sphinx presents these sections using the existing example cards, tables, dropdowns, and downloads.
 
 Each catalog entry has these fields:
 
@@ -26,8 +38,8 @@ Each catalog entry has these fields:
 - `data` (optional): Dataset filenames, expected layout, and any setup limitations.
 - `download` (optional, default `true`): Set to `false` when downloading a script alone would omit required data or companion files. Readers receive a folder link instead.
 
-The shared Markdown templates are in `python_example_templates/`. They use the existing Sphinx Design cards and dropdowns and Sphinx's native download links. The small `python_examples.py` extension resolves catalog paths and renders those templates; it does not execute example scripts.
+The shared templates are in `python_example_templates/`. The `*-source.md.template` files use standard Markdown and generate the checked-in sections. The `.md.jinja` files use Sphinx Design cards and dropdowns and Sphinx's native download links. Both presentations use the same catalog. The `markdown_compatibility.py` extension checks the source sections and passes them to `python_examples.py` for the built presentation; neither executes example scripts.
 
-The documentation build checks that every Python script appears in the catalog, all catalog paths stay inside `examples/`, and the linked guides exist. Missing entries fail the build so new examples are not silently left out. Unknown paths in a guide also fail the build. Sphinx copies downloadable scripts from the repository into the built documentation; no second source copy needs to be maintained.
+The documentation build checks that every Python script appears in the catalog, all catalog paths stay inside `examples/`, and the linked guides exist. Missing entries, unknown paths, incomplete section comments, and stale generated Markdown fail the build so examples are not silently left out. Sphinx copies downloadable scripts from the repository into the built documentation; no second script copy needs to be maintained.
 
 GitHub links use the commit checked out for the documentation build. Without Git, the configured Read the Docs identifier is used, falling back to `master`. This keeps source links aligned with versioned documentation.

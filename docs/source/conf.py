@@ -39,6 +39,7 @@ extensions = [
     'sphinx_design',
     'sphinx_copybutton',
     'python_examples',
+    'markdown_compatibility',
 ]
 
 # Read both Markdown and reStructuredText. Markdown is the source of truth.

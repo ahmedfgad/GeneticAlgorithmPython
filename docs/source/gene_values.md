@@ -2,7 +2,9 @@
 
 This page covers the parameters that control the values a gene can take: the `gene_space` and `gene_type` parameters, gene constraints, the `sample_size` parameter, and preventing duplicate genes.
 
+<!-- sphinx
 (initial-population-guide)=
+-->
 ## Creating the Initial Population
 
 PyGAD can generate the initial population or start from a population passed to `initial_population`.
@@ -56,9 +58,32 @@ Constraints depending on other genes should follow the dependency order: a gene 
 
 When `allow_duplicate_genes=False`, duplicate repair follows constraint handling and uses the same converted domains. The search behavior and limits are described in [Prevent Duplicates in Gene Values](https://pygad.readthedocs.io/en/latest/gene_values.html#prevent-duplicates-in-gene-values).
 
-:::{python-examples}
+<!-- python-examples
 example_initial_population.py
-:::
+-->
+
+**Python example**
+
+**[Initial populations](../../examples/example_initial_population.py)**
+
+Generate values from per-gene ranges and nested spaces, or supply values and infer the dimensions.
+
+`examples/example_initial_population.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_initial_population.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Limit the Gene Value Range using the `gene_space` Parameter
 
@@ -108,7 +133,9 @@ For a 3-gene problem, the next code creates a dictionary for each gene to restri
 gene_space = [{'low': 1, 'high': 5}, {'low': 0.3, 'high': 1.4}, {'low': -0.2, 'high': 4.5}]
 ```
 
+<!-- sphinx
 (gene-space-guide)=
+-->
 ## More about the `gene_space` Parameter
 
 The `gene_space` parameter customizes the space of values of each gene.  
@@ -208,11 +235,36 @@ If the dictionary has a step like the example below, then it is considered a dis
 Gene space: {'low': 1, 'high': 5, 'step': 0.5}
 ```
 
-:::{python-examples}
+<!-- python-examples
 example_gene_space.py
-:::
+-->
 
+**Python example**
+
+**[Gene spaces](../../examples/example_gene_space.py)**
+
+Compare shared and per-gene choices, ranges, dictionaries, fixed values, and None entries.
+
+`examples/example_gene_space.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_gene_space.py
+```
+
+</details>
+
+<!-- /python-examples -->
+
+<!-- sphinx
 (gene-constraints-guide)=
+-->
 ## Gene Constraint
 
 In [PyGAD 3.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0), a new parameter called `gene_constraint` is added to the constructor of the `pygad.GA` class. An instance attribute of the same name is created for any instance of the `pygad.GA` class.
@@ -316,9 +368,32 @@ Duplicate repair also checks all constraints against complete candidate solution
 
 ### Full Example
 
-:::{python-examples}
+<!-- python-examples
 example_gene_constraint.py
-:::
+-->
+
+**Python example**
+
+**[Gene constraints](../../examples/example_gene_constraint.py)**
+
+Filter gene candidates with constraints that depend on other genes.
+
+`examples/example_gene_constraint.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_gene_constraint.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## `sample_size` Parameter
 
@@ -342,7 +417,9 @@ For duplicate repair, finite spaces are considered in full. These include lists,
 
 When replacement chains do not satisfy a dependent constraint, PyGAD also tries alternative complete assignments. This additional search considers up to `sample_size * num_genes` tentative gene assignments. A larger value allows more alternatives to be checked. The limit prevents arbitrary constraint functions from requiring an unbounded combinatorial search.
 
+<!-- sphinx
 (duplicate-gene-repair-guide)=
+-->
 ## Prevent Duplicates in Gene Values
 
 In [PyGAD 2.13.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-13-0), a new bool parameter called `allow_duplicate_genes` is supported to control whether duplicates are supported in the chromosome or not. In other words, whether 2 or more genes might have the same exact value. 
@@ -473,7 +550,9 @@ Generation 5
  [1 2 4 3]]
 ```
 
+<!-- sphinx
 (solve-duplicates-using-a-third-gene)=
+-->
 
 ### Repair through Other Genes
 
@@ -492,9 +571,32 @@ The last gene can only keep 0. Repair moves the third gene from 2 to 3, the seco
 
 This behavior also handles third-gene repairs, such as changing `[3, 4, 4, 5]` into `[2, 3, 4, 5]` for `gene_space=[[2, 3], [3, 4], [4, 5], [5, 6]]`.
 
-:::{python-examples}
+<!-- python-examples
 example_duplicate_gene_repair.py
-:::
+-->
+
+**Python example**
+
+**[Duplicate repair](../../examples/example_duplicate_gene_repair.py)**
+
+Repair duplicates through a chain of replacements while respecting each gene space.
+
+`examples/example_duplicate_gene_repair.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_duplicate_gene_repair.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ### Ranges, Types, and Constraints
 
@@ -523,7 +625,9 @@ The `gene_type` parameter allows the user to control the data type for all genes
 
 Let us look at some examples.
 
+<!-- sphinx
 (gene-type-conversion-guide)=
+-->
 ### Conversion and Rounding Rules
 
 PyGAD applies the same conversion rules to generated and supplied initial populations, mutation candidates, and custom operator outputs. `on_parents`, `on_crossover`, and `on_mutation` receive converted values; any replacements returned or made in place by these callbacks are converted again before use. These rules apply whether `allow_duplicate_genes` is `True` or `False`.
@@ -537,9 +641,32 @@ Floating-point types use binary representations, so a stored value can differ sl
 
 When types are specified per gene, population arrays use `dtype=object` so each column can retain its requested Python or NumPy scalar type. Saved best solutions retain these types too. This also preserves large integers when other genes are floating-point values. A NumPy array constructed without `dtype=object` can already lose integer precision through conversion to a shared floating-point type; use a list or an object array for mixed input values that must remain exact.
 
-:::{python-examples}
+<!-- python-examples
 example_gene_type_conversion.py
-:::
+-->
+
+**Python example**
+
+**[Gene types and rounding](../../examples/example_gene_type_conversion.py)**
+
+Preserve mixed numeric types, apply precision, and convert custom mutation outputs.
+
+`examples/example_gene_type_conversion.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_gene_type_conversion.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ### Data Type for All Genes without Precision
 

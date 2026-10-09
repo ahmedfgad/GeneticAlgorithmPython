@@ -89,7 +89,55 @@ accuracy = ca.result().numpy()
 print(f"Accuracy : {accuracy}")
 ```
 
-:::{python-examples}
+<!-- python-examples
 KerasGA/cancer_dataset.py
 KerasGA/cancer_dataset_generator.py
-:::
+-->
+
+**Python examples**
+
+**[Image-directory classification](../../examples/KerasGA/cancer_dataset.py)**
+
+Use directory-based image input for a two-class Keras CNN.
+
+`examples/KerasGA/cancer_dataset.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, TensorFlow/Keras
+
+**Data:** benign/ and malignant/ image folders under examples/data/Skin_Cancer_Dataset/. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/KerasGA/ so the relative data paths resolve:
+
+```console
+cd examples/KerasGA
+python cancer_dataset.py
+```
+
+</details>
+
+**[Batched image-directory classification](../../examples/KerasGA/cancer_dataset_generator.py)**
+
+Use directory-based image input for a two-class Keras CNN.
+
+`examples/KerasGA/cancer_dataset_generator.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, TensorFlow/Keras
+
+**Data:** benign/ and malignant/ image folders under examples/data/Skin_Cancer_Dataset/. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/KerasGA/ so the relative data paths resolve:
+
+```console
+cd examples/KerasGA
+python cancer_dataset_generator.py
+```
+
+</details>
+
+<!-- /python-examples -->

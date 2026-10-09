@@ -50,6 +50,8 @@ These changes are available in the repository after PyGAD 3.7.0 and will be incl
 
 33. A new [Examples index](examples.md) connects all 81 repository Python scripts and the TSP notebook to their documentation guides. Shared Python example cards link scripts beside the relevant explanations, use compact tables for larger groups, and provide expandable run instructions, requirements, and working directories. Self-contained scripts can be downloaded directly from the built documentation; examples needing data link to their folders and dataset setup instructions. One catalog and shared templates keep descriptions and links consistent, and the documentation build rejects missing scripts, uncataloged Python files, unknown example references, and missing guides. GitHub links match the documentation checkout. The TSP notebook's Colab-specific CSV path and local adaptation requirements are clarified. Earlier entries describe the regression tests and runnable examples added with the library changes.
 
+34. Documentation guides also render directly on GitHub and in compatible Markdown previews. Internal references use Markdown links; parameter descriptions use expandable details; navigation lists and PNG diagrams remain visible; and Sphinx-only labels, toctrees, and video embeds are hidden from previews. All Python example sections and the Examples index include checked-in Markdown generated from the shared catalog and templates, with script links, requirements, dataset setup, and run instructions. A Python-only command updates these sections, and builds reject stale content or incomplete section comments. Built documentation retains its cards, dropdowns, figures, downloads, navigation, and published anchors.
+
 The operators consume different random draws from earlier versions. Runs with the same `random_seed` remain reproducible within the same version and environment, but can produce different results from earlier versions.
 
 ## PyGAD 3.7.0
@@ -58,9 +60,11 @@ Release Date June 5, 2026
 
 Watch the release video on [YouTube](https://youtu.be/EXMy37crL7c).
 
+<!-- sphinx
 ```{raw} html
 <iframe width="560" height="315" src="https://www.youtube.com/embed/EXMy37crL7c" title="PyGAD 3.7.0 Release" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 ```
+-->
 
 1. Validation logic is applied to validate the `num_generations` parameter.
 2. The `num_generations` parameter must be assigned a positive integer. Previously, any number (positive/negative, int/float) was accepted.

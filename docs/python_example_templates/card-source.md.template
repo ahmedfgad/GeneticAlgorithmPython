@@ -1,0 +1,12 @@
+**[$title](../../examples/$path)**
+
+$description
+
+`examples/$path`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** $requirements
+
+$data_instructions$run_instructions</details>

@@ -2,7 +2,9 @@
 
 This page covers how to see what PyGAD is doing: printing a lifecycle summary and logging the outputs.
 
+<!-- sphinx
 (print-lifecycle-summary)=
+-->
 ## Print Lifecycle Summary
 
 In [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0), a new method called `summary()` is supported. It prints a Keras-like summary of the PyGAD lifecycle showing the steps, callback functions, parameters, etc.
@@ -122,9 +124,32 @@ On Generation          on_gen()                           None
 ======================================================================
 ```
 
-:::{python-examples}
+<!-- python-examples
 example_summary.py
-:::
+-->
+
+**Python example**
+
+**[Text lifecycle summary](../../examples/example_summary.py)**
+
+Print the configured GA stages and their parameters.
+
+`examples/example_summary.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_summary.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Plot Lifecycle Chart
 
@@ -134,11 +159,34 @@ Use `plot_lifecycle()` to draw the configured lifecycle as a flowchart with oper
 ga_instance.plot_lifecycle(save_dir="lifecycle.svg")
 ```
 
-The method returns a matplotlib figure. Use `show_parameters=False` for a compact chart or `show=False` to save without displaying it. See {ref}`plot_lifecycle() <plot-lifecycle>` for the full description and an example.
+The method returns a matplotlib figure. Use `show_parameters=False` for a compact chart or `show=False` to save without displaying it. See [plot_lifecycle()](visualize.md#plot_lifecycle) for the full description and an example.
 
-:::{python-examples}
+<!-- python-examples
 plots/example_plot_lifecycle.py
-:::
+-->
+
+**Python example**
+
+**[Configured lifecycle](../../examples/plots/example_plot_lifecycle.py)**
+
+Draw detailed and compact lifecycle charts and export SVG and PNG files.
+
+`examples/plots/example_plot_lifecycle.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/plots/example_plot_lifecycle.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Logging Outputs
 
@@ -391,6 +439,29 @@ By executing this code, the logged messages are printed to the console and also 
 2023-04-03 19:04:27 INFO: Fitness    = 0.000389832593101348
 ```
 
-:::{python-examples}
+<!-- python-examples
 example_logger.py
-:::
+-->
+
+**Python example**
+
+**[Logging](../../examples/example_logger.py)**
+
+Send progress and GA messages to a configured logger.
+
+`examples/example_logger.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_logger.py
+```
+
+</details>
+
+<!-- /python-examples -->

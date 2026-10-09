@@ -119,7 +119,9 @@ The `model_weights_as_matrix()` function accepts the following parameters:
 
 It returns the restored model weights after reshaping the vector.
 
+<!-- sphinx
 (keras-predict)=
+-->
 ### `pygad.kerasga.predict()`
 
 The `predict()` function makes a prediction based on a solution. It accepts the following parameters:
@@ -155,36 +157,17 @@ These objects are local to a Python process. They are module attributes, not add
 
 This section gives the complete code of some examples that build and train a Keras model using PyGAD. Each subsection builds a different network.
 
-::::{grid} 1 2 2 2
-:gutter: 3
+<!-- navigation-grid: 1 2 2 2 -->
 
-:::{grid-item-card} Example 1: Regression Example
-:link: kerasga_regression
-:link-type: doc
-:::
+- [Example 1: Regression Example](kerasga_regression.md)
+- [Example 2: XOR Binary Classification](kerasga_xor.md)
+- [Example 3: Image Multi-Class Classification (Dense Layers)](kerasga_image_dense.md)
+- [Example 4: Image Multi-Class Classification (Conv Layers)](kerasga_image_conv.md)
+- [Example 5: Image Classification using Data Generator](kerasga_image_datagen.md)
 
-:::{grid-item-card} Example 2: XOR Binary Classification
-:link: kerasga_xor
-:link-type: doc
-:::
+<!-- /navigation-grid -->
 
-:::{grid-item-card} Example 3: Image Multi-Class Classification (Dense Layers)
-:link: kerasga_image_dense
-:link-type: doc
-:::
-
-:::{grid-item-card} Example 4: Image Multi-Class Classification (Conv Layers)
-:link: kerasga_image_conv
-:link-type: doc
-:::
-
-:::{grid-item-card} Example 5: Image Classification using Data Generator
-:link: kerasga_image_datagen
-:link-type: doc
-:::
-
-::::
-
+<!-- sphinx
 :::{toctree}
 :hidden:
 
@@ -194,3 +177,4 @@ kerasga_image_dense
 kerasga_image_conv
 kerasga_image_datagen
 :::
+-->

@@ -72,6 +72,32 @@ abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
 print(f"Absolute error : {abs_error}.")
 ```
 
-:::{python-examples}
+<!-- python-examples
 nn/example_regression_fish.py
-:::
+-->
+
+**Python example**
+
+**[Fish-weight regression](../../examples/nn/example_regression_fish.py)**
+
+Predict fish weight from numeric measurements.
+
+`examples/nn/example_regression_fish.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, pandas
+
+**Data:** examples/data/Fish.csv. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/nn/ so the relative data paths resolve:
+
+```console
+cd examples/nn
+python example_regression_fish.py
+```
+
+</details>
+
+<!-- /python-examples -->

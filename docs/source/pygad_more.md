@@ -2,60 +2,19 @@
 
 This section covers the more advanced features of the `pygad` module. Pick a topic:
 
-::::{grid} 1 2 2 3
-:gutter: 3
+<!-- navigation-grid: 1 2 2 3 -->
 
-:::{grid-item-card} Multi-Objective Optimization
-:link: multi_objective
-:link-type: doc
+- [Multi-Objective Optimization](multi_objective.md) — Optimize several objectives at once using NSGA-II or NSGA-III.
+- [Controlling Gene Values](gene_values.md) — Restrict gene values with `gene_space`, `gene_type`, constraints, `sample_size`, and duplicate prevention.
+- [Controlling Generations](generations.md) — Elitism, stopping criteria, random seed, saving and continuing, and population size.
+- [Fitness Calculation and Performance](fitness_calculation.md) — Parallel processing, batch fitness, reusing fitness, and non-deterministic problems.
+- [Logging and the Lifecycle Summary](logging.md) — Print a Keras-like summary and log the outputs.
+- [User-Defined Functions, Methods, and Classes](custom_functions.md) — Pass your own functions, methods, or classes for the fitness and callbacks.
+- [Benchmark Problems](benchmarks.md) — Built-in single, multi, and many-objective benchmark problems to plug into the GA.
 
-Optimize several objectives at once using NSGA-II or NSGA-III.
-:::
+<!-- /navigation-grid -->
 
-:::{grid-item-card} Controlling Gene Values
-:link: gene_values
-:link-type: doc
-
-Restrict gene values with `gene_space`, `gene_type`, constraints, `sample_size`, and duplicate prevention.
-:::
-
-:::{grid-item-card} Controlling Generations
-:link: generations
-:link-type: doc
-
-Elitism, stopping criteria, random seed, saving and continuing, and population size.
-:::
-
-:::{grid-item-card} Fitness Calculation and Performance
-:link: fitness_calculation
-:link-type: doc
-
-Parallel processing, batch fitness, reusing fitness, and non-deterministic problems.
-:::
-
-:::{grid-item-card} Logging and the Lifecycle Summary
-:link: logging
-:link-type: doc
-
-Print a Keras-like summary and log the outputs.
-:::
-
-:::{grid-item-card} User-Defined Functions, Methods, and Classes
-:link: custom_functions
-:link-type: doc
-
-Pass your own functions, methods, or classes for the fitness and callbacks.
-:::
-
-:::{grid-item-card} Benchmark Problems
-:link: benchmarks
-:link-type: doc
-
-Built-in single, multi, and many-objective benchmark problems to plug into the GA.
-:::
-
-::::
-
+<!-- sphinx
 :::{toctree}
 :hidden:
 
@@ -67,3 +26,4 @@ logging
 custom_functions
 benchmarks
 :::
+-->

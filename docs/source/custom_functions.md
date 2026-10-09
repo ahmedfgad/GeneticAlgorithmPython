@@ -67,9 +67,32 @@ ga_instance = pygad.GA(num_generations=5,
 ga_instance.run()
 ```
 
-:::{python-examples}
+<!-- python-examples
 example_fitness_wrapper.py
-:::
+-->
+
+**Python example**
+
+**[Extra fitness arguments](../../examples/example_fitness_wrapper.py)**
+
+Wrap a fitness function to pass additional values while preserving its PyGAD signature.
+
+`examples/example_fitness_wrapper.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_fitness_wrapper.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Assign Methods
 
@@ -122,9 +145,32 @@ ga_instance = pygad.GA(num_generations=5,
 ga_instance.run()
 ```
 
-:::{python-examples}
+<!-- python-examples
 example_lifecycle_methods.py
-:::
+-->
+
+**Python example**
+
+**[Callbacks as methods](../../examples/example_lifecycle_methods.py)**
+
+Implement fitness and lifecycle callbacks with bound methods.
+
+`examples/example_lifecycle_methods.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_lifecycle_methods.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Assign a Class
 
@@ -200,6 +246,29 @@ ga_instance = pygad.GA(num_generations=10,
 ga_instance.run()
 ```
 
-:::{python-examples}
+<!-- python-examples
 example_lifecycle_classes.py
-:::
+-->
+
+**Python example**
+
+**[Callbacks as callable classes](../../examples/example_lifecycle_classes.py)**
+
+Implement fitness and lifecycle callbacks with callable class instances.
+
+`examples/example_lifecycle_classes.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_lifecycle_classes.py
+```
+
+</details>
+
+<!-- /python-examples -->

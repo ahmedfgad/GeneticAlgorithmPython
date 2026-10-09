@@ -26,7 +26,7 @@ Available in `pygad.benchmarks.classic`:
 | `Ackley` | f(0, ..., 0) = 0 | `(-32.768, 32.768)` |
 | `Himmelblau` | four equal minima at f = 0 (2D only) | `(-5.0, 5.0)` |
 
-:::{python-examples}
+<!-- python-examples
 benchmarks/example_classic_sphere.py
 benchmarks/example_classic_rastrigin.py
 benchmarks/example_classic_rosenbrock.py
@@ -34,7 +34,82 @@ benchmarks/example_classic_griewank.py
 benchmarks/example_classic_schwefel.py
 benchmarks/example_classic_ackley.py
 benchmarks/example_classic_himmelblau.py
-:::
+-->
+
+**Python examples**
+
+| Python script | What it shows | Related information |
+| --- | --- | --- |
+| [benchmarks/example_classic_sphere.py](../../examples/benchmarks/example_classic_sphere.py) | **Sphere.** Optimize the Sphere single-objective benchmark. | [Guide](benchmarks.md) |
+| [benchmarks/example_classic_rastrigin.py](../../examples/benchmarks/example_classic_rastrigin.py) | **Rastrigin.** Optimize the Rastrigin single-objective benchmark. | [Guide](benchmarks.md) |
+| [benchmarks/example_classic_rosenbrock.py](../../examples/benchmarks/example_classic_rosenbrock.py) | **Rosenbrock.** Optimize the Rosenbrock single-objective benchmark. | [Guide](benchmarks.md) |
+| [benchmarks/example_classic_griewank.py](../../examples/benchmarks/example_classic_griewank.py) | **Griewank.** Optimize the Griewank single-objective benchmark. | [Guide](benchmarks.md) |
+| [benchmarks/example_classic_schwefel.py](../../examples/benchmarks/example_classic_schwefel.py) | **Schwefel.** Optimize the Schwefel single-objective benchmark. | [Guide](benchmarks.md) |
+| [benchmarks/example_classic_ackley.py](../../examples/benchmarks/example_classic_ackley.py) | **Ackley.** Optimize the Ackley single-objective benchmark. | [Guide](benchmarks.md) |
+| [benchmarks/example_classic_himmelblau.py](../../examples/benchmarks/example_classic_himmelblau.py) | **Himmelblau.** Optimize the Himmelblau single-objective benchmark. | [Guide](benchmarks.md) |
+
+<details>
+<summary>Run these examples</summary>
+
+**Sphere** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_classic_sphere.py
+```
+
+**Rastrigin** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_classic_rastrigin.py
+```
+
+**Rosenbrock** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_classic_rosenbrock.py
+```
+
+**Griewank** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_classic_griewank.py
+```
+
+**Schwefel** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_classic_schwefel.py
+```
+
+**Ackley** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_classic_ackley.py
+```
+
+**Himmelblau** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_classic_himmelblau.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Multi-Objective Problems (ZDT family)
 
@@ -48,13 +123,70 @@ In `pygad.benchmarks.zdt`. Two objectives, variables in `[0, 1]` (ZDT4 uses `[-5
 | `ZDT4` | convex, many local minima in the search space |
 | `ZDT6` | non-uniform |
 
-:::{python-examples}
+<!-- python-examples
 benchmarks/example_zdt1.py
 benchmarks/example_zdt2.py
 benchmarks/example_zdt3.py
 benchmarks/example_zdt4.py
 benchmarks/example_zdt6.py
-:::
+-->
+
+**Python examples**
+
+| Python script | What it shows | Related information |
+| --- | --- | --- |
+| [benchmarks/example_zdt1.py](../../examples/benchmarks/example_zdt1.py) | **ZDT1.** Optimize the ZDT1 problem and plot its Pareto front. | [Guide](benchmarks.md) |
+| [benchmarks/example_zdt2.py](../../examples/benchmarks/example_zdt2.py) | **ZDT2.** Optimize the ZDT2 problem and plot its Pareto front. | [Guide](benchmarks.md) |
+| [benchmarks/example_zdt3.py](../../examples/benchmarks/example_zdt3.py) | **ZDT3.** Optimize the ZDT3 problem and plot its Pareto front. | [Guide](benchmarks.md) |
+| [benchmarks/example_zdt4.py](../../examples/benchmarks/example_zdt4.py) | **ZDT4.** Optimize the ZDT4 problem and plot its Pareto front. | [Guide](benchmarks.md) |
+| [benchmarks/example_zdt6.py](../../examples/benchmarks/example_zdt6.py) | **ZDT6.** Optimize the ZDT6 problem and plot its Pareto front. | [Guide](benchmarks.md) |
+
+<details>
+<summary>Run these examples</summary>
+
+**ZDT1** — Requires: PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_zdt1.py
+```
+
+**ZDT2** — Requires: PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_zdt2.py
+```
+
+**ZDT3** — Requires: PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_zdt3.py
+```
+
+**ZDT4** — Requires: PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_zdt4.py
+```
+
+**ZDT6** — Requires: PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_zdt6.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Many-Objective Problems (DTLZ family)
 
@@ -67,12 +199,60 @@ In `pygad.benchmarks.dtlz`. Any number of objectives `M`. Decision variables: `M
 | `DTLZ3` | 3 | unit sphere with hard multimodal g-function |
 | `DTLZ4` | 3 | unit sphere with strong bias toward one corner |
 
-:::{python-examples}
+<!-- python-examples
 benchmarks/example_dtlz1.py
 benchmarks/example_dtlz2.py
 benchmarks/example_dtlz3.py
 benchmarks/example_dtlz4.py
-:::
+-->
+
+**Python examples**
+
+| Python script | What it shows | Related information |
+| --- | --- | --- |
+| [benchmarks/example_dtlz1.py](../../examples/benchmarks/example_dtlz1.py) | **DTLZ1.** Optimize the DTLZ1 problem and plot its Pareto front. | [Guide](benchmarks.md) |
+| [benchmarks/example_dtlz2.py](../../examples/benchmarks/example_dtlz2.py) | **DTLZ2.** Optimize the DTLZ2 problem and plot its Pareto front. | [Guide](benchmarks.md) |
+| [benchmarks/example_dtlz3.py](../../examples/benchmarks/example_dtlz3.py) | **DTLZ3.** Optimize the DTLZ3 problem and plot its Pareto front. | [Guide](benchmarks.md) |
+| [benchmarks/example_dtlz4.py](../../examples/benchmarks/example_dtlz4.py) | **DTLZ4.** Optimize the DTLZ4 problem and plot its Pareto front. | [Guide](benchmarks.md) |
+
+<details>
+<summary>Run these examples</summary>
+
+**DTLZ1** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_dtlz1.py
+```
+
+**DTLZ2** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_dtlz2.py
+```
+
+**DTLZ3** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_dtlz3.py
+```
+
+**DTLZ4** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_dtlz4.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Combinatorial Problems
 
@@ -104,11 +284,36 @@ ga = pygad.GA(
 ga.run()
 ```
 
-:::{python-examples}
+<!-- python-examples
 benchmarks/example_knapsack.py
-:::
+-->
 
+**Python example**
+
+**[Knapsack](../../examples/benchmarks/example_knapsack.py)**
+
+Select items to maximize value within a weight capacity.
+
+`examples/benchmarks/example_knapsack.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_knapsack.py
+```
+
+</details>
+
+<!-- /python-examples -->
+
+<!-- sphinx
 (tsp-benchmark)=
+-->
 ### Travelling Salesman Problem
 
 In `pygad.benchmarks.tsp`. Build `TSP` from either a 2D `coordinates` array or a square `distance_matrix`. A solution is a permutation of city indices and the fitness is the negative tour length (the tour closes back to the start). Non-permutation candidates get a large negative penalty.
@@ -155,10 +360,48 @@ ga = pygad.GA(
 ga.run()
 ```
 
-:::{python-examples}
+<!-- python-examples
 benchmarks/example_tsp.py
 example_travelling_salesman.ipynb
-:::
+-->
+
+**Python examples**
+
+**[Travelling salesman](../../examples/benchmarks/example_tsp.py)**
+
+Find a short tour using a permutation of four cities.
+
+`examples/benchmarks/example_tsp.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/benchmarks/example_tsp.py
+```
+
+</details>
+
+**[Travelling-salesman Colab notebook](../../examples/example_travelling_salesman.ipynb)**
+
+Explore a city-tour problem using a user-supplied CSV and interactive maps.
+
+`examples/example_travelling_salesman.ipynb`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Google Colab, NumPy, pandas, Plotly, folium, and geopy
+
+**Data:** The notebook reads /content/sample_data/startbucks.csv in Google Colab. Supply a compatible CSV at that path. The original data source was not recorded. For local Jupyter use, adapt the Colab-specific imports and CSV path. See the [dataset setup instructions](../../examples/data/README.md).
+
+</details>
+
+<!-- /python-examples -->
 
 ## Example: SOO
 

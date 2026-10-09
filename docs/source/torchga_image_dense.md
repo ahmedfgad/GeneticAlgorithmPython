@@ -125,6 +125,32 @@ Crossentropy :  0.74366045
 Accuracy :  1.0
 ```
 
-:::{python-examples}
+<!-- python-examples
 TorchGA/image_classification_Dense.py
-:::
+-->
+
+**Python example**
+
+**[Dense image classifier](../../examples/TorchGA/image_classification_Dense.py)**
+
+Train an image classifier with the genetic algorithm.
+
+`examples/TorchGA/image_classification_Dense.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, TensorFlow/Keras, PyTorch
+
+**Data:** examples/data/dataset_features.npy and examples/data/outputs.npy. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/TorchGA/ so the relative data paths resolve:
+
+```console
+cd examples/TorchGA
+python image_classification_Dense.py
+```
+
+</details>
+
+<!-- /python-examples -->

@@ -201,6 +201,29 @@ After the instance is loaded, you can use it to run any method or access any pro
 print(loaded_ga_instance.best_solution())
 ```
 
-:::{python-examples}
+<!-- python-examples
 example.py
-:::
+-->
+
+**Python example**
+
+**[First GA run](../../examples/example.py)**
+
+Optimize a linear equation, inspect the best solution, plot fitness, and save and reload the GA.
+
+`examples/example.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example.py
+```
+
+</details>
+
+<!-- /python-examples -->

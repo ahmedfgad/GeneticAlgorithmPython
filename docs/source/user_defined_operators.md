@@ -339,6 +339,29 @@ ga_instance.run()
 ga_instance.plot_fitness()
 ```
 
-:::{python-examples}
+<!-- python-examples
 example_custom_operators.py
-:::
+-->
+
+**Python example**
+
+**[Custom GA operators](../../examples/example_custom_operators.py)**
+
+Implement parent selection, crossover, and mutation functions.
+
+`examples/example_custom_operators.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_custom_operators.py
+```
+
+</details>
+
+<!-- /python-examples -->

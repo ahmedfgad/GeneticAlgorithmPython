@@ -24,7 +24,7 @@ The next sections discuss each submodule.
 
 ## `pygad.utils.engine` Submodule
 
-The `pygad.utils.engine` module has the `GAEngine` class that implements the engine of the library. It inherits fitness dispatch and serialization methods from {ref}`FitnessEvaluation <fitness-evaluation>`. The main methods defined in `GAEngine` are:
+The `pygad.utils.engine` module has the `GAEngine` class that implements the engine of the library. It inherits fitness dispatch and serialization methods from [FitnessEvaluation](utils.md#pygadutilsparallel-submodule). The main methods defined in `GAEngine` are:
 
 1. `initialize_population()`
 2. `cal_pop_fitness()`
@@ -64,9 +64,9 @@ For each solution, it checks the following sources in order:
 4. Retained parents, when `keep_parents != 0`. `last_generation_parents_indices` maps each parent back to its value in `previous_generation_fitness`.
 5. The fitness function, for solutions with no cached value.
 
-These cache rules apply in serial, thread, and process modes. Only uncached rows are passed to `_evaluate_fitness()`, which respects `fitness_batch_size`, validates returned values, and increments `num_fitness_evaluations` by the number of evaluated solutions. Cached rows contribute zero to that counter. These rules assume that a solution's fitness can be reused; see {ref}`non-deterministic problems <non-deterministic-fitness>` for settings that disable reuse.
+These cache rules apply in serial, thread, and process modes. Only uncached rows are passed to `_evaluate_fitness()`, which respects `fitness_batch_size`, validates returned values, and increments `num_fitness_evaluations` by the number of evaluated solutions. Cached rows contribute zero to that counter. These rules assume that a solution's fitness can be reused; see [non-deterministic problems](fitness_calculation.md#solve-non-deterministic-problems) for settings that disable reuse.
 
-During `run()`, evaluations reuse the run's worker pool. Outside `run()`, parallel evaluation creates and closes a temporary pool. If all fitness values are cached, no pool is created. Fitness-function exceptions and invalid return values propagate to the caller after being logged. See the {ref}`fitness dispatch reference <fitness-evaluation>` for return-value validation.
+During `run()`, evaluations reuse the run's worker pool. Outside `run()`, parallel evaluation creates and closes a temporary pool. If all fitness values are cached, no pool is created. Fitness-function exceptions and invalid return values propagate to the caller after being logged. See the [fitness dispatch reference](utils.md#pygadutilsparallel-submodule) for return-value validation.
 
 ### `run()`
 
@@ -99,7 +99,9 @@ Note that the `run()` method is calling 5 different methods during the loop:
 4. `run_mutation()`
 5. `run_update_population()`
 
+<!-- sphinx
 (current-population-best-solution)=
+-->
 ### `best_solution()`
 
 Returns information about the best solution in the **current population**. Single-objective problems use the maximum fitness; multi-objective problems use the first solution in the NSGA-II ordering (non-dominated front, then crowding distance). This method does not search all saved generations.
@@ -120,10 +122,12 @@ It returns the following:
 
 A method to round the genes in the passed solutions. It loops through each gene across all the passed solutions and rounds their values if applicable. 
 
+<!-- sphinx
 (fitness-evaluation)=
+-->
 ## `pygad.utils.parallel` Submodule
 
-This module contains the `FitnessEvaluation` mixin and the process-worker function `_process_fitness_chunk()`. A mixin is a class that provides methods for another class to inherit. `GAEngine` inherits this mixin, so `pygad.GA` inherits its methods indirectly. Configure evaluation through `fitness_func`, `fitness_batch_size`, and `parallel_processing`; see the {ref}`parallel processing guide <parallel-processing-guide>` for examples and performance tradeoffs.
+This module contains the `FitnessEvaluation` mixin and the process-worker function `_process_fitness_chunk()`. A mixin is a class that provides methods for another class to inherit. `GAEngine` inherits this mixin, so `pygad.GA` inherits its methods indirectly. Configure evaluation through `fitness_func`, `fitness_batch_size`, and `parallel_processing`; see the [parallel processing guide](fitness_calculation.md#parallel-processing-in-pygad) for examples and performance tradeoffs.
 
 The methods and worker attributes below are internal implementation details, documented for completeness. Their signatures and lifetime are not a stable public API.
 
@@ -151,7 +155,9 @@ Serial evaluation calls `fitness_func(self, solution, index_argument)` directly 
 
 Internal process grouping preserves the scalar fitness signature. Only `fitness_batch_size` changes the function's input to a batch. Fitness-function and serialization exceptions propagate while results are consumed.
 
+<!-- sphinx
 (evaluate-selected-fitness)=
+-->
 #### `_evaluate_fitness(population, indices, adaptive=False)`
 
 Parameters:
@@ -204,13 +210,13 @@ The `pygad.utils.crossover` module has a class named `Crossover` with the suppor
 
 Crossover takes two parents and builds a child by mixing their genes. The next figure shows how single-point, two-point, and uniform crossover do this.
 
-:::{figure} images/crossover_types.*
-:alt: Single-point, two-point, and uniform crossover
-:width: 560px
-:align: center
+<!-- documentation-figure: 560px -->
+
+![Single-point, two-point, and uniform crossover](images/crossover_types.png)
 
 How single-point, two-point, and uniform crossover build a child from two parents.
-:::
+
+<!-- /documentation-figure -->
 
 All crossover methods accept these parameters:
 
@@ -232,7 +238,9 @@ The next subsections list the supported methods for crossover.
 
 Applies the single-point crossover. It selects a point randomly at which crossover takes place between the pairs of parents.
 
+<!-- sphinx
 (two-points-crossover)=
+-->
 #### `two_points_crossover()`
 
 Applies the 2 points crossover. It selects the 2 points randomly at which crossover takes place between the pairs of parents.
@@ -249,7 +257,9 @@ Applies the uniform crossover. For each gene, a parent out of the 2 mating paren
 
 Applies the scattered crossover. It randomly selects the gene from one of the 2 parents. 
 
+<!-- sphinx
 (sbx-crossover)=
+-->
 #### `sbx_crossover()`
 
 Applies simulated binary crossover for numeric genes. The `sbx_crossover_eta` parameter controls the spread: larger values keep children closer to their parents. Bounds come from `init_range_low` and `init_range_high`, which can specify a separate range for each gene.
@@ -269,19 +279,21 @@ The `pygad.utils.mutation` module has a class named `Mutation` with the supporte
 
 Mutation makes small random changes to the offspring so the search can explore new values. The next figure shows random mutation, where a few genes are picked at random and their values are changed.
 
-:::{figure} images/mutation.*
-:alt: Random mutation changes a few genes
-:width: 560px
-:align: center
+<!-- documentation-figure: 560px -->
+
+![Random mutation changes a few genes](images/mutation.png)
 
 Random mutation changes the values of a few genes that are picked at random.
-:::
+
+<!-- /documentation-figure -->
 
 All mutation methods accept this parameter:
 
 1. `offspring`: The offspring to mutate.
 
+<!-- sphinx
 (mutation-methods)=
+-->
 ### Mutation Methods
 
 The `Mutation` class in the `pygad.utils.mutation` module supports several methods for applying mutation. All of these methods accept the same parameter which is:
@@ -304,7 +316,9 @@ Each gene participates in at most one fallback swap per offspring per mutation p
 
 For each gene, a random value is selected according to the range specified by the 2 attributes `random_mutation_min_val` and `random_mutation_max_val`. The random value is added to the selected gene.
 
+<!-- sphinx
 (swap-mutation)=
+-->
 #### `swap_mutation()`
 
 Applies the swap mutation which interchanges the values of 2 randomly selected genes.
@@ -315,7 +329,9 @@ Any pair of distinct positions can be selected. An offspring with only one gene 
 
 Applies the inversion mutation which selects a subset of genes and inverts them.
 
+<!-- sphinx
 (scramble-mutation)=
+-->
 #### `scramble_mutation()`
 
 Applies the scramble mutation which selects a subset of genes and shuffles their order randomly.
@@ -328,7 +344,9 @@ Applies the adaptive mutation, which selects the number/percentage of genes to m
 
 The count-based and probability-based adaptive mutation methods use the same compatible-swap fallback for permutations as random mutation. Their fitness-based controls select which genes can initiate a mutation; swapped partners are not mutated again in the same pass.
 
+<!-- sphinx
 (polynomial-mutation)=
+-->
 #### `polynomial_mutation(offspring)`
 
 Applies polynomial mutation to the passed two-dimensional offspring array in place and returns it. Each gene is selected with `mutation_probability`, or with probability `1 / num_genes` when that parameter is `None`. `polynomial_mutation_eta` controls the size of the change; higher values favor smaller changes. Bounds come from `init_range_low` and `init_range_high` for each gene, and mutated values are clipped to those bounds. Genes whose range has effectively zero width are skipped. When `allow_duplicate_genes=False`, the existing random duplicate-resolution helper is applied after changing a gene.
@@ -349,7 +367,9 @@ The `pygad.utils.mutation` module has some helper methods to assist applying the
 10. `adaptive_mutation_probs_randomly()`: Uses the mutation probabilities to decide which genes to apply the adaptive mutation randomly.
 11. `swap_gene_by_space(solution, gene_idx, swapped_genes=None)`: Swap one gene with a compatible partner while preserving gene types, numeric values, gene spaces, uniqueness, and constraints. The solution is modified in place. The optional `swapped_genes` set tracks both positions already swapped in the same offspring's mutation pass; start with a new set for each pass.
 
+<!-- sphinx
 (adaptive-offspring-fitness)=
+-->
 #### `adaptive_mutation_population_fitness(offspring)`
 
 Accepts a two-dimensional NumPy array of offspring before mutation, with one chromosome per row. It builds a temporary population containing retained solutions followed by these actual offspring, without replacing `self.population`. The number of offspring must match the available rows after retention, as prepared by PyGAD's crossover step.
@@ -358,7 +378,7 @@ Retention follows the GA configuration: positive `keep_elitism` selects the best
 
 Returns `(average_fitness, offspring_fitness)`. For a single objective, the average is a scalar and offspring fitness is a one-dimensional NumPy array. For multiple objectives, the average is a vector and offspring fitness has one row per offspring and one column per objective. The average includes both retained solutions and offspring. NumPy infers a common fitness dtype, preserving fractional offspring values when earlier population fitness was integer-valued.
 
-All execution modes and batch sizes evaluate the same offspring values. The fitness function receives `None` as its index argument in both scalar and batch calls. It must use the supplied chromosomes rather than indexing the current `ga_instance.population`. Every evaluated offspring contributes to `num_fitness_evaluations`; retained fitness does not. During a run, these calls reuse the same executor as ordinary population evaluation. Return validation and propagated exceptions are described in {ref}`_evaluate_fitness() <evaluate-selected-fitness>`.
+All execution modes and batch sizes evaluate the same offspring values. The fitness function receives `None` as its index argument in both scalar and batch calls. It must use the supplied chromosomes rather than indexing the current `ga_instance.population`. Every evaluated offspring contributes to `num_fitness_evaluations`; retained fitness does not. During a run, these calls reuse the same executor as ordinary population evaluation. Return validation and propagated exceptions are described in [_evaluate_fitness()](utils.md#_evaluate_fitnesspopulation-indices-adaptivefalse).
 
 #### `swap_gene_by_space(solution, gene_idx, swapped_genes=None)`
 
@@ -405,7 +425,9 @@ The next subsections list the supported methods for parent selection.
 
 Selects the parents using the steady-state selection technique.
 
+<!-- sphinx
 (rank-selection)=
+-->
 #### `rank_selection()`
 
 Selects the parents using the rank selection technique.
@@ -424,7 +446,9 @@ Selects the parents using the tournament selection technique.
 
 Selects the parents using the roulette wheel selection technique.
 
+<!-- sphinx
 (stochastic-universal-selection)=
+-->
 #### `stochastic_universal_selection()`
 
 Selects the parents using the stochastic universal selection technique.
@@ -487,11 +511,36 @@ pip install pygad[report]
 
 See [`generate_report()`](https://pygad.readthedocs.io/en/latest/pygad.html#generate-report).
 
-:::{python-examples}
+<!-- python-examples
 example_generate_report.py
-:::
+-->
 
+**Python example**
+
+**[PDF report](../../examples/example_generate_report.py)**
+
+Export the run configuration, summary, best solution, and applicable plots to PDF.
+
+`examples/example_generate_report.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD with the report extra (Matplotlib and ReportLab)
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_generate_report.py
+```
+
+</details>
+
+<!-- /python-examples -->
+
+<!-- sphinx
 (quality-indicators)=
+-->
 ## `pygad.utils.quality_indicators` Submodule
 
 The `pygad.utils.quality_indicators` module has functions to measure the quality of a Pareto front. All functions take fitness values in PyGAD's maximization format. The functions are:
@@ -518,37 +567,75 @@ true_front = problem.pareto_front(num_points=100)
 igd = inverted_generational_distance(fitness, true_front)
 ```
 
-:::{python-examples}
+<!-- python-examples
 quality_indicators/example_hypervolume.py
 quality_indicators/example_inverted_generational_distance.py
 quality_indicators/example_generational_distance.py
 quality_indicators/example_spacing.py
-:::
+-->
+
+**Python examples**
+
+| Python script | What it shows | Related information |
+| --- | --- | --- |
+| [quality_indicators/example_hypervolume.py](../../examples/quality_indicators/example_hypervolume.py) | **Hypervolume.** Measure the objective-space volume dominated by the final population. | [Guide](utils.md) |
+| [quality_indicators/example_inverted_generational_distance.py](../../examples/quality_indicators/example_inverted_generational_distance.py) | **Inverted generational distance.** Measure distance from a reference front to the approximation. | [Guide](utils.md) |
+| [quality_indicators/example_generational_distance.py](../../examples/quality_indicators/example_generational_distance.py) | **Generational distance.** Measure distance from the approximation to a reference front. | [Guide](utils.md) |
+| [quality_indicators/example_spacing.py](../../examples/quality_indicators/example_spacing.py) | **Spacing.** Measure how evenly the approximation points are spread. | [Guide](utils.md) |
+
+<details>
+<summary>Run these examples</summary>
+
+**Hypervolume** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/quality_indicators/example_hypervolume.py
+```
+
+**Inverted generational distance** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/quality_indicators/example_inverted_generational_distance.py
+```
+
+**Generational distance** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/quality_indicators/example_generational_distance.py
+```
+
+**Spacing** — Requires: PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/quality_indicators/example_spacing.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## More about the Operators
 
-::::{grid} 1 2 2 2
-:gutter: 3
+<!-- navigation-grid: 1 2 2 2 -->
 
-:::{grid-item-card} Adaptive Mutation
-:link: adaptive_mutation
-:link-type: doc
+- [Adaptive Mutation](adaptive_mutation.md) — Change the mutation rate per solution based on its fitness.
+- [User-Defined Operators](user_defined_operators.md) — Plug in your own crossover, mutation, and parent selection.
 
-Change the mutation rate per solution based on its fitness.
-:::
+<!-- /navigation-grid -->
 
-:::{grid-item-card} User-Defined Operators
-:link: user_defined_operators
-:link-type: doc
-
-Plug in your own crossover, mutation, and parent selection.
-:::
-
-::::
-
+<!-- sphinx
 :::{toctree}
 :hidden:
 
 adaptive_mutation
 user_defined_operators
 :::
+-->
