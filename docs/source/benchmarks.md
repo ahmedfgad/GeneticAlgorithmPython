@@ -108,6 +108,7 @@ ga.run()
 benchmarks/example_knapsack.py
 :::
 
+(tsp-benchmark)=
 ### Travelling Salesman Problem
 
 In `pygad.benchmarks.tsp`. Build `TSP` from either a 2D `coordinates` array or a square `distance_matrix`. A solution is a permutation of city indices and the fitness is the negative tour length (the tour closes back to the start). Non-permutation candidates get a large negative penalty.

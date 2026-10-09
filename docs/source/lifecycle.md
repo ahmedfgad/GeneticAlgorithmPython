@@ -44,6 +44,7 @@ Drawing the chart does not run the GA or call user functions. See {ref}`plot_lif
 plots/example_plot_lifecycle.py
 :::
 
+(reporting-progress)=
 ## Reporting Progress
 
 Use `on_generation` to report progress once a generation has completed. There is no need to change the fitness function or the GA operators:

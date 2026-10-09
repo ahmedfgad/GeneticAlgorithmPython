@@ -114,6 +114,7 @@ ga_instance.plot_genes(graph_type="boxplot")
 plots/example_plot_genes.py
 :::
 
+(plot-pareto-front-curve)=
 ## `plot_pareto_front_curve()`
 
 Pareto front of the final population. With 2 objectives it draws the population as a scatter and connects the non-dominated points with a curve. With 3 objectives it switches to a 3D scatter and highlights the non-dominated points. With 4 or more objectives it raises and points to the high-dimensional plots below.
@@ -137,6 +138,7 @@ plots/example_plot_pareto_front_curve_2d.py
 plots/example_plot_pareto_front_curve_3d.py
 :::
 
+(plot-pareto-front-pcp)=
 ## `plot_pareto_front_pcp()`
 
 Parallel-coordinates view of the final non-dominated set. Each objective is a vertical axis. Each non-dominated solution becomes a polyline that crosses every axis. Values are normalized per objective so very different scales remain comparable. Useful for any M >= 2 and especially for M >= 4.
@@ -153,6 +155,7 @@ ga_instance.plot_pareto_front_pcp()
 plots/example_plot_pareto_front_pcp.py
 :::
 
+(plot-pareto-front-scatter-matrix)=
 ## `plot_pareto_front_scatter_matrix()`
 
 M-by-M grid of pairwise scatter plots for the final non-dominated set. The diagonal shows a histogram of each objective. The best fit when M >= 4 and a single 3D scatter no longer reads well.
@@ -169,6 +172,7 @@ ga_instance.plot_pareto_front_scatter_matrix()
 plots/example_plot_pareto_front_scatter_matrix.py
 :::
 
+(plot-pareto-front-heatmap)=
 ## `plot_pareto_front_heatmap()`
 
 Heatmap of the final non-dominated set. Rows are solutions, columns are objectives, color is the raw objective value. Rows are sorted by objective `sort_by` (default `0`); pass `sort_by=None` to keep the original order.
@@ -185,6 +189,7 @@ ga_instance.plot_pareto_front_heatmap(sort_by=0)
 plots/example_plot_pareto_front_heatmap.py
 :::
 
+(plot-fitness-band)=
 ## `plot_fitness_band()`
 
 Per-generation min, mean, and max with a shaded min-max band. Reveals selection pressure and diversity collapse at a glance. For MOO, pick one objective via `objective_index` (default `0`). Requires `save_solutions=True`.
@@ -201,6 +206,7 @@ ga_instance.plot_fitness_band()
 plots/example_plot_fitness_band.py
 :::
 
+(plot-non-dominated-hypervolume)=
 ## `plot_non_dominated_hypervolume()`
 
 Hypervolume of the non-dominated set per generation. Uses `pygad.utils.quality_indicators.hypervolume`. Pass `reference_point` explicitly, or let the method pick the column-wise min across all saved generations minus `0.1`. Requires `save_solutions=True`.
@@ -217,6 +223,7 @@ ga_instance.plot_non_dominated_hypervolume()
 plots/example_plot_non_dominated_hypervolume.py
 :::
 
+(plot-population-diversity)=
 ## `plot_population_diversity()`
 
 Mean pairwise Euclidean distance between solutions per generation. A drop signals the population is converging or collapsing into duplicates. Requires `save_solutions=True`.
@@ -233,6 +240,7 @@ ga_instance.plot_population_diversity()
 plots/example_plot_population_diversity.py
 :::
 
+(plot-pareto-front-evolution)=
 ## `plot_pareto_front_evolution()`
 
 Overlays the non-dominated set every `every_k` generations on a single figure. The colormap goes from early to late so you can see the front converge. Works for 2 or 3 objectives. Requires `save_solutions=True`.

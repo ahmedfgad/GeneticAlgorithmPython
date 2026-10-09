@@ -119,6 +119,7 @@ The `model_weights_as_matrix()` function accepts the following parameters:
 
 It returns the restored model weights after reshaping the vector.
 
+(keras-predict)=
 ### `pygad.kerasga.predict()`
 
 The `predict()` function makes a prediction based on a solution. It accepts the following parameters:

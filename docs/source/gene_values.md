@@ -2,6 +2,7 @@
 
 This page covers the parameters that control the values a gene can take: the `gene_space` and `gene_type` parameters, gene constraints, the `sample_size` parameter, and preventing duplicate genes.
 
+(initial-population-guide)=
 ## Creating the Initial Population
 
 PyGAD can generate the initial population or start from a population passed to `initial_population`.
@@ -107,6 +108,7 @@ For a 3-gene problem, the next code creates a dictionary for each gene to restri
 gene_space = [{'low': 1, 'high': 5}, {'low': 0.3, 'high': 1.4}, {'low': -0.2, 'high': 4.5}]
 ```
 
+(gene-space-guide)=
 ## More about the `gene_space` Parameter
 
 The `gene_space` parameter customizes the space of values of each gene.  
@@ -210,6 +212,7 @@ Gene space: {'low': 1, 'high': 5, 'step': 0.5}
 example_gene_space.py
 :::
 
+(gene-constraints-guide)=
 ## Gene Constraint
 
 In [PyGAD 3.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0), a new parameter called `gene_constraint` is added to the constructor of the `pygad.GA` class. An instance attribute of the same name is created for any instance of the `pygad.GA` class.
@@ -339,6 +342,7 @@ For duplicate repair, finite spaces are considered in full. These include lists,
 
 When replacement chains do not satisfy a dependent constraint, PyGAD also tries alternative complete assignments. This additional search considers up to `sample_size * num_genes` tentative gene assignments. A larger value allows more alternatives to be checked. The limit prevents arbitrary constraint functions from requiring an unbounded combinatorial search.
 
+(duplicate-gene-repair-guide)=
 ## Prevent Duplicates in Gene Values
 
 In [PyGAD 2.13.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-13-0), a new bool parameter called `allow_duplicate_genes` is supported to control whether duplicates are supported in the chromosome or not. In other words, whether 2 or more genes might have the same exact value. 
@@ -519,6 +523,7 @@ The `gene_type` parameter allows the user to control the data type for all genes
 
 Let us look at some examples.
 
+(gene-type-conversion-guide)=
 ### Conversion and Rounding Rules
 
 PyGAD applies the same conversion rules to generated and supplied initial populations, mutation candidates, and custom operator outputs. `on_parents`, `on_crossover`, and `on_mutation` receive converted values; any replacements returned or made in place by these callbacks are converted again before use. These rules apply whether `allow_duplicate_genes` is `True` or `False`.

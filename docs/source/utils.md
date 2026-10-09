@@ -232,6 +232,7 @@ The next subsections list the supported methods for crossover.
 
 Applies the single-point crossover. It selects a point randomly at which crossover takes place between the pairs of parents.
 
+(two-points-crossover)=
 #### `two_points_crossover()`
 
 Applies the 2 points crossover. It selects the 2 points randomly at which crossover takes place between the pairs of parents.
@@ -248,6 +249,7 @@ Applies the uniform crossover. For each gene, a parent out of the 2 mating paren
 
 Applies the scattered crossover. It randomly selects the gene from one of the 2 parents. 
 
+(sbx-crossover)=
 #### `sbx_crossover()`
 
 Applies simulated binary crossover for numeric genes. The `sbx_crossover_eta` parameter controls the spread: larger values keep children closer to their parents. Bounds come from `init_range_low` and `init_range_high`, which can specify a separate range for each gene.
@@ -302,6 +304,7 @@ Each gene participates in at most one fallback swap per offspring per mutation p
 
 For each gene, a random value is selected according to the range specified by the 2 attributes `random_mutation_min_val` and `random_mutation_max_val`. The random value is added to the selected gene.
 
+(swap-mutation)=
 #### `swap_mutation()`
 
 Applies the swap mutation which interchanges the values of 2 randomly selected genes.
@@ -312,6 +315,7 @@ Any pair of distinct positions can be selected. An offspring with only one gene 
 
 Applies the inversion mutation which selects a subset of genes and inverts them.
 
+(scramble-mutation)=
 #### `scramble_mutation()`
 
 Applies the scramble mutation which selects a subset of genes and shuffles their order randomly.
@@ -324,6 +328,7 @@ Applies the adaptive mutation, which selects the number/percentage of genes to m
 
 The count-based and probability-based adaptive mutation methods use the same compatible-swap fallback for permutations as random mutation. Their fitness-based controls select which genes can initiate a mutation; swapped partners are not mutated again in the same pass.
 
+(polynomial-mutation)=
 #### `polynomial_mutation(offspring)`
 
 Applies polynomial mutation to the passed two-dimensional offspring array in place and returns it. Each gene is selected with `mutation_probability`, or with probability `1 / num_genes` when that parameter is `None`. `polynomial_mutation_eta` controls the size of the change; higher values favor smaller changes. Bounds come from `init_range_low` and `init_range_high` for each gene, and mutated values are clipped to those bounds. Genes whose range has effectively zero width are skipped. When `allow_duplicate_genes=False`, the existing random duplicate-resolution helper is applied after changing a gene.
@@ -400,6 +405,7 @@ The next subsections list the supported methods for parent selection.
 
 Selects the parents using the steady-state selection technique.
 
+(rank-selection)=
 #### `rank_selection()`
 
 Selects the parents using the rank selection technique.
@@ -418,6 +424,7 @@ Selects the parents using the tournament selection technique.
 
 Selects the parents using the roulette wheel selection technique.
 
+(stochastic-universal-selection)=
 #### `stochastic_universal_selection()`
 
 Selects the parents using the stochastic universal selection technique.
@@ -484,6 +491,7 @@ See [`generate_report()`](https://pygad.readthedocs.io/en/latest/pygad.html#gene
 example_generate_report.py
 :::
 
+(quality-indicators)=
 ## `pygad.utils.quality_indicators` Submodule
 
 The `pygad.utils.quality_indicators` module has functions to measure the quality of a Pareto front. All functions take fitness values in PyGAD's maximization format. The functions are:

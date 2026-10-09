@@ -120,6 +120,7 @@ This is the figure created by the `plot_fitness()` method. The fitness of the fi
 
 ![multi-objective-pygad](https://github.com/ahmedfgad/GeneticAlgorithmPython/assets/16560492/7896f8d8-01c5-4ff9-8d15-52191c309b63)
 
+(nsga3-guide)=
 ## NSGA-III Example
 
 This is the same problem solved with `nsga3` instead of `nsga2`. The only differences are the `parent_selection_type` value and the new `nsga3_num_divisions` parameter.

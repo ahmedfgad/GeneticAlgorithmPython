@@ -2,6 +2,7 @@
 
 This page covers how PyGAD calculates the fitness efficiently: parallel processing, non-deterministic problems, reusing fitness values, and batch fitness calculation.
 
+(fitness-output-validation)=
 ## Fitness Output Validation
 
 For a single-objective problem, `fitness_func` returns one numeric value per solution. For a multi-objective problem, it returns a non-empty, one-dimensional list, tuple, or NumPy array of numeric objective values. Every solution must return the same number of objectives throughout a run, including cached solutions and offspring evaluated for adaptive mutation. Empty vectors, nested vectors, non-numeric values, and inconsistent objective counts raise a descriptive error before parent selection.
@@ -162,6 +163,7 @@ ga_instance = pygad.GA(...,
 
 This way, PyGAD will not save any explored solution, so the fitness function has to be called for each individual solution.
 
+(fitness-cache-reuse)=
 ## Reuse the Fitness instead of Calling the Fitness Function
 
 Saved solutions are indexed by their complete gene values to avoid scanning the entire history for every population member. Built-in evolution indexes new snapshots incrementally. Cache precedence remains saved solutions, saved best solutions, retained elites, then retained parents, using the first matching entry in each source. Duplicate solutions that have not been evaluated or saved are still evaluated independently.

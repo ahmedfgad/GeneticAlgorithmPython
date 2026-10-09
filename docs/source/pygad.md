@@ -8,6 +8,7 @@ With the `pygad` module, you can create, run, save, and load instances of the ge
 
 The `pygad` module has a class named `GA` for building the genetic algorithm. This section explains the class constructor, its methods, functions, and attributes.
 
+(ga-constructor)=
 ### `__init__()`
 
 To create an instance of the `pygad.GA` class, the constructor accepts several parameters. These let you adjust the genetic algorithm for different types of applications.
@@ -300,6 +301,7 @@ For each parent, a random value between 0.0 and 1.0 is generated. If that value 
 Added in [PyGAD 2.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-5-0) and higher.
 :::
 
+(mutation-controls)=
 #### Mutation
 
 :::{dropdown} `mutation_type="random"`: How offspring genes are mutated.
@@ -888,6 +890,7 @@ Accepts the following parameter:
 
 Returns the genetic algorithm instance.
 
+(updating-loaded-fitness-function)=
 #### Updating the Fitness Function after Loading
 
 The checkpoint includes the fitness function assigned when `save()` was called. Editing a function in the script does not automatically replace the function in a loaded GA. Assign the updated callable explicitly:
