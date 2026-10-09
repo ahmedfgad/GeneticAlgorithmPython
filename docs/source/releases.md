@@ -46,6 +46,8 @@ These changes are available in the repository after PyGAD 3.7.0 and will be incl
 
 31. Release history is ordered from newest to oldest, with Unreleased first and the latest 10 entries visible initially. Readers can show 10 more entries at a time, show the complete history, or jump directly to a selected release on the same page. Existing release links automatically reveal their target, the table of contents follows the visible entries, and keyboard focus moves to newly revealed notes. All release content remains available to documentation search, printing, and readers without JavaScript.
 
+32. The generation guide explains instance-owned random generators with a custom mutation example, precise saturation counting, and generation metadata across repeated runs and checkpoints. The seeded example output is refreshed, and the guide clarifies that best-fitness history is collected even when best-solution gene values are not saved.
+
 The operators consume different random draws from earlier versions. Runs with the same `random_seed` remain reproducible within the same version and environment, but can produce different results from earlier versions.
 
 ## PyGAD 3.7.0
