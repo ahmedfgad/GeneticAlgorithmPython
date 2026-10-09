@@ -59,7 +59,7 @@ html_theme = 'furo'
 html_title = 'PyGAD'
 html_static_path = ['_static']
 html_css_files = ['custom.css']
-html_js_files = ['scroll-sidebar.js']
+html_js_files = ['scroll-sidebar.js', 'release-history.js']
 
 html_theme_options = {
     'light_css_variables': {
