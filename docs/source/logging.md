@@ -122,6 +122,10 @@ On Generation          on_gen()                           None
 ======================================================================
 ```
 
+:::{python-examples}
+example_summary.py
+:::
+
 ## Plot Lifecycle Chart
 
 Use `plot_lifecycle()` to draw the configured lifecycle as a flowchart with operators, callbacks, population replacement, and stopping decisions. It works before or after `run()`.
@@ -131,6 +135,10 @@ ga_instance.plot_lifecycle(save_dir="lifecycle.svg")
 ```
 
 The method returns a matplotlib figure. Use `show_parameters=False` for a compact chart or `show=False` to save without displaying it. See {ref}`plot_lifecycle() <plot-lifecycle>` for the full description and an example.
+
+:::{python-examples}
+plots/example_plot_lifecycle.py
+:::
 
 ## Logging Outputs
 
@@ -382,3 +390,7 @@ By executing this code, the logged messages are printed to the console and also 
 2023-04-03 19:04:27 INFO: Generation = 10
 2023-04-03 19:04:27 INFO: Fitness    = 0.000389832593101348
 ```
+
+:::{python-examples}
+example_logger.py
+:::

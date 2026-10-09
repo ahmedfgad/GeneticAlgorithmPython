@@ -71,3 +71,7 @@ predictions = pygad.nn.predict(last_layer=output_layer,
 abs_error = numpy.mean(numpy.abs(predictions - data_outputs))
 print(f"Absolute error : {abs_error}.")
 ```
+
+:::{python-examples}
+nn/example_regression_fish.py
+:::

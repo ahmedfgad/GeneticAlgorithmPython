@@ -48,6 +48,8 @@ These changes are available in the repository after PyGAD 3.7.0 and will be incl
 
 32. The generation guide explains instance-owned random generators with a custom mutation example, precise saturation counting, and generation metadata across repeated runs and checkpoints. The seeded example output is refreshed, and the guide clarifies that best-fitness history is collected even when best-solution gene values are not saved.
 
+33. A new Examples index connects all 81 repository Python scripts and the TSP notebook to their documentation guides. Shared Python example cards link scripts beside the relevant explanations, use compact tables for larger groups, and provide expandable run instructions, requirements, and working directories. Self-contained scripts can be downloaded directly from the built documentation; examples needing data link to their folders and dataset setup instructions. One catalog and shared templates keep descriptions and links consistent, and the documentation build rejects missing scripts, uncataloged Python files, unknown example references, and missing guides. GitHub links match the documentation checkout. The TSP notebook's Colab-specific CSV path and local adaptation requirements are clarified. Earlier entries describe the regression tests and runnable examples added with the library changes.
+
 The operators consume different random draws from earlier versions. Runs with the same `random_seed` remain reproducible within the same version and environment, but can produce different results from earlier versions.
 
 ## PyGAD 3.7.0

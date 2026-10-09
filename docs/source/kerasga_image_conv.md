@@ -152,3 +152,7 @@ To improve the model performance, you can do the following:
 - Modify the existing layers.
 - Use different parameters for the layers.
 - Use different parameters for the genetic algorithm (e.g. number of solution, number of generations, etc)
+
+:::{python-examples}
+KerasGA/image_classification_CNN.py
+:::

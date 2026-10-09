@@ -231,3 +231,7 @@ print("Absolute Error : ", abs_error.detach().numpy())
 ```
 Absolute Error :  0.006876422
 ```
+
+:::{python-examples}
+TorchGA/regression_example.py
+:::

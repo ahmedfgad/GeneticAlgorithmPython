@@ -200,3 +200,7 @@ After the instance is loaded, you can use it to run any method or access any pro
 ```python
 print(loaded_ga_instance.best_solution())
 ```
+
+:::{python-examples}
+example.py
+:::

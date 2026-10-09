@@ -150,3 +150,7 @@ Binary Crossentropy :  0.0
 
 Accuracy :  1.0
 ```
+
+:::{python-examples}
+TorchGA/XOR_classification.py
+:::

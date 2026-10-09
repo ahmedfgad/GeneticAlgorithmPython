@@ -237,3 +237,7 @@ print(f"Absolute Error : {abs_error}")
 ```
 Absolute Error :  0.013740465
 ```
+
+:::{python-examples}
+KerasGA/regression_example.py
+:::

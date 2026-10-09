@@ -55,7 +55,9 @@ Constraints depending on other genes should follow the dependency order: a gene 
 
 When `allow_duplicate_genes=False`, duplicate repair follows constraint handling and uses the same converted domains. The search behavior and limits are described in [Prevent Duplicates in Gene Values](https://pygad.readthedocs.io/en/latest/gene_values.html#prevent-duplicates-in-gene-values).
 
-See [`examples/example_initial_population.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_initial_population.py) for generated and supplied populations.
+:::{python-examples}
+example_initial_population.py
+:::
 
 ## Limit the Gene Value Range using the `gene_space` Parameter
 
@@ -204,6 +206,10 @@ If the dictionary has a step like the example below, then it is considered a dis
 Gene space: {'low': 1, 'high': 5, 'step': 0.5}
 ```
 
+:::{python-examples}
+example_gene_space.py
+:::
+
 ## Gene Constraint
 
 In [PyGAD 3.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0), a new parameter called `gene_constraint` is added to the constructor of the `pygad.GA` class. An instance attribute of the same name is created for any instance of the `pygad.GA` class.
@@ -307,7 +313,9 @@ Duplicate repair also checks all constraints against complete candidate solution
 
 ### Full Example
 
-For a full example, please check the [`examples/example_gene_constraint.py` script](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_gene_constraint.py).
+:::{python-examples}
+example_gene_constraint.py
+:::
 
 ## `sample_size` Parameter
 
@@ -480,7 +488,9 @@ The last gene can only keep 0. Repair moves the third gene from 2 to 3, the seco
 
 This behavior also handles third-gene repairs, such as changing `[3, 4, 4, 5]` into `[2, 3, 4, 5]` for `gene_space=[[2, 3], [3, 4], [4, 5], [5, 6]]`.
 
-A runnable example is available in [`examples/example_duplicate_gene_repair.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_duplicate_gene_repair.py).
+:::{python-examples}
+example_duplicate_gene_repair.py
+:::
 
 ### Ranges, Types, and Constraints
 
@@ -522,7 +532,9 @@ Floating-point types use binary representations, so a stored value can differ sl
 
 When types are specified per gene, population arrays use `dtype=object` so each column can retain its requested Python or NumPy scalar type. Saved best solutions retain these types too. This also preserves large integers when other genes are floating-point values. A NumPy array constructed without `dtype=object` can already lose integer precision through conversion to a shared floating-point type; use a list or an object array for mixed input values that must remain exact.
 
-The new `examples/example_gene_type_conversion.py` demonstrates mixed types, rounding, and a custom mutation function.
+:::{python-examples}
+example_gene_type_conversion.py
+:::
 
 ### Data Type for All Genes without Precision
 

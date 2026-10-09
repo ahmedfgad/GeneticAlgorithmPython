@@ -67,6 +67,10 @@ ga_instance = pygad.GA(num_generations=5,
 ga_instance.run()
 ```
 
+:::{python-examples}
+example_fitness_wrapper.py
+:::
+
 ## Assign Methods
 
 The next example has all the methods defined inside the class `Test`. All of the methods accept an additional parameter representing the method's object of the class `Test`.
@@ -117,6 +121,10 @@ ga_instance = pygad.GA(num_generations=5,
     
 ga_instance.run()
 ```
+
+:::{python-examples}
+example_lifecycle_methods.py
+:::
 
 ## Assign a Class
 
@@ -191,3 +199,7 @@ ga_instance = pygad.GA(num_generations=10,
 
 ga_instance.run()
 ```
+
+:::{python-examples}
+example_lifecycle_classes.py
+:::

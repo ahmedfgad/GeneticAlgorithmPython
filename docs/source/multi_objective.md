@@ -169,3 +169,8 @@ print(f"Predicted output 2 based on the best solution : {prediction}")
 ```
 
 For M = 2 objectives and `nsga3_num_divisions = 12`, the number of reference points is `C(13, 12) = 13`, which is within `sol_per_pop = 20`. For higher-dimensional problems pick `nsga3_num_divisions` such that `C(M + p - 1, p)` stays close to the population size you want.
+
+:::{python-examples}
+example_multi_objective.py
+example_multi_objective_nsga3.py
+:::

@@ -521,6 +521,10 @@ If both the `mutation_type` and `crossover_type` parameters are `None`, then the
 
 The parameters are validated by calling the `validate_parameters()` method of the `utils.validation.Validation` class inside the constructor. If any parameter is not correct, an exception is raised and the `valid_parameters` attribute is set to `False`.
 
+:::{python-examples}
+example_constructor_parameters.py
+:::
+
 ## Extended Classes
 
 To keep the library modular and structured, the code is split into several scripts, where each script has one or more classes. Each class has its own purpose.
@@ -861,9 +865,13 @@ Parameters:
 - `notes` (`str` or `None`, default `None`): Free-form text rendered in the optional `"notes"` section.
 - `page_size` (`str`, default `"letter"`): Either `"letter"` or `"A4"`.
 
-The report skips any plot whose preconditions are not met. For example, `plot_pareto_front_curve` is included only for multi-objective runs with 2 or 3 objectives; `plot_non_dominated_hypervolume` is included only when `save_solutions=True` is set on the GA. A full example lives at [`examples/example_generate_report.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/example_generate_report.py).
+The report skips any plot whose preconditions are not met. For example, `plot_pareto_front_curve` is included only for multi-objective runs with 2 or 3 objectives; `plot_non_dominated_hypervolume` is included only when `save_solutions=True` is set on the GA.
 
 The title page shows the PyGAD logo. The image ships with the package, so it works without network access. If the image file is missing, the report is built without it.
+
+:::{python-examples}
+example_generate_report.py
+:::
 
 ## Functions in `pygad`
 
@@ -904,7 +912,11 @@ new_ga_instance = pygad.GA(
 new_ga_instance.run()
 ```
 
-Set the constructor options needed by the new problem, including `gene_type`, `gene_space`, constraints, operators, and batch settings. This starts new fitness histories and generation counters; it reuses the chromosomes, not the previous run's fitness values. A complete example is available in [`examples/example_load_fitness_function.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_load_fitness_function.py).
+Set the constructor options needed by the new problem, including `gene_type`, `gene_space`, constraints, operators, and batch settings. This starts new fitness histories and generation counters; it reuses the chromosomes, not the previous run's fitness values.
+
+:::{python-examples}
+example_load_fitness_function.py
+:::
 
 ## Using PyGAD
 
@@ -956,6 +968,11 @@ This section gives the complete code of some examples that use `pygad`. Each sub
 For a 2-cluster problem, the code is available [here](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/example_clustering_2.py). For a 3-cluster problem, the code is [here](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/example_clustering_3.py). The 2 examples are using artificial samples.
 
 Soon a tutorial will be published at [Paperspace](https://blog.paperspace.com/author/ahmed) to explain how clustering works using the genetic algorithm with examples in PyGAD.
+
+:::{python-examples}
+clustering/example_clustering_2.py
+clustering/example_clustering_3.py
+:::
 
 ### CoinTex Game Playing using PyGAD
 

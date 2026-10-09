@@ -266,7 +266,11 @@ ga_instance = pygad.GA(...,
                        random_seed=2)
 ```
 
-The custom operator must choose values appropriate for the problem's gene spaces and constraints. Calls to global `numpy.random` or `random` functions in user code need their own seeds; `random_seed` does not seed these global generators. A complete example of independent seeded instances is available at [`examples/example_constructor_parameters.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_constructor_parameters.py).
+The custom operator must choose values appropriate for the problem's gene spaces and constraints. Calls to global `numpy.random` or `random` functions in user code need their own seeds; `random_seed` does not seed these global generators.
+
+:::{python-examples}
+example_constructor_parameters.py
+:::
 
 ## Continue without Losing Progress
 
@@ -325,7 +329,11 @@ The plot created by the `plot_fitness()` method will show the data collected fro
 
 With `save_solutions=True`, `solutions_generations` records one generation number per saved population, while `solutions` and `solutions_fitness` keep one entry per solution. `best_solution_generation` reports the actual generation of the best saved fitness, rather than its position in the history. History plots and PDF reports use these generation numbers.
 
-Saving and loading preserves the metadata. Older checkpoints with a single-run history recover their generation numbers. Unknown generations in older repeated-run histories are represented by `None`; `best_solution_generation` is `-1` if the winning snapshot has an unknown generation. See {ref}`Saved Fitness across Repeated Runs <saved-fitness-across-repeated-runs>` for callback behavior and checkpoint compatibility, and [`examples/example_repeated_runs.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_repeated_runs.py) for a complete checkpoint example.
+Saving and loading preserves the metadata. Older checkpoints with a single-run history recover their generation numbers. Unknown generations in older repeated-run histories are represented by `None`; `best_solution_generation` is `-1` if the winning snapshot has an unknown generation. See {ref}`Saved Fitness across Repeated Runs <saved-fitness-across-repeated-runs>` for callback behavior and checkpoint compatibility.
+
+:::{python-examples}
+example_repeated_runs.py
+:::
 
 ## Change Population Size during Runtime
 
@@ -350,3 +358,7 @@ These are examples of the instance attributes that might be changed. The user sh
    2. `last_generation_parents` and `last_generation_parents_indices`: Two NumPy arrays: 2D array representing the parents and 1D array of the parents indices.
    3. `last_generation_elitism` and `last_generation_elitism_indices`: Must be changed if `keep_elitism != 0`. The default value of `keep_elitism` is 1. Two NumPy arrays: 2D array representing the elitism and 1D array of the elitism indices.
 2. `pop_size`: The population size.
+
+:::{python-examples}
+example_dynamic_population_size.py
+:::

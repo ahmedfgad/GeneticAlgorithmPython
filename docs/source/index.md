@@ -180,6 +180,7 @@ If you used PyGAD, please consider citing its paper with the following details:
 
 pygad
 pygad_more
+examples
 ```
 
 ```{toctree}

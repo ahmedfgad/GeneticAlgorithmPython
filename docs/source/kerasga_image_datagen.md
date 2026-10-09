@@ -88,3 +88,8 @@ ca.update_state(data_outputs, predictions)
 accuracy = ca.result().numpy()
 print(f"Accuracy : {accuracy}")
 ```
+
+:::{python-examples}
+KerasGA/cancer_dataset.py
+KerasGA/cancer_dataset_generator.py
+:::

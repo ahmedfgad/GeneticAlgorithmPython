@@ -1,0 +1,781 @@
+[
+    {
+        "path": "example.py",
+        "title": "First GA run",
+        "description": "Optimize a linear equation, inspect the best solution, plot fitness, and save and reload the GA.",
+        "category": "Getting Started",
+        "guide": "steps_to_use.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/example.py"
+    },
+    {
+        "path": "example_initial_population.py",
+        "title": "Initial populations",
+        "description": "Generate values from per-gene ranges and nested spaces, or supply values and infer the dimensions.",
+        "category": "Population and Genes",
+        "guide": "gene_values.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_initial_population.py"
+    },
+    {
+        "path": "example_gene_space.py",
+        "title": "Gene spaces",
+        "description": "Compare shared and per-gene choices, ranges, dictionaries, fixed values, and None entries.",
+        "category": "Population and Genes",
+        "guide": "gene_values.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_gene_space.py"
+    },
+    {
+        "path": "example_gene_constraint.py",
+        "title": "Gene constraints",
+        "description": "Filter gene candidates with constraints that depend on other genes.",
+        "category": "Population and Genes",
+        "guide": "gene_values.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_gene_constraint.py"
+    },
+    {
+        "path": "example_duplicate_gene_repair.py",
+        "title": "Duplicate repair",
+        "description": "Repair duplicates through a chain of replacements while respecting each gene space.",
+        "category": "Population and Genes",
+        "guide": "gene_values.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_duplicate_gene_repair.py"
+    },
+    {
+        "path": "example_gene_type_conversion.py",
+        "title": "Gene types and rounding",
+        "description": "Preserve mixed numeric types, apply precision, and convert custom mutation outputs.",
+        "category": "Population and Genes",
+        "guide": "gene_values.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_gene_type_conversion.py"
+    },
+    {
+        "path": "example_dynamic_population_size.py",
+        "title": "Changing population size",
+        "description": "Adjust the population and related runtime settings during evolution.",
+        "category": "Population and Genes",
+        "guide": "generations.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_dynamic_population_size.py"
+    },
+    {
+        "path": "example_custom_operators.py",
+        "title": "Custom GA operators",
+        "description": "Implement parent selection, crossover, and mutation functions.",
+        "category": "Operators and Configuration",
+        "guide": "user_defined_operators.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/example_custom_operators.py"
+    },
+    {
+        "path": "example_constructor_parameters.py",
+        "title": "Constructor settings and random seeds",
+        "description": "Use callable fitness signatures, NumPy counts, and independent seeded GA instances.",
+        "category": "Operators and Configuration",
+        "guide": "pygad.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_constructor_parameters.py"
+    },
+    {
+        "path": "example_fitness_batch_size.py",
+        "title": "Batch fitness",
+        "description": "Return one fitness result per solution, including a shorter final batch.",
+        "category": "Fitness and Parallel Processing",
+        "guide": "fitness_calculation.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_fitness_batch_size.py"
+    },
+    {
+        "path": "example_parallel_processing.py",
+        "title": "Parallel fitness",
+        "description": "Evaluate population fitness with process workers and report the run time.",
+        "category": "Fitness and Parallel Processing",
+        "guide": "fitness_calculation.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_parallel_processing.py"
+    },
+    {
+        "path": "benchmarks/parallel_processing.py",
+        "title": "Compare fitness execution modes",
+        "description": "Measure complete runs for CPU, I/O, and NumPy workloads with serial, thread, process, and batch evaluation.",
+        "category": "Fitness and Parallel Processing",
+        "guide": "fitness_calculation.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/parallel_processing.py --workload cpu"
+    },
+    {
+        "path": "example_fitness_wrapper.py",
+        "title": "Extra fitness arguments",
+        "description": "Wrap a fitness function to pass additional values while preserving its PyGAD signature.",
+        "category": "Fitness and Parallel Processing",
+        "guide": "custom_functions.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/example_fitness_wrapper.py"
+    },
+    {
+        "path": "pygad_lifecycle.py",
+        "title": "Lifecycle callbacks",
+        "description": "Trace fitness, parent selection, crossover, mutation, generation, and stop callbacks.",
+        "category": "Lifecycle and Saved Runs",
+        "guide": "lifecycle.md",
+        "requirements": "PyGAD",
+        "run": "python examples/pygad_lifecycle.py"
+    },
+    {
+        "path": "example_lifecycle_methods.py",
+        "title": "Callbacks as methods",
+        "description": "Implement fitness and lifecycle callbacks with bound methods.",
+        "category": "Lifecycle and Saved Runs",
+        "guide": "custom_functions.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/example_lifecycle_methods.py"
+    },
+    {
+        "path": "example_lifecycle_classes.py",
+        "title": "Callbacks as callable classes",
+        "description": "Implement fitness and lifecycle callbacks with callable class instances.",
+        "category": "Lifecycle and Saved Runs",
+        "guide": "custom_functions.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/example_lifecycle_classes.py"
+    },
+    {
+        "path": "example_summary.py",
+        "title": "Text lifecycle summary",
+        "description": "Print the configured GA stages and their parameters.",
+        "category": "Lifecycle and Saved Runs",
+        "guide": "pygad_more.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/example_summary.py"
+    },
+    {
+        "path": "example_logger.py",
+        "title": "Logging",
+        "description": "Send progress and GA messages to a configured logger.",
+        "category": "Lifecycle and Saved Runs",
+        "guide": "logging.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_logger.py"
+    },
+    {
+        "path": "example_repeated_runs.py",
+        "title": "Repeated runs and checkpoints",
+        "description": "Continue from a saved GA and inspect the actual generation numbers in its histories.",
+        "category": "Lifecycle and Saved Runs",
+        "guide": "generations.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_repeated_runs.py"
+    },
+    {
+        "path": "example_load_fitness_function.py",
+        "title": "Change a loaded fitness function",
+        "description": "Replace the fitness callable after loading, or start fresh when the objective changes.",
+        "category": "Lifecycle and Saved Runs",
+        "guide": "pygad.md",
+        "requirements": "PyGAD",
+        "run": "python examples/example_load_fitness_function.py"
+    },
+    {
+        "path": "example_multi_objective.py",
+        "title": "NSGA-II optimization",
+        "description": "Optimize two objectives and inspect the resulting trade-offs.",
+        "category": "Multi-Objective Optimization",
+        "guide": "multi_objective.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/example_multi_objective.py"
+    },
+    {
+        "path": "example_multi_objective_nsga3.py",
+        "title": "NSGA-III optimization",
+        "description": "Configure reference points and optimize two objectives with NSGA-III.",
+        "category": "Multi-Objective Optimization",
+        "guide": "multi_objective.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/example_multi_objective_nsga3.py"
+    },
+    {
+        "path": "plots/example_plot_fitness.py",
+        "title": "Best-fitness curve",
+        "description": "Plot best fitness across generations on the Sphere benchmark.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_fitness.py"
+    },
+    {
+        "path": "plots/example_plot_fitness_band.py",
+        "title": "Fitness band",
+        "description": "Plot per-generation minimum, mean, and maximum fitness with a shaded band.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_fitness_band.py"
+    },
+    {
+        "path": "plots/example_plot_genes.py",
+        "title": "Gene histories",
+        "description": "Show how gene values change across saved generations.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_genes.py"
+    },
+    {
+        "path": "plots/example_plot_lifecycle.py",
+        "title": "Configured lifecycle",
+        "description": "Draw detailed and compact lifecycle charts and export SVG and PNG files.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_lifecycle.py"
+    },
+    {
+        "path": "plots/example_plot_new_solution_rate.py",
+        "title": "New-solution rate",
+        "description": "Count previously unseen solutions in each generation.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_new_solution_rate.py"
+    },
+    {
+        "path": "plots/example_plot_non_dominated_hypervolume.py",
+        "title": "Hypervolume history",
+        "description": "Track the hypervolume of the non-dominated set across generations.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_non_dominated_hypervolume.py"
+    },
+    {
+        "path": "plots/example_plot_pareto_front_curve_2d.py",
+        "title": "2D Pareto front",
+        "description": "Plot a two-objective Pareto front after NSGA-II optimization.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_pareto_front_curve_2d.py"
+    },
+    {
+        "path": "plots/example_plot_pareto_front_curve_3d.py",
+        "title": "3D Pareto front",
+        "description": "Plot a three-objective Pareto front after NSGA-III optimization.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_pareto_front_curve_3d.py"
+    },
+    {
+        "path": "plots/example_plot_pareto_front_evolution.py",
+        "title": "Pareto-front evolution",
+        "description": "Overlay the non-dominated fronts from selected generations.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_pareto_front_evolution.py"
+    },
+    {
+        "path": "plots/example_plot_pareto_front_heatmap.py",
+        "title": "Pareto heatmap",
+        "description": "Compare objective values with a solutions-by-objectives heatmap.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_pareto_front_heatmap.py"
+    },
+    {
+        "path": "plots/example_plot_pareto_front_pcp.py",
+        "title": "Parallel coordinates",
+        "description": "Compare Pareto solutions across objective axes.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_pareto_front_pcp.py"
+    },
+    {
+        "path": "plots/example_plot_pareto_front_scatter_matrix.py",
+        "title": "Pareto scatter matrix",
+        "description": "Compare every pair of objectives in a many-objective run.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_pareto_front_scatter_matrix.py"
+    },
+    {
+        "path": "plots/example_plot_population_diversity.py",
+        "title": "Population diversity",
+        "description": "Track mean pairwise distance between solutions across generations.",
+        "category": "Plots",
+        "guide": "visualize.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/plots/example_plot_population_diversity.py"
+    },
+    {
+        "path": "example_generate_report.py",
+        "title": "PDF report",
+        "description": "Export the run configuration, summary, best solution, and applicable plots to PDF.",
+        "category": "Reports",
+        "guide": "pygad.md",
+        "requirements": "PyGAD with the report extra (Matplotlib and ReportLab)",
+        "run": "python examples/example_generate_report.py"
+    },
+    {
+        "path": "benchmarks/example_classic_sphere.py",
+        "title": "Sphere",
+        "description": "Optimize the Sphere single-objective benchmark.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_classic_sphere.py"
+    },
+    {
+        "path": "benchmarks/example_classic_rastrigin.py",
+        "title": "Rastrigin",
+        "description": "Optimize the Rastrigin single-objective benchmark.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_classic_rastrigin.py"
+    },
+    {
+        "path": "benchmarks/example_classic_rosenbrock.py",
+        "title": "Rosenbrock",
+        "description": "Optimize the Rosenbrock single-objective benchmark.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_classic_rosenbrock.py"
+    },
+    {
+        "path": "benchmarks/example_classic_griewank.py",
+        "title": "Griewank",
+        "description": "Optimize the Griewank single-objective benchmark.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_classic_griewank.py"
+    },
+    {
+        "path": "benchmarks/example_classic_schwefel.py",
+        "title": "Schwefel",
+        "description": "Optimize the Schwefel single-objective benchmark.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_classic_schwefel.py"
+    },
+    {
+        "path": "benchmarks/example_classic_ackley.py",
+        "title": "Ackley",
+        "description": "Optimize the Ackley single-objective benchmark.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_classic_ackley.py"
+    },
+    {
+        "path": "benchmarks/example_classic_himmelblau.py",
+        "title": "Himmelblau",
+        "description": "Optimize the Himmelblau single-objective benchmark.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_classic_himmelblau.py"
+    },
+    {
+        "path": "benchmarks/example_zdt1.py",
+        "title": "ZDT1",
+        "description": "Optimize the ZDT1 problem and plot its Pareto front.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/benchmarks/example_zdt1.py"
+    },
+    {
+        "path": "benchmarks/example_zdt2.py",
+        "title": "ZDT2",
+        "description": "Optimize the ZDT2 problem and plot its Pareto front.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/benchmarks/example_zdt2.py"
+    },
+    {
+        "path": "benchmarks/example_zdt3.py",
+        "title": "ZDT3",
+        "description": "Optimize the ZDT3 problem and plot its Pareto front.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/benchmarks/example_zdt3.py"
+    },
+    {
+        "path": "benchmarks/example_zdt4.py",
+        "title": "ZDT4",
+        "description": "Optimize the ZDT4 problem and plot its Pareto front.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/benchmarks/example_zdt4.py"
+    },
+    {
+        "path": "benchmarks/example_zdt6.py",
+        "title": "ZDT6",
+        "description": "Optimize the ZDT6 problem and plot its Pareto front.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/benchmarks/example_zdt6.py"
+    },
+    {
+        "path": "benchmarks/example_dtlz1.py",
+        "title": "DTLZ1",
+        "description": "Optimize the DTLZ1 problem and plot its Pareto front.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_dtlz1.py"
+    },
+    {
+        "path": "benchmarks/example_dtlz2.py",
+        "title": "DTLZ2",
+        "description": "Optimize the DTLZ2 problem and plot its Pareto front.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_dtlz2.py"
+    },
+    {
+        "path": "benchmarks/example_dtlz3.py",
+        "title": "DTLZ3",
+        "description": "Optimize the DTLZ3 problem and plot its Pareto front.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_dtlz3.py"
+    },
+    {
+        "path": "benchmarks/example_dtlz4.py",
+        "title": "DTLZ4",
+        "description": "Optimize the DTLZ4 problem and plot its Pareto front.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_dtlz4.py"
+    },
+    {
+        "path": "benchmarks/example_knapsack.py",
+        "title": "Knapsack",
+        "description": "Select items to maximize value within a weight capacity.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_knapsack.py"
+    },
+    {
+        "path": "benchmarks/example_tsp.py",
+        "title": "Travelling salesman",
+        "description": "Find a short tour using a permutation of four cities.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD",
+        "run": "python examples/benchmarks/example_tsp.py"
+    },
+    {
+        "path": "quality_indicators/example_hypervolume.py",
+        "title": "Hypervolume",
+        "description": "Measure the objective-space volume dominated by the final population.",
+        "category": "Quality Indicators",
+        "guide": "utils.md",
+        "requirements": "PyGAD",
+        "run": "python examples/quality_indicators/example_hypervolume.py"
+    },
+    {
+        "path": "quality_indicators/example_inverted_generational_distance.py",
+        "title": "Inverted generational distance",
+        "description": "Measure distance from a reference front to the approximation.",
+        "category": "Quality Indicators",
+        "guide": "utils.md",
+        "requirements": "PyGAD",
+        "run": "python examples/quality_indicators/example_inverted_generational_distance.py"
+    },
+    {
+        "path": "quality_indicators/example_generational_distance.py",
+        "title": "Generational distance",
+        "description": "Measure distance from the approximation to a reference front.",
+        "category": "Quality Indicators",
+        "guide": "utils.md",
+        "requirements": "PyGAD",
+        "run": "python examples/quality_indicators/example_generational_distance.py"
+    },
+    {
+        "path": "quality_indicators/example_spacing.py",
+        "title": "Spacing",
+        "description": "Measure how evenly the approximation points are spread.",
+        "category": "Quality Indicators",
+        "guide": "utils.md",
+        "requirements": "PyGAD",
+        "run": "python examples/quality_indicators/example_spacing.py"
+    },
+    {
+        "path": "nn/example_regression.py",
+        "title": "Regression",
+        "description": "Fit a neural network to a small numeric regression problem.",
+        "category": "Neural Networks",
+        "guide": "nn_regression_1.md",
+        "requirements": "PyGAD",
+        "run": "python examples/nn/example_regression.py"
+    },
+    {
+        "path": "nn/example_XOR_classification.py",
+        "title": "XOR classification",
+        "description": "Train a neural network on the four XOR inputs.",
+        "category": "Neural Networks",
+        "guide": "nn_xor.md",
+        "requirements": "PyGAD",
+        "run": "python examples/nn/example_XOR_classification.py"
+    },
+    {
+        "path": "nn/example_classification.py",
+        "title": "Image classification",
+        "description": "Classify fruit images from prepared feature vectors.",
+        "category": "Neural Networks",
+        "guide": "nn_image_classification.md",
+        "requirements": "PyGAD",
+        "run": "cd examples/nn\npython example_classification.py",
+        "data": "examples/data/dataset_features.npy and examples/data/outputs.npy.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/nn/ so the relative data paths resolve:"
+    },
+    {
+        "path": "nn/example_regression_fish.py",
+        "title": "Fish-weight regression",
+        "description": "Predict fish weight from numeric measurements.",
+        "category": "Neural Networks",
+        "guide": "nn_regression_2.md",
+        "requirements": "PyGAD, pandas",
+        "run": "cd examples/nn\npython example_regression_fish.py",
+        "data": "examples/data/Fish.csv.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/nn/ so the relative data paths resolve:"
+    },
+    {
+        "path": "gann/example_regression.py",
+        "title": "Regression",
+        "description": "Fit a neural network to a small numeric regression problem.",
+        "category": "Neural Networks with the GA",
+        "guide": "gann_regression_1.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/gann/example_regression.py"
+    },
+    {
+        "path": "gann/example_XOR_classification.py",
+        "title": "XOR classification",
+        "description": "Train a neural network on the four XOR inputs.",
+        "category": "Neural Networks with the GA",
+        "guide": "gann_xor.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/gann/example_XOR_classification.py"
+    },
+    {
+        "path": "gann/example_classification.py",
+        "title": "Image classification",
+        "description": "Classify fruit images from prepared feature vectors.",
+        "category": "Neural Networks with the GA",
+        "guide": "gann_image_classification.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "cd examples/gann\npython example_classification.py",
+        "data": "examples/data/dataset_features.npy and examples/data/outputs.npy.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/gann/ so the relative data paths resolve:"
+    },
+    {
+        "path": "gann/example_regression_fish.py",
+        "title": "Fish-weight regression",
+        "description": "Predict fish weight from numeric measurements.",
+        "category": "Neural Networks with the GA",
+        "guide": "gann_regression_2.md",
+        "requirements": "PyGAD, Matplotlib, pandas",
+        "run": "cd examples/gann\npython example_regression_fish.py",
+        "data": "examples/data/Fish.csv.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/gann/ so the relative data paths resolve:"
+    },
+    {
+        "path": "nn/extract_features.py",
+        "title": "Prepare image features",
+        "description": "Extract fruit-image features and write the arrays used by the dense classifiers.",
+        "category": "Neural Networks",
+        "guide": "nn_image_classification.md",
+        "requirements": "PyGAD, scikit-image",
+        "run": "cd examples/nn\npython extract_features.py",
+        "data": "The apple, lemon, mango, and raspberry folders under examples/data/Fruit360/.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/nn/ so the relative data paths resolve:"
+    },
+    {
+        "path": "cnn/example_image_classification.py",
+        "title": "Build a CNN",
+        "description": "Classify fruit images using prepared image arrays.",
+        "category": "Convolutional Networks",
+        "guide": "cnn.md",
+        "requirements": "PyGAD",
+        "run": "cd examples/cnn\npython example_image_classification.py",
+        "data": "examples/data/dataset_inputs.npy and examples/data/dataset_outputs.npy.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/cnn/ so the relative data paths resolve:"
+    },
+    {
+        "path": "gacnn/example_image_classification.py",
+        "title": "Optimize a CNN with the GA",
+        "description": "Classify fruit images using prepared image arrays.",
+        "category": "Convolutional Networks",
+        "guide": "gacnn.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "cd examples/gacnn\npython example_image_classification.py",
+        "data": "examples/data/dataset_inputs.npy and examples/data/dataset_outputs.npy.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/gacnn/ so the relative data paths resolve:"
+    },
+    {
+        "path": "KerasGA/regression_example.py",
+        "title": "Regression",
+        "description": "Optimize neural-network weights with the genetic algorithm.",
+        "category": "Keras",
+        "guide": "kerasga_regression.md",
+        "requirements": "PyGAD, Matplotlib, TensorFlow/Keras",
+        "run": "python examples/KerasGA/regression_example.py"
+    },
+    {
+        "path": "KerasGA/XOR_classification.py",
+        "title": "XOR classification",
+        "description": "Optimize neural-network weights with the genetic algorithm.",
+        "category": "Keras",
+        "guide": "kerasga_xor.md",
+        "requirements": "PyGAD, Matplotlib, TensorFlow/Keras",
+        "run": "python examples/KerasGA/XOR_classification.py"
+    },
+    {
+        "path": "KerasGA/image_classification_Dense.py",
+        "title": "Dense image classifier",
+        "description": "Train an image classifier with the genetic algorithm.",
+        "category": "Keras",
+        "guide": "kerasga_image_dense.md",
+        "requirements": "PyGAD, Matplotlib, TensorFlow/Keras",
+        "run": "cd examples/KerasGA\npython image_classification_Dense.py",
+        "data": "examples/data/dataset_features.npy and examples/data/outputs.npy.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/KerasGA/ so the relative data paths resolve:"
+    },
+    {
+        "path": "KerasGA/image_classification_CNN.py",
+        "title": "Convolutional image classifier",
+        "description": "Train an image classifier with the genetic algorithm.",
+        "category": "Keras",
+        "guide": "kerasga_image_conv.md",
+        "requirements": "PyGAD, Matplotlib, TensorFlow/Keras",
+        "run": "cd examples/KerasGA\npython image_classification_CNN.py",
+        "data": "examples/data/dataset_inputs.npy and examples/data/dataset_outputs.npy.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/KerasGA/ so the relative data paths resolve:"
+    },
+    {
+        "path": "TorchGA/regression_example.py",
+        "title": "Regression",
+        "description": "Optimize neural-network weights with the genetic algorithm.",
+        "category": "PyTorch",
+        "guide": "torchga_regression.md",
+        "requirements": "PyGAD, Matplotlib, PyTorch",
+        "run": "python examples/TorchGA/regression_example.py"
+    },
+    {
+        "path": "TorchGA/XOR_classification.py",
+        "title": "XOR classification",
+        "description": "Optimize neural-network weights with the genetic algorithm.",
+        "category": "PyTorch",
+        "guide": "torchga_xor.md",
+        "requirements": "PyGAD, Matplotlib, PyTorch",
+        "run": "python examples/TorchGA/XOR_classification.py"
+    },
+    {
+        "path": "TorchGA/image_classification_Dense.py",
+        "title": "Dense image classifier",
+        "description": "Train an image classifier with the genetic algorithm.",
+        "category": "PyTorch",
+        "guide": "torchga_image_dense.md",
+        "requirements": "PyGAD, Matplotlib, TensorFlow/Keras, PyTorch",
+        "run": "cd examples/TorchGA\npython image_classification_Dense.py",
+        "data": "examples/data/dataset_features.npy and examples/data/outputs.npy.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/TorchGA/ so the relative data paths resolve:"
+    },
+    {
+        "path": "TorchGA/image_classification_CNN.py",
+        "title": "Convolutional image classifier",
+        "description": "Train an image classifier with the genetic algorithm.",
+        "category": "PyTorch",
+        "guide": "torchga_image_conv.md",
+        "requirements": "PyGAD, Matplotlib, PyTorch",
+        "run": "cd examples/TorchGA\npython image_classification_CNN.py",
+        "data": "examples/data/dataset_inputs.npy and examples/data/dataset_outputs.npy.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/TorchGA/ so the relative data paths resolve:"
+    },
+    {
+        "path": "KerasGA/cancer_dataset.py",
+        "title": "Image-directory classification",
+        "description": "Use directory-based image input for a two-class Keras CNN.",
+        "category": "Keras",
+        "guide": "kerasga_image_datagen.md",
+        "requirements": "PyGAD, Matplotlib, TensorFlow/Keras",
+        "run": "cd examples/KerasGA\npython cancer_dataset.py",
+        "data": "benign/ and malignant/ image folders under examples/data/Skin_Cancer_Dataset/.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/KerasGA/ so the relative data paths resolve:"
+    },
+    {
+        "path": "KerasGA/cancer_dataset_generator.py",
+        "title": "Batched image-directory classification",
+        "description": "Use directory-based image input for a two-class Keras CNN.",
+        "category": "Keras",
+        "guide": "kerasga_image_datagen.md",
+        "requirements": "PyGAD, Matplotlib, TensorFlow/Keras",
+        "run": "cd examples/KerasGA\npython cancer_dataset_generator.py",
+        "data": "benign/ and malignant/ image folders under examples/data/Skin_Cancer_Dataset/.",
+        "download": false,
+        "run_note": "From the repository root, change to examples/KerasGA/ so the relative data paths resolve:"
+    },
+    {
+        "path": "clustering/example_clustering_2.py",
+        "title": "2-cluster example",
+        "description": "Optimize 2 cluster centers for generated two-dimensional data.",
+        "category": "Clustering",
+        "guide": "pygad.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/clustering/example_clustering_2.py"
+    },
+    {
+        "path": "clustering/example_clustering_3.py",
+        "title": "3-cluster example",
+        "description": "Optimize 3 cluster centers for generated two-dimensional data.",
+        "category": "Clustering",
+        "guide": "pygad.md",
+        "requirements": "PyGAD, Matplotlib",
+        "run": "python examples/clustering/example_clustering_3.py"
+    },
+    {
+        "path": "example_travelling_salesman.ipynb",
+        "title": "Travelling-salesman Colab notebook",
+        "description": "Explore a city-tour problem using a user-supplied CSV and interactive maps.",
+        "category": "Benchmarks",
+        "guide": "benchmarks.md",
+        "requirements": "PyGAD, Google Colab, NumPy, pandas, Plotly, folium, and geopy",
+        "run": "",
+        "data": "The notebook reads /content/sample_data/startbucks.csv in Google Colab. Supply a compatible CSV at that path. The original data source was not recorded. For local Jupyter use, adapt the Colab-specific imports and CSV path.",
+        "download": false
+    }
+]

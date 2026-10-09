@@ -2,7 +2,7 @@
 
 The `pygad.visualize.plot.Plot` class is mixed into `pygad.GA`. Each method below is callable on a GA instance after `run()`. `plot_lifecycle()` can also be called before `run()` because it draws the configured execution flow.
 
-Every method returns the `matplotlib.figure.Figure` it created and optionally writes it to disk via `save_dir`. A runnable script for each plot lives under [`examples/plots/`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/plots).
+Every method returns the `matplotlib.figure.Figure` it created and optionally writes it to disk via `save_dir`. Complete scripts are linked below and listed in the [Examples index](examples.md).
 
 ## Plot inventory
 
@@ -58,7 +58,11 @@ ga_instance.plot_lifecycle(show_parameters=False)
 
 The method reads the current GA configuration without evaluating fitness, calling operators or callbacks, or changing GA state. It describes the configured flow rather than recording the path taken during a run. Before fitness is available, the objective count is marked as unknown. After a run, the chart can show the known objective count and fitness shape. Each `run()` call uses the configured generation count, including when continuing a previous run.
 
-Install the optional plotting dependency with `pip install pygad[visualize]`. A complete example is available at [`examples/plots/example_plot_lifecycle.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/plots/example_plot_lifecycle.py).
+Install the optional plotting dependency with `pip install pygad[visualize]`.
+
+:::{python-examples}
+plots/example_plot_lifecycle.py
+:::
 
 ## `plot_fitness()`
 
@@ -72,6 +76,10 @@ ga_instance.plot_fitness()
 
 ![plot_fitness](figures/plot_fitness.png)
 
+:::{python-examples}
+plots/example_plot_fitness.py
+:::
+
 ## `plot_new_solution_rate()`
 
 Number of previously-unseen solutions per generation. A flat curve means the GA is repeating itself; a high curve means it is still exploring. Requires `save_solutions=True`.
@@ -83,6 +91,10 @@ ga_instance.plot_new_solution_rate()
 ```
 
 ![plot_new_solution_rate](figures/plot_new_solution_rate.png)
+
+:::{python-examples}
+plots/example_plot_new_solution_rate.py
+:::
 
 ## `plot_genes()`
 
@@ -97,6 +109,10 @@ ga_instance.plot_genes(graph_type="boxplot")
 ```
 
 ![plot_genes](figures/plot_genes.png)
+
+:::{python-examples}
+plots/example_plot_genes.py
+:::
 
 ## `plot_pareto_front_curve()`
 
@@ -116,6 +132,11 @@ For M=3 (NSGA-III on DTLZ2):
 
 ![plot_pareto_front_curve_3d](figures/plot_pareto_front_curve_3d.png)
 
+:::{python-examples}
+plots/example_plot_pareto_front_curve_2d.py
+plots/example_plot_pareto_front_curve_3d.py
+:::
+
 ## `plot_pareto_front_pcp()`
 
 Parallel-coordinates view of the final non-dominated set. Each objective is a vertical axis. Each non-dominated solution becomes a polyline that crosses every axis. Values are normalized per objective so very different scales remain comparable. Useful for any M >= 2 and especially for M >= 4.
@@ -127,6 +148,10 @@ ga_instance.plot_pareto_front_pcp()
 ```
 
 ![plot_pareto_front_pcp](figures/plot_pareto_front_pcp.png)
+
+:::{python-examples}
+plots/example_plot_pareto_front_pcp.py
+:::
 
 ## `plot_pareto_front_scatter_matrix()`
 
@@ -140,6 +165,10 @@ ga_instance.plot_pareto_front_scatter_matrix()
 
 ![plot_pareto_front_scatter_matrix](figures/plot_pareto_front_scatter_matrix.png)
 
+:::{python-examples}
+plots/example_plot_pareto_front_scatter_matrix.py
+:::
+
 ## `plot_pareto_front_heatmap()`
 
 Heatmap of the final non-dominated set. Rows are solutions, columns are objectives, color is the raw objective value. Rows are sorted by objective `sort_by` (default `0`); pass `sort_by=None` to keep the original order.
@@ -151,6 +180,10 @@ ga_instance.plot_pareto_front_heatmap(sort_by=0)
 ```
 
 ![plot_pareto_front_heatmap](figures/plot_pareto_front_heatmap.png)
+
+:::{python-examples}
+plots/example_plot_pareto_front_heatmap.py
+:::
 
 ## `plot_fitness_band()`
 
@@ -164,6 +197,10 @@ ga_instance.plot_fitness_band()
 
 ![plot_fitness_band](figures/plot_fitness_band.png)
 
+:::{python-examples}
+plots/example_plot_fitness_band.py
+:::
+
 ## `plot_non_dominated_hypervolume()`
 
 Hypervolume of the non-dominated set per generation. Uses `pygad.utils.quality_indicators.hypervolume`. Pass `reference_point` explicitly, or let the method pick the column-wise min across all saved generations minus `0.1`. Requires `save_solutions=True`.
@@ -175,6 +212,10 @@ ga_instance.plot_non_dominated_hypervolume()
 ```
 
 ![plot_non_dominated_hypervolume](figures/plot_non_dominated_hypervolume.png)
+
+:::{python-examples}
+plots/example_plot_non_dominated_hypervolume.py
+:::
 
 ## `plot_population_diversity()`
 
@@ -188,6 +229,10 @@ ga_instance.plot_population_diversity()
 
 ![plot_population_diversity](figures/plot_population_diversity.png)
 
+:::{python-examples}
+plots/example_plot_population_diversity.py
+:::
+
 ## `plot_pareto_front_evolution()`
 
 Overlays the non-dominated set every `every_k` generations on a single figure. The colormap goes from early to late so you can see the front converge. Works for 2 or 3 objectives. Requires `save_solutions=True`.
@@ -199,3 +244,7 @@ ga_instance.plot_pareto_front_evolution(every_k=20)
 ```
 
 ![plot_pareto_front_evolution](figures/plot_pareto_front_evolution.png)
+
+:::{python-examples}
+plots/example_plot_pareto_front_evolution.py
+:::

@@ -163,3 +163,7 @@ Index of the best solution : 0
 Crossentropy :  0.7686678
 Accuracy :  0.975
 ```
+
+:::{python-examples}
+TorchGA/image_classification_CNN.py
+:::

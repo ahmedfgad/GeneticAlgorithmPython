@@ -338,3 +338,7 @@ ga_instance = pygad.GA(num_generations=10,
 ga_instance.run()
 ga_instance.plot_fitness()
 ```
+
+:::{python-examples}
+example_custom_operators.py
+:::

@@ -512,3 +512,7 @@ print(f"Number of correct classifications : {num_correct}.")
 print(f"Number of wrong classifications : {num_wrong.size}.")
 print(f"Classification accuracy : {accuracy}.")
 ```
+
+:::{python-examples}
+cnn/example_image_classification.py
+:::

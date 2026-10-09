@@ -19,9 +19,14 @@ When `save_solutions=True`, `solutions_generations` contains one generation numb
 
 `on_fitness(ga_instance, population_fitness)` runs before parent selection for each generation. After it returns, PyGAD recomputes the best solution so the saved solution and fitness agree. The final population is saved without an additional `on_fitness` call. Previously saved arrays are independent of later callback edits. Callbacks receive the population fitness after cache reuse, so changes to already cached scores can accumulate if the callback repeatedly adds to them.
 
-Checkpoints preserve the generation numbers and population boundaries. Older checkpoints containing a single-run history recover the generation numbers automatically. Older repeated-run checkpoints did not record run boundaries, so unavailable generation numbers are represented by `None`; `best_solution_generation` is `-1` if the winning snapshot has an unknown generation. New snapshots have their actual generation numbers. Plots use snapshot positions only for those unknown legacy entries. A complete example is available at [`examples/example_repeated_runs.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/example_repeated_runs.py).
+Checkpoints preserve the generation numbers and population boundaries. Older checkpoints containing a single-run history recover the generation numbers automatically. Older repeated-run checkpoints did not record run boundaries, so unavailable generation numbers are represented by `None`; `best_solution_generation` is `-1` if the winning snapshot has an unknown generation. New snapshots have their actual generation numbers. Plots use snapshot positions only for those unknown legacy entries.
 
 (parallel-processing-guide)=
+
+:::{python-examples}
+example_repeated_runs.py
+:::
+
 ## Parallel Processing in PyGAD
 
 Starting from [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0), parallel processing is supported. This section explains how to use parallel processing in PyGAD.
@@ -120,6 +125,12 @@ The repository's `examples/benchmarks/parallel_processing.py` measures complete 
 For Keras, calls to `pygad.kerasga.predict()` sharing one model are synchronized; they preserve each solution's weights but run one at a time. Separate models are needed for concurrent predictions. Direct changes to shared models outside that helper require their own synchronization.
 
 (non-deterministic-fitness)=
+
+:::{python-examples}
+example_parallel_processing.py
+benchmarks/parallel_processing.py
+:::
+
 ## Solve Non-Deterministic Problems
 
 PyGAD can be used to solve both deterministic and non-deterministic problems. Deterministic problems are those that return the same fitness for the same solution. For non-deterministic problems, a different fitness value may be returned for the same solution.
@@ -257,7 +268,11 @@ ga_instance = pygad.GA(num_generations=1,
 ga_instance.run()
 ```
 
-The runnable script is [`examples/example_fitness_batch_size.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_fitness_batch_size.py). The same variable-batch-size contract applies to serial, thread, and process evaluation.
+The same variable-batch-size contract applies to serial, thread, and process evaluation.
+
+:::{python-examples}
+example_fitness_batch_size.py
+:::
 
 ### Example without `fitness_batch_size` Parameter
 
@@ -364,4 +379,4 @@ print(number_of_calls)
 30
 ```
 
-When batch fitness calculation is used, then we saved `120 - 30 = 90` calls to the fitness function. 
+When batch fitness calculation is used, then we saved `120 - 30 = 90` calls to the fitness function.

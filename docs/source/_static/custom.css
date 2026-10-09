@@ -42,13 +42,37 @@ details.sd-dropdown > .sd-summary-title code {
     font-weight: 600;
 }
 
-/* Release-history controls follow the theme in light and dark mode. */
+/* Shared cards connecting documentation topics to complete Python examples. */
+.python-example {
+    border-left: 3px solid var(--color-brand-primary);
+}
+
+.python-example .sd-card-header {
+    background: var(--color-background-secondary);
+    font-weight: 600;
+}
+
+.python-example code {
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.python-example pre code {
+    white-space: pre;
+    overflow-wrap: normal;
+}
+
+.python-example .sd-card-footer {
+    background: var(--color-background-primary);
+}
+
 /* Keep the release-page header compact so the newest notes are in view. */
 #release-history > p > img[alt="PYGAD-LOGO"] {
     max-width: 12rem;
     height: auto;
 }
 
+/* Release-history controls follow the theme in light and dark mode. */
 .release-history-navigation {
     display: flex;
     flex-wrap: wrap;

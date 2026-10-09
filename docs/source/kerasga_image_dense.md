@@ -123,3 +123,7 @@ Index of the best solution : 0
 Categorical Crossentropy :  0.23823906
 Accuracy :  0.9852192
 ```
+
+:::{python-examples}
+KerasGA/image_classification_Dense.py
+:::

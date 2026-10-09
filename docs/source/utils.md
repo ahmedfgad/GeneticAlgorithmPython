@@ -478,7 +478,11 @@ The `pygad.utils.report` module has a class named `Report` that adds the `genera
 pip install pygad[report]
 ```
 
-See [`generate_report()`](https://pygad.readthedocs.io/en/latest/pygad.html#generate-report) and the runnable example at [`examples/example_generate_report.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/example_generate_report.py).
+See [`generate_report()`](https://pygad.readthedocs.io/en/latest/pygad.html#generate-report).
+
+:::{python-examples}
+example_generate_report.py
+:::
 
 ## `pygad.utils.quality_indicators` Submodule
 
@@ -506,7 +510,12 @@ true_front = problem.pareto_front(num_points=100)
 igd = inverted_generational_distance(fitness, true_front)
 ```
 
-A runnable example per indicator lives under `examples/quality_indicators/`.
+:::{python-examples}
+quality_indicators/example_hypervolume.py
+quality_indicators/example_inverted_generational_distance.py
+quality_indicators/example_generational_distance.py
+quality_indicators/example_spacing.py
+:::
 
 ## More about the Operators
 

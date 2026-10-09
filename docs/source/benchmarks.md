@@ -10,7 +10,7 @@ Attributes for setting up the GA (some are class attributes and others are set o
 
 ZDT classes also have a `pareto_front(num_points)` method that returns true-front reference points. Pass these to the IGD or GD indicators as `reference_front`.
 
-A runnable example per benchmark lives under `examples/benchmarks/`.
+Complete scripts are linked beside each benchmark family and listed in the [Examples index](examples.md).
 
 ## Single-Objective Problems
 
@@ -26,6 +26,16 @@ Available in `pygad.benchmarks.classic`:
 | `Ackley` | f(0, ..., 0) = 0 | `(-32.768, 32.768)` |
 | `Himmelblau` | four equal minima at f = 0 (2D only) | `(-5.0, 5.0)` |
 
+:::{python-examples}
+benchmarks/example_classic_sphere.py
+benchmarks/example_classic_rastrigin.py
+benchmarks/example_classic_rosenbrock.py
+benchmarks/example_classic_griewank.py
+benchmarks/example_classic_schwefel.py
+benchmarks/example_classic_ackley.py
+benchmarks/example_classic_himmelblau.py
+:::
+
 ## Multi-Objective Problems (ZDT family)
 
 In `pygad.benchmarks.zdt`. Two objectives, variables in `[0, 1]` (ZDT4 uses `[-5, 5]` for the rest).
@@ -38,6 +48,14 @@ In `pygad.benchmarks.zdt`. Two objectives, variables in `[0, 1]` (ZDT4 uses `[-5
 | `ZDT4` | convex, many local minima in the search space |
 | `ZDT6` | non-uniform |
 
+:::{python-examples}
+benchmarks/example_zdt1.py
+benchmarks/example_zdt2.py
+benchmarks/example_zdt3.py
+benchmarks/example_zdt4.py
+benchmarks/example_zdt6.py
+:::
+
 ## Many-Objective Problems (DTLZ family)
 
 In `pygad.benchmarks.dtlz`. Any number of objectives `M`. Decision variables: `M + k - 1`, where `k` is the distance-variable count.
@@ -48,6 +66,13 @@ In `pygad.benchmarks.dtlz`. Any number of objectives `M`. Decision variables: `M
 | `DTLZ2` | 3 | unit sphere first orthant |
 | `DTLZ3` | 3 | unit sphere with hard multimodal g-function |
 | `DTLZ4` | 3 | unit sphere with strong bias toward one corner |
+
+:::{python-examples}
+benchmarks/example_dtlz1.py
+benchmarks/example_dtlz2.py
+benchmarks/example_dtlz3.py
+benchmarks/example_dtlz4.py
+:::
 
 ## Combinatorial Problems
 
@@ -78,6 +103,10 @@ ga = pygad.GA(
 )
 ga.run()
 ```
+
+:::{python-examples}
+benchmarks/example_knapsack.py
+:::
 
 ### Travelling Salesman Problem
 
@@ -124,6 +153,11 @@ ga = pygad.GA(
 )
 ga.run()
 ```
+
+:::{python-examples}
+benchmarks/example_tsp.py
+example_travelling_salesman.ipynb
+:::
 
 ## Example: SOO
 

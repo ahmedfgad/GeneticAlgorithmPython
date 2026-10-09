@@ -40,6 +40,10 @@ ga_instance.plot_lifecycle(title="PyGAD - My Optimization Problem",
 
 Drawing the chart does not run the GA or call user functions. See {ref}`plot_lifecycle() <plot-lifecycle>` for the parameters, a sample chart, and a runnable example. To print a text description, use {ref}`summary() <print-lifecycle-summary>`.
 
+:::{python-examples}
+plots/example_plot_lifecycle.py
+:::
+
 ## Reporting Progress
 
 Use `on_generation` to report progress once a generation has completed. There is no need to change the fitness function or the GA operators:
@@ -141,4 +145,8 @@ on_generation()
 on_stop()
 ```
 
-The same example is available as [`examples/pygad_lifecycle.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/pygad_lifecycle.py). To stop from `on_generation`, return `"stop"`; otherwise no return value is needed.
+To stop from `on_generation`, return `"stop"`; otherwise no return value is needed.
+
+:::{python-examples}
+pygad_lifecycle.py
+:::

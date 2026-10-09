@@ -16,12 +16,29 @@ master_doc = 'index'
 
 # -- General configuration ---------------------------------------------------
 
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+# Pin example links to the checkout used to build the documentation. This also
+# works for release branches and older documentation versions on Read the Docs.
+try:
+    python_examples_source_revision = subprocess.check_output(
+        ['git', 'rev-parse', 'HEAD'], cwd=Path(__file__).resolve().parent,
+        text=True, stderr=subprocess.DEVNULL).strip()
+except (OSError, subprocess.CalledProcessError):
+    python_examples_source_revision = os.environ.get('READTHEDOCS_GIT_IDENTIFIER', 'master')
+
 # The documentation is written in Markdown and read directly by Sphinx
 # through the MyST parser. There is no Markdown-to-reStructuredText step.
 extensions = [
     'myst_parser',
     'sphinx_design',
     'sphinx_copybutton',
+    'python_examples',
 ]
 
 # Read both Markdown and reStructuredText. Markdown is the source of truth.

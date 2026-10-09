@@ -50,3 +50,8 @@ print(f"Number of correct classifications : {num_correct}.")
 print(f"Number of wrong classifications : {num_wrong.size}.")
 print(f"Classification accuracy : {accuracy}.")
 ```
+
+:::{python-examples}
+nn/example_classification.py
+nn/extract_features.py
+:::

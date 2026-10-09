@@ -151,3 +151,7 @@ print(f"Absolute error : {abs_error}.")
 The next figure shows how the fitness value changes for the generations used.
 
 ![example_regression](images/92948154-3cf24b00-f459-11ea-94ea-952b66ab2145.png)
+
+:::{python-examples}
+gann/example_regression.py
+:::

@@ -54,4 +54,4 @@ Put the image folders here as `Skin_Cancer_Dataset/benign/` and `Skin_Cancer_Dat
 
 ## Travelling salesman notebook
 
-`examples/example_travelling_salesman.ipynb` reads `data/startbucks.csv`. That file is not in the repository and its source was not recorded. Add your own CSV at `examples/data/startbucks.csv` or change the path in the notebook.
+`examples/example_travelling_salesman.ipynb` uses Google Colab and reads `/content/sample_data/startbucks.csv`. That file is not in the repository and its source was not recorded. Supply your own compatible CSV at that path in Colab. To run the notebook locally with Jupyter, adapt its Colab-specific imports and change the CSV path, for example to `examples/data/startbucks.csv` when running from the repository root.

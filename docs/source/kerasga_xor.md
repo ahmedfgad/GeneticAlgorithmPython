@@ -143,3 +143,7 @@ Binary Crossentropy :  0.0013527311
 
 Accuracy :  1.0
 ```
+
+:::{python-examples}
+KerasGA/XOR_classification.py
+:::

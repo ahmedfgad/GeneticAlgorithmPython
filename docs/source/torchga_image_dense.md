@@ -124,3 +124,7 @@ Index of the best solution : 0
 Crossentropy :  0.74366045
 Accuracy :  1.0
 ```
+
+:::{python-examples}
+TorchGA/image_classification_Dense.py
+:::
