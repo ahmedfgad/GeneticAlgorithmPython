@@ -30,6 +30,8 @@ The library is under active development and more features are added regularly. I
 
 # Installation
 
+The current release is [PyGAD 3.8.0](https://github.com/ahmedfgad/GeneticAlgorithmPython/releases/tag/3.8.0), dated October 9, 2026. Read the [release notes](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/3.8.0/docs/source/releases.md#pygad-380) for its new features, fixes, and compatibility changes. PyGAD requires Python 3.8 or newer.
+
 To install [PyGAD](https://pypi.org/project/pygad), use pip to download and install the library from [PyPI](https://pypi.org/project/pygad) (Python Package Index). The library is available on PyPI at this page: https://pypi.org/project/pygad.
 
 Install PyGAD with the following command:
@@ -46,6 +48,9 @@ pip install pygad[visualize]
 
 # Training Keras/PyTorch models (pygad.kerasga, pygad.torchga):
 pip install pygad[deep_learning]
+
+# PDF reports need ReportLab and matplotlib:
+pip install pygad[report]
 ```
 
 To get started with PyGAD, read the documentation at [Read the Docs](https://pygad.readthedocs.io).

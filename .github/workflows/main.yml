@@ -21,6 +21,7 @@ on:
       - 'setup.py'
       - '.github/workflows/main.yml'
       - '.github/workflows/release.yml'
+      - 'tools/release.py'
   # Test relevant pull requests, including fork contributions, against master.
   pull_request:
     branches:
@@ -34,6 +35,7 @@ on:
       - 'setup.py'
       - '.github/workflows/main.yml'
       - '.github/workflows/release.yml'
+      - 'tools/release.py'
   # Allows manual triggering of the workflow from the GitHub Actions tab.
   workflow_dispatch:
   # Release tags run this same matrix before publishing.

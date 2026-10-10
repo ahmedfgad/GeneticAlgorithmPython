@@ -4,7 +4,13 @@ Find complete Python scripts by topic, open their source on GitHub, or download 
 
 ## Running the Examples
 
-For examples from this documentation revision, use the matching repository version of PyGAD. This is especially important for features in the Unreleased notes. Clone or download that repository revision, then install it from the repository root:
+For examples from this documentation revision, use the matching version of PyGAD. The PyGAD 3.8.0 examples can use the published package:
+
+```console
+python -m pip install "pygad[visualize]==3.8.0"
+```
+
+For development examples, including features in the Unreleased notes, clone or download the matching repository revision, then install it from the repository root:
 
 ```console
 python -m pip install -e ".[visualize]"
