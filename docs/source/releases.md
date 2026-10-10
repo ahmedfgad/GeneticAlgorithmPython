@@ -12,6 +12,14 @@ No changes yet.
 
 Release Date: October 9, 2026.
 
+Watch the release video on [YouTube](https://youtu.be/8pdIiMAMLUM).
+
+<!-- sphinx
+```{raw} html
+<iframe width="560" height="315" src="https://www.youtube.com/embed/8pdIiMAMLUM" title="PyGAD 3.8.0 Release" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+```
+-->
+
 1. [Two-point crossover](utils.md#two_points_crossover) selects two distinct random cut points from `0` through `num_genes`, with every pair equally likely. The segment length can vary from one to all genes, and the single-gene case no longer raises a slicing error. See [PR #371](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/371).
 2. [Swap mutation](utils.md#swap_mutation) can select any pair of distinct gene positions, matching its documentation. Single-gene offspring are returned unchanged. See [PR #375](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/375).
 3. [SBX crossover](utils.md#sbx_crossover) selects the lower or upper child with equal probability, removing the bias toward lower gene values. See [PR #376](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/376).

@@ -5,6 +5,24 @@ preparation and validation performed on `github-actions` before its release
 pull request to `master`. The publication date in the release notes is
 October 9, 2026.
 
+## Published release
+
+PyGAD 3.8.0 is published on [PyPI](https://pypi.org/project/pygad/3.8.0/)
+and [GitHub](https://github.com/ahmedfgad/GeneticAlgorithmPython/releases/tag/3.8.0).
+[PR #378](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/378) merged
+`github-actions` into `master`. The release tag points to commit
+`c8752b6a901a078299998f137453f7b650046c94`.
+
+The [publishing workflow](https://github.com/ahmedfgad/GeneticAlgorithmPython/actions/runs/38013833060)
+passed all seven Python jobs, package checks, documentation checks, PyPI
+publication, and GitHub Release creation. Independent downloads confirmed that
+both GitHub package files match PyPI by SHA-256. Fresh installs of the wheel and
+source distribution passed optimization, repeated-history, transparent-chart,
+and PDF-report checks. Another 151 regression tests passed against the published
+wheel. The public `latest` and `stable` documentation builds succeeded.
+
+Watch the [published announcement video on YouTube](https://youtu.be/8pdIiMAMLUM).
+
 ## Version
 
 At the start of this review, the latest public release was **3.7.0**, published
@@ -110,8 +128,9 @@ All four run at 60 fps,
 with H.264 video and 48 kHz AAC stereo audio. Every encoded frame decoded successfully;
 contact sheets from all nine segments were visually checked in all orientations.
 Thumbnails, a Reel cover, chapter timestamps, title captions, draft social posts,
-and machine-readable media validation are included. Social posts remain drafts;
-no videos have been published to social platforms.
+and machine-readable media validation are included. The release video is now
+published on [YouTube](https://youtu.be/8pdIiMAMLUM). The other platform posts
+remain drafts.
 
 The October 9 revisions move section takeaways into larger, high-contrast
 callouts above the output and enlarge the history chart in every orientation.
