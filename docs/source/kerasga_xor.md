@@ -143,3 +143,30 @@ Binary Crossentropy :  0.0013527311
 
 Accuracy :  1.0
 ```
+
+<!-- python-examples
+KerasGA/XOR_classification.py
+-->
+
+**Python example**
+
+**[XOR classification](../../examples/KerasGA/XOR_classification.py)**
+
+Optimize neural-network weights with the genetic algorithm.
+
+`examples/KerasGA/XOR_classification.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, TensorFlow/Keras
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/KerasGA/XOR_classification.py
+```
+
+</details>
+
+<!-- /python-examples -->

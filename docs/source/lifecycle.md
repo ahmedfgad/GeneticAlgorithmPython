@@ -2,24 +2,74 @@
 
 The next figure shows the main steps in the life cycle of a `pygad.GA` instance. The genetic algorithm evaluates its initial population, then repeats parent selection, crossover, mutation, population update, and fitness evaluation for each generation. It can reuse cached fitness values. PyGAD stops when all generations are done, a stopping criterion is met, or the function passed to `on_generation` returns the string `stop`.
 
-:::{figure} images/ga_lifecycle.*
-:alt: The PyGAD genetic algorithm life cycle
-:width: 480px
-:align: center
+<!-- documentation-figure: 480px -->
+
+![The PyGAD genetic algorithm life cycle](images/ga_lifecycle.png)
 
 The main steps of the genetic algorithm in PyGAD.
-:::
+
+<!-- /documentation-figure -->
 
 The next figure shows the same life cycle in more detail, including the callback functions that PyGAD calls at each stage.
 
-:::{figure} images/pygad_lifecycle.*
-:alt: The PyGAD life cycle with callback functions
-:width: 480px
-:align: center
+<!-- documentation-figure: 480px -->
+
+![The PyGAD life cycle with callback functions](images/pygad_lifecycle.png)
 
 The PyGAD life cycle in detail, including the callback functions called at each stage.
-:::
 
+<!-- /documentation-figure -->
+
+## Plotting the Configured Lifecycle
+
+Call `plot_lifecycle()` to create a chart adjusted to the operators, callbacks, gene settings, and stopping conditions of a GA instance. It can be called before or after `run()`.
+
+```python
+ga_instance.plot_lifecycle()
+```
+
+The chart shows the generation loop and exit paths. It includes population replacement and fitness evaluation before `on_generation`, and omits disabled crossover or mutation. Configured callbacks still appear at their execution points, including `on_crossover` and `on_mutation` when their corresponding operators are disabled. The detailed `Stop Early?` block lists the configured stopping criteria and the possible `"stop"` return from `on_generation`, when that callback is supplied.
+
+Use `show_parameters=False` for a compact chart, or save the figure by passing `save_dir`. The filename extension selects the output format.
+
+```python
+ga_instance.plot_lifecycle(title="PyGAD - My Optimization Problem",
+                           save_dir="lifecycle.svg",
+                           show=False)
+```
+
+Drawing the chart does not run the GA or call user functions. See [plot_lifecycle()](visualize.md#plot_lifecycle) for the parameters, a sample chart, and a runnable example. To print a text description, use [summary()](logging.md#print-lifecycle-summary).
+
+<!-- python-examples
+plots/example_plot_lifecycle.py
+-->
+
+**Python example**
+
+**[Configured lifecycle](../../examples/plots/example_plot_lifecycle.py)**
+
+Draw detailed and compact lifecycle charts and export SVG and PNG files.
+
+`examples/plots/example_plot_lifecycle.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/plots/example_plot_lifecycle.py
+```
+
+</details>
+
+<!-- /python-examples -->
+
+<!-- sphinx
+(reporting-progress)=
+-->
 ## Reporting Progress
 
 Use `on_generation` to report progress once a generation has completed. There is no need to change the fitness function or the GA operators:
@@ -121,4 +171,31 @@ on_generation()
 on_stop()
 ```
 
-The same example is available as [`examples/pygad_lifecycle.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/pygad_lifecycle.py). To stop from `on_generation`, return `"stop"`; otherwise no return value is needed.
+To stop from `on_generation`, return `"stop"`; otherwise no return value is needed.
+
+<!-- python-examples
+pygad_lifecycle.py
+-->
+
+**Python example**
+
+**[Lifecycle callbacks](../../examples/pygad_lifecycle.py)**
+
+Trace fitness, parent selection, crossover, mutation, generation, and stop callbacks.
+
+`examples/pygad_lifecycle.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/pygad_lifecycle.py
+```
+
+</details>
+
+<!-- /python-examples -->

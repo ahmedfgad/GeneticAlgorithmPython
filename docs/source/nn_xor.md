@@ -48,3 +48,30 @@ print(f"Number of correct classifications : {num_correct}.")
 print(f"Number of wrong classifications : {num_wrong.size}.")
 print(f"Classification accuracy : {accuracy}.")
 ```
+
+<!-- python-examples
+nn/example_XOR_classification.py
+-->
+
+**Python example**
+
+**[XOR classification](../../examples/nn/example_XOR_classification.py)**
+
+Train a neural network on the four XOR inputs.
+
+`examples/nn/example_XOR_classification.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/nn/example_XOR_classification.py
+```
+
+</details>
+
+<!-- /python-examples -->

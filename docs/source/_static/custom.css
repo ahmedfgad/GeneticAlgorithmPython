@@ -41,3 +41,104 @@ details.sd-dropdown > summary.sd-summary-title code,
 details.sd-dropdown > .sd-summary-title code {
     font-weight: 600;
 }
+
+/* Shared cards connecting documentation topics to complete Python examples. */
+.python-example {
+    border-left: 3px solid var(--color-brand-primary);
+}
+
+.python-example .sd-card-header {
+    background: var(--color-background-secondary);
+    font-weight: 600;
+}
+
+.python-example code {
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.python-example pre code {
+    white-space: pre;
+    overflow-wrap: normal;
+}
+
+.python-example .sd-card-footer {
+    background: var(--color-background-primary);
+}
+
+/* Keep the release-page header compact so the newest notes are in view. */
+#release-history > p > img[alt="PYGAD-LOGO"] {
+    max-width: 12rem;
+    height: auto;
+}
+
+/* Release-history controls follow the theme in light and dark mode. */
+.release-history-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+}
+
+.release-history-navigation select {
+    max-width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--color-brand-primary);
+    border-radius: 0.35rem;
+    background: var(--color-background-primary);
+    color: var(--color-foreground-primary);
+    font: inherit;
+}
+
+.release-history-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 2rem 0;
+}
+
+.release-history-controls p {
+    flex-basis: 100%;
+    margin: 0;
+    color: var(--color-foreground-secondary);
+}
+
+.release-history-controls button {
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--color-brand-primary);
+    border-radius: 0.35rem;
+    background: var(--color-background-primary);
+    color: var(--color-brand-content);
+    font: inherit;
+    cursor: pointer;
+}
+
+.release-history-controls button:hover {
+    background: var(--color-background-secondary);
+}
+
+.release-history-controls button:focus-visible,
+.release-history-navigation select:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 3px;
+}
+
+/* Some theme display rules otherwise override the native hidden attribute. */
+#release-history > section[hidden],
+.toc-tree li[hidden],
+.release-history-controls button[hidden] {
+    display: none;
+}
+
+/* Printed and exported notes always include the complete release history. */
+@media print {
+    #release-history > section[hidden] {
+        display: block;
+    }
+
+    .release-history-controls,
+    .release-history-navigation {
+        display: none;
+    }
+}

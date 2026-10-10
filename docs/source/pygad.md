@@ -8,50 +8,62 @@ With the `pygad` module, you can create, run, save, and load instances of the ge
 
 The `pygad` module has a class named `GA` for building the genetic algorithm. This section explains the class constructor, its methods, functions, and attributes.
 
+<!-- sphinx
+(ga-constructor)=
+-->
 ### `__init__()`
 
 To create an instance of the `pygad.GA` class, the constructor accepts several parameters. These let you adjust the genetic algorithm for different types of applications.
+
+The constructor validates settings before generating a population or calling gene constraints. Counts accept Python and NumPy integers, excluding Boolean values; ranges, probabilities, and distribution indices must be finite. Mutable settings such as gene spaces, per-gene ranges, and adaptive mutation rates are copied, so changing the original containers does not change the GA configuration.
 
 The `pygad.GA` class constructor supports the parameters below, grouped by purpose. Click a parameter to expand its full description.
 
 #### Population and Generations
 
-:::{dropdown} `num_generations`: Number of generations to run.
-:animate: fade-in-slide-down
+<details>
+<summary><code>num_generations</code>: Number of generations to run.</summary>
 
-Number of generations.
-:::
+Number of generations per `run()` call. Must be a non-negative integer; `0` evaluates the initial population without evolving it.
 
-:::{dropdown} `num_parents_mating`: How many solutions are selected as parents.
-:animate: fade-in-slide-down
+</details>
 
-Number of solutions to be selected as parents.
-:::
+<details>
+<summary><code>num_parents_mating</code>: How many solutions are selected as parents.</summary>
 
-:::{dropdown} `sol_per_pop`: Number of solutions in the population.
-:animate: fade-in-slide-down
+Number of solutions to be selected as parents. Must be an integer between `1` and `sol_per_pop`, inclusive.
+
+</details>
+
+<details>
+<summary><code>sol_per_pop</code>: Number of solutions in the population.</summary>
 
 Number of solutions (i.e. chromosomes) within the population. This parameter has no action if `initial_population` parameter exists.
-:::
 
-:::{dropdown} `num_genes`: Number of genes in each solution.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>num_genes</code>: Number of genes in each solution.</summary>
 
 Number of genes in the solution/chromosome. This parameter is not needed if the user feeds the initial population to the `initial_population` parameter.
-:::
 
-:::{dropdown} `initial_population`: Start from your own population.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>initial_population</code>: Start from your own population.</summary>
 
 A population you provide yourself to start the run instead of a random one. It defaults to `None`, in which case PyGAD builds the initial population from the `sol_per_pop` and `num_genes` parameters.
+
+Pass a non-empty rectangular 2D list, tuple, or NumPy array of numeric values. PyGAD infers both dimensions from its shape, overriding any explicit `sol_per_pop` and `num_genes` values. It copies and converts the values using `gene_type`, applies `gene_constraint`, and repairs duplicates when `allow_duplicate_genes=False`. Supplied values may lie outside the gene space or initialization ranges; replacements follow the initialization settings. See [Creating the Initial Population](https://pygad.readthedocs.io/en/latest/gene_values.html#creating-the-initial-population).
 
 If `initial_population` is `None` and either `sol_per_pop` or `num_genes` is also `None`, an exception is raised.
 
 Introduced in [PyGAD 2.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-0-0) and higher.
-:::
 
-:::{dropdown} `stop_criteria=None`: Stop early when a condition is met.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>stop_criteria=None</code>: Stop early when a condition is met.</summary>
 
 One or more conditions that stop the evolution early. Each criterion is a string made of a stop word and a number, like `"reach_40"`.
 
@@ -62,15 +74,20 @@ Four stop words are supported:
 - `time`: stop when the time spent inside `run()` is at least the given number of seconds. Example: `"time_30"` stops the run after 30 seconds.
 - `evaluations`: stop when the number of solutions whose fitness was evaluated inside `run()` reaches the given count. Example: `"evaluations_1000"` stops after at least 1000 solution evaluations. A batch counts once per solution, and adaptive mutation's offspring evaluations are included. Cached fitness values do not count. The criterion is checked at generation boundaries, so the count can exceed the threshold.
 
-You can also pass a list of criteria; the run stops as soon as any one of them is met.
+You can also pass a list, tuple, or 1D NumPy array of criteria; the run stops as soon as any one of them is met. Duplicate criteria are removed while preserving their order.
+
+The counts for `saturate` and `evaluations` must be positive integers. Fractional counts are rejected. The threshold for `reach` must be finite, and the duration for `time` must be finite and non-negative; `time_0` stops at the first stopping check. Scientific notation is accepted, for example `evaluations_1e3` or `time_1e-2`. For multi-objective problems, `reach_10_20` requires both objective thresholds to be met; a single threshold applies to every objective.
+
+`saturate_N` counts consecutive completed generations whose best fitness equals the preceding population's best fitness, including the initial population as the baseline. `saturate_1` stops after one unchanged generation. Any change resets the count, so matching endpoints with changes in between do not count as saturation. Multi-objective problems compare the whole best-fitness vector. Each `run()` starts a new saturation count while `generations_completed` continues increasing across runs.
 
 Added in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0). The `time` and `evaluations` keywords were added in PyGAD 3.6.0.
-:::
+
+</details>
 
 #### Fitness Function
 
-:::{dropdown} `fitness_func`: Function that scores each solution.
-:animate: fade-in-slide-down
+<details>
+<summary><code>fitness_func</code>: Function that scores each solution.</summary>
 
 The function, bound method, or callable instance that calculates the fitness of a solution. This is the one parameter you almost always need to set.
 
@@ -82,15 +99,16 @@ A fitness **function** must accept 3 parameters:
 
 If you pass a **method**, it takes a fourth parameter for the method's class instance.
 
-A callable instance's `__call__(self, ga_instance, solution, solution_idx)` uses the same three fitness arguments after `self`. Process evaluation transports the callable and current GA state with cloudpickle; custom attributes and resources must be serializable. Thread evaluation shares the GA instance, so changes to shared state need synchronization.
+A callable instance's `__call__(self, ga_instance, solution, solution_idx)` uses the same three fitness arguments after `self`. Functions, bound methods, callable instances, and `functools.partial` are supported when their signatures accept PyGAD's positional arguments. Additional optional parameters are allowed. Required keyword-only parameters and asynchronous callables are rejected during construction. Process evaluation transports the callable and current GA state with cloudpickle; custom attributes and resources must be serializable. Thread evaluation shares the GA instance, so changes to shared state need synchronization.
 
 Return a single number for a single-objective problem, or a `list`, `tuple`, or `numpy.ndarray` for a multi-objective problem (supported since [PyGAD 3.2.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-2-0)).
 
 See [Preparing the fitness_func Parameter](https://pygad.readthedocs.io/en/latest/steps_to_use.html#preparing-the-fitness-func-parameter) for how to build one.
-:::
 
-:::{dropdown} `fitness_batch_size=None`: Score the solutions in batches.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>fitness_batch_size=None</code>: Score the solutions in batches.</summary>
 
 Calculates the fitness in batches instead of one solution at a time.
 
@@ -100,30 +118,36 @@ Calculates the fitness in batches instead of one solution at a time.
 In batch mode, the second fitness argument is a two-dimensional array of solutions and the third is a list of their population indices. Adaptive mutation passes `None` as the third argument instead. Return a `list`, `tuple`, or NumPy array with one fitness value per solution (a scalar for each single-objective solution, or an objective vector for each multi-objective solution). Cached rows are skipped, so batches can contain non-contiguous indices and the final batch can be smaller than the configured size.
 
 See [Batch Fitness Calculation](https://pygad.readthedocs.io/en/latest/fitness_calculation.html#batch-fitness-calculation) for details and examples. Added in [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0).
-:::
+
+</details>
 
 #### Genes: Values and Types
 
-:::{dropdown} `gene_type=float`: Data type (and precision) of the genes.
-:animate: fade-in-slide-down
+<details>
+<summary><code>gene_type=float</code>: Data type (and precision) of the genes.</summary>
 
 Sets the data type (and optional precision) of the genes. It defaults to `float`, so every gene is a `float`.
 
 You can set it to:
 
-- **One type for all genes:** a numeric type such as `int`, `float`, or any `numpy.int/uint/float(8-64)` type. Example: `gene_type=int`.
+- **One type for all genes:** `int`, `float`, NumPy signed or unsigned integer types with widths of 8, 16, 32, or 64 bits, or `numpy.float16`, `numpy.float32`, or `numpy.float64`. Example: `gene_type=int`.
 - **A type per gene:** a `list`, `tuple`, or `numpy.ndarray` with one type per gene. Example: `gene_type=[int, float, numpy.int8]`.
 - **A float precision:** pair a `float` type with the number of decimal places. Example: `gene_type=[float, 2]`.
+
+Integer conversion truncates towards zero. Floating-point values are rounded before casting, using nearest-even rounding at halfway points. Precision can be `None` to leave values unrounded, or an integer including `0` and negative values. For example, `[float, -1]` rounds to tens. Integer types may only be paired with `None`.
+
+The same rules apply to initialization, mutation, custom operators, and the outputs of `on_parents`, `on_crossover`, and `on_mutation`, independently of `allow_duplicate_genes`. Per-gene type specifications and saved best solutions preserve mixed scalar types using object arrays. See [Conversion and Rounding Rules](https://pygad.readthedocs.io/en/latest/gene_values.html#conversion-and-rounding-rules).
 
 Version history:
 
 - [PyGAD 2.9.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-9-0): a single numeric type can be used.
 - [PyGAD 2.14.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-14-0): a type per gene can be used.
 - [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0): a precision can be set for `float` types.
-:::
 
-:::{dropdown} `gene_space=None`: Allowed values or range for each gene.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>gene_space=None</code>: Allowed values or range for each gene.</summary>
 
 Sets the allowed values for each gene, so you can limit the search space to a range or to a set of discrete values.
 
@@ -140,50 +164,58 @@ Version history:
 - [PyGAD 2.9.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-9-0): NumPy arrays can be used.
 - [PyGAD 2.11.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-11-0): a dictionary can set the low and high limits.
 - [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0): the `"step"` key was added.
-:::
 
-:::{dropdown} `gene_constraint=None`: Functions that restrict gene values.
-:animate: fade-in-slide-down
+</details>
 
-A list of callables (functions), one per gene, that restrict the values a gene can take. Before a value is chosen for a gene, its callable checks that the candidate value is valid.
+<details>
+<summary><code>gene_constraint=None</code>: Functions that restrict gene values.</summary>
+
+A list of callables (functions), one per gene, that restrict the values a gene can take. Before a value is chosen for a gene, its callable checks that the candidate value is valid. A list or tuple must contain exactly one callable or `None` per gene. Each callable must accept the solution and candidate values as 2 positional arguments; bound methods, callable instances, and partial functions are supported.
 
 Added in [PyGAD 3.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0). See the [Gene Constraint](https://pygad.readthedocs.io/en/latest/gene_values.html#gene-constraint) section for more information.
-:::
 
-:::{dropdown} `init_range_low=-4`: Lower bound for the initial gene values.
-:animate: fade-in-slide-down
+</details>
 
-The lower value of the random range from which the gene values in the initial population are selected. `init_range_low` defaults to `-4`. Available in [PyGAD 1.0.20](https://pygad.readthedocs.io/en/latest/releases.html#pygad-1-0-20) and higher. This parameter has no action if the `initial_population` parameter exists.
-:::
+<details>
+<summary><code>init_range_low=-4</code>: Lower bound for the initial gene values.</summary>
 
-:::{dropdown} `init_range_high=4`: Upper bound for the initial gene values.
-:animate: fade-in-slide-down
+The lower value of the random range from which the gene values in the initial population are selected. `init_range_low` defaults to `-4`. Available in [PyGAD 1.0.20](https://pygad.readthedocs.io/en/latest/releases.html#pygad-1-0-20) and higher. Supplied values are preserved, but this bound is used when replacing a value to satisfy a constraint or repair duplicates. Generated range values stay within their bounds after conversion and rounding. See [Creating the Initial Population](https://pygad.readthedocs.io/en/latest/gene_values.html#creating-the-initial-population).
 
-The upper value of the random range from which the gene values in the initial population are selected. `init_range_high` defaults to `+4`. Available in [PyGAD 1.0.20](https://pygad.readthedocs.io/en/latest/releases.html#pygad-1-0-20) and higher. This parameter has no action if the `initial_population` parameter exists.
-:::
+</details>
 
-:::{dropdown} `allow_duplicate_genes=True`: Allow repeated values within a solution.
-:animate: fade-in-slide-down
+<details>
+<summary><code>init_range_high=4</code>: Upper bound for the initial gene values.</summary>
 
-Added in [PyGAD 2.13.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-13-0). If `True`, then a solution/chromosome may have duplicate gene values. If `False`, then each gene will have a unique value in its solution.
+The upper value of the random range from which the gene values in the initial population are selected. `init_range_high` defaults to `+4`. Available in [PyGAD 1.0.20](https://pygad.readthedocs.io/en/latest/releases.html#pygad-1-0-20) and higher. Supplied values are preserved, but this bound is used when replacing a value to satisfy a constraint or repair duplicates. Generated range values stay within their bounds after conversion and rounding. See [Creating the Initial Population](https://pygad.readthedocs.io/en/latest/gene_values.html#creating-the-initial-population).
 
-For permutation encodings where every value in `gene_space` is already used, random and adaptive mutation try a compatible swap instead of keeping the selected gene unchanged. The fallback preserves destination gene types, numeric values, gene spaces, uniqueness, and constraints. Each gene can participate in at most one fallback swap per mutation pass. If no compatible partner exists, the gene stays unchanged. See {ref}`Mutation Methods <mutation-methods>`.
-:::
+</details>
 
-:::{dropdown} `sample_size=100`: Sample size used when searching for a valid value.
-:animate: fade-in-slide-down
+<details>
+<summary><code>allow_duplicate_genes=True</code>: Allow repeated values within a solution.</summary>
+
+Added in [PyGAD 2.13.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-13-0). If `True`, then a solution/chromosome may have duplicate gene values. If `False`, PyGAD tries to give each gene a different numeric value after conversion and rounding. Repair can follow chains of replacements using each destination gene's space, range, type, precision, and constraint. If no usable alternative is found, duplicates remain with a warning unless warnings are suppressed. See [Prevent Duplicates in Gene Values](https://pygad.readthedocs.io/en/latest/gene_values.html#prevent-duplicates-in-gene-values).
+
+For permutation encodings where every value in `gene_space` is already used, random and adaptive mutation try a compatible swap instead of keeping the selected gene unchanged. The fallback preserves destination gene types, numeric values, gene spaces, uniqueness, and constraints. Each gene can participate in at most one fallback swap per mutation pass. If no compatible partner exists, the gene stays unchanged. See [Mutation Methods](utils.md#mutation-methods).
+
+</details>
+
+<details>
+<summary><code>sample_size=100</code>: Sample size used when searching for a valid value.</summary>
 
 The size of the sample of candidate values PyGAD draws when it needs to pick a gene value. It defaults to `100`.
 
 It is useful when `allow_duplicate_genes=False` or `gene_constraint` is used. If PyGAD cannot find a unique value or a value that meets a constraint, increase this parameter.
 
+Duplicate repair considers finite spaces in full. For constraints depending on other genes, an additional search checks up to `sample_size * num_genes` tentative assignments when replacement chains do not satisfy all constraints.
+
 Added in [PyGAD 3.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-5-0). See the [sample_size Parameter](https://pygad.readthedocs.io/en/latest/gene_values.html#sample-size-parameter) section for more information.
-:::
+
+</details>
 
 #### Parent Selection
 
-:::{dropdown} `parent_selection_type="sss"`: How the parents are selected.
-:animate: fade-in-slide-down
+<details>
+<summary><code>parent_selection_type="sss"</code>: How the parents are selected.</summary>
 
 How the parents are selected. It defaults to `"sss"`.
 
@@ -201,26 +233,29 @@ The built-in types are:
 - `tournament_nsga3`: Tournament selection that ranks competitors with NSGA-III niche count instead of crowding distance. Requires the `nsga3_num_divisions` parameter.
 
 You can also pass your own parent selection function (since [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0)). See [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/user_defined_operators.html#user-defined-crossover-mutation-and-parent-selection-operators).
-:::
 
-:::{dropdown} `K_tournament=3`: Contestants per tournament selection.
-:animate: fade-in-slide-down
+</details>
 
-In case that the parent selection type is `tournament`, the `K_tournament` specifies the number of parents participating in the tournament selection. It defaults to `3`.
-:::
+<details>
+<summary><code>K_tournament=3</code>: Contestants per tournament selection.</summary>
 
-:::{dropdown} `nsga3_num_divisions=None`: Number of divisions per objective axis for NSGA-III.
-:animate: fade-in-slide-down
+For `tournament`, `tournament_nsga2`, and `tournament_nsga3`, this is the number of contestants per tournament. It must be a positive integer and defaults to `3`. Values larger than `sol_per_pop` are clipped to the population size with a warning unless warnings are suppressed. Other selection types do not use this parameter.
+
+</details>
+
+<details>
+<summary><code>nsga3_num_divisions=None</code>: Number of divisions per objective axis for NSGA-III.</summary>
 
 Only used when `parent_selection_type` is `'nsga3'` or `'tournament_nsga3'`. It is the number of divisions per objective axis used to build the structured reference points (the `p` parameter from Deb & Jain 2014). The total number of reference points is `C(M + p - 1, p)` where `M` is the number of objectives. Must be a positive integer. Defaults to `None`.
 
 If `sol_per_pop` is smaller than the resulting number of reference points, PyGAD raises a warning and grows the population to match before the generational loop starts.
-:::
+
+</details>
 
 #### Keeping Solutions
 
-:::{dropdown} `keep_elitism=1`: Keep the best solutions each generation.
-:animate: fade-in-slide-down
+<details>
+<summary><code>keep_elitism=1</code>: Keep the best solutions each generation.</summary>
 
 The number of best solutions (the elitism) to keep in the next generation. It defaults to `1`, so only the best solution is kept.
 
@@ -230,10 +265,11 @@ The number of best solutions (the elitism) to keep in the next generation. It de
 If this parameter is not `0`, then `keep_parents` has no effect.
 
 Added in [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0). To see how `keep_elitism` and `keep_parents` work together, see [How the Number of Offspring Is Decided](https://pygad.readthedocs.io/en/latest/generations.html#how-the-number-of-offspring-is-decided).
-:::
 
-:::{dropdown} `keep_parents=-1`: Keep the parents in the next generation.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>keep_parents=-1</code>: Keep the parents in the next generation.</summary>
 
 The number of parents to keep in the next population. It defaults to `-1`.
 
@@ -241,17 +277,18 @@ The number of parents to keep in the next population. It defaults to `-1`.
 - `0`: keep no parents.
 - A positive integer: keep that many parents.
 
-The value cannot be less than `-1` or greater than `sol_per_pop`.
+The value must be an integer from `-1` through `num_parents_mating`. Passing `None` uses the default of keeping all parents.
 
 This parameter has an effect only when `keep_elitism=0` (since [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0)). Since PyGAD 2.20.0, the parents' fitness from the last generation is not re-used if `keep_parents=0`.
 
 To see how `keep_parents` and `keep_elitism` work together, see [How the Number of Offspring Is Decided](https://pygad.readthedocs.io/en/latest/generations.html#how-the-number-of-offspring-is-decided).
-:::
+
+</details>
 
 #### Crossover
 
-:::{dropdown} `crossover_type="single_point"`: How parents are combined into offspring.
-:animate: fade-in-slide-down
+<details>
+<summary><code>crossover_type="single_point"</code>: How parents are combined into offspring.</summary>
 
 The type of crossover. It defaults to `"single_point"`.
 
@@ -266,30 +303,36 @@ The built-in types are:
 You can also pass your own crossover function (since [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0)). See [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/user_defined_operators.html#user-defined-crossover-mutation-and-parent-selection-operators).
 
 If `crossover_type=None`, the crossover step is skipped and no offspring are created, so the next generation reuses the current population (since [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2)).
-:::
 
-:::{dropdown} `sbx_crossover_eta=30`: Distribution index for SBX crossover.
-:animate: fade-in-slide-down
+</details>
 
-Only used when `crossover_type` is `'sbx'`. Sets how close the children stay to the parents. A higher value means children stay closer. Must be a positive number. Defaults to `30`.
+<details>
+<summary><code>sbx_crossover_eta=30</code>: Distribution index for SBX crossover.</summary>
 
-Each crossed gene selects the lower or upper SBX child with equal probability. This avoids consistently moving genes below their parents' midpoint. The bounds are taken from `init_range_low` and `init_range_high`.
-:::
+Only used when `crossover_type` is `'sbx'`. Sets how close the children stay to the parents. A higher value means children stay closer. Must be a finite positive number. Defaults to `30`.
 
-:::{dropdown} `crossover_probability=None`: Chance a parent is used for crossover.
-:animate: fade-in-slide-down
+Each crossed gene selects the lower or upper SBX child with equal probability. This avoids consistently moving genes below their parents' midpoint. The bounds come from each gene's `gene_space`, falling back to its initialization range for a `None` space. Reversed initialization bounds are sorted for calculation. Supplied parent values outside these bounds are clipped before the SBX calculation. Results apply the destination type, precision, space, constraints, and duplicate policy; an invalid proposed child falls back to its parent.
+
+</details>
+
+<details>
+<summary><code>crossover_probability=None</code>: Chance a parent is used for crossover.</summary>
 
 The probability of selecting a parent for crossover. Its value must be between 0.0 and 1.0.
 
-For each parent, a random value between 0.0 and 1.0 is generated. If that value is less than or equal to `crossover_probability`, the parent is selected.
+For each parent, a random value between 0.0 and 1.0 is generated. If that value is less than `crossover_probability`, the parent is selected. Setting `0` copies parents without crossing them.
 
 Added in [PyGAD 2.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-5-0) and higher.
-:::
 
+</details>
+
+<!-- sphinx
+(mutation-controls)=
+-->
 #### Mutation
 
-:::{dropdown} `mutation_type="random"`: How offspring genes are mutated.
-:animate: fade-in-slide-down
+<details>
+<summary><code>mutation_type="random"</code>: How offspring genes are mutated.</summary>
 
 The type of mutation. It defaults to `"random"`.
 
@@ -304,74 +347,86 @@ The built-in types are:
 
 You can also pass your own mutation function (since [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0)). See [User-Defined Crossover, Mutation, and Parent Selection Operators](https://pygad.readthedocs.io/en/latest/user_defined_operators.html#user-defined-crossover-mutation-and-parent-selection-operators).
 
+Permutation mutations (`swap`, `inversion`, and `scramble`) check the complete proposed solution against destination gene spaces, types, constraints, and the duplicate policy. An incompatible permutation is retried; if no acceptable proposal is found, the solution is retained. With no explicit mutation probability, count, or percentage, swap selects one pair and inversion/scramble use their usual half-length segment. When a control is explicitly supplied, it selects the eligible positions: swap exchanges pairs, inversion reverses the selected values, and scramble shuffles them. Fewer than 2 eligible positions leave the solution unchanged; an odd number in swap leaves one eligible position unpaired.
+
 If `mutation_type=None`, the mutation step is skipped and the offspring are used unchanged (since [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2)).
-:::
 
-:::{dropdown} `polynomial_mutation_eta=20`: Distribution index for polynomial mutation.
-:animate: fade-in-slide-down
+</details>
 
-Only used when `mutation_type` is `'polynomial'`. Sets the size of the change. A higher value means a smaller change. Must be a positive number. Defaults to `20`.
-:::
+<details>
+<summary><code>polynomial_mutation_eta=20</code>: Distribution index for polynomial mutation.</summary>
 
-:::{dropdown} `mutation_probability=None`: Per-gene chance of mutation.
-:animate: fade-in-slide-down
+Only used when `mutation_type` is `'polynomial'`. Sets the size of the change. A higher value means a smaller change. Must be a finite positive number. Defaults to `20`.
+
+Polynomial mutation uses the gene-space bounds, falling back to the initialization range for a `None` space. It supports probabilities, explicit counts, and percentages. When none is explicitly supplied, its default per-gene probability is `1 / num_genes`. It clips supplied values before calculation, converts and rounds the results, and checks spaces, constraints, and duplicates before accepting the complete solution.
+
+</details>
+
+<details>
+<summary><code>mutation_probability=None</code>: Per-gene chance of mutation.</summary>
 
 The probability of selecting a gene for mutation. Its value must be between 0.0 and 1.0.
 
-For each gene, a random value between 0.0 and 1.0 is generated. If that value is less than or equal to `mutation_probability`, the gene is mutated.
+For each gene, a random value between 0.0 and 1.0 is generated. If that value is less than `mutation_probability`, the gene is selected. Setting `0` leaves the offspring unchanged, including permutation and polynomial mutation; `1` selects every gene. Adaptive mutation takes 2 probabilities, for below-average and above-average solutions, respectively.
 
-If this parameter is set, you do not need `mutation_percent_genes` or `mutation_num_genes`. Added in [PyGAD 2.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-5-0) and higher.
-:::
+Only the active mutation control is validated: `mutation_probability` takes precedence over `mutation_num_genes`, which takes precedence over `mutation_percent_genes`. Values for inactive controls are ignored. Built-in operators apply these controls; custom mutation functions implement their own selection rules. Added in [PyGAD 2.5.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-5-0) and higher.
 
-:::{dropdown} `mutation_by_replacement=False`: Replace the gene value instead of adding to it.
-:animate: fade-in-slide-down
+</details>
 
-A bool that controls how `random` mutation changes a gene. It works only when `mutation_type="random"`.
+<details>
+<summary><code>mutation_by_replacement=False</code>: Replace the gene value instead of adding to it.</summary>
+
+A bool that controls how `random` and `adaptive` mutation change a gene when drawing random values. Finite gene spaces select replacement values directly.
 
 - `True`: replace the gene with the randomly generated value.
 - `False` (default): add the random value to the gene.
 
 Supported in [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) and higher. See the [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) release notes for an example.
-:::
 
-:::{dropdown} `mutation_percent_genes="default"`: Percentage of genes to mutate.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>mutation_percent_genes="default"</code>: Percentage of genes to mutate.</summary>
 
 The percentage of genes to mutate. It defaults to the string `"default"`, which becomes `10` (10% of the genes). The value must be `> 0` and `<= 100`.
 
-PyGAD uses this percentage to compute `mutation_num_genes`.
+PyGAD computes `mutation_num_genes` by multiplying the percentage by `num_genes` and discarding the fractional part. If this gives `0`, it selects `1` gene and warns unless warnings are suppressed. Adaptive mutation requires 2 percentages, for below-average and above-average solutions, respectively.
 
 This parameter has no effect if `mutation_probability` or `mutation_num_genes` is set, or if `mutation_type` is `None` (since [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2)).
-:::
 
-:::{dropdown} `mutation_num_genes=None`: Number of genes to mutate.
-:animate: fade-in-slide-down
+</details>
 
-The number of genes to mutate. It defaults to `None`, meaning no number is set.
+<details>
+<summary><code>mutation_num_genes=None</code>: Number of genes to mutate.</summary>
+
+The number of genes eligible for mutation. It defaults to `None`, meaning no number is set. When active, it must be an integer between `1` and `num_genes`, inclusive. Adaptive mutation requires 2 counts, for below-average and above-average solutions, respectively. Permutation operators may leave selected positions unchanged when a compatible rearrangement is unavailable.
 
 This parameter has no effect if `mutation_probability` is set, or if `mutation_type` is `None` (since [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2)).
-:::
 
-:::{dropdown} `random_mutation_min_val=-1.0`: Lower bound of the random mutation value.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>random_mutation_min_val=-1.0</code>: Lower bound of the random mutation value.</summary>
 
 For `random` mutation, the start of the range from which a random value is drawn and added to the gene. It defaults to `-1`.
 
 This parameter has no effect if `mutation_type` is `None` (since [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2)).
-:::
 
-:::{dropdown} `random_mutation_max_val=1.0`: Upper bound of the random mutation value.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>random_mutation_max_val=1.0</code>: Upper bound of the random mutation value.</summary>
 
 For `random` mutation, the end of the range from which a random value is drawn and added to the gene. It defaults to `+1`.
 
 This parameter has no effect if `mutation_type` is `None` (since [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2)).
-:::
+
+</details>
 
 #### Lifecycle Callbacks
 
-:::{dropdown} `on_start=None`: Called once before the run starts.
-:animate: fade-in-slide-down
+<details>
+<summary><code>on_start=None</code>: Called once before the run starts.</summary>
 
 A function (or method) called once before the run starts.
 
@@ -379,21 +434,23 @@ A function (or method) called once before the run starts.
 - As a **method**, it takes a second parameter for the method's object.
 
 Added in [PyGAD 2.6.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-6-0).
-:::
 
-:::{dropdown} `on_fitness=None`: Called after the fitness is calculated.
-:animate: fade-in-slide-down
+</details>
 
-A function (or method) called after the fitness of all solutions is calculated.
+<details>
+<summary><code>on_fitness=None</code>: Called after the fitness is calculated.</summary>
 
-- As a **function**, it takes 2 parameters: a list of all the solutions' fitness values, and the instance of the genetic algorithm.
+A function (or method) called before parent selection after the fitness of all solutions is calculated. It receives `on_fitness(ga_instance, population_fitness)` and may return replacement fitness with the same shape, or modify the supplied array in place and return `None`. Both forms are validated before selection, and saved best solutions are updated to agree with the resulting fitness.
+
+- As a **function**, it takes 2 parameters: the instance of the genetic algorithm, and a NumPy array of all the solutions' fitness values.
 - As a **method**, it takes a third parameter for the method's object.
 
 Added in [PyGAD 2.6.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-6-0).
-:::
 
-:::{dropdown} `on_parents=None`: Called after the parents are selected.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>on_parents=None</code>: Called after the parents are selected.</summary>
 
 A function (or method) called after the parents are selected.
 
@@ -401,96 +458,110 @@ A function (or method) called after the parents are selected.
 - As a **method**, it takes a third parameter for the method's object.
 
 Added in [PyGAD 2.6.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-6-0).
-:::
 
-:::{dropdown} `on_crossover=None`: Called after crossover.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>on_crossover=None</code>: Called after crossover.</summary>
 
 A function called each time crossover is applied. It takes 2 parameters: the instance of the genetic algorithm, and the offspring generated by crossover.
 
 Added in [PyGAD 2.6.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-6-0).
-:::
 
-:::{dropdown} `on_mutation=None`: Called after mutation.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>on_mutation=None</code>: Called after mutation.</summary>
 
 A function called each time mutation is applied. It takes 2 parameters: the instance of the genetic algorithm, and the offspring after mutation.
 
 Added in [PyGAD 2.6.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-6-0).
-:::
 
-:::{dropdown} `on_generation=None`: Called after each generation.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>on_generation=None</code>: Called after each generation.</summary>
 
 A function called after each generation. It takes 1 parameter: the instance of the genetic algorithm.
 
 If it returns the string `"stop"`, the `run()` method stops without completing the remaining generations.
 
 Added in [PyGAD 2.6.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-6-0).
-:::
 
-:::{dropdown} `on_stop=None`: Called once when the run ends.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>on_stop=None</code>: Called once when the run ends.</summary>
 
 A function called once just before the run ends (or after the last generation). It takes 2 parameters: the instance of the genetic algorithm, and the list of the last population's fitness values.
 
 Added in [PyGAD 2.6.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-6-0).
-:::
+
+</details>
 
 #### Saving and Logging
 
-:::{dropdown} `save_best_solutions=False`: Save the best solution of each generation.
-:animate: fade-in-slide-down
+<details>
+<summary><code>save_best_solutions=False</code>: Save the best solution of each generation.</summary>
 
 When `True`, the best solution of each generation is saved into the `best_solutions` attribute. When `False` (default), nothing is saved and `best_solutions` stays empty.
 
 Supported in [PyGAD 2.9.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-9-0).
-:::
 
-:::{dropdown} `save_solutions=False`: Save every solution of each generation.
-:animate: fade-in-slide-down
+</details>
 
-If `True`, then all solutions in each generation are appended into an attribute called `solutions` which is NumPy array. Supported in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0).
-:::
+<details>
+<summary><code>save_solutions=False</code>: Save every solution of each generation.</summary>
 
-:::{dropdown} `logger=None`: Custom logger for the outputs.
-:animate: fade-in-slide-down
+If `True`, then all solutions in each generation are appended into the `solutions` list, with their fitness in `solutions_fitness`. Each run includes its starting and final populations. `solutions_generations` records one generation number per saved population. Supported in [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0).
 
-An instance of the `logging.Logger` class used to log the outputs. When set, messages are logged instead of printed with `print()`. If `None`, PyGAD creates a logger that uses a `StreamHandler` to write the messages to the console.
+</details>
+
+<details>
+<summary><code>logger=None</code>: Custom logger for the outputs.</summary>
+
+An instance of the `logging.Logger` class used to log the outputs. When set, messages are logged instead of printed with `print()`. If `None`, PyGAD uses its default logger and adds a console `StreamHandler` only when it has no handlers. Existing handlers are preserved. Invalid logger values raise a `TypeError` naming the parameter.
 
 Added in [PyGAD 3.0.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-0-0). See [Logging Outputs](https://pygad.readthedocs.io/en/latest/logging.html#logging-outputs) for more information.
-:::
 
-:::{dropdown} `suppress_warnings=False`: Turn warning messages on or off.
-:animate: fade-in-slide-down
+</details>
+
+<details>
+<summary><code>suppress_warnings=False</code>: Turn warning messages on or off.</summary>
 
 A bool parameter to control whether the warning messages are printed or not. It defaults to `False`.
-:::
+
+</details>
 
 #### Performance and Reproducibility
 
-:::{dropdown} `parallel_processing=None`: Use threads or processes to speed up fitness.
-:animate: fade-in-slide-down
+<details>
+<summary><code>parallel_processing=None</code>: Use threads or processes to speed up fitness.</summary>
 
 Runs the fitness calculation in parallel. It defaults to `None` (no parallel processing).
 
 You can set it to:
 
+- **`None` or integer `0`:** disable parallel processing.
 - **A positive integer:** the number of threads. Example: `parallel_processing=5` uses 5 threads (the same as `["thread", 5]`).
 - **A list/tuple of 2 elements:** the first is `"process"` or `"thread"`; the second is a positive maximum worker count, `None` for the executor's default, or `0` to disable parallel processing. Example: `parallel_processing=["process", 10]` uses up to 10 processes.
 
 Validation normalizes a positive integer to `["thread", count]` and a zero worker count to `None`. Workers are created only for uncached fitness work and reused during one `run()`, including adaptive offspring evaluation. Completion, early stopping, and exceptions shut down the pool. Calling `cal_pop_fitness()` outside a run uses a temporary pool. Process-based scripts should start the GA under `if __name__ == "__main__":`.
 
 Added in [PyGAD 2.17.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-17-0). See [Parallel Processing in PyGAD](https://pygad.readthedocs.io/en/latest/fitness_calculation.html#parallel-processing-in-pygad) for more information.
-:::
 
-:::{dropdown} `random_seed=None`: Seed for reproducible runs.
-:animate: fade-in-slide-down
+</details>
 
-The random seed used by the NumPy and `random` number generators. Setting it makes runs reproducible (for example, `random_seed=2`). It defaults to `None`, which means no seed is used.
+<details>
+<summary><code>random_seed=None</code>: Seed for reproducible runs.</summary>
+
+The seed for this instance's NumPy and Python random generators. Accepts `None` or a Python/NumPy integer from `0` through `2**32 - 1`. Setting it makes built-in operations reproducible (for example, `random_seed=2`). With `None`, each instance starts with an automatically initialized state.
+
+Each GA owns `numpy_random_generator` (a `numpy.random.RandomState`) and `python_random_generator` (a `random.Random`). Creating or running another GA and drawing from the global generators do not alter its state. Repeated `run()` calls continue the same generator states, and checkpoints preserve them. To reproduce random draws in custom operators or callbacks, use these instance generators, for example `ga_instance.numpy_random_generator.random()`. Global random draws in user code need their own seed. Seeded results may differ between PyGAD versions. See `examples/example_constructor_parameters.py` for an example.
 
 Added in [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0).
-:::
+
+</details>
 
 You do not have to set all of these parameters when you create an instance of the `GA` class. The most important one is `fitness_func`, which defines the fitness function.
 
@@ -499,6 +570,33 @@ It is OK to set the value of any of the 2 parameters `init_range_low` and `init_
 If both the `mutation_type` and `crossover_type` parameters are `None`, then the genetic algorithm cannot evolve at all. As a result, it cannot find a solution better than the best solution in the initial population.
 
 The parameters are validated by calling the `validate_parameters()` method of the `utils.validation.Validation` class inside the constructor. If any parameter is not correct, an exception is raised and the `valid_parameters` attribute is set to `False`.
+
+<!-- python-examples
+example_constructor_parameters.py
+-->
+
+**Python example**
+
+**[Constructor settings and random seeds](../../examples/example_constructor_parameters.py)**
+
+Use callable fitness signatures, NumPy counts, and independent seeded GA instances.
+
+`examples/example_constructor_parameters.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_constructor_parameters.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Extended Classes
 
@@ -530,8 +628,10 @@ Here is the list of scripts and the classes that the `pygad.GA` class extends:
     1. `helper.misc.Helper`: Generic helpers used across the library (population dtype handling, per-gene value generation, constraint sampling, lifecycle summary).
 12. `visualize/plot.py`
     1. `visualize.plot.Plot`: All plot methods. See [`pygad.visualize`](https://pygad.readthedocs.io/en/latest/visualize.html).
+13. `visualize/lifecycle.py`
+    1. Internal helpers that describe the configured lifecycle and draw its flowchart without running the GA or calling user functions.
 
-`utils.engine.GAEngine` also extends `utils.parallel.FitnessEvaluation`, so `pygad.GA` indirectly inherits its fitness dispatch and serialization methods. See the {ref}`pygad.utils.parallel reference <fitness-evaluation>` for all of its methods, the process-worker function, and runtime attributes.
+`utils.engine.GAEngine` also extends `utils.parallel.FitnessEvaluation`, so `pygad.GA` indirectly inherits its fitness dispatch and serialization methods. See the [pygad.utils.parallel reference](utils.md#pygadutilsparallel-submodule) for all of its methods, the process-worker function, and runtime attributes.
 
 Since the `pygad.GA` class extends such classes, the attributes and methods inside them can be retrieved by instances of the `pygad.GA` class.
 
@@ -543,7 +643,7 @@ Since the `pygad.GA` class extends such classes, the attributes and methods insi
 
 ### Other Instance Attributes & Methods
 
-Constructor settings and user callables are stored as instance attributes, with some values normalized during validation. Active operators are exposed as `select_parents`, `crossover`, and `mutation`. The following sections describe additional instance attributes and inherited methods; the supported numeric type lists above are class attributes.
+Constructor settings and user callables are stored as instance attributes, with some values normalized during validation. Numeric counts become Python integers, mutable parameter containers are copied, and inactive mutation counts/percentages are normalized to `None`/`"default"`. Active operators are exposed as `select_parents`, `crossover`, and `mutation`. The following sections describe additional instance attributes and inherited methods; the supported numeric type lists above are class attributes.
 
 > The `GA` class gains the attributes of its parent classes via inheritance, making them accessible through the `GA` object even if they are defined externally to its specific class body.
 
@@ -568,6 +668,7 @@ Constructor settings and user callables are stored as instance attributes, with 
 - `run_mutation()`: Apply mutation and call `on_mutation` when defined. Internal. Added in [PyGAD 3.3.1](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1).
 - `run_update_population()`: Replace `self.population` with the crossed-over and mutated offspring. Internal. Added in [PyGAD 3.3.1](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-3-1).
 - `summary(...)`: Prints a Keras-like summary of the PyGAD lifecycle. Added in [PyGAD 2.19.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-19-0). See [Print Lifecycle Summary](https://pygad.readthedocs.io/en/latest/logging.html#print-lifecycle-summary).
+- `plot_lifecycle(title="PyGAD - Lifecycle", font_size=11, show_parameters=True, save_dir=None, show=True)`: Draws the configured lifecycle with operators, callbacks, population replacement, and stopping decisions. Works before or after `run()` and returns a matplotlib figure. See [plot_lifecycle()](visualize.md#plot_lifecycle).
 
 #### Population and Initialization
 
@@ -577,15 +678,21 @@ Constructor settings and user callables are stored as instance attributes, with 
 - `initial_population`: Frozen copy of the initial population, set after `initialize_population` runs.
 - `pop_size`: A `(sol_per_pop, num_genes)` tuple describing the population shape.
 - `gene_type_single`: `True` when every gene shares the same dtype; `False` when `gene_type` is a list/tuple/numpy.ndarray. Added in [PyGAD 2.14.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-14-0).
-- `gene_space_unpacked`: Unpacked version of `gene_space`. For example, `range(1, 5)` becomes `[1, 2, 3, 4]`; `{'low': 2, 'high': 4}` becomes a finite sample. Added in [PyGAD 3.1.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-1-0).
+- `gene_space_unpacked`: An inspection snapshot of converted values in `gene_space`. Small finite spaces are kept in full; large ranges, stepped dictionaries, and continuous intervals contribute at most 100 values per gene by default. Generation and duplicate repair read the original space, so inspection samples do not restrict the available values and `None` entries remain random. For example, `range(1, 5)` becomes `[1, 2, 3, 4]`; `{'low': 2, 'high': 4}` becomes a finite sample. Added in [PyGAD 3.1.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-3-1-0).
 
 ##### Methods
 
 - `initialize_population(allow_duplicate_genes, gene_type, gene_constraint)`: Build the initial population, apply gene types and constraints, resolve duplicates when not allowed.
+- `generate_initial_population(num_solutions)`: Sample new population values in bulk and prepare the resulting solutions. Also used by NSGA-III population growth.
+- `prepare_initial_population(population)`: Convert generated or supplied rows, apply constraints, and repair duplicates.
+- `apply_initial_population_gene_constraints(population)`: Replace rejected values using initialization candidates, warning when no candidate satisfies a constraint.
+- `sample_initial_population_gene_values(gene_index, num_values)`: Sample one column from its space or initialization range.
+- `get_initial_population_gene_candidates(gene_index, sample_size, all_integer_values=True)`: Return converted replacement candidates for initialization constraints and duplicate repair.
 - `initialize_parents_array(shape)`: Allocate an empty parents (or offspring) array with the right dtype.
 - `change_population_dtype_and_round(population)`: Cast a 2D population to the dtype encoded in `self.gene_type` and round non-integer genes.
-- `change_gene_dtype_and_round(gene_index, gene_value)`: Same as above, but for a single gene value.
-- `round_genes(solutions)`: Round genes in a 2D array according to `self.gene_type` precision.
+- `change_gene_dtype_and_round(gene_index, gene_value)`: Apply one gene's type and precision to a scalar or an array of candidates, preserving the input shape.
+- `round_genes(solutions)`: Convert and round genes in a 2D array according to `self.gene_type`. Update the input array when its dtype matches the converted output.
+- `prepare_operator_output(population, build_initial_pop=False)`: Apply gene types and precision, then repair duplicates if `allow_duplicate_genes=False`. SBX and polynomial mutation use initialization bounds for repair.
 - `get_initial_population_range(gene_index)`: Return the `[init_range_low, init_range_high]` window for a specific gene.
 - `get_random_mutation_range(gene_index)`: Return the `[random_mutation_min_val, random_mutation_max_val]` window for a specific gene.
 - `get_gene_dtype(gene_index)`: Return the `(type, precision)` pair for a specific gene.
@@ -600,17 +707,19 @@ Constructor settings and user callables are stored as instance attributes, with 
 - `last_generation_fitness`: Fitness values of the solutions in the last generation. Added in [PyGAD 2.12.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-12-0).
 - `previous_generation_fitness`: Fitness of the population one step before `last_generation_fitness`. Used to skip re-evaluating solutions PyGAD has already seen. Added in [PyGAD 2.16.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-2).
 - `best_solutions_fitness`: Fitness history of the best solution per generation, including the final population. Recorded even when `save_best_solutions=False`; with saving enabled, entries correspond to `best_solutions`.
+- `best_solutions_generations`: The actual generation number for each entry in `best_solutions_fitness`. Repeated runs retain both the final and starting snapshots at their boundary.
 - `best_solutions`: A NumPy array of the best solution per generation. Only populated when `save_best_solutions=True`.
 - `solutions`: All visited solutions when `save_solutions=True`.
 - `solutions_fitness`: Fitness for every entry in `solutions`.
+- `solutions_generations`: One generation number per saved population when `save_solutions=True`. The solutions and their fitness retain one entry per solution.
 - `num_fitness_evaluations`: Number of solutions evaluated during the current `run()`, including adaptive offspring and every solution in returned fitness batches. Cache hits do not count. Each run resets the counter after `on_start`; direct fitness evaluations outside a run increment the existing count. `evaluations_<N>` checks the count at generation boundaries, so the run can exceed the requested budget by a generation's work.
-- `best_solution_generation`: Generation at which the best fitness was reached. `-1` until `run()` completes.
+- `best_solution_generation`: Actual generation at which the best saved fitness was reached, using the same single-objective or NSGA-II ordering as `best_solution()`. `-1` until `run()` completes, or when an older checkpoint lacks the winning snapshot's generation number. See [Saved Fitness across Repeated Runs](fitness_calculation.md#saved-fitness-across-repeated-runs).
 
 ##### Methods
 
 - `cal_pop_fitness()`: Compute the fitness of every solution in the current population, reusing previously calculated values where possible.
-- `best_solution(pop_fitness=None)`: Return the best solution in the current population, its fitness, and its population index. Pass the current population's fitness to avoid additional evaluation. See {ref}`best_solution() <current-population-best-solution>` for single-objective and multi-objective selection rules.
-- `adaptive_mutation_population_fitness(offspring)`: Return `(average_fitness, offspring_fitness)` using retained solutions and actual offspring before mutation. See the {ref}`adaptive fitness reference <adaptive-offspring-fitness>`.
+- `best_solution(pop_fitness=None)`: Return the best solution in the current population, its fitness, and its population index. Pass the current population's fitness to avoid additional evaluation. See [best_solution()](utils.md#best_solution) for single-objective and multi-objective selection rules.
+- `adaptive_mutation_population_fitness(offspring)`: Return `(average_fitness, offspring_fitness)` using retained solutions and actual offspring before mutation. See the [adaptive fitness reference](utils.md#adaptive_mutation_population_fitnessoffspring).
 
 #### Fitness Worker Lifecycle (internal)
 
@@ -630,7 +739,7 @@ The `FitnessEvaluation` mixin manages these attributes and methods. They may not
 - `_map_fitness(tasks)`: Yield fitness results in task order using serial calls, threads, or process snapshots.
 - `_evaluate_fitness(population, indices, adaptive=False)`: Evaluate selected rows, prepare scalar or batch arguments, validate results, and update the evaluation count.
 
-The {ref}`complete fitness dispatch reference <fitness-evaluation>` documents parameters, return values, exceptions, process isolation, and attribute lifetimes.
+The [complete fitness dispatch reference](utils.md#pygadutilsparallel-submodule) documents parameters, return values, exceptions, process isolation, and attribute lifetimes.
 
 #### Parent Selection (general)
 
@@ -760,16 +869,26 @@ The {ref}`complete fitness dispatch reference <fitness-evaluation>` documents pa
 - `validate_gene_constraint_callable_output(selected_values, values)`: Sanity-check the return value of a user-defined `gene_constraint`.
 - `filter_gene_values_by_constraint(values, solution, gene_idx)`: Run `gene_constraint[gene_idx]` and return the filtered list.
 - `get_valid_gene_constraint_values(...)`: Sample candidate values until one satisfies the gene constraint.
-- `solve_duplicate_genes_randomly(...)`: Resolve duplicate genes by sampling new values from the random range.
-- `solve_duplicate_genes_by_space(...)`: Resolve duplicate genes by sampling new values from `gene_space`.
-- `solve_duplicates_deeply(...)`: Slow, exhaustive fallback for duplicate resolution.
+- `solve_duplicate_genes(solution, build_initial_pop=False, ...)`: Shared repair for a solution using each gene's space, range, type, precision, and constraint. Returns the repaired copy, remaining duplicate indices, and their count. Can follow chains of replacements.
+- `solve_duplicate_genes_in_population(population, build_initial_pop=False)`: Convert and round population rows before applying the shared repair.
+- `get_duplicate_gene_indices(solution)`: Return the indices after the first occurrence of each repeated value.
+- `solution_satisfies_gene_constraints(solution)`: Check every constraint against a complete candidate solution.
+- `get_gene_space_values(..., all_values=True)`: Return converted candidates for one gene. The default includes complete finite domains for duplicate repair; `all_values=False` samples ranges, stepped dictionaries, and integer intervals without allocating their complete domains.
+- `is_gene_value_in_space(...)`: Check a swap candidate against the original finite space or continuous bounds.
+- `solve_duplicate_genes_randomly(...)`: Compatibility helper for the shared repair using explicit random ranges.
+- `solve_duplicate_genes_by_space(...)`: Compatibility helper for the shared repair using `gene_space`.
+- `solve_duplicates_deeply(...)`: Compatibility helper for replacement-chain repair. Returns `None` when no duplicates are resolved.
 - `unique_int_gene_from_range(...)`: Pick an integer gene that does not already appear in the solution.
 - `unique_float_gene_from_range(...)`: Pick a float gene that does not already appear in the solution.
 - `unique_gene_by_space(...)`: Pick a unique value from `gene_space`.
 - `unique_genes_by_space(...)`: Pick unique values for several genes from `gene_space`.
-- `select_unique_value(...)`: Sample one value uniformly at random from a list of candidates.
-- `find_two_duplicates(solution)`: Locate the first pair of duplicated indices in a solution.
-- `unpack_gene_space(...)`: Materialize the unpacked `gene_space` (used to build `gene_space_unpacked`).
+- `select_unique_value(...)`: Pick an unused candidate when possible, otherwise keep the current value.
+- `find_two_duplicates(solution, gene_space_unpacked)`: Find a duplicated gene with alternative values in its space.
+- `unpack_gene_space(...)`: Build an inspection snapshot of `gene_space`, sampling large lazy domains without allocating them in full.
+- `get_bounded_operator_gene_range(gene_index)`: Resolve SBX/polynomial bounds from a gene's space or initialization range.
+- `convert_bounded_operator_gene_value(gene_index, value)`: Apply the destination type and precision and select an allowed value.
+- `prepare_changed_operator_solution(...)`: Validate a complete converted proposal against spaces, constraints, and duplicates.
+- `prepare_bounded_operator_solution(...)`: Repair bounded-operator constraints and accept a valid proposal or retain the original solution.
 
 #### Saving, Loading, and Reporting
 
@@ -791,9 +910,11 @@ Accepts the following parameter:
 
 * `filename`: Name of the file to save the instance. No extension is needed.
 
-The file is written as `filename + ".pkl"` using cloudpickle. Saving during a run excludes live worker handles and the active-run flag through `__getstate__()`. The remaining GA state, including custom attributes, must be serializable. {ref}`pygad.load() <loading-ga-checkpoint>` restores the saved optimization state; the next `run()` creates a new pool when needed. A checkpoint does not contain in-flight worker tasks.
+The file is written as `filename + ".pkl"` using cloudpickle. Saving during a run excludes live worker handles and the active-run flag through `__getstate__()`. The remaining GA state, including custom attributes, must be serializable. [pygad.load()](pygad.md#pygadload) restores the saved optimization state; the next `run()` creates a new pool when needed. A checkpoint does not contain in-flight worker tasks.
 
+<!-- sphinx
 (generate-report)=
+-->
 ### `generate_report()`
 
 Builds a PDF report of the current GA run. It bundles the configuration table, a run-summary table, the best solution, and every applicable plot. Requires the optional `report` extra:
@@ -819,15 +940,44 @@ Parameters:
 - `notes` (`str` or `None`, default `None`): Free-form text rendered in the optional `"notes"` section.
 - `page_size` (`str`, default `"letter"`): Either `"letter"` or `"A4"`.
 
-The report skips any plot whose preconditions are not met. For example, `plot_pareto_front_curve` is included only for multi-objective runs with 2 or 3 objectives; `plot_non_dominated_hypervolume` is included only when `save_solutions=True` is set on the GA. A full example lives at [`examples/example_generate_report.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/tree/master/examples/example_generate_report.py).
+The report skips any plot whose preconditions are not met. For example, `plot_pareto_front_curve` is included only for multi-objective runs with 2 or 3 objectives; `plot_non_dominated_hypervolume` is included only when `save_solutions=True` is set on the GA.
 
 The title page shows the PyGAD logo. The image ships with the package, so it works without network access. If the image file is missing, the report is built without it.
+
+<!-- python-examples
+example_generate_report.py
+-->
+
+**Python example**
+
+**[PDF report](../../examples/example_generate_report.py)**
+
+Export the run configuration, summary, best solution, and applicable plots to PDF.
+
+`examples/example_generate_report.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD with the report extra (Matplotlib and ReportLab)
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_generate_report.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Functions in `pygad`
 
 Besides the methods available in the `pygad.GA` class, this section discusses the functions available in `pygad`. Up to this time, there is only a single function named `load()`.
 
+<!-- sphinx
 (loading-ga-checkpoint)=
+-->
 ### `pygad.load()`
 
 Reads a saved instance of the genetic algorithm. This is not a method but a function that is indented under the `pygad` module. So, it could be called by the pygad module as follows: `pygad.load(filename)`.
@@ -838,6 +988,9 @@ Accepts the following parameter:
 
 Returns the genetic algorithm instance.
 
+<!-- sphinx
+(updating-loaded-fitness-function)=
+-->
 #### Updating the Fitness Function after Loading
 
 The checkpoint includes the fitness function assigned when `save()` was called. Editing a function in the script does not automatically replace the function in a loaded GA. Assign the updated callable explicitly:
@@ -862,52 +1015,55 @@ new_ga_instance = pygad.GA(
 new_ga_instance.run()
 ```
 
-Set the constructor options needed by the new problem, including `gene_type`, `gene_space`, constraints, operators, and batch settings. This starts new fitness histories and generation counters; it reuses the chromosomes, not the previous run's fitness values. A complete example is available in [`examples/example_load_fitness_function.py`](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/master/examples/example_load_fitness_function.py).
+Set the constructor options needed by the new problem, including `gene_type`, `gene_space`, constraints, operators, and batch settings. This starts new fitness histories and generation counters; it reuses the chromosomes, not the previous run's fitness values.
+
+<!-- python-examples
+example_load_fitness_function.py
+-->
+
+**Python example**
+
+**[Change a loaded fitness function](../../examples/example_load_fitness_function.py)**
+
+Replace the fitness callable after loading, or start fresh when the objective changes.
+
+`examples/example_load_fitness_function.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_load_fitness_function.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Using PyGAD
 
-::::{grid} 1 2 2 2
-:gutter: 3
+<!-- navigation-grid: 1 2 2 2 -->
 
-:::{grid-item-card} Steps to Use PyGAD
-:link: steps_to_use
-:link-type: doc
+- [Steps to Use PyGAD](steps_to_use.md) — A step-by-step walkthrough to build and run the genetic algorithm.
+- [Life Cycle of PyGAD](lifecycle.md) — How a generation runs and where each callback is called.
 
-A step-by-step walkthrough to build and run the genetic algorithm.
-:::
-
-:::{grid-item-card} Life Cycle of PyGAD
-:link: lifecycle
-:link-type: doc
-
-How a generation runs and where each callback is called.
-:::
-
-::::
+<!-- /navigation-grid -->
 
 ## Examples
 
 This section gives the complete code of some examples that use `pygad`. Each subsection builds a different example.
 
-::::{grid} 1 2 2 2
-:gutter: 3
+<!-- navigation-grid: 1 2 2 2 -->
 
-:::{grid-item-card} Linear Model - Single Objective
-:link: pygad_example_linear
-:link-type: doc
-:::
+- [Linear Model - Single Objective](pygad_example_linear.md)
+- [Linear Model - Multi-Objective](pygad_example_multi_objective.md)
+- [Reproducing Images](pygad_example_reproducing_images.md)
 
-:::{grid-item-card} Linear Model - Multi-Objective
-:link: pygad_example_multi_objective
-:link-type: doc
-:::
-
-:::{grid-item-card} Reproducing Images
-:link: pygad_example_reproducing_images
-:link-type: doc
-:::
-
-::::
+<!-- /navigation-grid -->
 
 ### Clustering
 
@@ -915,12 +1071,60 @@ For a 2-cluster problem, the code is available [here](https://github.com/ahmedfg
 
 Soon a tutorial will be published at [Paperspace](https://blog.paperspace.com/author/ahmed) to explain how clustering works using the genetic algorithm with examples in PyGAD.
 
+<!-- python-examples
+clustering/example_clustering_2.py
+clustering/example_clustering_3.py
+-->
+
+**Python examples**
+
+**[2-cluster example](../../examples/clustering/example_clustering_2.py)**
+
+Optimize 2 cluster centers for generated two-dimensional data.
+
+`examples/clustering/example_clustering_2.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/clustering/example_clustering_2.py
+```
+
+</details>
+
+**[3-cluster example](../../examples/clustering/example_clustering_3.py)**
+
+Optimize 3 cluster centers for generated two-dimensional data.
+
+`examples/clustering/example_clustering_3.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/clustering/example_clustering_3.py
+```
+
+</details>
+
+<!-- /python-examples -->
+
 ### CoinTex Game Playing using PyGAD
 
 The code is available at the [CoinTex GitHub project](https://github.com/ahmedfgad/CoinTex/tree/master/PlayerGA). CoinTex is an Android game written in Python using the Kivy framework. Find CoinTex at [Google Play](https://play.google.com/store/apps/details?id=coin.tex.cointexreactfast): https://play.google.com/store/apps/details?id=coin.tex.cointexreactfast
 
 Check this [Paperspace tutorial](https://blog.paperspace.com/building-agent-for-cointex-using-genetic-algorithm) for how the genetic algorithm plays CoinTex: https://blog.paperspace.com/building-agent-for-cointex-using-genetic-algorithm. Check also this [YouTube video](https://youtu.be/Sp_0RGjaL-0) showing the genetic algorithm while playing CoinTex.
 
+<!-- sphinx
 :::{toctree}
 :hidden:
 
@@ -930,3 +1134,4 @@ pygad_example_linear
 pygad_example_multi_objective
 pygad_example_reproducing_images
 :::
+-->

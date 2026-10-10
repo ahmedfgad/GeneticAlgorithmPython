@@ -2,7 +2,8 @@ name: release
 
 # On a version tag this builds the package once, publishes it to PyPI via
 # trusted publishing (no API token stored in the repo), and attaches the built
-# wheel and sdist to a GitHub Release for the tag. The PyPI project must list
+# wheel and sdist downloaded back from PyPI to a GitHub Release for the tag.
+# Both downloads must match the checked build. The PyPI project must list
 # this repo and workflow as a trusted publisher first.
 
 on:
@@ -11,14 +12,33 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
 
+permissions:
+  contents: read
+
 jobs:
+  tests:
+    uses: ./.github/workflows/main.yml
+    permissions:
+      contents: read
+
   build:
+    needs: tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Verify release tag matches package version
+        run: |
+          python - <<'PY'
+          import os
+          import runpy
+          version = runpy.run_path("pygad/_version.py")["__version__"]
+          tag = os.environ["GITHUB_REF_NAME"]
+          if tag != version:
+              raise SystemExit(f"Release tag {tag} does not match package version {version}")
+          PY
       - name: Build distributions
         run: |
           pip install build . pytest responses 'vilvik>=0.5.3'
@@ -28,10 +48,21 @@ jobs:
         run: |
           pip install twine
           python -m twine check dist/*
+      - name: Check documentation
+        run: |
+          pip install -r docs/requirements.txt
+          python docs/markdown_compatibility.py
+          python -m sphinx -b html -W --keep-going docs/source docs/build/html
+      - name: Prepare documented release notes
+        run: python tools/release.py notes "$GITHUB_REF_NAME" release-notes.md
       - uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: release-notes.md
 
   publish:
     needs: build
@@ -48,22 +79,35 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
 
   github-release:
-    needs: build
+    needs: [build, publish]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist/
-      - name: Attach the built files to the GitHub release
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+      - name: Download and verify the published PyPI distributions
+        run: python tools/release.py fetch-pypi "$GITHUB_REF_NAME" dist published-dist
+      - name: Publish GitHub release with documented notes and PyPI files
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/* \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "$GITHUB_REF_NAME" \
-            --generate-notes \
-          || gh release upload "$GITHUB_REF_NAME" dist/* \
-            --repo "$GITHUB_REPOSITORY" --clobber
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" published-dist/* \
+              --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+              --title "PyGAD $GITHUB_REF_NAME" --notes-file release-notes.md --draft=false --latest
+          else
+            gh release create "$GITHUB_REF_NAME" published-dist/* \
+              --repo "$GITHUB_REPOSITORY" --verify-tag --latest \
+              --title "PyGAD $GITHUB_REF_NAME" --notes-file release-notes.md
+          fi

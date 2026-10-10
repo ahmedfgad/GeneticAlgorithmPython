@@ -344,6 +344,7 @@ class NSGA3:
                 candidates_at_target,
                 critical_front_distances,
                 niche_counts[target_reference_index],
+                random_generator=getattr(self, 'numpy_random_generator', numpy.random),
             )
             picked.append(critical_front_indices[chosen_position])
             niche_counts[target_reference_index] += 1
@@ -373,7 +374,7 @@ def _nsga3_pick_target_reference_point(niche_counts,
 
 def _nsga3_pick_candidate_at_reference(candidates_at_target,
                                        critical_front_distances,
-                                       niche_count_at_target):
+                                       niche_count_at_target, random_generator=None):
     """
     Choose one critical-front candidate at the given reference point. If
     the niche count is 0 (empty niche), pick the closest candidate.
@@ -382,9 +383,8 @@ def _nsga3_pick_candidate_at_reference(candidates_at_target,
     if niche_count_at_target == 0:
         return min(candidates_at_target,
                    key=lambda position: critical_front_distances[position])
-    return candidates_at_target[
-        numpy.random.randint(len(candidates_at_target))
-    ]
+    random_generator = numpy.random if random_generator is None else random_generator
+    return candidates_at_target[random_generator.randint(len(candidates_at_target))]
 
 
 def _nsga3_enumerate_compositions(num_objectives, num_divisions):

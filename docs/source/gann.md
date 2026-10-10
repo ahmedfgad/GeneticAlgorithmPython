@@ -384,31 +384,16 @@ Classification accuracy : 100.0.
 
 This section gives the complete code of some examples that build and train neural networks using the genetic algorithm. Each subsection builds a different network.
 
-::::{grid} 1 2 2 2
-:gutter: 3
+<!-- navigation-grid: 1 2 2 2 -->
 
-:::{grid-item-card} XOR Classification
-:link: gann_xor
-:link-type: doc
-:::
+- [XOR Classification](gann_xor.md)
+- [Image Classification](gann_image_classification.md)
+- [Regression Example 1](gann_regression_1.md)
+- [Regression Example 2 - Fish Weight Prediction](gann_regression_2.md)
 
-:::{grid-item-card} Image Classification
-:link: gann_image_classification
-:link-type: doc
-:::
+<!-- /navigation-grid -->
 
-:::{grid-item-card} Regression Example 1
-:link: gann_regression_1
-:link-type: doc
-:::
-
-:::{grid-item-card} Regression Example 2 - Fish Weight Prediction
-:link: gann_regression_2
-:link-type: doc
-:::
-
-::::
-
+<!-- sphinx
 :::{toctree}
 :hidden:
 
@@ -417,3 +402,4 @@ gann_image_classification
 gann_regression_1
 gann_regression_2
 :::
+-->

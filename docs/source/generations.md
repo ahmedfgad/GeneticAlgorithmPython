@@ -16,6 +16,9 @@ def func_generation(ga_instance):
         return "stop"
 ```
 
+<!-- sphinx
+(stop-criteria-guide)=
+-->
 ## Stop Criteria
 
 In [PyGAD 2.15.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-15-0), a new parameter named `stop_criteria` is added to the constructor of the `pygad.GA` class. It helps to stop the evolution based on some criteria. It can be assigned one or more criteria.
@@ -35,7 +38,11 @@ The supported words are `reach`, `saturate`, `time`, and `evaluations`.
 
 The `reach` word stops the `run()` method if the fitness value is equal to or greater than a given fitness value. An example for `reach` is `"reach_40"` which stops the evolution if the fitness is >= 40.
 
-`saturate` stops the evolution if the fitness saturates for a given number of consecutive generations. An example for `saturate` is `"saturate_7"` which means stop the `run()` method if the fitness does not change for 7 consecutive generations. 
+`saturate` stops the evolution if the fitness saturates for a given number of consecutive generations. An example for `saturate` is `"saturate_7"` which means stop the `run()` method if the fitness does not change for 7 consecutive generations.
+
+The initial population's best fitness is the baseline. `saturate_1` stops after one completed generation with unchanged best fitness. Any change resets the count, even if a later generation returns to an earlier fitness value. Multi-objective problems compare the entire best-fitness vector. Every `run()` starts a new saturation count while `generations_completed` continues from the previous run.
+
+The counts for `saturate` and `evaluations` must be positive integers. The `reach` threshold must be finite, and the `time` duration must be finite and non-negative. Scientific notation is accepted, for example `"evaluations_1e3"` or `"time_1e-2"`.
 
 `time` stops after the elapsed runtime reaches the specified seconds, for example `"time_30"`. `evaluations` stops after the number of evaluated solutions reaches its threshold, for example `"evaluations_1000"`. This count includes adaptive mutation's offspring evaluations and counts every solution in a fitness batch. Reusing a cached fitness value contributes zero. Both criteria are checked after a generation, so runtime and evaluation count can exceed their thresholds.
 
@@ -158,13 +165,13 @@ number of offspring = sol_per_pop - (number of kept solutions)
 
 The next tree shows how the two parameters decide the number of offspring.
 
-:::{figure} images/offspring_decision_tree.*
-:alt: Decision tree showing how keep_elitism and keep_parents decide the number of offspring
-:width: 680px
-:align: center
+<!-- documentation-figure: 680px -->
+
+![Decision tree showing how keep_elitism and keep_parents decide the number of offspring](images/offspring_decision_tree.png)
 
 How `keep_elitism` and `keep_parents` decide the number of offspring.
-:::
+
+<!-- /documentation-figure -->
 
 There are four cases:
 
@@ -177,20 +184,25 @@ There are four cases:
 
 The kept solutions are placed at the top of the next population, starting at index 0. The offspring fill the slots that remain.
 
-:::{figure} images/population_assembly.*
-:alt: The kept solutions sit at the top of the next population and the offspring fill the rest
-:width: 620px
-:align: center
+<!-- documentation-figure: 620px -->
+
+![The kept solutions sit at the top of the next population and the offspring fill the rest](images/population_assembly.png)
 
 The kept solutions are copied to the top of the population. The offspring fill the rest.
-:::
+
+<!-- /documentation-figure -->
 
 Watch the tutorial on [YouTube](https://www.youtube.com/shorts/-uupRJhesjI).
 
+<!-- sphinx
 ```{raw} html
 <iframe width="315" height="560" src="https://www.youtube.com/embed/-uupRJhesjI" title="keep_elitism vs keep_parents" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 ```
+-->
 
+<!-- sphinx
+(random-seed-guide)=
+-->
 ## Random Seed
 
 In [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-18-0), a new parameter called `random_seed` is supported. Its value is used as a seed for the random function generators.
@@ -200,7 +212,7 @@ In [PyGAD 2.18.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-1
 1.  NumPy
 2.  random
 
-The `random_seed` parameter defaults to `None` which means no seed is used. As a result, different random numbers are generated for each run of PyGAD.
+Each GA instance owns its NumPy and Python random generators. Creating or running another GA, or drawing from the global generators, does not change that instance's random state. The `random_seed` parameter accepts Python and NumPy integer seeds. It defaults to `None`, so separate instances can generate different random values.
 
 If this parameter is assigned a proper seed, then the results will be reproducible. In the next example, the integer 2 is used as a random seed. 
 
@@ -232,16 +244,64 @@ print(best_solution_fitness)
 This is the best solution found and its fitness value.
 
 ```
-[ 2.77249188 -4.06570662  0.04196872 -3.47770796 -0.57502138 -3.22775267]
-0.04872203136549972
+[ 2.77249188 -3.36283618  0.62335921 -0.51742086 -0.63705758 -1.35732143]
+0.0757422952817227
 ```
 
 After running the code again, it will find the same result.
 
 ```
-[ 2.77249188 -4.06570662  0.04196872 -3.47770796 -0.57502138 -3.22775267]
-0.04872203136549972
+[ 2.77249188 -3.36283618  0.62335921 -0.51742086 -0.63705758 -1.35732143]
+0.0757422952817227
 ```
+
+Reproducibility applies within the same PyGAD version and environment. Changes to operators can produce different results from earlier versions with the same seed. Repeated calls to `run()` continue the existing generator states rather than restarting from the seed, and saving and loading a GA preserves those states.
+
+### Random Choices in Custom Operators and Callbacks
+
+Use `ga_instance.numpy_random_generator` (a `numpy.random.RandomState`) or `ga_instance.python_random_generator` (a `random.Random`) for reproducible random choices in user code. For example, this custom mutation selects one gene per offspring and draws its replacement from the GA's NumPy generator:
+
+```python
+def custom_mutation(offspring, ga_instance):
+    for solution in offspring:
+        gene_index = ga_instance.numpy_random_generator.randint(ga_instance.num_genes)
+        solution[gene_index] = ga_instance.numpy_random_generator.uniform(-1.0, 1.0)
+    return offspring
+
+
+ga_instance = pygad.GA(...,
+                       mutation_type=custom_mutation,
+                       random_seed=2)
+```
+
+The custom operator must choose values appropriate for the problem's gene spaces and constraints. Calls to global `numpy.random` or `random` functions in user code need their own seeds; `random_seed` does not seed these global generators.
+
+<!-- python-examples
+example_constructor_parameters.py
+-->
+
+**Python example**
+
+**[Constructor settings and random seeds](../../examples/example_constructor_parameters.py)**
+
+Use callable fitness signatures, NumPy counts, and independent seeded GA instances.
+
+`examples/example_constructor_parameters.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_constructor_parameters.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Continue without Losing Progress
 
@@ -290,7 +350,44 @@ loaded_ga_instance.plot_fitness()
 
 The plot created by the `plot_fitness()` method will show the data collected from both the runs. 
 
-Note that the 2 attributes (`self.best_solutions` and `self.best_solutions_fitness`) only work if the `save_best_solutions` parameter is set to `True`. Also, the 2 attributes (`self.solutions` and `self.solutions_fitness`) only work if the `save_solutions` parameter is `True`.
+`best_solutions_fitness` is collected regardless of `save_best_solutions`. Set `save_best_solutions=True` to save the corresponding gene values in `best_solutions`. The `solutions` and `solutions_fitness` histories require `save_solutions=True`.
+
+### Generation Numbers in Saved Histories
+
+`num_generations` specifies how many additional generations each `run()` can complete. `generations_completed` records the cumulative count. With `num_generations=2`, two completed runs leave `generations_completed=4`.
+
+`best_solutions_generations` records the actual generation number for each entry in `best_solutions_fitness`. Both the starting and final snapshots of each run are kept, so two runs of 2 generations produce `[0, 1, 2, 2, 3, 4]`. The two entries for generation 2 represent the final snapshot of the first run and the starting snapshot of the second run.
+
+With `save_solutions=True`, `solutions_generations` records one generation number per saved population, while `solutions` and `solutions_fitness` keep one entry per solution. `best_solution_generation` reports the actual generation of the best saved fitness, rather than its position in the history. History plots and PDF reports use these generation numbers.
+
+Saving and loading preserves the metadata. Older checkpoints with a single-run history recover their generation numbers. Unknown generations in older repeated-run histories are represented by `None`; `best_solution_generation` is `-1` if the winning snapshot has an unknown generation. See [Saved Fitness across Repeated Runs](fitness_calculation.md#saved-fitness-across-repeated-runs) for callback behavior and checkpoint compatibility.
+
+<!-- python-examples
+example_repeated_runs.py
+-->
+
+**Python example**
+
+**[Repeated runs and checkpoints](../../examples/example_repeated_runs.py)**
+
+Continue from a saved GA and inspect the actual generation numbers in its histories.
+
+`examples/example_repeated_runs.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_repeated_runs.py
+```
+
+</details>
+
+<!-- /python-examples -->
 
 ## Change Population Size during Runtime
 
@@ -315,3 +412,30 @@ These are examples of the instance attributes that might be changed. The user sh
    2. `last_generation_parents` and `last_generation_parents_indices`: Two NumPy arrays: 2D array representing the parents and 1D array of the parents indices.
    3. `last_generation_elitism` and `last_generation_elitism_indices`: Must be changed if `keep_elitism != 0`. The default value of `keep_elitism` is 1. Two NumPy arrays: 2D array representing the elitism and 1D array of the elitism indices.
 2. `pop_size`: The population size.
+
+<!-- python-examples
+example_dynamic_population_size.py
+-->
+
+**Python example**
+
+**[Changing population size](../../examples/example_dynamic_population_size.py)**
+
+Adjust the population and related runtime settings during evolution.
+
+`examples/example_dynamic_population_size.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_dynamic_population_size.py
+```
+
+</details>
+
+<!-- /python-examples -->

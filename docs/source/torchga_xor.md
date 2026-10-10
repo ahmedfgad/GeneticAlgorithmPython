@@ -150,3 +150,30 @@ Binary Crossentropy :  0.0
 
 Accuracy :  1.0
 ```
+
+<!-- python-examples
+TorchGA/XOR_classification.py
+-->
+
+**Python example**
+
+**[XOR classification](../../examples/TorchGA/XOR_classification.py)**
+
+Optimize neural-network weights with the genetic algorithm.
+
+`examples/TorchGA/XOR_classification.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, PyTorch
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/TorchGA/XOR_classification.py
+```
+
+</details>
+
+<!-- /python-examples -->

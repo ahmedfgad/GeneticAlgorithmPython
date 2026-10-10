@@ -5,10 +5,98 @@ from pygad.utils.parallel import FitnessEvaluation
 
 class GAEngine(FitnessEvaluation):
 
+    def __setstate__(self, state):
+        """Restore generator states, initializing them for older checkpoints."""
+        legacy_history = 'best_solutions_generations' not in state
+        self.__dict__.update(state)
+        for name in ['random_seed', 'num_generations', 'num_parents_mating', 'sol_per_pop',
+                     'num_genes', 'K_tournament', 'nsga3_num_divisions', 'sample_size',
+                     'fitness_batch_size', 'keep_parents', 'keep_elitism']:
+            value = getattr(self, name, None)
+            if isinstance(value, numpy.integer):
+                setattr(self, name, int(value))
+        if not hasattr(self, 'numpy_random_generator'):
+            self.numpy_random_generator = numpy.random.RandomState(self.random_seed)
+        if not hasattr(self, 'python_random_generator'):
+            self.python_random_generator = random.Random(self.random_seed)
+        if not hasattr(self, 'mutation_control_explicitly_set'):
+            self.mutation_control_explicitly_set = False
+        self._restore_history_generations()
+        if legacy_history and self.run_completed and len(self.best_solutions_fitness) > 0:
+            self._update_best_solution_generation()
+
+    def _restore_history_generations(self):
+        """Supply history metadata for checkpoints saved before it existed.
+
+        A single-run history has an unambiguous generation sequence. Older
+        repeated-run checkpoints did not save their run boundaries; None
+        marks generation numbers that cannot be recovered reliably.
+        """
+        count = len(self.best_solutions_fitness)
+        if (not hasattr(self, 'best_solutions_generations')
+                or len(self.best_solutions_generations) != count):
+            self.best_solutions_generations = (list(range(count))
+                if count == self.generations_completed + 1 else [None] * count)
+        if (not hasattr(self, '_saved_population_sizes')
+                or sum(self._saved_population_sizes) != len(self.solutions)):
+            count = len(self.solutions) // self.sol_per_pop
+            self._saved_population_sizes = [self.sol_per_pop] * count
+        count = len(self._saved_population_sizes)
+        if (not hasattr(self, 'solutions_generations')
+                or len(self.solutions_generations) != count):
+            self.solutions_generations = (list(range(count))
+                if count == self.generations_completed + 1 else [None] * count)
+
+    def _history_generation_numbers(self, generations):
+        """Use snapshot positions only for unknown legacy generation numbers."""
+        return [index if generation is None else generation
+                for index, generation in enumerate(generations)]
+
+    def _update_best_solution_generation(self):
+        """Find the best history entry using the same ordering as best_solution()."""
+        fitness = numpy.asarray(self.best_solutions_fitness)
+        if fitness.ndim == 1:
+            index = int(numpy.argmax(fitness))
+        else:
+            index = self.sort_solutions_nsga2(fitness=fitness,
+                                             find_best_solution=True)[0]
+        generation = self.best_solutions_generations[index]
+        self.best_solution_generation = -1 if generation is None else generation
+
+    def _saved_fitness_index(self, name, solutions, fitness):
+        """Index saved solutions incrementally, retaining the first match.
+
+        Rebuild outside run() so edits to public history arrays are honored.
+        During a run, only newly appended snapshots need indexing. Fitness
+        is read from the source list on each hit, so changes to saved scores
+        are also respected without duplicating those scores in the index.
+        """
+        indexes = getattr(self, '_saved_fitness_indexes', {})
+        self._saved_fitness_indexes = indexes
+        count = min(len(solutions), len(fitness))
+        indexed_solutions, indexed_count, lookup = indexes.get(name, (None, 0, {}))
+        if (not getattr(self, '_fitness_run_active', False)
+                or indexed_solutions is not solutions or indexed_count > count):
+            indexed_count, lookup = 0, {}
+        for index in range(indexed_count, count):
+            lookup.setdefault(tuple(solutions[index]), index)
+        indexes[name] = (solutions, count, lookup)
+        return lookup
+
+    def _save_population_snapshot(self):
+        """Append independent population and fitness snapshots with their generation."""
+        if self.save_solutions:
+            # Building each row preserves NumPy scalar types. tolist()
+            # would convert narrow NumPy types into Python int or float.
+            self.solutions.extend([list(solution) for solution in self.population])
+            self.solutions_fitness.extend(self.last_generation_fitness.copy())
+            self.solutions_generations.append(self.generations_completed)
+            self._saved_population_sizes.append(len(self.population))
+
     def round_genes(self, solutions):
         """
-        Round the genes in ``solutions`` according to the precision
-        encoded in ``self.gene_type``. When ``gene_type_single`` is
+        Convert and round genes in ``solutions`` using ``self.gene_type``.
+        When ``gene_type_single`` is
         True, the same dtype and precision are applied to every gene;
         otherwise the per-gene dtype / precision pair is used.
 
@@ -20,172 +108,117 @@ class GAEngine(FitnessEvaluation):
         Returns
         -------
         solutions : numpy.ndarray
-            The same array with the rounding applied.
+            The converted and rounded array. The original array is
+            updated when its dtype can hold the configured gene types.
         """
-        if self.gene_type_single:
-            if not self.gene_type[1] is None:
-                solutions = numpy.round(numpy.asarray(solutions, dtype=self.gene_type[0]),
-                                        self.gene_type[1])
-        else:
-            for gene_idx in range(self.num_genes):
-                if not self.gene_type[gene_idx][1] is None:
-                    solutions[:, gene_idx] = numpy.round(numpy.asarray(solutions[:, gene_idx],
-                                                                       dtype=self.gene_type[gene_idx][0]),
-                                                         self.gene_type[gene_idx][1])
-        return solutions
+        converted_solutions = self.change_population_dtype_and_round(solutions)
+        if isinstance(solutions, numpy.ndarray) and solutions.dtype == converted_solutions.dtype:
+            solutions[:] = converted_solutions
+            return solutions
+        return converted_solutions
 
-    def initialize_population(self,
-                              allow_duplicate_genes,
-                              gene_type,
-                              gene_constraint):
+    def initialize_population(self, allow_duplicate_genes, gene_type, gene_constraint):
         """
-        Build the initial population at random and store it on the GA
-        instance. The procedure has four steps: generate the gene
-        values (from the gene space or the init range), apply the
-        gene dtype and rounding, enforce gene constraints, and resolve
-        duplicate genes when not allowed.
-
-        Sets the following instance attributes:
-
-        - ``pop_size``: a ``(sol_per_pop, num_genes)`` tuple.
-        - ``population``: the working population. Updated every
-          generation after this initial call.
-        - ``initial_population``: a frozen copy of the initial
-          population for later reference.
+        Generate and store the initial population using the validated
+        initialization settings. Sample the values, apply constraints,
+        and repair duplicate genes when they are not allowed. The working
+        population and its initial snapshot are independent arrays.
 
         Parameters
         ----------
         allow_duplicate_genes : bool
-            If False, duplicate genes inside a single solution are
-            resolved by sampling new values.
-        gene_type : list or type
-            The dtype (and optional precision) for the genes. Used by
-            ``solve_duplicate_genes_randomly`` when resolving
-            duplicates outside the gene space.
+            Whether repeated gene values are allowed within a solution.
+        gene_type : type or list
+            Retained for compatibility. Sampling uses the validated
+            gene types and optional precisions stored in self.gene_type.
         gene_constraint : list or None
-            One callable per gene that returns the subset of a
-            candidate values list which satisfy the constraint. ``None``
-            disables the per-gene constraint check.
+            Validated per-gene constraint callables.
         """
-
-        # Population size = (number of chromosomes, number of genes per chromosome)
-        # The population will have sol_per_pop chromosome where each chromosome has num_genes genes.
-        self.pop_size = (self.sol_per_pop, self.num_genes)
-
-        # There are 4 steps to build the initial population:
-            # 1) Generate the population.
-            # 2) Change the data type and round the values.
-            # 3) Check for the constraints.
-            # 4) Solve duplicates if not allowed.
-
-        # Create an empty population.
-        self.population = numpy.empty(shape=self.pop_size, dtype=object)
-
-        # 1) Create the initial population either randomly or using the gene space.
-        if self.gene_space is None:
-            # Create the initial population randomly.
-
-            # Set gene_value=None to consider generating values for the initial population instead of generating values for mutation.
-            # Loop through the genes, randomly generate the values of a single gene at a time, and insert the values of each gene to the population.
-            for sol_idx in range(self.sol_per_pop):
-                for gene_idx in range(self.num_genes):
-                    range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
-                    self.population[sol_idx, gene_idx] = self.generate_gene_value_randomly(range_min=range_min,
-                                                                                           range_max=range_max,
-                                                                                           gene_idx=gene_idx,
-                                                                                           mutation_by_replacement=True,
-                                                                                           gene_value=None,
-                                                                                           sample_size=1,
-                                                                                           step=1)
-
-        else:
-            # Generate the initial population using the gene_space.
-            for sol_idx in range(self.sol_per_pop):
-                for gene_idx in range(self.num_genes):
-                    self.population[sol_idx, gene_idx] = self.generate_gene_value_from_space(gene_idx=gene_idx,
-                                                                                             mutation_by_replacement=True,
-                                                                                             gene_value=None,
-                                                                                             solution=self.population[sol_idx],
-                                                                                             sample_size=1)
-
-        # 2) Change the data type and round all genes within the initial population.
-        # This step is necessary before applying the gene constraints since the right gene value must be used for accuracy.
-        self.population = self.change_population_dtype_and_round(self.population)
-
-        # Note that gene_constraint is not validated yet.
-        # We have to set it as a property of the pygad.GA instance to retrieve without passing it as an additional parameter.
+        # Store the policies passed by the constructor or by a caller
+        # explicitly rebuilding the initial population.
+        self.allow_duplicate_genes = allow_duplicate_genes
         self.gene_constraint = gene_constraint
-
-        # 3) Enforce the gene constraints as much as possible.
-        if self.gene_constraint is None:
-            pass
-        else:
-            for sol_idx, solution in enumerate(self.population):
-                for gene_idx in range(self.num_genes):
-                    # Check that a constraint is available for the gene and that the current value does not satisfy that constraint
-                    if self.gene_constraint[gene_idx]:
-                        # Remember that the second argument to the gene constraint callable is a list/numpy.ndarray of the values to check if they meet the gene constraint.
-                        values = [solution[gene_idx]]
-                        filtered_values = self.gene_constraint[gene_idx](solution, values)
-                        result = self.validate_gene_constraint_callable_output(selected_values=filtered_values,
-                                                                               values=values)
-                        if result:
-                            pass
-                        else:
-                            raise Exception("The output from the gene_constraint callable/function must be a list or NumPy array that is a subset of the passed values (second argument).")
-
-                        if len(filtered_values) ==1 and filtered_values[0] != solution[gene_idx]:
-                            # Error by the user's defined gene constraint callable.
-                            raise Exception(f"It is expected to receive a list/numpy.ndarray from the gene_constraint callable with a single value equal to {values[0]}, but the value {filtered_values[0]} found.")
-
-                        # Check if the gene value does not satisfy the gene constraint.
-                        # Note that we already passed a list of a single value.
-                        # It is expected to receive a list of either a single value or an empty list.
-                        if len(filtered_values) < 1:
-                            # Search for a value that satisfies the gene constraint.
-                            range_min, range_max = self.get_initial_population_range(gene_index=gene_idx)
-                            # While initializing the population, we follow a mutation by replacement approach. So, the original gene value is not needed.
-                            values_filtered = self.get_valid_gene_constraint_values(range_min=range_min,
-                                                                                    range_max=range_max,
-                                                                                    gene_value=None,
-                                                                                    gene_idx=gene_idx,
-                                                                                    mutation_by_replacement=True,
-                                                                                    solution=solution,
-                                                                                    sample_size=self.sample_size)
-                            if values_filtered is None:
-                                if not self.suppress_warnings:
-                                    warnings.warn(f"No value satisfied the constraint for the gene at index {gene_idx} with value {solution[gene_idx]} while creating the initial population.")
-                            else:
-                                self.population[sol_idx, gene_idx] = random.choice(values_filtered)
-                        elif len(filtered_values) == 1:
-                            # The value already satisfied the gene constraint.
-                            pass
-                        else:
-                            # Error by the user's defined gene constraint callable.
-                            raise Exception(f"It is expected to receive a list/numpy.ndarray from the gene_constraint callable that is either empty or has a single value equal, but received a list/numpy.ndarray of length {len(filtered_values)}.")
-
-        # 4) Solve duplicate genes.
-        if allow_duplicate_genes == False:
-            for solution_idx in range(self.population.shape[0]):
-                if self.gene_space is None:
-                    self.population[solution_idx], _, _ = self.solve_duplicate_genes_randomly(solution=self.population[solution_idx],
-                                                                                              min_val=self.init_range_low,
-                                                                                              max_val=self.init_range_high,
-                                                                                              gene_type=gene_type,
-                                                                                              mutation_by_replacement=True,
-                                                                                              sample_size=self.sample_size)
-                else:
-                    self.population[solution_idx], _, _ = self.solve_duplicate_genes_by_space(solution=self.population[solution_idx].copy(),
-                                                                                              gene_type=self.gene_type,
-                                                                                              mutation_by_replacement=True,
-                                                                                              sample_size=self.sample_size,
-                                                                                              build_initial_pop=True)
-
-        # Change the data type and round all genes within the initial population.
-        self.population = self.change_population_dtype_and_round(self.population)
-
-        # Keeping the initial population in the initial_population attribute.
+        self.pop_size = (self.sol_per_pop, self.num_genes)
+        self.population = self.generate_initial_population(self.sol_per_pop)
         self.initial_population = self.population.copy()
+
+    def generate_initial_population(self, num_solutions):
+        """
+        Return new solutions using the initialization settings. Sampling
+        in bulk avoids rebuilding finite candidate sets for every solution
+        and calling the sampler for every value. NSGA-III population growth
+        uses this same method.
+        """
+        continuous_space = (self.gene_space is None or
+                            (type(self.gene_space) is dict and 'step' not in self.gene_space))
+        if self.gene_type_single and self.gene_type[0] in self.supported_float_types and continuous_space:
+            if self.gene_space is None:
+                lower = numpy.minimum(self.init_range_low, self.init_range_high)
+                upper = numpy.maximum(self.init_range_low, self.init_range_high)
+            else:
+                lower = min(self.gene_space['low'], self.gene_space['high'])
+                upper = max(self.gene_space['low'], self.gene_space['high'])
+            # A single draw retains the traditional solution-then-gene
+            # order for continuous populations while avoiding scalar calls.
+            population = self.numpy_random_generator.uniform(lower, upper, size=(num_solutions, self.num_genes))
+            for gene_index in range(self.num_genes):
+                if self.gene_space is None:
+                    gene_lower, gene_upper = self.get_initial_population_range(gene_index)
+                    gene_lower, gene_upper = sorted([gene_lower, gene_upper])
+                else:
+                    gene_lower, gene_upper = lower, upper
+                population[:, gene_index] = self._convert_initial_population_range_values(
+                    gene_index, gene_lower, gene_upper, population[:, gene_index])
+        else:
+            population = numpy.empty((num_solutions, self.num_genes), dtype=object)
+            for gene_index in range(self.num_genes):
+                population[:, gene_index] = self.sample_initial_population_gene_values(
+                    gene_index, num_solutions)
+        return self.prepare_initial_population(population)
+
+    def prepare_initial_population(self, population):
+        """
+        Convert a generated or supplied population, then apply constraints
+        and duplicate repair. Existing supplied values need not belong to
+        the gene space or initialization range. Any replacement uses the
+        initialization settings for its own gene.
+        """
+        population = self.change_population_dtype_and_round(population)
+        population = self.apply_initial_population_gene_constraints(population)
+        if not self.allow_duplicate_genes:
+            population = self.solve_duplicate_genes_in_population(
+                population, build_initial_pop=True)
+        return population
+
+    def apply_initial_population_gene_constraints(self, population, warn=True):
+        """
+        Replace values rejected by their constraints using converted
+        initialization candidates. Constraints see the complete solution
+        and are applied in gene-index order. Leave the existing value and
+        warn when no candidate satisfies a constraint.
+        """
+        if self.gene_constraint is None:
+            return population
+        for solution in population:
+            for gene_index, constraint in enumerate(self.gene_constraint):
+                if constraint is None:
+                    continue
+                accepted_values = self.filter_gene_values_by_constraint(
+                    [solution[gene_index]], solution, gene_index, warn=False)
+                if accepted_values is not None:
+                    if len(accepted_values) != 1:
+                        raise ValueError("A gene constraint checking a single value must return an empty list or NumPy array, or one containing only that value.")
+                    continue
+                candidates = self.get_initial_population_gene_candidates(
+                    gene_index, self.sample_size, all_integer_values=False)
+                accepted_values = self.filter_gene_values_by_constraint(
+                    candidates, solution, gene_index, warn=False)
+                if accepted_values is None:
+                    if warn and not self.suppress_warnings:
+                        warnings.warn(f"No value satisfied the constraint for the gene at index {gene_index} with value {solution[gene_index]} while creating the initial population.")
+                else:
+                    solution[gene_index] = self.python_random_generator.choice(accepted_values)
+        return population
 
     def cal_pop_fitness(self):
         """Compute population fitness with the same cache rules in all modes."""
@@ -197,31 +230,41 @@ class GAEngine(FitnessEvaluation):
 
             if type(self.best_solutions) is numpy.ndarray:
                 self.best_solutions = self.best_solutions.tolist()
-            saved_solutions = (self.solutions.tolist()
-                               if type(self.solutions) is numpy.ndarray
-                               else self.solutions)
+            saved_solutions = self.solutions
+            saved_index = (self._saved_fitness_index('solutions', saved_solutions,
+                            self.solutions_fitness) if self.save_solutions else {})
+            best_index = (self._saved_fitness_index('best_solutions', self.best_solutions,
+                            self.best_solutions_fitness) if self.save_best_solutions else {})
             parents = (self.last_generation_parents.tolist()
                        if self.last_generation_parents is not None else [])
             elites = (self.last_generation_elitism.tolist()
                       if self.last_generation_elitism is not None else [])
+            parent_index = {}
+            elite_index = {}
+            for index, solution in enumerate(parents):
+                parent_index.setdefault(tuple(solution), index)
+            for index, solution in enumerate(elites):
+                elite_index.setdefault(tuple(solution), index)
             pop_fitness = [None] * len(self.population)
             missing_indices = []
+            if not getattr(self, '_fitness_run_active', False):
+                self._fitness_value_shape = None
             for index, solution in enumerate(self.population):
-                values = solution.tolist()
-                if self.save_solutions and values in saved_solutions:
-                    fitness = self.solutions_fitness[saved_solutions.index(values)]
-                elif self.save_best_solutions and values in self.best_solutions:
-                    fitness = self.best_solutions_fitness[self.best_solutions.index(values)]
-                elif self.keep_elitism > 0 and values in elites:
-                    previous_index = self.last_generation_elitism_indices[elites.index(values)]
+                values = tuple(solution)
+                if values in saved_index:
+                    fitness = self.solutions_fitness[saved_index[values]]
+                elif values in best_index:
+                    fitness = self.best_solutions_fitness[best_index[values]]
+                elif self.keep_elitism > 0 and values in elite_index:
+                    previous_index = self.last_generation_elitism_indices[elite_index[values]]
                     fitness = self.previous_generation_fitness[previous_index]
-                elif self.keep_parents != 0 and values in parents:
-                    previous_index = self.last_generation_parents_indices[parents.index(values)]
+                elif self.keep_parents != 0 and values in parent_index:
+                    previous_index = self.last_generation_parents_indices[parent_index[values]]
                     fitness = self.previous_generation_fitness[previous_index]
                 else:
                     missing_indices.append(index)
                     continue
-                pop_fitness[index] = fitness
+                pop_fitness[index] = self._validate_fitness_value(fitness, 'cached fitness')
 
             fitness_values = self._evaluate_fitness(self.population, missing_indices)
             for index, fitness in zip(missing_indices, fitness_values):
@@ -258,12 +301,15 @@ class GAEngine(FitnessEvaluation):
             current number of objectives.
         """
         self._fitness_run_active = True
+        self._saved_fitness_indexes = {}
+        self._fitness_value_shape = None
         try:
             if self.valid_parameters == False:
                 raise Exception("Error calling the run() method: \nThe run() method cannot be executed with invalid parameters. Please check the parameters passed while creating an instance of the GA class.\n")
 
             # Starting from PyGAD 2.18.0, the 4 properties (best_solutions, best_solutions_fitness, solutions, and solutions_fitness) are no longer reset with each call to the run() method. Instead, they are extended.
-            # For example, if there are 50 generations and the user set save_best_solutions=True, then the length of the 2 properties best_solutions and best_solutions_fitness will be 50 after the first call to the run() method, then 100 after the second call, 150 after the third, and so on.
+            # Each run retains its starting population and every completed generation.
+            self._restore_history_generations()
 
             # self.best_solutions: Holds the best solution in each generation.
             if type(self.best_solutions) is numpy.ndarray:
@@ -327,9 +373,12 @@ class GAEngine(FitnessEvaluation):
             if self.save_best_solutions:
                 self.best_solutions.append(list(best_solution))
 
+            unchanged_generations = 0
+
             for generation in range(generation_first_idx, generation_last_idx):
 
                 self.run_loop_head(best_solution_fitness)
+                previous_best_fitness = self.best_solutions_fitness[-1]
 
                 # Call the 'run_select_parents()' method to select the parents.
                 # It edits these 2 instance attributes:
@@ -353,6 +402,15 @@ class GAEngine(FitnessEvaluation):
                     # 1) population: A NumPy array of the population of solutions/chromosomes.
                 self.run_update_population()
 
+                # User operators and callbacks may edit the public histories.
+                # Rebuild their indexes after those calls; ordinary built-in
+                # evolution keeps the incremental indexes between generations.
+                if (any(callable(operator) for operator in
+                        (self.parent_selection_type, self.crossover_type, self.mutation_type))
+                        or any(callback is not None for callback in
+                               (self.on_parents, self.on_crossover, self.on_mutation))):
+                    self._saved_fitness_indexes = {}
+
                 # The generations_completed attribute holds the number of the last completed generation.
                 self.generations_completed = generation + 1
 
@@ -362,6 +420,10 @@ class GAEngine(FitnessEvaluation):
 
                 best_solution, best_solution_fitness, best_match_idx = self.best_solution(
                     pop_fitness=self.last_generation_fitness)
+                if numpy.array_equal(previous_best_fitness, best_solution_fitness):
+                    unchanged_generations += 1
+                else:
+                    unchanged_generations = 0
 
                 # Appending the best solution in the current generation to the best_solutions list.
                 if self.save_best_solutions:
@@ -371,6 +433,7 @@ class GAEngine(FitnessEvaluation):
                 # If the on_generation attribute is not None, then call the callback function after the generation.
                 if not (self.on_generation is None):
                     r = self.on_generation(self)
+                    self._saved_fitness_indexes = {}
                     if type(r) is str and r.lower() == "stop":
                         break
 
@@ -415,22 +478,9 @@ class GAEngine(FitnessEvaluation):
                                         stop_run = False
                                         break
                         elif criterion[0] == "saturate":
-                            criterion[1] = int(criterion[1])
-                            if self.generations_completed >= criterion[1]:
-                                # Single-objective problem.
-                                if type(self.last_generation_fitness[0]) in self.supported_int_float_types:
-                                    if (self.best_solutions_fitness[self.generations_completed - criterion[1]] - self.best_solutions_fitness[self.generations_completed - 1]) == 0:
-                                        stop_run = True
-                                        break
-                                # Multi-objective problem.
-                                elif type(self.last_generation_fitness[0]) in [list, tuple, numpy.ndarray]:
-                                    stop_run = True
-                                    for obj_idx in range(len(self.last_generation_fitness[0])):
-                                        if (self.best_solutions_fitness[self.generations_completed - criterion[1]][obj_idx] - self.best_solutions_fitness[self.generations_completed - 1][obj_idx]) == 0:
-                                            pass
-                                        else:
-                                            stop_run = False
-                                            break
+                            if unchanged_generations >= criterion[1]:
+                                stop_run = True
+                                break
                         elif criterion[0] == "time":
                             # Stop when the time spent inside run()
                             # passes the user limit.
@@ -449,13 +499,7 @@ class GAEngine(FitnessEvaluation):
                     break
 
             # Save the fitness of the last generation.
-            if self.save_solutions:
-                # self.solutions.extend(self.population.copy())
-                population_as_list = self.population.copy()
-                population_as_list = [list(item) for item in population_as_list]
-                self.solutions.extend(population_as_list)
-
-                self.solutions_fitness.extend(self.last_generation_fitness)
+            self._save_population_snapshot()
 
             # Call the run_select_parents() method to update these 2 attributes according to the 'last_generation_fitness' attribute:
                 # 1) last_generation_parents 2) last_generation_parents_indices
@@ -468,12 +512,15 @@ class GAEngine(FitnessEvaluation):
                                                                                                                  num_parents=self.keep_elitism)
 
             # Save the fitness value of the best solution.
-            _, best_solution_fitness, _ = self.best_solution(
+            best_solution, best_solution_fitness, _ = self.best_solution(
                 pop_fitness=self.last_generation_fitness)
-            self.best_solutions_fitness.append(best_solution_fitness)
+            if self.save_best_solutions:
+                self.best_solutions[-1] = best_solution.tolist()
+            self.best_solutions_fitness.append(numpy.copy(best_solution_fitness)
+                if isinstance(best_solution_fitness, numpy.ndarray) else best_solution_fitness)
+            self.best_solutions_generations.append(self.generations_completed)
 
-            self.best_solution_generation = numpy.where(numpy.array(
-                self.best_solutions_fitness) == numpy.max(numpy.array(self.best_solutions_fitness)))[0][0]
+            self._update_best_solution_generation()
             # After the run() method completes, the run_completed flag is changed from False to True.
             # Set to True only after the run() method completes gracefully.
             self.run_completed = True
@@ -482,7 +529,7 @@ class GAEngine(FitnessEvaluation):
                 self.on_stop(self, self.last_generation_fitness)
 
             # Converting the 'best_solutions' list into a NumPy array.
-            self.best_solutions = numpy.array(self.best_solutions)
+            self.best_solutions = numpy.array(self.best_solutions, dtype=self.population.dtype)
 
             # Update previous_generation_fitness because it is used to get the fitness of the parents.
             self.previous_generation_fitness = self.last_generation_fitness.copy()
@@ -502,7 +549,7 @@ class GAEngine(FitnessEvaluation):
         """
         Run the bookkeeping that takes place at the top of every
         generation: call ``self.on_fitness`` if set (with optional
-        validation of the returned values), append the running best
+        validation of returned or edited values), recompute and append the best
         fitness to ``self.best_solutions_fitness``, and append the
         current population and fitness to ``self.solutions`` /
         ``self.solutions_fitness`` when ``self.save_solutions`` is
@@ -513,7 +560,8 @@ class GAEngine(FitnessEvaluation):
         Parameters
         ----------
         best_solution_fitness : numeric or numpy.ndarray
-            Fitness of the best solution in the previous generation.
+            Retained for compatibility. The best fitness is recomputed
+            after on_fitness so it agrees with the saved solution.
 
         Raises
         ------
@@ -522,8 +570,10 @@ class GAEngine(FitnessEvaluation):
             match the population fitness, or an unsupported type.
         """
         if not (self.on_fitness is None):
+            expected_shape = self.last_generation_fitness.shape
             on_fitness_output = self.on_fitness(self, 
                                                 self.last_generation_fitness)
+            self._saved_fitness_indexes = {}
 
             if on_fitness_output is None:
                 pass
@@ -536,18 +586,25 @@ class GAEngine(FitnessEvaluation):
                         raise ValueError(f"Size mismatch between the output of on_fitness() {on_fitness_output.shape} and the expected fitness output {self.last_generation_fitness.shape}.")
                 else:
                     raise ValueError(f"The output of on_fitness() is expected to be tuple/list/range/numpy.ndarray but {type(on_fitness_output)} found.")
+            self.last_generation_fitness = self._validate_population_fitness(
+                self.last_generation_fitness, 'on_fitness output')
+            if self.last_generation_fitness.shape != expected_shape:
+                raise ValueError(f"Size mismatch between the output of on_fitness() {self.last_generation_fitness.shape} and the expected fitness output {expected_shape}.")
 
         # Appending the fitness value of the best solution in the current generation to the best_solutions_fitness attribute.
-        self.best_solutions_fitness.append(best_solution_fitness)
+        if self.on_fitness is not None:
+            best_solution, best_solution_fitness, _ = self.best_solution(
+                pop_fitness=self.last_generation_fitness)
+        self.best_solutions_fitness.append(numpy.copy(best_solution_fitness)
+            if isinstance(best_solution_fitness, numpy.ndarray) else best_solution_fitness)
+        self.best_solutions_generations.append(self.generations_completed)
+        if self.save_best_solutions and self.on_fitness is not None:
+            # This snapshot was appended before on_fitness ran. The callback
+            # may change which solution is best, so update the matching entry.
+            self.best_solutions[-1] = best_solution.tolist()
 
         # Appending the solutions in the current generation to the solutions list.
-        if self.save_solutions:
-            # self.solutions.extend(self.population.copy())
-            population_as_list = self.population.copy()
-            population_as_list = [list(item) for item in population_as_list]
-            self.solutions.extend(population_as_list)
-
-            self.solutions_fitness.extend(self.last_generation_fitness)
+        self._save_population_snapshot()
 
     def run_select_parents(self, call_on_parents=True):
         """
@@ -612,6 +669,9 @@ class GAEngine(FitnessEvaluation):
         elif len(self.last_generation_parents_indices) != self.num_parents_mating:
             raise ValueError(f"The iterable holding the selected parents indices is expected to have ({self.num_parents_mating}) values but ({len(self.last_generation_parents_indices)}) found.")
 
+        if callable(self.parent_selection_type):
+            self.last_generation_parents = self.change_population_dtype_and_round(self.last_generation_parents)
+
         if call_on_parents:
             if not (self.on_parents is None):
                 on_parents_output = self.on_parents(self, 
@@ -630,7 +690,7 @@ class GAEngine(FitnessEvaluation):
                                 raise ValueError("The returned outputs of on_parents() cannot be None but the first output is None.")
                     else:
                         if type(on_parents_selected_parents) in [tuple, list, numpy.ndarray]:
-                            on_parents_selected_parents = numpy.array(on_parents_selected_parents)
+                            on_parents_selected_parents = numpy.asarray(on_parents_selected_parents, dtype=object)
                             if on_parents_selected_parents.shape == self.last_generation_parents.shape:
                                 self.last_generation_parents = on_parents_selected_parents
                             else:
@@ -654,6 +714,9 @@ class GAEngine(FitnessEvaluation):
     
                 else:
                     raise TypeError(f"The output of on_parents() is expected to be tuple/list/numpy.ndarray but {type(on_parents_output)} found.")
+
+        if call_on_parents and self.on_parents is not None:
+            self.last_generation_parents = self.change_population_dtype_and_round(self.last_generation_parents)
 
     def run_crossover(self):
         """
@@ -721,6 +784,10 @@ class GAEngine(FitnessEvaluation):
                 elif self.last_generation_offspring_crossover.shape[1] != self.num_genes:
                     raise ValueError(f"Size mismatch between the crossover output {self.last_generation_offspring_crossover.shape} and the expected crossover output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_crossover.shape[1]}) produced.")
 
+        if callable(self.crossover_type) and self.on_crossover is not None:
+            self.last_generation_offspring_crossover = self.change_population_dtype_and_round(
+                self.last_generation_offspring_crossover)
+
         # PyGAD 2.18.2 // The on_crossover() callback function is called even if crossover_type is None.
         if not (self.on_crossover is None):
             on_crossover_output = self.on_crossover(self, 
@@ -729,13 +796,18 @@ class GAEngine(FitnessEvaluation):
                 pass
             else:
                 if type(on_crossover_output) in [tuple, list, numpy.ndarray]:
-                    on_crossover_output = numpy.array(on_crossover_output)
+                    on_crossover_output = numpy.asarray(on_crossover_output, dtype=object)
                     if on_crossover_output.shape == self.last_generation_offspring_crossover.shape:
                         self.last_generation_offspring_crossover = on_crossover_output
                     else:
                         raise ValueError(f"Size mismatch between the output of on_crossover() {on_crossover_output.shape} and the expected crossover output {self.last_generation_offspring_crossover.shape}.")
                 else:
                     raise ValueError(f"The output of on_crossover() is expected to be tuple/list/numpy.ndarray but {type(on_crossover_output)} found.")
+
+        if callable(self.crossover_type) or self.on_crossover is not None:
+            self.last_generation_offspring_crossover = self.prepare_operator_output(
+                self.last_generation_offspring_crossover,
+                build_initial_pop=self.crossover_type == 'sbx')
 
     def run_mutation(self):
         """
@@ -781,6 +853,10 @@ class GAEngine(FitnessEvaluation):
                 elif self.last_generation_offspring_mutation.shape[1] != self.num_genes:
                     raise ValueError(f"Size mismatch between the mutation output {self.last_generation_offspring_mutation.shape} and the expected mutation output {(self.num_offspring, self.num_genes)}. It is expected that the offspring has ({self.num_genes}) genes but ({self.last_generation_offspring_mutation.shape[1]}) produced.")
 
+        if callable(self.mutation_type) and self.on_mutation is not None:
+            self.last_generation_offspring_mutation = self.change_population_dtype_and_round(
+                self.last_generation_offspring_mutation)
+
         # PyGAD 2.18.2 // The on_mutation() callback function is called even if mutation_type is None.
         if not (self.on_mutation is None):
             on_mutation_output = self.on_mutation(self, 
@@ -790,13 +866,41 @@ class GAEngine(FitnessEvaluation):
                 pass
             else:
                 if type(on_mutation_output) in [tuple, list, numpy.ndarray]:
-                    on_mutation_output = numpy.array(on_mutation_output)
+                    on_mutation_output = numpy.asarray(on_mutation_output, dtype=object)
                     if on_mutation_output.shape == self.last_generation_offspring_mutation.shape:
                         self.last_generation_offspring_mutation = on_mutation_output
                     else:
                         raise ValueError(f"Size mismatch between the output of on_mutation() {on_mutation_output.shape} and the expected mutation output {self.last_generation_offspring_mutation.shape}.")
                 else:
                     raise ValueError(f"The output of on_mutation() is expected to be tuple/list/numpy.ndarray but {type(on_mutation_output)} found.")
+
+        if callable(self.mutation_type) or self.on_mutation is not None:
+            self.last_generation_offspring_mutation = self.prepare_operator_output(
+                self.last_generation_offspring_mutation,
+                build_initial_pop=self.mutation_type == 'polynomial')
+
+    def prepare_operator_output(self, population, build_initial_pop=False):
+        """
+        Convert an operator's population using the configured gene types
+        and precision, then repair duplicates if they are disallowed.
+
+        Parameters
+        ----------
+        population : numpy.ndarray
+            Parents or offspring to prepare without modifying the input.
+        build_initial_pop : bool
+            Use initialization bounds for duplicate repair, as required
+            for SBX crossover and polynomial mutation.
+
+        Returns
+        -------
+        numpy.ndarray
+            The converted population, with duplicate repair applied when
+            allow_duplicate_genes is False.
+        """
+        if self.allow_duplicate_genes:
+            return self.change_population_dtype_and_round(population)
+        return self.solve_duplicate_genes_in_population(population, build_initial_pop=build_initial_pop)
 
     def run_update_population(self):
         """
@@ -878,24 +982,24 @@ class GAEngine(FitnessEvaluation):
                 pop_fitness = self.cal_pop_fitness()
             # Verify the type of the 'pop_fitness' parameter.
             elif type(pop_fitness) in [tuple, list, numpy.ndarray]:
+                if isinstance(pop_fitness, numpy.ndarray) and pop_fitness.ndim == 0:
+                    raise ValueError("pop_fitness must contain one fitness value per population solution.")
                 # Verify that the length of the passed population fitness matches the length of the 'self.population' attribute.
                 if len(pop_fitness) == len(self.population):
                     # This successfully verifies the 'pop_fitness' parameter.
-                    pass
+                    pop_fitness = self._validate_population_fitness(
+                        pop_fitness, 'pop_fitness', check_shape=False)
                 else:
                     raise ValueError(f"The length of the list/tuple/numpy.ndarray passed to the 'pop_fitness' parameter ({len(pop_fitness)}) must match the length of the 'self.population' attribute ({len(self.population)}).")
             else:
                 raise ValueError(f"The type of the 'pop_fitness' parameter is expected to be list, tuple, or numpy.ndarray but ({type(pop_fitness)}) found.")
 
-            # Return the index of the best solution that has the best fitness value.
-            # For multi-objective optimization: find the index of the solution with the maximum fitness in the first objective,
-            # break ties using the second objective, then third, etc.
+            # Use the same ordering as parent selection for multi-objective fitness.
             pop_fitness_arr = numpy.array(pop_fitness)
             # Get the indices that would sort by all objectives in descending order
             if pop_fitness_arr.ndim == 1:
                 # Single-objective optimization.
-                best_match_idx = numpy.where(
-                 pop_fitness == numpy.max(pop_fitness))[0][0]
+                best_match_idx = int(numpy.argmax(pop_fitness_arr))
             elif pop_fitness_arr.ndim == 2:
                 # Multi-objective optimization.
                 # Use NSGA-2 to sort the solutions using the fitness.
@@ -961,137 +1065,17 @@ class GAEngine(FitnessEvaluation):
         self.last_generation_fitness = self.cal_pop_fitness()
 
     def _nsga3_generate_extra_random_solutions(self, count):
-        """
-        Build ``count`` random solutions that obey every initial-
-        population rule: ``gene_space``, ``init_range_low`` /
-        ``init_range_high``, ``gene_type`` (including nested per-gene
-        type / precision), ``gene_constraint``, and
-        ``allow_duplicate_genes``.
-
-        Steps mirror ``initialize_population``:
-          1. Sample each gene from its space (or init range).
-          2. Cast and round to the configured gene type.
-          3. Enforce gene constraints when present.
-          4. Resolve duplicate genes when not allowed.
-        """
-        extra = numpy.empty((count, self.num_genes), dtype=object)
-        for sol_idx in range(count):
-            for gene_idx in range(self.num_genes):
-                extra[sol_idx, gene_idx] = self._nsga3_generate_single_random_gene(
-                    gene_idx, extra[sol_idx])
-        extra = self.change_population_dtype_and_round(extra)
-
-        if self.gene_constraint is not None:
-            extra = self._nsga3_apply_gene_constraints(extra)
-
-        if not self.allow_duplicate_genes:
-            extra = self._nsga3_resolve_duplicate_genes(extra)
-            extra = self.change_population_dtype_and_round(extra)
-
-        return extra
+        """Generate NSGA-III growth rows using the initialization settings."""
+        return self.generate_initial_population(count)
 
     def _nsga3_generate_single_random_gene(self, gene_idx, partial_solution):
-        """
-        Pick a single random gene value for ``gene_idx`` using the
-        initial-population settings. When ``gene_space`` is set, the
-        gene-space sampler is used; otherwise the per-gene init range
-        is used. ``mutation_by_replacement`` is forced to True so the
-        sampler returns a value drawn from the configured range rather
-        than an offset to add to an existing gene (which is the
-        mutation-time behavior).
-        """
-        if self.gene_space is None:
-            range_min, range_max = self.get_initial_population_range(
-                gene_index=gene_idx)
-            return self.generate_gene_value_randomly(range_min=range_min,
-                                                    range_max=range_max,
-                                                    gene_idx=gene_idx,
-                                                    mutation_by_replacement=True,
-                                                    gene_value=None,
-                                                    sample_size=1,
-                                                    step=1)
-        return self.generate_gene_value_from_space(gene_idx=gene_idx,
-                                                   mutation_by_replacement=True,
-                                                   gene_value=None,
-                                                   solution=partial_solution,
-                                                   sample_size=1)
+        """Compatibility helper for sampling one initialization value."""
+        return self.sample_initial_population_gene_values(gene_idx, 1)[0]
 
     def _nsga3_apply_gene_constraints(self, population):
-        """
-        Walk the new rows and replace any gene that does not satisfy
-        its gene constraint, using the same logic that
-        ``initialize_population`` runs during the initial build.
-        """
-        for sol_idx, solution in enumerate(population):
-            for gene_idx in range(self.num_genes):
-                if not self.gene_constraint[gene_idx]:
-                    continue
-                values = [solution[gene_idx]]
-                filtered_values = self.gene_constraint[gene_idx](solution, values)
-                result = self.validate_gene_constraint_callable_output(
-                    selected_values=filtered_values, values=values)
-                if not result:
-                    raise Exception(
-                        "The output from the gene_constraint callable/function "
-                        "must be a list or NumPy array that is a subset of the "
-                        "passed values (second argument).")
-                if len(filtered_values) == 1 and filtered_values[0] != solution[gene_idx]:
-                    raise Exception(
-                        f"It is expected to receive a list/numpy.ndarray from "
-                        f"the gene_constraint callable with a single value "
-                        f"equal to {values[0]}, but the value "
-                        f"{filtered_values[0]} found.")
-                if len(filtered_values) < 1:
-                    range_min, range_max = self.get_initial_population_range(
-                        gene_index=gene_idx)
-                    values_filtered = self.get_valid_gene_constraint_values(
-                        range_min=range_min,
-                        range_max=range_max,
-                        gene_value=None,
-                        gene_idx=gene_idx,
-                        mutation_by_replacement=True,
-                        solution=solution,
-                        sample_size=self.sample_size,
-                    )
-                    if values_filtered is None:
-                        if not self.suppress_warnings:
-                            warnings.warn(
-                                f"No value satisfied the constraint for the "
-                                f"gene at index {gene_idx} with value "
-                                f"{solution[gene_idx]} while growing the "
-                                f"population for NSGA-III.")
-                    else:
-                        population[sol_idx, gene_idx] = random.choice(values_filtered)
-                elif len(filtered_values) > 1:
-                    raise Exception(
-                        f"It is expected to receive a list/numpy.ndarray from "
-                        f"the gene_constraint callable that is either empty or "
-                        f"has a single value equal, but received a list/numpy."
-                        f"ndarray of length {len(filtered_values)}.")
-        return population
+        """Compatibility helper for applying initialization constraints."""
+        return self.apply_initial_population_gene_constraints(population)
 
     def _nsga3_resolve_duplicate_genes(self, population):
-        """
-        Apply the same duplicate-resolution path
-        ``initialize_population`` uses, so the grown rows never carry
-        duplicate genes when ``allow_duplicate_genes`` is False.
-        """
-        for solution_idx in range(population.shape[0]):
-            if self.gene_space is None:
-                population[solution_idx], _, _ = self.solve_duplicate_genes_randomly(
-                    solution=population[solution_idx],
-                    min_val=self.init_range_low,
-                    max_val=self.init_range_high,
-                    gene_type=self.gene_type,
-                    mutation_by_replacement=True,
-                    sample_size=self.sample_size,
-                )
-            else:
-                population[solution_idx], _, _ = self.solve_duplicate_genes_by_space(
-                    solution=population[solution_idx].copy(),
-                    gene_type=self.gene_type,
-                    mutation_by_replacement=True,
-                    sample_size=self.sample_size,
-                    build_initial_pop=True,
-                )
-        return population
+        """Repair newly generated rows using initialization rules."""
+        return self.solve_duplicate_genes_in_population(population, build_initial_pop=True)

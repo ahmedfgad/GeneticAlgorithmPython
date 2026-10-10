@@ -144,3 +144,33 @@ Classification accuracy : 99.94903160040775.
 The next figure shows how fitness value evolves by generation.
 
 ![Training Neural Networks using Genetic Algorithm](images/82152993-21898180-9865-11ea-8387-b995f88b83f7.png)
+
+<!-- python-examples
+gann/example_classification.py
+-->
+
+**Python example**
+
+**[Image classification](../../examples/gann/example_classification.py)**
+
+Classify fruit images from prepared feature vectors.
+
+`examples/gann/example_classification.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+**Data:** examples/data/dataset_features.npy and examples/data/outputs.npy. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/gann/ so the relative data paths resolve:
+
+```console
+cd examples/gann
+python example_classification.py
+```
+
+</details>
+
+<!-- /python-examples -->

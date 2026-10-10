@@ -1,5 +1,7 @@
 """Sampling probabilities, requested parent counts, and population row mappings."""
 
+from unittest.mock import Mock
+
 import copy
 
 import numpy
@@ -30,7 +32,8 @@ def test_rank_selection_favors_better_fitness_and_maps_population_rows(
                            suppress_warnings=True)
     # Sample every interval uniformly without statistical sampling noise.
     random_pointers = iter((numpy.arange(1000) + 0.5) / 1000)
-    monkeypatch.setattr(numpy.random, "rand", lambda: next(random_pointers))
+    monkeypatch.setattr(ga_instance, 'numpy_random_generator', Mock(wraps=ga_instance.numpy_random_generator))
+    monkeypatch.setattr(ga_instance.numpy_random_generator, "rand", lambda: next(random_pointers))
 
     parents, parents_indices = ga_instance.rank_selection(
         fitness=numpy.array(fitness), num_parents=1000)
@@ -51,7 +54,8 @@ def test_rank_selection_favors_best_tied_group_or_crowding_boundaries(monkeypatc
                            mutation_type=None,
                            suppress_warnings=True)
     random_pointers = iter((numpy.arange(1000) + 0.5) / 1000)
-    monkeypatch.setattr(numpy.random, "rand", lambda: next(random_pointers))
+    monkeypatch.setattr(ga_instance, 'numpy_random_generator', Mock(wraps=ga_instance.numpy_random_generator))
+    monkeypatch.setattr(ga_instance.numpy_random_generator, "rand", lambda: next(random_pointers))
 
     parents, parents_indices = ga_instance.rank_selection(
         fitness=numpy.array(fitness), num_parents=1000)
@@ -115,7 +119,8 @@ def test_sus_respects_requested_count_and_balances_equal_fitness(
                            random_seed=17,
                            suppress_warnings=True)
     fitness = (numpy.ones((4, 2)) if multi_objective else numpy.ones(4))
-    monkeypatch.setattr(numpy.random, "uniform",
+    monkeypatch.setattr(ga_instance, 'numpy_random_generator', Mock(wraps=ga_instance.numpy_random_generator))
+    monkeypatch.setattr(ga_instance.numpy_random_generator, "uniform",
                         lambda **options: numpy.array([options["high"] * offset_fraction]))
 
     parents, parents_indices = ga_instance.stochastic_universal_selection(

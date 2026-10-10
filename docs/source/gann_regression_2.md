@@ -146,3 +146,33 @@ print(f"Absolute error : {abs_error}.")
 The next figure shows how the fitness value changes for the 500 generations used.
 
 ![example_regression_fish](images/92948486-bbe78380-f459-11ea-9e31-0d4c7269d606.png)
+
+<!-- python-examples
+gann/example_regression_fish.py
+-->
+
+**Python example**
+
+**[Fish-weight regression](../../examples/gann/example_regression_fish.py)**
+
+Predict fish weight from numeric measurements.
+
+`examples/gann/example_regression_fish.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, pandas
+
+**Data:** examples/data/Fish.csv. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/gann/ so the relative data paths resolve:
+
+```console
+cd examples/gann
+python example_regression_fish.py
+```
+
+</details>
+
+<!-- /python-examples -->

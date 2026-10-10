@@ -152,3 +152,33 @@ To improve the model performance, you can do the following:
 - Modify the existing layers.
 - Use different parameters for the layers.
 - Use different parameters for the genetic algorithm (e.g. number of solution, number of generations, etc)
+
+<!-- python-examples
+KerasGA/image_classification_CNN.py
+-->
+
+**Python example**
+
+**[Convolutional image classifier](../../examples/KerasGA/image_classification_CNN.py)**
+
+Train an image classifier with the genetic algorithm.
+
+`examples/KerasGA/image_classification_CNN.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, TensorFlow/Keras
+
+**Data:** examples/data/dataset_inputs.npy and examples/data/dataset_outputs.npy. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/KerasGA/ so the relative data paths resolve:
+
+```console
+cd examples/KerasGA
+python image_classification_CNN.py
+```
+
+</details>
+
+<!-- /python-examples -->

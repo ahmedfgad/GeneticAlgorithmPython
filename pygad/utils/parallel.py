@@ -55,14 +55,14 @@ class FitnessEvaluation:
         -------
         state : dict
             A shallow copy of instance attributes excluding the executor,
-            its configuration, and the active-run flag. Cloudpickle uses
+            its configuration, the active-run flag, and saved fitness indexes. Cloudpickle uses
             it for checkpoints and GA snapshots sent to process workers.
         """
         # Executors contain locks and worker handles. Neither checkpoints
         # nor GA snapshots sent to workers should contain these resources.
         state = self.__dict__.copy()
         for name in ("_fitness_executor", "_fitness_executor_config",
-                     "_fitness_run_active"):
+                     "_fitness_run_active", "_saved_fitness_indexes"):
             state.pop(name, None)
         return state
 
@@ -188,7 +188,8 @@ class FitnessEvaluation:
             If a batch call returns neither list, tuple, nor numpy.ndarray.
         ValueError
             If a batch's result length differs from its solution count,
-            or an individual fitness value has an unsupported type.
+            or a fitness value has an unsupported type, shape, objective
+            count, or non-finite objective value.
 
         Notes
         -----
@@ -224,6 +225,8 @@ class FitnessEvaluation:
                         raise TypeError("Expected to receive a list, tuple, or "
                                         "numpy.ndarray from the fitness function "
                                         f"but the value ({result}) of type {type(result)}.")
+                    if isinstance(result, numpy.ndarray) and result.ndim == 0:
+                        raise ValueError("A batched fitness_func must return one fitness value per solution, not a scalar array.")
                     if len(result) != len(group):
                         raise ValueError("There is a mismatch between the number "
                                          "of solutions passed to the fitness function "
@@ -232,15 +235,56 @@ class FitnessEvaluation:
                     values = result
                 else:
                     values = [result]
-                for value in values:
-                    if (type(value) not in self.supported_int_float_types
-                            and type(value) not in (list, tuple, numpy.ndarray)):
-                        raise ValueError("The fitness function should return a "
-                                         "number or an iterable (list, tuple, or "
-                                         f"numpy.ndarray) but the value {value} "
-                                         f"of type {type(value)} found.")
-                    fitness_values.append(value)
+                for index, value in zip(group, values):
+                    fitness_values.append(self._validate_fitness_value(
+                        value, f"fitness_func for solution {index}"))
         finally:
             # Close an out-of-run executor even if result validation fails.
             results.close()
         return fitness_values
+
+    def _validate_fitness_value(self, value, source, check_shape=True):
+        """Validate one scalar or non-empty objective vector before selection.
+
+        Scalars may include infinity to represent a perfect or rejected
+        solution. Objective vectors must be finite because Pareto distance
+        and normalization calculations require finite objective ranges.
+        Every solution must return the same number of objectives.
+        """
+        if isinstance(value, numpy.ndarray) and value.ndim == 0:
+            value = value.item()
+        if type(value) in self.supported_int_float_types and type(value) is not object:
+            shape = ()
+            values = [value]
+        elif isinstance(value, (list, tuple, numpy.ndarray)):
+            try:
+                array = numpy.asarray(value)
+            except (TypeError, ValueError) as error:
+                raise ValueError(f"{source} must return a non-empty one-dimensional numeric objective vector.") from error
+            if array.ndim != 1 or array.size == 0:
+                raise ValueError(f"{source} must return a number or a non-empty one-dimensional objective vector.")
+            shape = array.shape
+            values = value
+        else:
+            raise ValueError(f"{source} must return a number or a non-empty one-dimensional objective vector, but received {type(value)}.")
+        for objective in values:
+            if type(objective) not in self.supported_int_float_types or type(objective) is object:
+                raise ValueError(f"{source} contains a non-numeric fitness value: {objective!r}.")
+            if isinstance(objective, (float, numpy.floating)):
+                if numpy.isnan(objective) or (shape and not numpy.isfinite(objective)):
+                    raise ValueError(f"{source} contains an invalid fitness value. NaN is not supported, and objective vectors must contain finite numbers.")
+        if check_shape:
+            expected_shape = getattr(self, '_fitness_value_shape', None)
+            if expected_shape is not None and shape != expected_shape:
+                raise ValueError(f"{source} has fitness shape {shape}, but all solutions must use the same fitness shape {expected_shape}.")
+            self._fitness_value_shape = shape
+        return value
+
+    def _validate_population_fitness(self, fitness, source, check_shape=True):
+        """Return validated population fitness without changing its shape."""
+        values = [self._validate_fitness_value(value, source, check_shape=check_shape)
+                  for value in fitness]
+        shapes = [numpy.shape(value) for value in values]
+        if shapes and any(shape != shapes[0] for shape in shapes):
+            raise ValueError(f"{source} must use the same fitness shape for all solutions.")
+        return numpy.asarray(values)

@@ -237,3 +237,30 @@ print(f"Absolute Error : {abs_error}")
 ```
 Absolute Error :  0.013740465
 ```
+
+<!-- python-examples
+KerasGA/regression_example.py
+-->
+
+**Python example**
+
+**[Regression](../../examples/KerasGA/regression_example.py)**
+
+Optimize neural-network weights with the genetic algorithm.
+
+`examples/KerasGA/regression_example.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, TensorFlow/Keras
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/KerasGA/regression_example.py
+```
+
+</details>
+
+<!-- /python-examples -->

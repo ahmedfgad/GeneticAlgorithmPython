@@ -1,5 +1,7 @@
 """Edge cases and invariants for the crossover and mutation operators."""
 
+from unittest.mock import Mock
+
 import itertools
 
 import numpy
@@ -131,7 +133,8 @@ def test_sbx_can_select_both_symmetric_children_at_boundaries(monkeypatch, paren
     parents = numpy.array(parents).reshape(2, 1)
     # The same spread draw with opposite child choices must straddle the mean.
     draws = iter([quantile, 0.0, quantile, 0.99])
-    monkeypatch.setattr(numpy.random, "random", lambda: next(draws))
+    monkeypatch.setattr(ga, 'numpy_random_generator', Mock(wraps=ga.numpy_random_generator))
+    monkeypatch.setattr(ga.numpy_random_generator, "random", lambda: next(draws))
     children = ga.sbx_crossover(parents, (2, 1))[:, 0]
 
     assert children[0] < parents.mean() < children[1]
@@ -146,7 +149,8 @@ def test_sbx_equal_parents_do_not_draw_random_values(monkeypatch):
     def unexpected_draw(*args, **kwargs):
         pytest.fail("Equal parents should be copied without a random draw")
 
-    monkeypatch.setattr(numpy.random, "random", unexpected_draw)
+    monkeypatch.setattr(ga, 'numpy_random_generator', Mock(wraps=ga.numpy_random_generator))
+    monkeypatch.setattr(ga.numpy_random_generator, "random", unexpected_draw)
     numpy.testing.assert_array_equal(ga.sbx_crossover(parents, (3, 2)),
                                      numpy.tile(parents[0], (3, 1)))
 
@@ -189,7 +193,8 @@ def test_scramble_mutation_preserves_values_and_unselected_genes(
     segment_start = (0 if segment_position == "first"
                      else int(numpy.ceil(num_genes / 2 + 1)) - 1)
     segment_end = segment_start + num_genes // 2
-    monkeypatch.setattr(numpy.random, "randint",
+    monkeypatch.setattr(ga, 'numpy_random_generator', Mock(wraps=ga.numpy_random_generator))
+    monkeypatch.setattr(ga.numpy_random_generator, "randint",
                         lambda **options: numpy.array([segment_start]))
     original = numpy.tile(numpy.arange(num_genes, dtype=gene_type), (64, 1))
     offspring = original.copy()
@@ -206,7 +211,8 @@ def test_scramble_mutation_preserves_values_and_unselected_genes(
 
 def test_scramble_mutation_can_reach_every_permutation_in_selected_segment(monkeypatch):
     ga = _make_ga(6, gene_type=int, mutation_type="scramble")
-    monkeypatch.setattr(numpy.random, "randint",
+    monkeypatch.setattr(ga, 'numpy_random_generator', Mock(wraps=ga.numpy_random_generator))
+    monkeypatch.setattr(ga.numpy_random_generator, "randint",
                         lambda **options: numpy.array([0]))
     offspring = numpy.tile(numpy.arange(6), (256, 1))
 

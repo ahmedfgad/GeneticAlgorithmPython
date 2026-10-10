@@ -1,0 +1,5 @@
+| Python script | What it shows | Related information |
+| --- | --- | --- |
+{% for example in examples -%}
+| [{{ example.path }}]({{ example.source_url }}) | **{{ example.title }}.** {{ example.description }}{% if example.data %} Requires external data.{% endif %} | [Guide]({{ example.guide }}){% if example.download | default(true) %} · {download}`Download <{{ example.download_path }}>`{% else %} · [Folder]({{ example.folder_url }}) · [Data setup]({{ example.data_url }}){% endif %} |
+{% endfor %}

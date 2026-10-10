@@ -429,31 +429,16 @@ It is very important to note that it is not expected that the classification acc
 
 This section gives the complete code of some examples that build neural networks using `pygad.nn`. Each subsection builds a different network.
 
-::::{grid} 1 2 2 2
-:gutter: 3
+<!-- navigation-grid: 1 2 2 2 -->
 
-:::{grid-item-card} XOR Classification
-:link: nn_xor
-:link-type: doc
-:::
+- [XOR Classification](nn_xor.md)
+- [Image Classification](nn_image_classification.md)
+- [Regression Example 1](nn_regression_1.md)
+- [Regression Example 2 - Fish Weight Prediction](nn_regression_2.md)
 
-:::{grid-item-card} Image Classification
-:link: nn_image_classification
-:link-type: doc
-:::
+<!-- /navigation-grid -->
 
-:::{grid-item-card} Regression Example 1
-:link: nn_regression_1
-:link-type: doc
-:::
-
-:::{grid-item-card} Regression Example 2 - Fish Weight Prediction
-:link: nn_regression_2
-:link-type: doc
-:::
-
-::::
-
+<!-- sphinx
 :::{toctree}
 :hidden:
 
@@ -462,3 +447,4 @@ nn_image_classification
 nn_regression_1
 nn_regression_2
 :::
+-->

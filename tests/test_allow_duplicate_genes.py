@@ -247,44 +247,14 @@ def test_number_duplicates_nested_gene_space_initial_population():
     assert num_duplicates == 0
 
 
-# def test_number_duplicates_nested_gene_space_nested_gene_type():
-    """
-    This example causes duplicate genes that can only be solved by changing the values of a chain of genes.
-    Let's explain it using this solution: [0, 2, 3, 4, 5, 6, 6, 7, 8, 9]
-    It has 2 genes with the value 6 at indices 5 and 6.
-    According to the gene space, none of these genes can has a different value that solves the duplicates.
-        -If the value of the gene at index 5 is changed from 6 to 5, then it causes another duplicate with the gene at index 4.
-        -If the value of the gene at index 6 is changed from 6 to 7, then it causes another duplicate with the gene at index 7.
-    The solution is to change a chain of genes that make a room to solve the duplicates between the 2 genes.
-        1) Change the second gene from 2 to 1.
-        2) Change the third gene from 3 to 2.
-        3) Change the fourth gene from 4 to 3.
-        4) Change the fifth gene from 5 to 4.
-        5) Change the sixth gene from 6 to 5. This solves the duplicates.
-    But this is NOT SUPPORTED yet.
-    We support changing only a single gene that makes a room to solve the duplicates.
+def test_number_duplicates_nested_gene_space_nested_gene_type():
+    """Repair duplicates that require a chain of gene replacements."""
+    num_duplicates = number_duplicate_genes(gene_space=[[index, index + 1] for index in range(10)],
+                                            gene_type=[int] * 10,
+                                            num_genes=10)
 
-    Let's explain it using this solution: [1, 2, 2, 4, 5, 6, 6, 7, 8, 9]
-    It has 2 genes with the value 2 at indices 1 and 2.
-    This is how the duplicates are solved:
-        1) Change the first gene from 1 to 0.
-        2) Change the second gene from 2 to 1. This solves the duplicates.
-    The result is [0, 1, 2, 4, 5, 6, 6, 7, 8, 9]
-    """
-    # num_duplicates = number_duplicate_genes(gene_space=[[0, 1], 
-    #                                                     [1, 2], 
-    #                                                     [2, 3],
-    #                                                     [3, 4],
-    #                                                     [4, 5],
-    #                                                     [5, 6],
-    #                                                     [6, 7],
-    #                                                     [7, 8],
-    #                                                     [8, 9],
-    #                                                     [9, 10]],
-    #                                         gene_type=[int, int, int, int, int, int, int, int, int, int],
-    #                                         num_genes=10)
+    assert num_duplicates == 0
 
-    # assert num_duplicates == 0
 
 def test_number_duplicates_nested_gene_space_nested_gene_type_initial_population():
     num_duplicates = number_duplicate_genes(gene_space=[[0, 1], 
@@ -480,44 +450,15 @@ def test_number_duplicates_nested_gene_space_initial_population_multi_objective(
     assert num_duplicates == 0
 
 
-# def test_number_duplicates_nested_gene_space_nested_gene_type_multi_objective():
-    """
-    This example causes duplicate genes that can only be solved by changing the values of a chain of genes.
-    Let's explain it using this solution: [0, 2, 3, 4, 5, 6, 6, 7, 8, 9]
-    It has 2 genes with the value 6 at indices 5 and 6.
-    According to the gene space, none of these genes can has a different value that solves the duplicates.
-        -If the value of the gene at index 5 is changed from 6 to 5, then it causes another duplicate with the gene at index 4.
-        -If the value of the gene at index 6 is changed from 6 to 7, then it causes another duplicate with the gene at index 7.
-    The solution is to change a chain of genes that make a room to solve the duplicates between the 2 genes.
-        1) Change the second gene from 2 to 1.
-        2) Change the third gene from 3 to 2.
-        3) Change the fourth gene from 4 to 3.
-        4) Change the fifth gene from 5 to 4.
-        5) Change the sixth gene from 6 to 5. This solves the duplicates.
-    But this is NOT SUPPORTED yet.
-    We support changing only a single gene that makes a room to solve the duplicates.
+def test_number_duplicates_nested_gene_space_nested_gene_type_multi_objective():
+    """Repair duplicates that require a chain of gene replacements."""
+    num_duplicates = number_duplicate_genes(gene_space=[[index, index + 1] for index in range(10)],
+                                            gene_type=[int] * 10,
+                                            num_genes=10,
+                                            multi_objective=True)
 
-    Let's explain it using this solution: [1, 2, 2, 4, 5, 6, 6, 7, 8, 9]
-    It has 2 genes with the value 2 at indices 1 and 2.
-    This is how the duplicates are solved:
-        1) Change the first gene from 1 to 0.
-        2) Change the second gene from 2 to 1. This solves the duplicates.
-    The result is [0, 1, 2, 4, 5, 6, 6, 7, 8, 9]
-    """
-    # num_duplicates = number_duplicate_genes(gene_space=[[0, 1], 
-    #                                                     [1, 2], 
-    #                                                     [2, 3],
-    #                                                     [3, 4],
-    #                                                     [4, 5],
-    #                                                     [5, 6],
-    #                                                     [6, 7],
-    #                                                     [7, 8],
-    #                                                     [8, 9],
-    #                                                     [9, 10]],
-    #                                         gene_type=[int, int, int, int, int, int, int, int, int, int],
-    #                                         num_genes=10)
+    assert num_duplicates == 0
 
-    # assert num_duplicates == 0
 
 def test_number_duplicates_nested_gene_space_nested_gene_type_initial_population_multi_objective():
     num_duplicates = number_duplicate_genes(gene_space=[[0, 1], 
@@ -580,7 +521,7 @@ if __name__ == "__main__":
     print()
 
     # This example causes duplicates that can only be solved by changing a chain of genes.
-    # test_number_duplicates_nested_gene_space_nested_gene_type()
+    test_number_duplicates_nested_gene_space_nested_gene_type()
     # print()
     test_number_duplicates_nested_gene_space_nested_gene_type_initial_population()
     print()
@@ -626,7 +567,7 @@ if __name__ == "__main__":
     print()
 
     # This example causes duplicates that can only be solved by changing a chain of genes.
-    # test_number_duplicates_nested_gene_space_nested_gene_type_multi_objective()
+    test_number_duplicates_nested_gene_space_nested_gene_type_multi_objective()
     # print()
     test_number_duplicates_nested_gene_space_nested_gene_type_initial_population_multi_objective()
     print()

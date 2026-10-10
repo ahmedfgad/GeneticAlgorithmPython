@@ -79,13 +79,13 @@ class GA(utils.parent_selection.ParentSelection,
         fitness_func: Accepts a function/method and returns the fitness value of the solution. In PyGAD 2.20.0, a third parameter is passed referring to the 'pygad.GA' instance.
         fitness_batch_size: Added in PyGAD 2.19.0. Supports calculating the fitness in batches. If the value is 1 or None, then the fitness function is called for each individual solution. If given another value X where X is neither 1 nor None (e.g. X=3), then the fitness function is called once for each X (3) solutions.
 
-        initial_population: A user-defined initial population. It is useful when the user wants to start the generations with a custom initial population. It defaults to None which means no initial population is specified by the user. In this case, PyGAD creates an initial population using the 'sol_per_pop' and 'num_genes' parameters. An exception is raised if the 'initial_population' is None while any of the 2 parameters ('sol_per_pop' or 'num_genes') is also None.
+        initial_population: A user-defined initial population. It is useful when the user wants to start the generations with a custom initial population. It defaults to None which means no initial population is specified by the user. In this case, PyGAD creates an initial population using the 'sol_per_pop' and 'num_genes' parameters. An exception is raised if the 'initial_population' is None while any of the 2 parameters ('sol_per_pop' or 'num_genes') is also None. A supplied population must be a non-empty rectangular 2D numeric list, tuple, or NumPy array. Its shape determines sol_per_pop and num_genes before per-gene validation. The input is copied, converted, checked against gene constraints, and repaired for duplicates when required.
         sol_per_pop: Number of solutions in the population. 
         num_genes: Number of genes in the solution.
 
         init_range_low: The lower value of the random range from which the gene values in the initial population are selected. It defaults to -4. Available in PyGAD 1.0.20 and higher.
         init_range_high: The upper value of the random range from which the gene values in the initial population are selected. It defaults to 4. Available in PyGAD 1.0.20.
-        It is OK for the 2 parameters ('init_range_low' and 'init_range_high') to be equal, or for one to be higher or lower than the other (i.e. 'init_range_low' does not need to be lower than 'init_range_high').
+        It is OK for the 2 parameters ('init_range_low' and 'init_range_high') to be equal, or for one to be higher or lower than the other (i.e. 'init_range_low' does not need to be lower than 'init_range_high'). Generated range values remain inside the interval after conversion and rounding; an error is raised if the type and precision cannot represent any valid value.
 
         gene_type: The type of the gene. It is assigned to any of these types (int, numpy.int8, numpy.int16, numpy.int32, numpy.int64, numpy.uint, numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64, float, numpy.float16, numpy.float32, numpy.float64) and forces all the genes to be of that type.
 
@@ -97,14 +97,14 @@ class GA(utils.parent_selection.ParentSelection,
         keep_elitism: Added in PyGAD 2.18.0. It can take the value 0 or a positive integer that satisfies (0 <= keep_elitism <= sol_per_pop). It defaults to 1 which means only the best solution in the current generation is kept in the next generation. If assigned 0, this means it has no effect. If assigned a positive integer K, then the best K solutions are kept in the next generation. It cannot be assigned a value greater than the value assigned to the sol_per_pop parameter. If this parameter has a value different from 0, then it takes precedence over the keep_parents parameter, which will have no effect (a warning is raised if keep_parents was explicitly set in this case). To use keep_parents instead, set keep_elitism=0.
 
         crossover_type: Type of the crossover operator. If  crossover_type=None, then the crossover step is bypassed which means no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
-        crossover_probability: The probability of selecting a solution for the crossover operation. If the solution probability is <= crossover_probability, the solution is selected. The value must be between 0 and 1 inclusive.
+        crossover_probability: The probability of selecting a solution for the crossover operation. If the generated value is < crossover_probability, the solution is selected. The value must be between 0 and 1 inclusive.
         sbx_crossover_eta: Only used when 'crossover_type' is 'sbx'. The distribution index that controls how close the children stay to the parents (higher value = closer). Defaults to 30.
 
         mutation_type: Type of the mutation operator. If mutation_type=None, then the mutation step is bypassed which means no mutation is applied and thus no changes are applied to the offspring created using the crossover operation. The offspring will be used unchanged in the next generation.
-        mutation_probability: The probability of selecting a gene for the mutation operation. If the gene probability is <= mutation_probability, the gene is selected. It accepts either a single value for fixed mutation or a list/tuple/numpy.ndarray of 2 values for adaptive mutation. The values must be between 0 and 1 inclusive. If specified, then no need for the 2 parameters mutation_percent_genes and mutation_num_genes.
+        mutation_probability: The probability of selecting a gene for the mutation operation. If the generated value is < mutation_probability, the gene is selected. Zero leaves offspring unchanged. It accepts either a single value for fixed mutation or a list/tuple/numpy.ndarray of 2 values for adaptive mutation. The values must be between 0 and 1 inclusive. If specified, then no need for the 2 parameters mutation_percent_genes and mutation_num_genes.
         polynomial_mutation_eta: Only used when 'mutation_type' is 'polynomial'. The distribution index that controls how small the mutation step is (higher value = smaller step). Defaults to 20.
 
-        mutation_by_replacement: An optional bool parameter. It works only when the selected type of mutation is random (mutation_type="random"). In this case, setting mutation_by_replacement=True means replace the gene by the randomly generated value. If False, then it has no effect and random mutation works by adding the random value to the gene.
+        mutation_by_replacement: An optional bool parameter. It applies when random or adaptive mutation draws random values. In this case, setting mutation_by_replacement=True means replace the gene by the randomly generated value. If False, then it has no effect and random mutation works by adding the random value to the gene.
 
         mutation_percent_genes: Percentage of genes to mutate which defaults to the string 'default' which means 10%. This parameter has no action if any of the 2 parameters mutation_probability or mutation_num_genes exist.
         mutation_num_genes: Number of genes to mutate which defaults to None. If the parameter mutation_num_genes exists, then no need for the parameter mutation_percent_genes. This parameter has no action if the mutation_probability parameter exists.
@@ -129,13 +129,13 @@ class GA(utils.parent_selection.ParentSelection,
 
         suppress_warnings: Added in PyGAD 2.10.0 and its type is bool. If True, then no warning messages will be displayed. It defaults to False.
 
-        allow_duplicate_genes: Added in PyGAD 2.13.0. If True, then a solution/chromosome may have duplicate gene values. If False, then each gene will have a unique value in its solution.
+        allow_duplicate_genes: Added in PyGAD 2.13.0. If True, then a solution/chromosome may have duplicate gene values. If False, PyGAD tries to give every gene a unique numeric value after conversion and rounding, using replacement chains when needed. Duplicates may remain if the spaces, ranges, constraints, or sampling limit leave no usable alternative.
 
         stop_criteria: Added in PyGAD 2.15.0. It is assigned to some criteria to stop the evolution if at least one criterion holds.
 
         parallel_processing: Added in PyGAD 2.17.0. Defaults to `None` which means no parallel processing is used. If a positive integer is assigned, it specifies the number of threads to be used. If a list or a tuple of exactly 2 elements is assigned, then: 1) The first element can be either "process" or "thread" to specify whether processes or threads are used, respectively. 2) The second element can be: 1) A positive integer to select the maximum number of processes or threads to be used. 2) 0 to indicate that parallel processing is not used. This is identical to setting 'parallel_processing=None'. 3) None to use the default value as calculated by the concurrent.futures module.
 
-        random_seed: Added in PyGAD 2.18.0. It defines the random seed to be used by the random function generators (we use random functions in the NumPy and random modules). This helps to reproduce the same results by setting the same random seed.
+        random_seed: Added in PyGAD 2.18.0. It accepts None or a Python/NumPy integer from 0 through 2**32-1. Each GA owns numpy_random_generator and python_random_generator; their states continue across runs and checkpoints. Custom operators can use these generators for reproducible random draws.
 
         logger: Added in PyGAD 2.20.0. It accepts a logger object of the 'logging.Logger' class to log the messages. If no logger is passed, then a default logger is created to log/print the messages to the console exactly like using the 'print()' function.
         """
@@ -185,7 +185,8 @@ class GA(utils.parent_selection.ParentSelection,
                                      random_seed=random_seed,
                                      logger=logger)
         except Exception as e:
-            self.logger.exception(e)
+            if hasattr(self, 'logger'):
+                self.logger.exception(e)
             # sys.exit(-1)
             raise e
 

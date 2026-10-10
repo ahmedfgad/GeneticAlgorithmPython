@@ -1,0 +1,61 @@
+:::::{card} Python example{% if examples | length > 1 %}s{% endif %}
+:class-card: python-example
+{% if examples | length > 3 %}
+
+{% include 'table.md.jinja' %}
+
+:::{dropdown} Run these examples
+{% for example in examples %}
+
+**{{ example.title }}** — Requires: {{ example.requirements }}
+{% if example.data %}
+
+Data: {{ example.data }} See the [dataset setup instructions]({{ example.data_url }}).
+{% endif %}
+{% if example.run %}
+
+{{ example.run_note | default('From the repository root, with the repository version of PyGAD installed:') }}
+
+```console
+{{ example.run }}
+```
+{% endif %}
+{% endfor %}
+:::
+{% else %}
+{% for example in examples %}
+
+**{{ example.title }}**
+
+{{ example.description }}
+
+`examples/{{ example.path }}`
+
+:::{dropdown} Run this example
+
+**Requires:** {{ example.requirements }}
+{% if example.data %}
+
+**Data:** {{ example.data }} See the [dataset setup instructions]({{ example.data_url }}). Use the repository folder layout rather than downloading this script alone.
+{% endif %}
+{% if example.run %}
+
+{{ example.run_note | default('From the repository root, with the repository version of PyGAD installed:') }}
+
+```console
+{{ example.run }}
+```
+{% endif %}
+:::
+{% if examples | length == 1 %}
+
++++
+{% endif %}
+[View script on GitHub]({{ example.source_url }}){% if example.download | default(true) %} · {download}`Download Python script <{{ example.download_path }}>`{% else %} · [Open example folder]({{ example.folder_url }}){% endif %}
+{% if not loop.last %}
+
+---
+{% endif %}
+{% endfor %}
+{% endif %}
+:::::

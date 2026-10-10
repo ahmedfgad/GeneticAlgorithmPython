@@ -476,3 +476,33 @@ print(f"Number of correct classifications : {num_correct}.")
 print(f"Number of wrong classifications : {num_wrong.size}.")
 print(f"Classification accuracy : {accuracy}.")
 ```
+
+<!-- python-examples
+gacnn/example_image_classification.py
+-->
+
+**Python example**
+
+**[Optimize a CNN with the GA](../../examples/gacnn/example_image_classification.py)**
+
+Classify fruit images using prepared image arrays.
+
+`examples/gacnn/example_image_classification.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+**Data:** examples/data/dataset_inputs.npy and examples/data/dataset_outputs.npy. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/gacnn/ so the relative data paths resolve:
+
+```console
+cd examples/gacnn
+python example_image_classification.py
+```
+
+</details>
+
+<!-- /python-examples -->

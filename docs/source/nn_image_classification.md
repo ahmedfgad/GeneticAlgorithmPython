@@ -50,3 +50,56 @@ print(f"Number of correct classifications : {num_correct}.")
 print(f"Number of wrong classifications : {num_wrong.size}.")
 print(f"Classification accuracy : {accuracy}.")
 ```
+
+<!-- python-examples
+nn/example_classification.py
+nn/extract_features.py
+-->
+
+**Python examples**
+
+**[Image classification](../../examples/nn/example_classification.py)**
+
+Classify fruit images from prepared feature vectors.
+
+`examples/nn/example_classification.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD
+
+**Data:** examples/data/dataset_features.npy and examples/data/outputs.npy. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/nn/ so the relative data paths resolve:
+
+```console
+cd examples/nn
+python example_classification.py
+```
+
+</details>
+
+**[Prepare image features](../../examples/nn/extract_features.py)**
+
+Extract fruit-image features and write the arrays used by the dense classifiers.
+
+`examples/nn/extract_features.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, scikit-image
+
+**Data:** The apple, lemon, mango, and raspberry folders under examples/data/Fruit360/. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/nn/ so the relative data paths resolve:
+
+```console
+cd examples/nn
+python extract_features.py
+```
+
+</details>
+
+<!-- /python-examples -->

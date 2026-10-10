@@ -120,6 +120,9 @@ This is the figure created by the `plot_fitness()` method. The fitness of the fi
 
 ![multi-objective-pygad](https://github.com/ahmedfgad/GeneticAlgorithmPython/assets/16560492/7896f8d8-01c5-4ff9-8d15-52191c309b63)
 
+<!-- sphinx
+(nsga3-guide)=
+-->
 ## NSGA-III Example
 
 This is the same problem solved with `nsga3` instead of `nsga2`. The only differences are the `parent_selection_type` value and the new `nsga3_num_divisions` parameter.
@@ -169,3 +172,50 @@ print(f"Predicted output 2 based on the best solution : {prediction}")
 ```
 
 For M = 2 objectives and `nsga3_num_divisions = 12`, the number of reference points is `C(13, 12) = 13`, which is within `sol_per_pop = 20`. For higher-dimensional problems pick `nsga3_num_divisions` such that `C(M + p - 1, p)` stays close to the population size you want.
+
+<!-- python-examples
+example_multi_objective.py
+example_multi_objective_nsga3.py
+-->
+
+**Python examples**
+
+**[NSGA-II optimization](../../examples/example_multi_objective.py)**
+
+Optimize two objectives and inspect the resulting trade-offs.
+
+`examples/example_multi_objective.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_multi_objective.py
+```
+
+</details>
+
+**[NSGA-III optimization](../../examples/example_multi_objective_nsga3.py)**
+
+Configure reference points and optimize two objectives with NSGA-III.
+
+`examples/example_multi_objective_nsga3.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_multi_objective_nsga3.py
+```
+
+</details>
+
+<!-- /python-examples -->

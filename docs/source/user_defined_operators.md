@@ -10,6 +10,14 @@ This way, the user can only use the built-in functions for each of these operato
 
 Starting from [PyGAD 2.16.0](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-16-0), the user can create a custom crossover, mutation, and parent selection operators and assign these functions to the above parameters. Thus, a new operator can be plugged easily into the [PyGAD Lifecycle](https://pygad.readthedocs.io/en/latest/lifecycle.html#life-cycle-of-pygad).
 
+Custom operators may be functions, bound methods, callable instances, or `functools.partial` objects. The constructor checks whether the callable accepts the positional arguments shown below; additional optional parameters are allowed. Required keyword-only parameters and asynchronous callables are rejected.
+
+For reproducible random choices, use `ga_instance.numpy_random_generator` or `ga_instance.python_random_generator`. These generators belong to the GA and use its `random_seed`. They are also preserved when saving and loading the GA. Mutation selection and replacement settings remain the responsibility of a custom mutation function.
+
+When `allow_duplicate_genes=False`, PyGAD applies its shared duplicate repair to custom crossover and mutation outputs after the corresponding callback has finished. Values are converted and rounded before repair. This also handles duplicate values returned or changed in place by `on_crossover` and `on_mutation`. If the configured spaces, ranges, or constraints leave no usable alternative, duplicates can remain with a warning. See [Prevent Duplicates in Gene Values](https://pygad.readthedocs.io/en/latest/gene_values.html#prevent-duplicates-in-gene-values).
+
+PyGAD applies `gene_type` and its precision to custom parent selection, crossover, and mutation outputs before the corresponding callback receives them. Values returned or changed in place by `on_parents`, `on_crossover`, and `on_mutation` are converted again before use, even when duplicates are allowed. When constructing an output array containing both large integers and floating-point values, use `numpy.array(values, dtype=object)` to preserve the original values until each gene's type is applied. See [Conversion and Rounding Rules](https://pygad.readthedocs.io/en/latest/gene_values.html#conversion-and-rounding-rules).
+
 This is a sample code that does not use any custom function.
 
 ```python
@@ -65,7 +73,7 @@ def crossover_func(parents, offspring_size, ga_instance):
         parent1 = parents[idx % parents.shape[0], :].copy()
         parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
 
-        random_split_point = numpy.random.choice(range(offspring_size[1]))
+        random_split_point = ga_instance.numpy_random_generator.choice(range(offspring_size[1]))
 
         parent1[random_split_point:] = parent2[random_split_point:]
 
@@ -108,9 +116,9 @@ The next code builds the random mutation where a single gene from each chromosom
 def mutation_func(offspring, ga_instance):
 
     for chromosome_idx in range(offspring.shape[0]):
-        random_gene_idx = numpy.random.choice(range(offspring.shape[1]))
+        random_gene_idx = ga_instance.numpy_random_generator.choice(range(offspring.shape[1]))
 
-        offspring[chromosome_idx, random_gene_idx] += numpy.random.random()
+        offspring[chromosome_idx, random_gene_idx] += ga_instance.numpy_random_generator.random()
 
     return offspring
 ```
@@ -230,7 +238,7 @@ def crossover_func(parents, offspring_size, ga_instance):
         parent1 = parents[idx % parents.shape[0], :].copy()
         parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
 
-        random_split_point = numpy.random.choice(range(offspring_size[1]))
+        random_split_point = ga_instance.numpy_random_generator.choice(range(offspring_size[1]))
 
         parent1[random_split_point:] = parent2[random_split_point:]
 
@@ -243,9 +251,9 @@ def crossover_func(parents, offspring_size, ga_instance):
 def mutation_func(offspring, ga_instance):
 
     for chromosome_idx in range(offspring.shape[0]):
-        random_gene_idx = numpy.random.choice(range(offspring.shape[0]))
+        random_gene_idx = ga_instance.numpy_random_generator.choice(range(offspring.shape[1]))
 
-        offspring[chromosome_idx, random_gene_idx] += numpy.random.random()
+        offspring[chromosome_idx, random_gene_idx] += ga_instance.numpy_random_generator.random()
 
     return offspring
 
@@ -299,7 +307,7 @@ class Test:
             parent1 = parents[idx % parents.shape[0], :].copy()
             parent2 = parents[(idx + 1) % parents.shape[0], :].copy()
     
-            random_split_point = numpy.random.choice(range(offspring_size[0]))
+            random_split_point = ga_instance.numpy_random_generator.choice(range(offspring_size[1]))
     
             parent1[random_split_point:] = parent2[random_split_point:]
     
@@ -312,9 +320,9 @@ class Test:
     def mutation_func(self, offspring, ga_instance):
 
         for chromosome_idx in range(offspring.shape[0]):
-            random_gene_idx = numpy.random.choice(range(offspring.shape[1]))
+            random_gene_idx = ga_instance.numpy_random_generator.choice(range(offspring.shape[1]))
     
-            offspring[chromosome_idx, random_gene_idx] += numpy.random.random()
+            offspring[chromosome_idx, random_gene_idx] += ga_instance.numpy_random_generator.random()
     
         return offspring
 
@@ -330,3 +338,30 @@ ga_instance = pygad.GA(num_generations=10,
 ga_instance.run()
 ga_instance.plot_fitness()
 ```
+
+<!-- python-examples
+example_custom_operators.py
+-->
+
+**Python example**
+
+**[Custom GA operators](../../examples/example_custom_operators.py)**
+
+Implement parent selection, crossover, and mutation functions.
+
+`examples/example_custom_operators.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/example_custom_operators.py
+```
+
+</details>
+
+<!-- /python-examples -->

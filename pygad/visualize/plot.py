@@ -26,6 +26,88 @@ class Plot:
     def __init__():
         pass
 
+    def plot_lifecycle(self,
+                       title="PyGAD - Lifecycle",
+                       font_size=11,
+                       show_parameters=True,
+                       save_dir=None,
+                       show=True,
+                       transparent=False):
+        """
+        Draw the configured lifecycle, including active operators,
+        callbacks, the generation loop, and stopping conditions.
+
+        Can be called before or after ``run()``. Drawing the chart
+        does not evaluate fitness, call callbacks, or change GA state.
+        Objective counts are shown only when fitness is already known.
+
+        Parameters
+        ----------
+        title : str
+            Figure title. Use a problem name to identify the chart.
+        font_size : numeric
+            Positive font size. The figure scales with the font size.
+        show_parameters : bool
+            If True, include stage parameters, decision conditions,
+            and a configuration panel. If False, show a compact chart
+            with handler names. Disabled operators and unset callbacks
+            are omitted in either view.
+        save_dir : str or None
+            If set, save the figure to this path. The extension
+            determines the format, for example SVG, PNG, or PDF.
+        show : bool
+            If True, display the figure. Set to False when saving
+            charts in scripts, notebooks, or reports without showing
+            a window. The figure is returned in either case.
+        transparent : bool
+            If True, use a transparent figure background when displaying
+            or exporting the chart. Stage cards retain their fill colors.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib figure that was created.
+
+        Raises
+        ------
+        TypeError
+            If a parameter has an unsupported type.
+        ValueError
+            If ``font_size`` is not finite and positive.
+        ImportError
+            If the optional matplotlib dependency is not installed.
+        """
+        if not isinstance(title, str):
+            raise TypeError("The title parameter must be a string.")
+        if isinstance(font_size, bool) or not isinstance(font_size, (int, float, numpy.integer, numpy.floating)):
+            raise TypeError("The font_size parameter must be a positive number.")
+        if not numpy.isfinite(font_size) or font_size <= 0:
+            raise ValueError("The font_size parameter must be finite and greater than 0.")
+        if not all(isinstance(value, bool) for value in (show_parameters, show, transparent)):
+            raise TypeError("The show_parameters, show, and transparent parameters must be bool values.")
+
+        # Keep chart construction separate from rendering so its flow
+        # can be checked without importing matplotlib or running a GA.
+        from pygad.visualize.lifecycle import _describe_lifecycle, _draw_lifecycle
+        lifecycle = _describe_lifecycle(self, show_parameters=show_parameters)
+        try:
+            matplt = get_matplotlib()
+        except ImportError as exc:
+            raise ImportError("plot_lifecycle requires matplotlib. Install it with: "
+                              "pip install pygad[visualize] (or pip install matplotlib).") from exc
+
+        fig = _draw_lifecycle(lifecycle, matplt, title, font_size)
+        if transparent:
+            fig.patch.set_alpha(0)
+            for axes in fig.axes:
+                axes.patch.set_alpha(0)
+        if save_dir is not None:
+            fig.savefig(fname=save_dir, bbox_inches="tight", pad_inches=0.02,
+                        transparent=transparent)
+        if show:
+            matplt.show()
+        return fig
+
     def plot_fitness(self, 
                      title="PyGAD - Generation vs. Fitness", 
                      xlabel="Generation", 
@@ -87,6 +169,7 @@ class Plot:
 
         matplt = get_matplotlib()
 
+        generations = self._history_generation_numbers(self.best_solutions_generations)
         fig = matplt.figure()
         if type(self.best_solutions_fitness[0]) in [list, tuple, numpy.ndarray] and len(self.best_solutions_fitness[0]) > 1:
             # Multi-objective optimization problem.
@@ -114,18 +197,18 @@ class Plot:
                 # Return the fitness values for the current objective function across all generations.
                 fitness = numpy.array(self.best_solutions_fitness)[:, objective_idx]
                 if plot_type == "plot":
-                    matplt.plot(fitness, 
+                    matplt.plot(generations, fitness,
                                            linewidth=current_linewidth, 
                                            color=current_color,
                                            label=current_label)
                 elif plot_type == "scatter":
-                    matplt.scatter(range(len(fitness)), 
+                    matplt.scatter(generations,
                                               fitness, 
                                               linewidth=current_linewidth, 
                                               color=current_color,
                                               label=current_label)
                 elif plot_type == "bar":
-                    matplt.bar(range(len(fitness)), 
+                    matplt.bar(generations,
                                           fitness, 
                                           linewidth=current_linewidth, 
                                           color=current_color,
@@ -133,16 +216,16 @@ class Plot:
         else:
             # Single-objective optimization problem.
             if plot_type == "plot":
-                matplt.plot(self.best_solutions_fitness, 
+                matplt.plot(generations, self.best_solutions_fitness,
                                        linewidth=linewidth, 
                                        color=color)
             elif plot_type == "scatter":
-                matplt.scatter(range(len(self.best_solutions_fitness)), 
+                matplt.scatter(generations,
                                           self.best_solutions_fitness, 
                                           linewidth=linewidth, 
                                           color=color)
             elif plot_type == "bar":
-                matplt.bar(range(len(self.best_solutions_fitness)), 
+                matplt.bar(generations,
                                       self.best_solutions_fitness, 
                                       linewidth=linewidth, 
                                       color=color)
@@ -223,30 +306,29 @@ class Plot:
 
         unique_solutions = set()
         num_unique_solutions_per_generation = []
-        for generation_idx in range(self.generations_completed):
-            
+        populations = self._per_generation_solutions()
+        generations = self._population_history_generations(len(populations))
+        # Repeated runs retain two snapshots at their boundary. Use the
+        # latest snapshot once per generation, excluding the final population
+        # as in a single run's new-solution-rate plot.
+        population_by_generation = dict(zip(generations, populations))
+        generations = sorted(generation for generation in population_by_generation
+                             if generation < self.generations_completed)
+        for generation in generations:
             len_before = len(unique_solutions)
-
-            start = generation_idx * self.sol_per_pop
-            end = start + self.sol_per_pop
-        
-            for sol in self.solutions[start:end]:
-                unique_solutions.add(tuple(sol))
-        
-            len_after = len(unique_solutions)
-        
-            generation_num_unique_solutions = len_after - len_before
-            num_unique_solutions_per_generation.append(generation_num_unique_solutions)
+            unique_solutions.update(tuple(solution)
+                                    for solution in population_by_generation[generation])
+            num_unique_solutions_per_generation.append(len(unique_solutions) - len_before)
 
         matplt = get_matplotlib()
 
         fig = matplt.figure()
         if plot_type == "plot":
-            matplt.plot(num_unique_solutions_per_generation, linewidth=linewidth, color=color)
+            matplt.plot(generations, num_unique_solutions_per_generation, linewidth=linewidth, color=color)
         elif plot_type == "scatter":
-            matplt.scatter(range(self.generations_completed), num_unique_solutions_per_generation, linewidth=linewidth, color=color)
+            matplt.scatter(generations, num_unique_solutions_per_generation, linewidth=linewidth, color=color)
         elif plot_type == "bar":
-            matplt.bar(range(self.generations_completed), num_unique_solutions_per_generation, linewidth=linewidth, color=color)
+            matplt.bar(generations, num_unique_solutions_per_generation, linewidth=linewidth, color=color)
         matplt.title(title, fontsize=font_size)
         matplt.xlabel(xlabel, fontsize=font_size)
         matplt.ylabel(ylabel, fontsize=font_size)
@@ -350,6 +432,8 @@ class Plot:
             self.logger.error("The solutions parameter must be a string but {solutions_type} found.".format(solutions_type=type(solutions)))
             raise RuntimeError("The solutions parameter must be a string but {solutions_type} found.".format(solutions_type=type(solutions)))
 
+        generations = (self._history_generation_numbers(self.best_solutions_generations)
+                       if solutions == 'best' else range(solutions_to_plot.shape[0]))
         if graph_type == "plot":
             # num_rows will be always be >= 1
             # num_cols can only be 0 if num_genes=1
@@ -361,11 +445,11 @@ class Plot:
                 # There is only a single gene
                 fig, ax = matplt.subplots(num_rows, figsize=figsize)
                 if plot_type == "plot":
-                    ax.plot(solutions_to_plot[:, 0], linewidth=linewidth, color=fill_color)
+                    ax.plot(generations, solutions_to_plot[:, 0], linewidth=linewidth, color=fill_color)
                 elif plot_type == "scatter":
-                    ax.scatter(range(self.generations_completed + 1), solutions_to_plot[:, 0], linewidth=linewidth, color=fill_color)
+                    ax.scatter(generations, solutions_to_plot[:, 0], linewidth=linewidth, color=fill_color)
                 elif plot_type == "bar":
-                    ax.bar(range(self.generations_completed + 1), solutions_to_plot[:, 0], linewidth=linewidth, color=fill_color)
+                    ax.bar(generations, solutions_to_plot[:, 0], linewidth=linewidth, color=fill_color)
                 ax.set_xlabel(0, fontsize=font_size)
             else:
                 fig, axs = matplt.subplots(num_rows, num_cols)
@@ -373,18 +457,19 @@ class Plot:
                 if num_cols == 1 and num_rows == 1:
                     fig.set_figwidth(5 * num_cols)
                     fig.set_figheight(4)
-                    axs.plot(solutions_to_plot[:, 0], linewidth=linewidth, color=fill_color)
+                    getattr(axs, plot_type)(generations, solutions_to_plot[:, 0],
+                                            linewidth=linewidth, color=fill_color)
                     axs.set_xlabel("Gene " + str(0), fontsize=font_size)
                 elif num_cols == 1 or num_rows == 1:
                     fig.set_figwidth(5 * num_cols)
                     fig.set_figheight(4)
                     for gene_idx in range(len(axs)):
                         if plot_type == "plot":
-                            axs[gene_idx].plot(solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
+                            axs[gene_idx].plot(generations, solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
                         elif plot_type == "scatter":
-                            axs[gene_idx].scatter(range(solutions_to_plot.shape[0]), solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
+                            axs[gene_idx].scatter(generations, solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
                         elif plot_type == "bar":
-                            axs[gene_idx].bar(range(solutions_to_plot.shape[0]), solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
+                            axs[gene_idx].bar(generations, solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
                         axs[gene_idx].set_xlabel("Gene " + str(gene_idx), fontsize=font_size)
                 else:
                     gene_idx = 0
@@ -396,11 +481,11 @@ class Plot:
                                 # axs[row_idx, col_idx].remove()
                                 break
                             if plot_type == "plot":
-                                axs[row_idx, col_idx].plot(solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
+                                axs[row_idx, col_idx].plot(generations, solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
                             elif plot_type == "scatter":
-                                axs[row_idx, col_idx].scatter(range(solutions_to_plot.shape[0]), solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
+                                axs[row_idx, col_idx].scatter(generations, solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
                             elif plot_type == "bar":
-                                axs[row_idx, col_idx].bar(range(solutions_to_plot.shape[0]), solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
+                                axs[row_idx, col_idx].bar(generations, solutions_to_plot[:, gene_idx], linewidth=linewidth, color=fill_color)
                             axs[row_idx, col_idx].set_xlabel("Gene " + str(gene_idx), fontsize=font_size)
                             gene_idx += 1
     
@@ -667,33 +752,34 @@ class Plot:
             self.logger.error(f"The {method_name} method requires save_solutions=True in the pygad.GA constructor.")
             raise RuntimeError(f"The {method_name} method requires save_solutions=True in the pygad.GA constructor.")
 
+    def _population_history_slices(self, count):
+        """Return saved population boundaries, including varying population sizes."""
+        sizes = self._saved_population_sizes
+        if sum(sizes) != count:
+            # Public histories and older checkpoints may lack size metadata.
+            sizes = [self.sol_per_pop] * (count // self.sol_per_pop)
+        start = 0
+        for size in sizes:
+            yield slice(start, start + size)
+            start += size
+
+    def _population_history_generations(self, count):
+        """Return generation labels for saved population snapshots."""
+        if len(self.solutions_generations) != count:
+            return list(range(count))
+        return self._history_generation_numbers(self.solutions_generations)
+
     def _per_generation_fitness(self):
-        """
-        Return a list of length (generations_completed + 1) where
-        each entry is the fitness array of one generation. Only valid
-        when save_solutions=True.
-        """
-        per_gen = []
-        fitness_flat = numpy.asarray(self.solutions_fitness)
-        sol_per_pop = self.sol_per_pop
-        num_blocks = fitness_flat.shape[0] // sol_per_pop
-        for g in range(num_blocks):
-            per_gen.append(fitness_flat[g * sol_per_pop:(g + 1) * sol_per_pop])
-        return per_gen
+        """Return fitness arrays for saved population snapshots in order."""
+        fitness = numpy.asarray(self.solutions_fitness)
+        return [fitness[boundary] for boundary in
+                self._population_history_slices(len(fitness))]
 
     def _per_generation_solutions(self):
-        """
-        Return a list of length (generations_completed + 1) where
-        each entry is the population array of one generation. Only
-        valid when save_solutions=True.
-        """
-        per_gen = []
-        solutions_flat = numpy.asarray(self.solutions, dtype=float)
-        sol_per_pop = self.sol_per_pop
-        num_blocks = solutions_flat.shape[0] // sol_per_pop
-        for g in range(num_blocks):
-            per_gen.append(solutions_flat[g * sol_per_pop:(g + 1) * sol_per_pop])
-        return per_gen
+        """Return saved populations in order, retaining their original gene types."""
+        solutions = numpy.asarray(self.solutions, dtype=self.population.dtype)
+        return [solutions[boundary] for boundary in
+                self._population_history_slices(len(solutions))]
 
     # ── Pareto-front views for M >= 3 ────────────────────────────────────────
 
@@ -964,7 +1050,7 @@ class Plot:
 
         matplt = get_matplotlib()
         fig, ax = matplt.subplots()
-        generations = numpy.arange(len(per_gen))
+        generations = self._population_history_generations(len(per_gen))
         ax.fill_between(generations, min_vals, max_vals,
                         color=color, alpha=band_alpha, label='min-max')
         ax.plot(generations, mean_vals,
@@ -1038,7 +1124,7 @@ class Plot:
 
         matplt = get_matplotlib()
         fig, ax = matplt.subplots()
-        generations = numpy.arange(len(hv_values))
+        generations = self._population_history_generations(len(hv_values))
         ax.plot(generations, hv_values, color=color, linewidth=linewidth)
         ax.set_title(title, fontsize=font_size)
         ax.set_xlabel(xlabel, fontsize=font_size)
@@ -1092,6 +1178,7 @@ class Plot:
         per_gen = self._per_generation_solutions()
         diversity = []
         for population in per_gen:
+            population = numpy.asarray(population, dtype=float)
             diff = population[:, None, :] - population[None, :, :]
             distances = numpy.sqrt((diff * diff).sum(axis=2))
             # Mean over the upper triangle (each pair counted once).
@@ -1104,7 +1191,7 @@ class Plot:
 
         matplt = get_matplotlib()
         fig, ax = matplt.subplots()
-        generations = numpy.arange(len(diversity))
+        generations = self._population_history_generations(len(diversity))
         ax.plot(generations, diversity, color=color, linewidth=linewidth)
         ax.set_title(title, fontsize=font_size)
         ax.set_xlabel(xlabel, fontsize=font_size)
@@ -1172,8 +1259,11 @@ class Plot:
 
         per_gen = self._per_generation_fitness()
         # Pick generations to draw. Always include the last one.
-        indices = list(range(0, len(per_gen), every_k))
-        if indices[-1] != len(per_gen) - 1:
+        generations = self._population_history_generations(len(per_gen))
+        latest_snapshot = dict((generation, index) for index, generation in enumerate(generations))
+        indices = [index for generation, index in latest_snapshot.items()
+                   if generation % every_k == 0]
+        if not indices or indices[-1] != len(per_gen) - 1:
             indices.append(len(per_gen) - 1)
 
         matplt = get_matplotlib()
@@ -1195,11 +1285,11 @@ class Plot:
             if num_objectives == 2:
                 ax.scatter(front[:, 0], front[:, 1],
                            color=color, marker=marker, alpha=alpha,
-                           label=f"gen {gen_idx}")
+                           label=f"gen {generations[gen_idx]}")
             else:
                 ax.scatter(front[:, 0], front[:, 1], front[:, 2],
                            color=color, marker=marker, alpha=alpha,
-                           label=f"gen {gen_idx}")
+                           label=f"gen {generations[gen_idx]}")
 
         ax.set_title(title, fontsize=font_size)
         ax.set_xlabel(xlabel, fontsize=font_size)

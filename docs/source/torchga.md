@@ -110,31 +110,16 @@ It returns the predictions for the data samples.
 
 This section gives the complete code of some examples that build and train a PyTorch model using PyGAD. Each subsection builds a different network.
 
-::::{grid} 1 2 2 2
-:gutter: 3
+<!-- navigation-grid: 1 2 2 2 -->
 
-:::{grid-item-card} Example 1: Regression Example
-:link: torchga_regression
-:link-type: doc
-:::
+- [Example 1: Regression Example](torchga_regression.md)
+- [Example 2: XOR Binary Classification](torchga_xor.md)
+- [Example 3: Image Multi-Class Classification (Dense Layers)](torchga_image_dense.md)
+- [Example 4: Image Multi-Class Classification (Conv Layers)](torchga_image_conv.md)
 
-:::{grid-item-card} Example 2: XOR Binary Classification
-:link: torchga_xor
-:link-type: doc
-:::
+<!-- /navigation-grid -->
 
-:::{grid-item-card} Example 3: Image Multi-Class Classification (Dense Layers)
-:link: torchga_image_dense
-:link-type: doc
-:::
-
-:::{grid-item-card} Example 4: Image Multi-Class Classification (Conv Layers)
-:link: torchga_image_conv
-:link-type: doc
-:::
-
-::::
-
+<!-- sphinx
 :::{toctree}
 :hidden:
 
@@ -143,3 +128,4 @@ torchga_xor
 torchga_image_dense
 torchga_image_conv
 :::
+-->

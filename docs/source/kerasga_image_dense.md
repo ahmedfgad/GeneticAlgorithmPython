@@ -123,3 +123,33 @@ Index of the best solution : 0
 Categorical Crossentropy :  0.23823906
 Accuracy :  0.9852192
 ```
+
+<!-- python-examples
+KerasGA/image_classification_Dense.py
+-->
+
+**Python example**
+
+**[Dense image classifier](../../examples/KerasGA/image_classification_Dense.py)**
+
+Train an image classifier with the genetic algorithm.
+
+`examples/KerasGA/image_classification_Dense.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, TensorFlow/Keras
+
+**Data:** examples/data/dataset_features.npy and examples/data/outputs.npy. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/KerasGA/ so the relative data paths resolve:
+
+```console
+cd examples/KerasGA
+python image_classification_Dense.py
+```
+
+</details>
+
+<!-- /python-examples -->

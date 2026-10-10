@@ -151,3 +151,30 @@ print(f"Absolute error : {abs_error}.")
 The next figure shows how the fitness value changes for the generations used.
 
 ![example_regression](images/92948154-3cf24b00-f459-11ea-94ea-952b66ab2145.png)
+
+<!-- python-examples
+gann/example_regression.py
+-->
+
+**Python example**
+
+**[Regression](../../examples/gann/example_regression.py)**
+
+Fit a neural network to a small numeric regression problem.
+
+`examples/gann/example_regression.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/gann/example_regression.py
+```
+
+</details>
+
+<!-- /python-examples -->

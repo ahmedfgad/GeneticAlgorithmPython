@@ -163,3 +163,33 @@ Index of the best solution : 0
 Crossentropy :  0.7686678
 Accuracy :  0.975
 ```
+
+<!-- python-examples
+TorchGA/image_classification_CNN.py
+-->
+
+**Python example**
+
+**[Convolutional image classifier](../../examples/TorchGA/image_classification_CNN.py)**
+
+Train an image classifier with the genetic algorithm.
+
+`examples/TorchGA/image_classification_CNN.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, PyTorch
+
+**Data:** examples/data/dataset_inputs.npy and examples/data/dataset_outputs.npy. See the [dataset setup instructions](../../examples/data/README.md).
+
+From the repository root, change to examples/TorchGA/ so the relative data paths resolve:
+
+```console
+cd examples/TorchGA
+python image_classification_CNN.py
+```
+
+</details>
+
+<!-- /python-examples -->

@@ -231,3 +231,30 @@ print("Absolute Error : ", abs_error.detach().numpy())
 ```
 Absolute Error :  0.006876422
 ```
+
+<!-- python-examples
+TorchGA/regression_example.py
+-->
+
+**Python example**
+
+**[Regression](../../examples/TorchGA/regression_example.py)**
+
+Optimize neural-network weights with the genetic algorithm.
+
+`examples/TorchGA/regression_example.py`
+
+<details>
+<summary>Run this example</summary>
+
+**Requires:** PyGAD, Matplotlib, PyTorch
+
+From the repository root, with the repository version of PyGAD installed:
+
+```console
+python examples/TorchGA/regression_example.py
+```
+
+</details>
+
+<!-- /python-examples -->
