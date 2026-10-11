@@ -31,10 +31,7 @@ class Crossover:
             ``offspring_size``.
         """
 
-        if self.gene_type_single == True:
-            offspring = numpy.empty(offspring_size, dtype=self.gene_type[0])
-        else:
-            offspring = numpy.empty(offspring_size, dtype=object)
+        offspring = self.initialize_parents_array(offspring_size)
 
         # Randomly generate all the K points at which crossover takes place between each two parents. The point does not have to be always at the center of the solutions.
         # This saves time by calling the self.numpy_random_generator.randint() function only once.
@@ -96,10 +93,7 @@ class Crossover:
             ``offspring_size``.
         """
 
-        if self.gene_type_single == True:
-            offspring = numpy.empty(offspring_size, dtype=self.gene_type[0])
-        else:
-            offspring = numpy.empty(offspring_size, dtype=object)
+        offspring = self.initialize_parents_array(offspring_size)
 
         # Randomly generate all the K pairs of points at which crossover takes place between each two parents.
         # This saves time by calling the self.numpy_random_generator.randint() function only twice.
@@ -172,10 +166,7 @@ class Crossover:
             ``offspring_size``.
         """
 
-        if self.gene_type_single == True:
-            offspring = numpy.empty(offspring_size, dtype=self.gene_type[0])
-        else:
-            offspring = numpy.empty(offspring_size, dtype=object)
+        offspring = self.initialize_parents_array(offspring_size)
 
         # Randomly generate all the genes sources at which crossover takes place between each two parents. 
         # This saves time by calling the self.numpy_random_generator.randint() function only once.
@@ -242,10 +233,7 @@ class Crossover:
         offspring : numpy.ndarray
             A 2D array of offspring with shape offspring_size.
         """
-        if self.gene_type_single == True:
-            offspring = numpy.empty(offspring_size, dtype=self.gene_type[0])
-        else:
-            offspring = numpy.empty(offspring_size, dtype=object)
+        offspring = self.initialize_parents_array(offspring_size)
 
         eta = float(self.sbx_crossover_eta)
         near_zero = 1e-14
@@ -327,10 +315,7 @@ class Crossover:
             ``offspring_size``.
         """
 
-        if self.gene_type_single == True:
-            offspring = numpy.empty(offspring_size, dtype=self.gene_type[0])
-        else:
-            offspring = numpy.empty(offspring_size, dtype=object)
+        offspring = self.initialize_parents_array(offspring_size)
 
         # Randomly generate all the genes sources at which crossover takes place between each two parents. 
         # This saves time by calling the self.numpy_random_generator.randint() function only once.

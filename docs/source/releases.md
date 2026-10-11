@@ -8,6 +8,14 @@ Release notes are listed from newest to oldest. Unreleased contains changes plan
 
 No changes yet.
 
+## PyGAD 3.8.1
+
+Release Date: October 11, 2026.
+
+1. Random and adaptive mutation clip generated values to NumPy integer type limits before casting, fixing overflow errors and wraparound with types such as `numpy.uint8` and `numpy.int8`. The same rule covers additive and replacement mutation, `None` gene-space entries, constraint candidates, and duplicate repair. Clipping applies only to explicitly requested NumPy integer types. See [issue #379](https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/379) and [Conversion and Rounding Rules](gene_values.md#conversion-and-rounding-rules).
+2. Python `int` conversion of candidate arrays and population columns uses explicit signed 64-bit storage across NumPy versions and platforms, fixing large-integer conversion and initialization failures on Windows with NumPy 1.x. Integer range sampling and bounded operators use the same storage limits. Parent selection and crossover share array allocation, preserving large integers throughout the lifecycle. Per-gene Python `int` elements keep their scalar type, and explicitly requested NumPy types keep their widths. Supplied Python `int` population values must fit in signed 64-bit storage; use `gene_type=object` for larger supplied integers. See [Conversion and Rounding Rules](gene_values.md#conversion-and-rounding-rules).
+3. Regression tests cover integer mutation limits, exact large-integer storage, initialization, constraints, duplicate repair, parent selection, crossover, and NSGA-III population growth. Windows CI checks both NumPy 1.24.4 and the latest NumPy release without version-specific implementation branches. The 16 pre-existing Windows failures with NumPy 1.24.4 are fixed, and no higher NumPy minimum is required. The `pygad.helper` and `pygad.utils` submodule versions are `1.4.6` and `1.5.8`.
+
 ## PyGAD 3.8.0
 
 Release Date: October 9, 2026.

@@ -136,7 +136,7 @@ You can set it to:
 
 Integer conversion truncates towards zero. Floating-point values are rounded before casting, using nearest-even rounding at halfway points. Precision can be `None` to leave values unrounded, or an integer including `0` and negative values. For example, `[float, -1]` rounds to tens. Integer types may only be paired with `None`.
 
-The same rules apply to initialization, mutation, custom operators, and the outputs of `on_parents`, `on_crossover`, and `on_mutation`, independently of `allow_duplicate_genes`. Per-gene type specifications and saved best solutions preserve mixed scalar types using object arrays. See [Conversion and Rounding Rules](https://pygad.readthedocs.io/en/latest/gene_values.html#conversion-and-rounding-rules).
+The same rules apply to initialization, mutation, custom operators, and the outputs of `on_parents`, `on_crossover`, and `on_mutation`, independently of `allow_duplicate_genes`. Python `int` uses signed 64-bit conversion for candidate arrays and population columns on every platform, including Windows with NumPy 1.x. Explicit NumPy types keep their requested widths. Per-gene type specifications and saved best solutions preserve mixed scalar types using object arrays. See [Conversion and Rounding Rules](https://pygad.readthedocs.io/en/latest/gene_values.html#conversion-and-rounding-rules) for storage limits and handling larger Python integers.
 
 Version history:
 
@@ -380,6 +380,8 @@ A bool that controls how `random` and `adaptive` mutation change a gene when dra
 
 - `True`: replace the gene with the randomly generated value.
 - `False` (default): add the random value to the gene.
+
+For NumPy integer gene types, both modes clip the resulting value to the type's limits before casting. For example, a `numpy.uint8` gene at `0` stays at `0` when adding `-1`. See [Conversion and Rounding Rules](gene_values.md#conversion-and-rounding-rules).
 
 Supported in [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) and higher. See the [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) release notes for an example.
 

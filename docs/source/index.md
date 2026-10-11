@@ -2,8 +2,10 @@
 
 [PyGAD](https://github.com/ahmedfgad/GeneticAlgorithmPython) is an open-source Python library for building the genetic algorithm and optimizing machine learning algorithms. It works with [Keras](https://keras.io) and [PyTorch](https://pytorch.org).
 
-Watch the [PyGAD 3.8.0 release video on YouTube](https://youtu.be/8pdIiMAMLUM)
-and read the [release notes](releases.md#pygad-380).
+The current release is PyGAD 3.8.1, dated October 11, 2026.
+Read the [release notes](releases.md#pygad-381).
+
+Watch the [PyGAD 3.8.0 release video on YouTube](https://youtu.be/8pdIiMAMLUM).
 
 ![PYGAD-LOGO](images/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)
 

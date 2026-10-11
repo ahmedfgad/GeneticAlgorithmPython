@@ -85,7 +85,7 @@ def test_population_growth_respects_single_gene_type_int():
         gene_type=int,
     )
     population = numpy.asarray(ga.initial_population)
-    assert population.dtype == int
+    assert population.dtype == numpy.dtype(numpy.int64)
 
 
 def test_population_growth_respects_nested_gene_types_per_gene():

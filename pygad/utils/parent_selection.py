@@ -392,10 +392,7 @@ class ParentSelection:
             is single-objective).
         """
 
-        if self.gene_type_single == True:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
-        else:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
+        parents = self.initialize_parents_array((num_parents, self.population.shape[1]))
 
         # Verify that the problem is multi-objective optimization as the tournament NSGA-II selection is only applied to multi-objective problems.
         if type(fitness[0]) in [list, tuple, numpy.ndarray]:
@@ -542,10 +539,7 @@ class ParentSelection:
             is single-objective).
         """
 
-        if self.gene_type_single == True:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=self.gene_type[0])
-        else:
-            parents = numpy.empty((num_parents, self.population.shape[1]), dtype=object)
+        parents = self.initialize_parents_array((num_parents, self.population.shape[1]))
 
         # Verify that the problem is multi-objective optimization as the NSGA-II selection is only applied to multi-objective problems.
         if type(fitness[0]) in [list, tuple, numpy.ndarray]:
