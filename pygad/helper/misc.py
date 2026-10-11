@@ -397,12 +397,13 @@ class Helper:
         Apply a random mutation value to a gene and cast / round the
         result. If ``mutation_by_replacement`` is True, the random
         value replaces the gene; otherwise it is added to the
-        existing value.
+        existing value. NumPy integer results are clipped to the
+        destination type's limits before casting.
 
         Parameters
         ----------
-        random_value : numeric
-            The freshly drawn mutation value.
+        random_value : numeric or numpy.ndarray
+            The freshly drawn mutation value or array of candidates.
         gene_index : int
             Index of the gene being mutated.
         gene_value : numeric
@@ -414,8 +415,9 @@ class Helper:
 
         Returns
         -------
-        gene_value_new : numeric
-            The mutated value after casting and rounding.
+        gene_value_new : numeric or numpy.ndarray
+            The mutated value or candidates after clipping NumPy
+            integer values, casting, and rounding.
         """
 
         if mutation_by_replacement:
@@ -431,6 +433,14 @@ class Helper:
                 mutated_value = gene_value + random_value
             else:
                 mutated_value = gene_value + numpy.asarray(random_value, dtype=object)
+        gene_dtype = self.get_gene_dtype(gene_index)[0]
+        if gene_dtype is not int and numpy.issubdtype(numpy.dtype(gene_dtype), numpy.integer):
+            type_limits = numpy.iinfo(gene_dtype)
+            # Object storage and Python bounds keep 64-bit integers exact.
+            # Clip the final sum or replacement, so an unsigned gene can
+            # still use negative offsets without wrapping or overflowing.
+            mutated_value = numpy.clip(numpy.asarray(mutated_value, dtype=object),
+                                       int(type_limits.min), int(type_limits.max))
         return self.change_gene_dtype_and_round(gene_index, mutated_value)
 
     def validate_gene_constraint_callable_output(self,

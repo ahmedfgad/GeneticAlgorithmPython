@@ -381,6 +381,8 @@ A bool that controls how `random` and `adaptive` mutation change a gene when dra
 - `True`: replace the gene with the randomly generated value.
 - `False` (default): add the random value to the gene.
 
+For NumPy integer gene types, both modes clip the resulting value to the type's limits before casting. For example, a `numpy.uint8` gene at `0` stays at `0` when adding `-1`. See [Conversion and Rounding Rules](gene_values.md#conversion-and-rounding-rules).
+
 Supported in [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) and higher. See the [PyGAD 2.2.2](https://pygad.readthedocs.io/en/latest/releases.html#pygad-2-2-2) release notes for an example.
 
 </details>

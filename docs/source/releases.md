@@ -6,7 +6,7 @@ Release notes are listed from newest to oldest. Unreleased contains changes plan
 
 ## Unreleased
 
-No changes yet.
+1. Random and adaptive mutation clip generated values to NumPy integer type limits before casting, fixing overflow errors and wraparound with types such as `numpy.uint8` and `numpy.int8`. The same rule covers additive and replacement mutation, `None` gene-space entries, constraint candidates, and duplicate repair. Python `int`, floating-point, and `object` genes retain their existing behavior. See [issue #379](https://github.com/ahmedfgad/GeneticAlgorithmPython/issues/379) and [Conversion and Rounding Rules](gene_values.md#conversion-and-rounding-rules). The `pygad.helper` submodule version is `1.4.5`.
 
 ## PyGAD 3.8.0
 
