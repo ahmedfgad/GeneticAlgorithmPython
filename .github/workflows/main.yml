@@ -44,6 +44,51 @@ on:
   workflow_call:
 
 jobs:
+  numpy-windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python-version: "3.9"
+            numpy-requirement: "numpy==1.24.4"
+            numpy-label: "NumPy 1.24.4"
+          - python-version: "3.14"
+            numpy-requirement: "numpy"
+            numpy-label: "Latest NumPy"
+    name: Windows / Python ${{ matrix.python-version }} / ${{ matrix.numpy-label }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install PyGAD and NumPy
+        run: python -m pip install . pytest "${{ matrix.numpy-requirement }}"
+
+      - name: Verify Installed Versions
+        working-directory: ${{ runner.temp }}
+        run: python -c "import numpy, pygad; print('NumPy:', numpy.__version__); print('Testing installed package:', pygad.__file__)"
+
+      # Windows used 32-bit storage for dtype=int before NumPy 2.0.
+      # Run the same regression tests on older and current NumPy releases.
+      - name: Test Gene Storage and Integer Mutation
+        working-directory: ${{ runner.temp }}
+        run: >-
+          python -m pytest
+          "${{ github.workspace }}/tests/test_python_int_storage.py"
+          "${{ github.workspace }}/tests/test_gene_type_conversion.py"
+          "${{ github.workspace }}/tests/test_initial_population.py"
+          "${{ github.workspace }}/tests/test_mutation_integer_limits.py"
+          "${{ github.workspace }}/tests/test_nsga3_population_growth.py"
+          "${{ github.workspace }}/tests/test_sbx_polynomial.py"
+          "${{ github.workspace }}/tests/test_parent_selection_regressions.py"
+          "${{ github.workspace }}/tests/test_permutation_mutation.py"
+          -q -W error::DeprecationWarning
+
   pytest:
     # Use the latest Ubuntu runner for all jobs.
     runs-on: ubuntu-latest

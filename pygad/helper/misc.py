@@ -267,8 +267,9 @@ class Helper:
     def initialize_parents_array(self, shape):
         """
         Allocate an empty parents (or offspring) array with the right
-        dtype. Uses the dtype of the first gene type when every gene
-        shares the same type, otherwise falls back to ``object``.
+        dtype. Uses the gene's storage dtype when every gene shares
+        the same type, otherwise falls back to ``object``. Python
+        ``int`` uses signed 64-bit array storage.
 
         Parameters
         ----------
@@ -282,9 +283,19 @@ class Helper:
             An uninitialised array of the requested shape and dtype.
         """
         if self.gene_type_single:
-            return numpy.empty(shape, dtype=self.gene_type[0])
+            return numpy.empty(shape, dtype=self._get_gene_storage_dtype(self.gene_type[0]))
         else:
             return numpy.empty(shape, dtype=object)
+
+    def _get_gene_storage_dtype(self, gene_dtype):
+        """Return the array storage type for a declared gene type.
+
+        Python int uses explicit signed 64-bit storage so array conversion,
+        allocation, and range sampling agree across NumPy versions and
+        platforms. Explicit NumPy types keep their requested widths. This
+        does not change scalar conversion or the declared gene_type.
+        """
+        return numpy.int64 if gene_dtype is int else gene_dtype
 
     def change_population_dtype_and_round(self,
                                           population):
@@ -359,7 +370,7 @@ class Helper:
         if precision is None:
             if numpy.isscalar(values):
                 return values if dtype is object else dtype(values)
-            converted_values = numpy.array(values, dtype=dtype, copy=True)
+            converted_values = numpy.array(values, dtype=self._get_gene_storage_dtype(dtype), copy=True)
         else:
             rounded_values = self._round_gene_values(numpy.asarray(values, dtype=float), precision)
             converted_values = numpy.asarray(rounded_values, dtype=dtype)
@@ -656,7 +667,7 @@ class Helper:
         dtype = self.get_gene_dtype(gene_index)[0]
         if numpy.issubdtype(numpy.dtype(dtype), numpy.integer):
             value = value.item() if isinstance(value, numpy.generic) else value
-            type_limits = numpy.iinfo(dtype)
+            type_limits = numpy.iinfo(self._get_gene_storage_dtype(dtype))
             first = max(math.ceil(lower), int(type_limits.min))
             last = min(math.floor(upper), int(type_limits.max))
             if first > last:
@@ -890,15 +901,15 @@ class Helper:
         if the gene type and precision cannot represent any valid value.
         """
         lower, upper = sorted([lower, upper])
-        dtype = self.get_gene_dtype(gene_index)[0]
+        dtype = self._get_gene_storage_dtype(self.get_gene_dtype(gene_index)[0])
         if numpy.issubdtype(numpy.dtype(dtype), numpy.integer):
             first_value, last_value = self._initial_population_integer_bounds(gene_index, lower, upper)
             if first_value > last_value:
                 raise ValueError(f"The initialization range [{lower}, {upper}) has no value representable by gene_type for the gene at index {gene_index}.")
             if all_integer_values:
                 return numpy.arange(first_value, last_value + 1, dtype=dtype)
-            # RandomState interprets the Python int type as C long on
-            # Windows. Use NumPy's resolved dtype to match the population.
+            # Pass the explicit storage type to RandomState so its integer
+            # draws use the same width as conversion and allocation.
             return self.numpy_random_generator.randint(first_value, last_value + 1,
                                         size=num_values, dtype=numpy.dtype(dtype).type)
 
@@ -912,7 +923,7 @@ class Helper:
         lower = lower.item() if isinstance(lower, numpy.generic) else lower
         upper = upper.item() if isinstance(upper, numpy.generic) else upper
         lower, upper = sorted([lower, upper])
-        type_limits = numpy.iinfo(self.get_gene_dtype(gene_index)[0])
+        type_limits = numpy.iinfo(self._get_gene_storage_dtype(self.get_gene_dtype(gene_index)[0]))
         first_value = max(math.ceil(lower), int(type_limits.min))
         last_value = min(math.ceil(upper) - 1, int(type_limits.max))
         if lower == upper and lower == first_value:
@@ -921,7 +932,7 @@ class Helper:
 
     def _initial_population_range_snapshot(self, gene_index, lower, upper, sample_size):
         """Create an inspection sample without allocating a range or drawing random values."""
-        dtype = self.get_gene_dtype(gene_index)[0]
+        dtype = self._get_gene_storage_dtype(self.get_gene_dtype(gene_index)[0])
         if numpy.issubdtype(numpy.dtype(dtype), numpy.integer):
             first_value, last_value = self._initial_population_integer_bounds(gene_index, lower, upper)
             count = min(sample_size, last_value - first_value + 1)
