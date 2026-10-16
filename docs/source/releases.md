@@ -6,7 +6,7 @@ Release notes are listed from newest to oldest. Unreleased contains changes plan
 
 ## Unreleased
 
-No changes yet.
+1. [Roulette wheel selection](utils.md#roulette_wheel_selection) and [stochastic universal selection](utils.md#stochastic_universal_selection) sum fitness values in a floating-point type wide enough for the input. Large `int64`, `uint64`, `float16`, and `float32` fitness values no longer overflow and raise `ZeroDivisionError`. Object arrays of Python integers keep exact values. See [PR #381](https://github.com/ahmedfgad/GeneticAlgorithmPython/pull/381). The `pygad.utils` submodule version is `1.5.9`.
 
 ## PyGAD 3.8.1
 
