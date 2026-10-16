@@ -6,6 +6,12 @@ Release notes are listed from newest to oldest. Unreleased contains changes plan
 
 ## Unreleased
 
+No changes yet.
+
+## PyGAD 3.9.1
+
+Release Date: October 16, 2026.
+
 1. [Roulette wheel selection](utils.md#roulette_wheel_selection) and [stochastic universal selection](utils.md#stochastic_universal_selection) favor the better solutions when fitness values are negative. Before this change, each share was the fitness divided by the total, which flips the order for negative values: the fitness values `-1` and `-9` gave the worse solution 90% of the selections. Negative fitness values are now shifted by the smallest fitness first, so `-1` and `-9` become `8` and `0`. This also covers mixed positive and negative values, and equal negative values give every solution the same chance. Fitness values that are all zero or above keep their exact previous behavior.
 2. Regression tests cover negative, mixed-sign, equal negative, multi-objective, and large Python integer fitness, and a minimization run with each selector. The `pygad.utils` submodule version is `1.5.11`.
 
