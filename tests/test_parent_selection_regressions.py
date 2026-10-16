@@ -150,3 +150,65 @@ def test_sus_selected_parents_do_not_alias_the_population():
     parents[:] = -1
 
     numpy.testing.assert_array_equal(ga_instance.population, original)
+
+
+@pytest.mark.parametrize("selection", ["rws", "sus"])
+@pytest.mark.parametrize("dtype,value", [
+    (numpy.int64, 2**62),
+    (numpy.uint64, 2**63),
+    (numpy.float16, 40000),
+    (numpy.float32, 2e38),
+])
+@pytest.mark.parametrize("multi_objective", [False, True])
+def test_fitness_sum_does_not_overflow_during_selection(
+        selection, dtype, value, multi_objective):
+    def large_fitness(ga_instance, solution, solution_idx):
+        fitness = dtype(value)
+        return [fitness, fitness] if multi_objective else fitness
+
+    ga_instance = pygad.GA(num_generations=1,
+                           num_parents_mating=2,
+                           fitness_func=large_fitness,
+                           initial_population=[[1, 2], [3, 4], [5, 6], [7, 8]],
+                           parent_selection_type=selection,
+                           mutation_type=None,
+                           random_seed=17,
+                           suppress_warnings=True)
+    ga_instance.run()
+
+    assert ga_instance.generations_completed == 1
+    assert ga_instance.last_generation_parents_indices.shape == (2,)
+    numpy.testing.assert_array_equal(
+        ga_instance.last_generation_parents,
+        ga_instance.population[ga_instance.last_generation_parents_indices])
+    assert numpy.all(ga_instance.last_generation_fitness > 0)
+
+
+@pytest.mark.parametrize("selection", ["rws", "sus"])
+def test_probability_selection_still_rejects_zero_sum_fitness(selection):
+    ga_instance = pygad.GA(num_generations=1,
+                           num_parents_mating=2,
+                           fitness_func=fitness_func,
+                           initial_population=[[1, 2], [3, 4], [5, 6], [7, 8]],
+                           parent_selection_type=selection,
+                           mutation_type=None,
+                           suppress_warnings=True)
+    with pytest.raises(ZeroDivisionError, match="sum of fitness values is zero"):
+        ga_instance.select_parents(numpy.zeros(4), 2)
+
+
+@pytest.mark.parametrize("selection", ["rws", "sus"])
+def test_probability_selection_preserves_python_integer_fitness(selection):
+    ga_instance = pygad.GA(num_generations=1,
+                           num_parents_mating=2,
+                           fitness_func=fitness_func,
+                           initial_population=[[1, 2], [3, 4], [5, 6], [7, 8]],
+                           parent_selection_type=selection,
+                           mutation_type=None,
+                           random_seed=17,
+                           suppress_warnings=True)
+    fitness = numpy.array([2**1500] * 4, dtype=object)
+    parents, indices = ga_instance.select_parents(fitness, 2)
+
+    assert indices.shape == (2,)
+    numpy.testing.assert_array_equal(parents, ga_instance.population[indices])

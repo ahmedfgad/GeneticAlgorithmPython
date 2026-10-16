@@ -69,7 +69,8 @@ class GA(utils.parent_selection.ParentSelection,
                  stop_criteria=None,
                  parallel_processing=None,
                  random_seed=None,
-                 logger=None):
+                 logger=None,
+                 gene_categorical=None):
         """
         The constructor of the GA class accepts all parameters required to create an instance of the GA class. It validates such parameters.
 
@@ -114,6 +115,7 @@ class GA(utils.parent_selection.ParentSelection,
         gene_space: It accepts a list of all possible values of the gene. This list is used in the mutation step. It should be used only if the gene space is a set of discrete values. No need for the 2 parameters (random_mutation_min_val and random_mutation_max_val) if the parameter gene_space exists. Added in PyGAD 2.5.0. In PyGAD 2.11.0, the gene_space can be assigned a dict.
 
         gene_constraint: It accepts a list of constraints for the genes. Each constraint is a Python function. Added in PyGAD 3.5.0.
+        gene_categorical: Marks the genes whose values are categories with no order, such as 0 for relu, 1 for tanh, and 2 for sigmoid. It accepts None (the default, every gene is ordered), a single bool applied to all genes, or a list with one bool per gene. A categorical gene must have a finite gene_space (a list of numbers, a range, or a dict with a step). For a categorical gene, polynomial mutation picks one of the other allowed values at random and SBX crossover copies the value of one parent. The other operators are not affected. Added in PyGAD 3.9.0.
         sample_size: To select a gene value that respects a constraint, this variable defines the size of the sample from which a value is selected randomly. Useful if either allow_duplicate_genes or gene_constraint is used. Added in PyGAD 3.5.0.
 
         on_start: Accepts a function/method to be called only once before the genetic algorithm starts its evolution. If function, then it must accept a single parameter representing the instance of the genetic algorithm. If method, then it must accept 2 parameters where the second one refers to the method's object. Added in PyGAD 2.6.0.
@@ -183,7 +185,8 @@ class GA(utils.parent_selection.ParentSelection,
                                      stop_criteria=stop_criteria,
                                      parallel_processing=parallel_processing,
                                      random_seed=random_seed,
-                                     logger=logger)
+                                     logger=logger,
+                                     gene_categorical=gene_categorical)
         except Exception as e:
             if hasattr(self, 'logger'):
                 self.logger.exception(e)

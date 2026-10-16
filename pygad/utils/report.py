@@ -109,7 +109,7 @@ CONFIGURATION_GROUPS = (
     ("Population", ["num_generations", "num_parents_mating", "sol_per_pop",
                     "num_genes", "init_range_low", "init_range_high",
                     "gene_type", "gene_space", "allow_duplicate_genes",
-                    "gene_constraint", "sample_size"]),
+                    "gene_constraint", "gene_categorical", "sample_size"]),
     ("Parent selection", ["parent_selection_type", "K_tournament",
                           "nsga3_num_divisions", "keep_parents",
                           "keep_elitism"]),

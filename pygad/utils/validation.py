@@ -349,6 +349,64 @@ class Validation:
                                 self._validate_callable_parameter(constraint, f'gene_constraint at index {index}', 2)
                                 for index, constraint in enumerate(gene_constraint)]
 
+    def _validate_gene_categorical(self, gene_categorical):
+        """
+        Validate the ``gene_categorical`` parameter and store one bool per
+        gene in ``self.gene_categorical``.
+
+        A categorical gene holds a choice whose values have no order. It
+        needs a finite gene space so the operators can pick another
+        allowed value.
+
+        Parameters
+        ----------
+        gene_categorical : None, bool, list, or tuple
+            None marks every gene as ordered. A single bool applies to all
+            genes. A list or tuple gives one bool per gene.
+
+        Raises
+        ------
+        TypeError
+            If the value, or one of its entries, is not a bool.
+        ValueError
+            If the list length differs from the number of genes, or a
+            categorical gene has no finite gene space.
+        """
+        boolean_types = (bool, numpy.bool_)
+        if gene_categorical is None:
+            self.gene_categorical = [False] * self.num_genes
+            return
+        if type(gene_categorical) in boolean_types:
+            gene_categorical = [bool(gene_categorical)] * self.num_genes
+        elif isinstance(gene_categorical, (list, tuple)):
+            if len(gene_categorical) != self.num_genes:
+                self.valid_parameters = False
+                raise ValueError(f"The length of gene_categorical ({len(gene_categorical)}) must equal the number of genes ({self.num_genes}).")
+            for index, entry in enumerate(gene_categorical):
+                if type(entry) not in boolean_types:
+                    self.valid_parameters = False
+                    raise TypeError(f"Each entry in gene_categorical must be a bool, but the entry at index {index} is {entry!r} of type {type(entry)}.")
+            gene_categorical = [bool(entry) for entry in gene_categorical]
+        else:
+            self.valid_parameters = False
+            raise TypeError(f"gene_categorical must be None, a bool, or a list or tuple of bools, but {type(gene_categorical)} found.")
+
+        # Every categorical gene needs a fixed list of allowed values.
+        for gene_index, is_categorical in enumerate(gene_categorical):
+            if not is_categorical:
+                continue
+            space = None
+            if self.gene_space is not None:
+                space = self.gene_space[gene_index] if self.gene_space_nested else self.gene_space
+            is_finite = (isinstance(space, range)
+                         or (isinstance(space, dict) and 'step' in space)
+                         or (isinstance(space, (list, tuple, numpy.ndarray))
+                             and not any(item is None for item in space)))
+            if not is_finite:
+                self.valid_parameters = False
+                raise ValueError(f"The gene at index {gene_index} is marked as categorical in gene_categorical, so its gene_space must be a list of numbers, a range, or a dict with a 'step'. Found: {space!r}.")
+        self.gene_categorical = gene_categorical
+
     def _validate_crossover(self, crossover_type, crossover_probability, sbx_crossover_eta=30):
         """Resolve crossover and validate its probability and finite distribution index."""
         operators = {'single_point': 'single_point_crossover', 'two_points': 'two_points_crossover',
@@ -717,7 +775,8 @@ class Validation:
                             stop_criteria,
                             parallel_processing,
                             random_seed,
-                            logger):
+                            logger,
+                            gene_categorical=None):
         """
         Validate every parameter passed to ``pygad.GA.__init__`` and
         store the parsed values on the GA instance. This method is
@@ -759,6 +818,8 @@ class Validation:
         if self.gene_space_nested and len(gene_space) != self.num_genes:
             self.valid_parameters = False
             raise ValueError(f"When gene_space is nested, its length ({len(gene_space)}) must equal the number of genes ({self.num_genes}).")
+        # Needs the validated gene_space, so it comes after the length check.
+        self._validate_gene_categorical(gene_categorical)
 
         self._validate_mutation_range(random_mutation_min_val, random_mutation_max_val)
         self.num_parents_mating = self._validate_integer_parameter(

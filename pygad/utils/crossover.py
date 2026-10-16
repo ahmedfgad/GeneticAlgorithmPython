@@ -258,6 +258,14 @@ class Crossover:
                 parent2_idx = (k + 1) % parents.shape[0]
 
             for gene_idx in range(offspring_size[1]):
+                if self.is_categorical_gene(gene_idx):
+                    # Blending two categories has no meaning, so the child
+                    # takes the value of one parent, each with equal chance.
+                    if self.numpy_random_generator.random() < 0.5:
+                        offspring[k, gene_idx] = parents[parent1_idx, gene_idx]
+                    else:
+                        offspring[k, gene_idx] = parents[parent2_idx, gene_idx]
+                    continue
                 range_min, range_max = self.get_bounded_operator_gene_range(gene_idx)
                 lower, upper = float(range_min), float(range_max)
                 p1 = float(numpy.clip(parents[parent1_idx, gene_idx], lower, upper))
