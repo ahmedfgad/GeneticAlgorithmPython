@@ -450,7 +450,7 @@ Selects the parents using the tournament selection technique.
 
 Selects the parents using the roulette wheel selection technique.
 
-Each solution gets a share of the wheel equal to its fitness divided by the total fitness. If any fitness value is negative, all values are first shifted by the smallest fitness, so the worst solution gets no share and the better solutions keep larger shares. For example, the fitness values `-1` and `-9` become `8` and `0`. If all values are equal and negative, every solution gets the same chance. Fitness values that are all zero or above are used without a shift, and a total of zero raises `ZeroDivisionError`.
+Each solution gets a share of the wheel equal to its fitness divided by the total fitness. If any fitness value is negative, all values are first shifted by the smallest fitness, so the worst solution gets no share and the better solutions keep larger shares. For example, the fitness values `-1` and `-9` become `8` and `0`. If all values are equal and negative, every solution gets the same chance. Fitness values that are all zero or above are used without a shift, and a total of zero raises `ZeroDivisionError`. Values near the float limits, such as `-sys.float_info.max` for a rejected solution, are scaled before they are shifted or added, so nothing overflows. `-inf` and `NaN` get no chance, and when any fitness is `+inf`, those solutions share every chance equally.
 
 <!-- sphinx
 (stochastic-universal-selection)=
@@ -459,7 +459,7 @@ Each solution gets a share of the wheel equal to its fitness divided by the tota
 
 Selects the parents using the stochastic universal selection technique.
 
-Each solution gets a share of the wheel equal to its fitness divided by the total fitness. If any fitness value is negative, all values are first shifted by the smallest fitness, so the worst solution gets no share and the better solutions keep larger shares. For example, the fitness values `-1` and `-9` become `8` and `0`. If all values are equal and negative, every solution gets the same chance. Fitness values that are all zero or above are used without a shift, and a total of zero raises `ZeroDivisionError`.
+Each solution gets a share of the wheel equal to its fitness divided by the total fitness. If any fitness value is negative, all values are first shifted by the smallest fitness, so the worst solution gets no share and the better solutions keep larger shares. For example, the fitness values `-1` and `-9` become `8` and `0`. If all values are equal and negative, every solution gets the same chance. Fitness values that are all zero or above are used without a shift, and a total of zero raises `ZeroDivisionError`. Values near the float limits, such as `-sys.float_info.max` for a rejected solution, are scaled before they are shifted or added, so nothing overflows. `-inf` and `NaN` get no chance, and when any fitness is `+inf`, those solutions share every chance equally.
 
 `stochastic_universal_selection(fitness, num_parents)` spaces its pointers according to the requested `num_parents`, even when this differs from `num_parents_mating`. It returns the selected parent array and its population indices. Sampling can select the same row more than once; with equal fitness, the evenly spaced pointers distribute selections as evenly as possible. For multiple objectives, the fitness values are summed per solution before constructing the wheel.
 

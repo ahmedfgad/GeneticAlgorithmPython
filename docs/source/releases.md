@@ -8,6 +8,13 @@ Release notes are listed from newest to oldest. Unreleased contains changes plan
 
 No changes yet.
 
+## PyGAD 3.9.2
+
+Release Date: October 16, 2026.
+
+1. [Roulette wheel selection](utils.md#roulette_wheel_selection) and [stochastic universal selection](utils.md#stochastic_universal_selection) no longer fail with fitness values near the float limits. In PyGAD 3.9.1, a fitness of `-sys.float_info.max`, which some libraries give a rejected solution, made the shifted values overflow, and parent selection raised `IndexError`. The values are now scaled before they are shifted or added. `-inf` and `NaN` get no chance, solutions with `+inf` fitness share every chance equally, and a population with no finite fitness raises a clear `ValueError`. Ordinary non-negative fitness keeps exactly the same probabilities.
+2. Regression tests cover the most negative float, huge values of both signs, huge positive values, infinite and missing values, and full runs with both selectors. The `pygad.utils` submodule version is `1.5.12`.
+
 ## PyGAD 3.9.1
 
 Release Date: October 16, 2026.
