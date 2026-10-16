@@ -204,13 +204,13 @@ class ParentSelection:
         if len(fitness.shape) > 1:
             # Multi-objective optimization problem.
             # Sum the fitness values of each solution to reduce the fitness from M-D array to just 1D array.
-            fitness = numpy.sum(fitness, axis=1)
+            fitness = numpy.sum(fitness, axis=1, dtype=numpy.result_type(fitness.dtype, float))
         else:
             # Single-objective optimization problem.
             pass
 
         # Reaching this step confirms that fitness is a 1D array.
-        fitness_sum = numpy.sum(fitness)
+        fitness_sum = numpy.sum(fitness, dtype=numpy.result_type(fitness.dtype, float))
         if fitness_sum == 0:
             self.logger.error("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
             raise ZeroDivisionError("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
@@ -313,13 +313,13 @@ class ParentSelection:
         if len(fitness.shape) > 1:
             # Multi-objective optimization problem.
             # Sum the fitness values of each solution to reduce the fitness from M-D array to just 1D array.
-            fitness = numpy.sum(fitness, axis=1)
+            fitness = numpy.sum(fitness, axis=1, dtype=numpy.result_type(fitness.dtype, float))
         else:
             # Single-objective optimization problem.
             pass
 
         # Reaching this step confirms that fitness is a 1D array.
-        fitness_sum = numpy.sum(fitness)
+        fitness_sum = numpy.sum(fitness, dtype=numpy.result_type(fitness.dtype, float))
         if fitness_sum == 0:
             self.logger.error("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
             raise ZeroDivisionError("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
