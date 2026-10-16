@@ -262,6 +262,50 @@ python examples/example_gene_space.py
 
 <!-- /python-examples -->
 
+## Categorical Genes
+
+PyGAD 3.9.0 adds the `gene_categorical` parameter to the constructor of the `pygad.GA` class. It marks the genes whose values are categories with no order.
+
+For example, an activation function can be stored as `0` for `relu`, `1` for `tanh`, and `2` for `sigmoid`. The numbers are only labels. `tanh` is not between `relu` and `sigmoid`.
+
+SBX crossover and polynomial mutation treat a gene value as a point on a number line. They move it to nearby values. This is right for a learning rate or a number of neurons, but it has no meaning for a category. For a categorical gene, these two operators work differently:
+
+1. Polynomial mutation replaces the value with one of the other allowed values. Each of them is equally likely. `polynomial_mutation_eta` is not used for this gene.
+2. SBX crossover gives the child the value of one of the two parents. Each parent is equally likely.
+
+The other crossover and mutation types already copy or pick allowed values, so `gene_categorical` does not change them.
+
+The `gene_categorical` parameter accepts:
+
+1. `None`: The default. Every gene is ordered, which is the behavior before PyGAD 3.9.0.
+2. A single `bool`: Applies to all genes.
+3. A list or tuple with one `bool` per gene.
+
+A categorical gene must have a finite gene space: a list of numbers, a `range`, or a dictionary with a `step`. A list that has `None` is not accepted because `None` stands for any value in the initialization range. Otherwise, PyGAD raises a `ValueError`.
+
+This example has a continuous learning rate, an integer number of neurons, and a categorical activation function.
+
+```python
+import pygad
+
+def fitness_func(ga_instance, solution, solution_idx):
+    learning_rate, num_neurons, activation = solution
+    ...
+
+ga_instance = pygad.GA(num_generations=20,
+                       num_parents_mating=4,
+                       sol_per_pop=10,
+                       num_genes=3,
+                       fitness_func=fitness_func,
+                       gene_space=[{'low': 0.0001, 'high': 0.1},
+                                   {'low': 16, 'high': 129, 'step': 1},
+                                   [0, 1, 2]],
+                       gene_type=[float, int, int],
+                       gene_categorical=[False, False, True],
+                       crossover_type="sbx",
+                       mutation_type="polynomial")
+```
+
 <!-- sphinx
 (gene-constraints-guide)=
 -->

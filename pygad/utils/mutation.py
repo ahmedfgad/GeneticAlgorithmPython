@@ -416,6 +416,11 @@ class Mutation:
             selected_any_gene = False
             for gene_index in gene_indices:
                 selected_any_gene = True
+                if self.is_categorical_gene(gene_index):
+                    # A categorical value has no neighbors on a number line,
+                    # so pick one of the other allowed values at random.
+                    solution[gene_index] = self.pick_other_categorical_value(gene_index, solution[gene_index])
+                    continue
                 lower, upper = map(float, self.get_bounded_operator_gene_range(gene_index))
                 if upper - lower < 1e-14:
                     solution[gene_index] = self.convert_bounded_operator_gene_value(gene_index, lower)

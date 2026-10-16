@@ -759,6 +759,82 @@ class Helper:
             return min(space, key=lambda allowed_value: abs(float(allowed_value) - value))
         return None
 
+    def is_categorical_gene(self, gene_index):
+        """
+        Check whether a gene is marked as categorical in ``gene_categorical``.
+
+        Parameters
+        ----------
+        gene_index : int
+            Index of the gene.
+
+        Returns
+        -------
+        bool
+            True when the gene is categorical. A GA instance saved by an
+            older PyGAD version has no ``gene_categorical`` attribute, so
+            its genes are treated as ordered.
+        """
+        gene_categorical = getattr(self, 'gene_categorical', None)
+        if gene_categorical is None:
+            return False
+        return bool(gene_categorical[gene_index])
+
+    def pick_other_categorical_value(self, gene_index, current_value):
+        """
+        Pick one allowed value of a categorical gene, other than its
+        current value, with every other value equally likely.
+
+        Parameters
+        ----------
+        gene_index : int
+            Index of the categorical gene. Its gene space is finite, which
+            ``gene_categorical`` validation guarantees.
+        current_value : number
+            The value the gene has now.
+
+        Returns
+        -------
+        number
+            The new value. When the gene has only one allowed value, that
+            value is returned. When the current value is not one of the
+            allowed values, any allowed value can be returned.
+        """
+        space = self.gene_space[gene_index] if self.gene_space_nested else self.gene_space
+        if isinstance(space, range) or isinstance(space, dict):
+            # Evenly spaced values: work with positions so a long range is
+            # never listed in full.
+            count = self._finite_gene_space_length(space)
+            low = space.start if isinstance(space, range) else space['low']
+            step = space.step if isinstance(space, range) else space['step']
+            current_position = int(round((float(current_value) - low) / step))
+            if not (0 <= current_position < count
+                    and math.isclose(float(self._finite_gene_space_value(space, current_position)), float(current_value))):
+                current_position = None
+            allowed_value_at = lambda position: self._finite_gene_space_value(space, position)
+        else:
+            count = len(space)
+            current_position = None
+            for position, allowed_value in enumerate(space):
+                if float(allowed_value) == float(current_value):
+                    current_position = position
+                    break
+            allowed_value_at = lambda position: space[position]
+
+        if count == 1:
+            new_position = 0
+        elif current_position is None:
+            new_position = int(self.numpy_random_generator.randint(0, count))
+        else:
+            # Draw from the other count - 1 positions, then skip over the
+            # current position so it can never be chosen.
+            new_position = int(self.numpy_random_generator.randint(0, count - 1))
+            if new_position >= current_position:
+                new_position += 1
+        # The chosen value is already allowed. The conversion only applies
+        # the gene type, for example turning 2.0 into 2 for an int gene.
+        return self.convert_bounded_operator_gene_value(gene_index, allowed_value_at(new_position))
+
     def is_bounded_operator_gene_value_in_space(self, gene_index, value):
         """Check a bounded operator against the original space, including None entries."""
         if self.gene_space is None:

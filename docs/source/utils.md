@@ -266,7 +266,7 @@ Applies simulated binary crossover for numeric genes. The `sbx_crossover_eta` pa
 
 For each crossed gene, SBX produces two possible values on opposite sides of the parents' midpoint. PyGAD selects either value with probability `0.5`, avoiding the downward bias from always selecting the lower child. Equal parent values are copied unchanged.
 
-For an integer gene, the child value is rounded to the nearest integer. For a gene with a finite gene space, it moves to the nearest allowed value.
+For an integer gene, the child value is rounded to the nearest integer. For a gene with a finite gene space, it moves to the nearest allowed value. For a gene marked in [`gene_categorical`](gene_values.md#categorical-genes), the child copies the value of one parent, each with probability `0.5`.
 
 ## `pygad.utils.mutation` Submodule
 
@@ -353,7 +353,7 @@ The count-based and probability-based adaptive mutation methods use the same com
 
 Applies polynomial mutation to the passed two-dimensional offspring array in place and returns it. Each gene is selected with `mutation_probability`, or with probability `1 / num_genes` when that parameter is `None`. `polynomial_mutation_eta` controls the size of the change; higher values favor smaller changes. Bounds come from `init_range_low` and `init_range_high` for each gene, and mutated values are clipped to those bounds. Genes whose range has effectively zero width are skipped. When `allow_duplicate_genes=False`, the existing random duplicate-resolution helper is applied after changing a gene.
 
-For an integer gene, the new value is rounded to the nearest integer. For a gene with a finite gene space, it moves to the nearest allowed value.
+For an integer gene, the new value is rounded to the nearest integer. For a gene with a finite gene space, it moves to the nearest allowed value. For a gene marked in [`gene_categorical`](gene_values.md#categorical-genes), the new value is one of the other allowed values, each equally likely, and `polynomial_mutation_eta` is not used.
 
 ### Mutation Helper Methods
 
