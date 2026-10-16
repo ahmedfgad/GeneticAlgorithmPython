@@ -210,12 +210,7 @@ class ParentSelection:
             pass
 
         # Reaching this step confirms that fitness is a 1D array.
-        fitness_sum = numpy.sum(fitness, dtype=numpy.result_type(fitness.dtype, float))
-        if fitness_sum == 0:
-            self.logger.error("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
-            raise ZeroDivisionError("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
-
-        probs = fitness / fitness_sum
+        probs = self.fitness_selection_probabilities(fitness)
 
         probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(),
                                                                       num_parents=num_parents)
@@ -233,6 +228,52 @@ class ParentSelection:
         parents[:, :] = self.population[parents_indices, :].copy()
 
         return parents, parents_indices
+
+    def fitness_selection_probabilities(self, fitness):
+        """
+        Turn 1D fitness values into the selection probabilities used by
+        roulette wheel and stochastic universal selection.
+
+        Each probability is the fitness divided by the total fitness. When
+        any fitness value is negative, this division would flip the order
+        and favor the worst solutions. So the values are first shifted by
+        the smallest fitness, which makes the worst solution 0 and keeps
+        the better solutions favored. Fitness values that are all zero or
+        above are used as they are.
+
+        Parameters
+        ----------
+        fitness : numpy.ndarray
+            A 1D array of fitness values, one per solution.
+
+        Returns
+        -------
+        probs : numpy.ndarray
+            The selection probability of each solution.
+
+        Raises
+        ------
+        ZeroDivisionError
+            If no fitness value is negative and the sum of fitness values
+            is zero.
+        """
+        # A wide accumulator avoids overflow. Object arrays of Python
+        # integers stay exact.
+        accumulator_dtype = numpy.result_type(fitness.dtype, float)
+        weights = fitness
+        if numpy.min(fitness) < 0:
+            weights = numpy.asarray(fitness, dtype=accumulator_dtype)
+            weights = weights - numpy.min(weights)
+            if not numpy.any(weights):
+                # Every solution has the same fitness, so every solution
+                # gets the same chance.
+                return numpy.full(weights.shape[0], 1.0 / weights.shape[0])
+
+        fitness_sum = numpy.sum(weights, dtype=accumulator_dtype)
+        if fitness_sum == 0:
+            self.logger.error("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
+            raise ZeroDivisionError("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
+        return weights / fitness_sum
 
     def wheel_cumulative_probs(self, probs, num_parents):
         """
@@ -319,12 +360,7 @@ class ParentSelection:
             pass
 
         # Reaching this step confirms that fitness is a 1D array.
-        fitness_sum = numpy.sum(fitness, dtype=numpy.result_type(fitness.dtype, float))
-        if fitness_sum == 0:
-            self.logger.error("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
-            raise ZeroDivisionError("Cannot proceed because the sum of fitness values is zero. Cannot divide by zero.")
-
-        probs = fitness / fitness_sum
+        probs = self.fitness_selection_probabilities(fitness)
 
         probs_start, probs_end, parents = self.wheel_cumulative_probs(probs=probs.copy(),
                                                                       num_parents=num_parents)
