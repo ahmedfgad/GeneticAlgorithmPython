@@ -33,7 +33,6 @@ The library is under active development, and new features are added often. Pleas
 
 You can donate to PyGAD through:
 
-- [Credit/Debit Card](https://donate.stripe.com/eVa5kO866elKgM0144): https://donate.stripe.com/eVa5kO866elKgM0144
 - [Open Collective](https://opencollective.com/pygad): [opencollective.com/pygad](https://opencollective.com/pygad)
 - PayPal: Use either this link [paypal.me/ahmedfgad](https://paypal.me/ahmedfgad) or the e-mail address ahmed.f.gad@gmail.com
 - Interac e-Transfer: Use the e-mail address ahmed.f.gad@gmail.com
