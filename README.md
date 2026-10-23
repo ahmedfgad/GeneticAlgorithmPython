@@ -30,7 +30,7 @@ The library is under active development and more features are added regularly. I
 
 # Installation
 
-The current release is [PyGAD 3.8.1](https://github.com/ahmedfgad/GeneticAlgorithmPython/releases/tag/3.8.1), dated October 11, 2026. Read the [release notes](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/3.8.1/docs/source/releases.md#pygad-381) for its fixes and compatibility changes. PyGAD requires Python 3.8 or newer.
+The current release is [PyGAD 3.9.2](https://github.com/ahmedfgad/GeneticAlgorithmPython/releases/tag/3.9.2), dated October 16, 2026. Read the [release notes](https://github.com/ahmedfgad/GeneticAlgorithmPython/blob/3.9.2/docs/source/releases.md#pygad-392) for its fixes and compatibility changes. PyGAD requires Python 3.8 or newer.
 
 Watch the [PyGAD 3.8.0 release video on YouTube](https://youtu.be/8pdIiMAMLUM).
 
