@@ -5,6 +5,8 @@ The methods here are used by both NSGA-II and NSGA-III. They live in
 this module so neither algorithm has to depend on the other.
 """
 
+import operator
+
 import numpy
 
 
@@ -35,8 +37,46 @@ class NSGA:
             ``curr_solutions`` dominates. These form the current Pareto
             front.
         """
+        def _fitness_rows(solutions):
+            # Return the fitness vectors as plain Python lists when they
+            # are all 1D numeric numpy arrays of the same dtype and length.
+            # Otherwise return None so the generic loop below is used.
+            if type(solutions) is not list or len(solutions) < 2:
+                return None
+            head = solutions[0]
+            first = head[1] if type(head) is tuple and len(head) == 2 else None
+            if (type(first) is not numpy.ndarray or first.ndim != 1
+                    or first.size == 0 or first.dtype.kind not in "biuf"):
+                return None
+            rows = []
+            for sol in solutions:
+                if type(sol) is not tuple or len(sol) != 2:
+                    return None
+                vector = sol[1]
+                if (type(vector) is not numpy.ndarray
+                        or vector.dtype != first.dtype
+                        or vector.shape != first.shape):
+                    return None
+                rows.append(vector.tolist())
+            return rows
+
         dominated_set = []
         non_dominated_set = []
+
+        rows = _fitness_rows(curr_solutions)
+        if rows is not None:
+            # The vectors are tiny, so plain Python comparisons are cheaper
+            # than numpy calls. PyGAD maximizes, so "other" dominates "row"
+            # when all values are >= and the two rows are not equal.
+            for sol, row in zip(curr_solutions, rows):
+                for other in rows:
+                    if other != row and all(map(operator.ge, other, row)):
+                        dominated_set.append(sol)
+                        break
+                else:
+                    non_dominated_set.append(sol)
+            return dominated_set, non_dominated_set
+
         for idx1, sol1 in enumerate(curr_solutions):
             is_not_dominated = True
             for idx2, sol2 in enumerate(curr_solutions):
