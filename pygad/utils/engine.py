@@ -751,8 +751,7 @@ class GAEngine(FitnessEvaluation):
         # If self.crossover_type=None, then no crossover is applied and thus no offspring will be created in the next generations. The next generation will use the solutions in the current population.
         if self.crossover_type is None:
             if self.keep_elitism == 0:
-                num_parents_to_keep = self.num_parents_mating if self.keep_parents == - 1 else self.keep_parents
-                if self.num_offspring <= num_parents_to_keep:
+                if self.num_offspring <= self.last_generation_parents.shape[0]:
                     self.last_generation_offspring_crossover = self.last_generation_parents[0:self.num_offspring]
                 else:
                     self.last_generation_offspring_crossover = numpy.concatenate(
@@ -764,6 +763,10 @@ class GAEngine(FitnessEvaluation):
                                                                               num_parents=self.keep_elitism)
                 if self.num_offspring <= self.keep_elitism:
                     self.last_generation_offspring_crossover = self.last_generation_parents[0:self.num_offspring]
+                    if self.last_generation_offspring_crossover.shape[0] < self.num_offspring:
+                        self.last_generation_offspring_crossover = numpy.concatenate(
+                            (self.last_generation_offspring_crossover,
+                             self.population[0:(self.num_offspring - self.last_generation_offspring_crossover.shape[0])]))
                 else:
                     self.last_generation_offspring_crossover = numpy.concatenate(
                         (self.last_generation_elitism, self.population[0:(self.num_offspring - self.last_generation_elitism.shape[0])]))
