@@ -1,25 +1,5 @@
 # PyGAD in Other Languages
 
-## French
-
-[Cómo los algoritmos genéticos pueden competir con el descenso de gradiente y el backprop](https://www.hebergementwebs.com/nouvelles/comment-les-algorithmes-genetiques-peuvent-rivaliser-avec-la-descente-de-gradient-et-le-backprop)
-
-Bien que la manière standard d'entraîner les réseaux de neurones soit la descente de gradient et la rétropropagation, il y a d'autres joueurs dans le jeu. L'un d'eux est les algorithmes évolutionnaires, tels que les algorithmes génétiques.
-
-Utiliser un algorithme génétique pour former un réseau de neurones simple pour résoudre le OpenAI CartPole Jeu. Dans cet article, nous allons former un simple réseau de neurones pour résoudre le OpenAI CartPole . J'utiliserai PyTorch et PyGAD .
-
-[![Cómo los algoritmos genéticos pueden competir con el descenso de gradiente y el backprop](images/111009275-3178d180-8361-11eb-9e86-7fb1519acde7.png)](https://www.hebergementwebs.com/nouvelles/comment-les-algorithmes-genetiques-peuvent-rivaliser-avec-la-descente-de-gradient-et-le-backprop)
-
-## Spanish
-
-[Cómo los algoritmos genéticos pueden competir con el descenso de gradiente y el backprop](https://www.hebergementwebs.com/noticias/como-los-algoritmos-geneticos-pueden-competir-con-el-descenso-de-gradiente-y-el-backprop)
-
-Aunque la forma estandar de entrenar redes neuronales es el descenso de gradiente y la retropropagacion, hay otros jugadores en el juego, uno de ellos son los algoritmos evolutivos, como los algoritmos geneticos.
-
-Usa un algoritmo genetico para entrenar una red neuronal simple para resolver el Juego OpenAI CartPole. En este articulo, entrenaremos una red neuronal simple para resolver el OpenAI CartPole . Usare PyTorch y PyGAD .
-
-[![Cómo los algoritmos genéticos pueden competir con el descenso de gradiente y el backprop](images/111009257-232ab580-8361-11eb-99a5-7226efbc3065.png)](https://www.hebergementwebs.com/noticias/como-los-algoritmos-geneticos-pueden-competir-con-el-descenso-de-gradiente-y-el-backprop)
-
 ## Korean
 
 ### [[PyGAD] Python 에서 Genetic Algorithm 을 사용해보기](https://data-newbie.tistory.com/m/685)
@@ -63,6 +43,16 @@ A hálózatok tenyésztéséhez a [PyGAD](https://pygad.readthedocs.io/en/latest
 Maga a PyGAD egy teljesen általános genetikus algoritmusok futtatására képes rendszer. Ennek a kiterjesztése a KerasGA, ami az általános motor Tensorflow (Keras) neurális hálókon történő futtatását segíti. A 47. sorban létrehozott KerasGA objektum ennek a kiterjesztésnek a része és arra szolgál, hogy a paraméterként átadott modellből a második paraméterben megadott számosságú populációt hozzon létre. Mivel a hálózatunk 386 állítható paraméterrel rendelkezik, ezért a DNS-ünk itt 386 elemből fog állni. A populáció mérete 10 egyed, így a kezdő populációnk egy 10x386 elemű mátrix lesz. Ezt adjuk át az 51. sorban az initial_population paraméterben.
 
 [![](images/101267295-c74c0180-375f-11eb-9ad0-f8e37bd796ce.png)](https://thebojda.medium.com/tensorflow-alapoz%C3%B3-10-24f7767d4a2c)
+
+## Persian
+
+### [الگوریتم ژنتیک در پایتون چیست و چطور پیاده‌سازی می‌شود؟](https://quera.org/blog/genetic-algorithm-in-python/)
+
+A guide on the Quera blog to the genetic algorithm in Python that uses PyGAD to solve optimization problems, from installing the library to writing the fitness function.
+
+### [الگوریتم ژنتیک در پایتون: اجزا، مراحل پیاده سازی و مثال](https://lancersara.com/genetic-algorithm-in-python/)
+
+An article on LancerSara that explains the parts of the genetic algorithm and the steps to implement it in Python, with a section on PyGAD.
 
 ## Russian
 
