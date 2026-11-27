@@ -5,6 +5,8 @@ The methods here are used by both NSGA-II and NSGA-III. They live in
 this module so neither algorithm has to depend on the other.
 """
 
+import operator
+
 import numpy
 
 
@@ -35,23 +37,20 @@ class NSGA:
             ``curr_solutions`` dominates. These form the current Pareto
             front.
         """
+        # The fitness vectors are tiny, so plain Python comparisons are
+        # cheaper than numpy calls on every pair of solutions.
+        rows = [numpy.asarray(sol[1]).tolist() for sol in curr_solutions]
         dominated_set = []
         non_dominated_set = []
-        for idx1, sol1 in enumerate(curr_solutions):
-            is_not_dominated = True
-            for idx2, sol2 in enumerate(curr_solutions):
-                if idx1 == idx2:
-                    continue
-                two_solutions = numpy.array(list(zip(sol1[1], sol2[1])))
+        for sol, row in zip(curr_solutions, rows):
+            for other in rows:
                 # PyGAD maximizes, so domination uses >= and >.
-                greater_or_equal = two_solutions[:, 1] >= two_solutions[:, 0]
-                strictly_greater = two_solutions[:, 1] > two_solutions[:, 0]
-                if greater_or_equal.all() and strictly_greater.any():
-                    is_not_dominated = False
-                    dominated_set.append(sol1)
+                if (all(map(operator.ge, other, row))
+                        and any(map(operator.gt, other, row))):
+                    dominated_set.append(sol)
                     break
-            if is_not_dominated:
-                non_dominated_set.append(sol1)
+            else:
+                non_dominated_set.append(sol)
         return dominated_set, non_dominated_set
 
     def non_dominated_sorting(self, fitness):
